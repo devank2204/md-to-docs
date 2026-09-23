@@ -1,0 +1,16 @@
+{
+  "name": "@folio/renderers",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@folio/compiler-core": "workspace:*",
+    "@folio/capability-graph": "workspace:*",
+    "docx": "^8.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@folio/compiler-core",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.0",
+    "mdast-util-to-string": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "typescript": "^5.0.0"
+  }
+}
