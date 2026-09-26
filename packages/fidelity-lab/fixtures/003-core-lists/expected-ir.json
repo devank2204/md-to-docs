@@ -1,11 +1,13 @@
 {
   "version": "1.0.0",
+  "metadata": {},
   "blocks": [
     {
       "type": "List",
       "ordered": false,
       "items": [
         {
+          "checked": null,
           "blocks": [
             {
               "type": "Paragraph",
@@ -14,11 +16,20 @@
                   "type": "Text",
                   "value": "Unordered list item 1"
                 }
-              ]
+              ],
+              "position": {
+                "startLine": 1,
+                "startColumn": 3,
+                "endLine": 1,
+                "endColumn": 24,
+                "startOffset": 2,
+                "endOffset": 23
+              }
             }
           ]
         },
         {
+          "checked": null,
           "blocks": [
             {
               "type": "Paragraph",
@@ -27,13 +38,22 @@
                   "type": "Text",
                   "value": "Unordered list item 2"
                 }
-              ]
+              ],
+              "position": {
+                "startLine": 2,
+                "startColumn": 3,
+                "endLine": 2,
+                "endColumn": 24,
+                "startOffset": 26,
+                "endOffset": 47
+              }
             },
             {
               "type": "List",
               "ordered": false,
               "items": [
                 {
+                  "checked": null,
                   "blocks": [
                     {
                       "type": "Paragraph",
@@ -42,11 +62,20 @@
                           "type": "Text",
                           "value": "Nested unordered item"
                         }
-                      ]
+                      ],
+                      "position": {
+                        "startLine": 3,
+                        "startColumn": 5,
+                        "endLine": 3,
+                        "endColumn": 26,
+                        "startOffset": 52,
+                        "endOffset": 73
+                      }
                     }
                   ]
                 },
                 {
+                  "checked": null,
                   "blocks": [
                     {
                       "type": "Paragraph",
@@ -55,15 +84,32 @@
                           "type": "Text",
                           "value": "Another nested item"
                         }
-                      ]
+                      ],
+                      "position": {
+                        "startLine": 4,
+                        "startColumn": 5,
+                        "endLine": 4,
+                        "endColumn": 24,
+                        "startOffset": 78,
+                        "endOffset": 97
+                      }
                     }
                   ]
                 }
-              ]
+              ],
+              "position": {
+                "startLine": 3,
+                "startColumn": 3,
+                "endLine": 4,
+                "endColumn": 24,
+                "startOffset": 50,
+                "endOffset": 97
+              }
             }
           ]
         },
         {
+          "checked": null,
           "blocks": [
             {
               "type": "Paragraph",
@@ -72,11 +118,27 @@
                   "type": "Text",
                   "value": "Unordered list item 3"
                 }
-              ]
+              ],
+              "position": {
+                "startLine": 5,
+                "startColumn": 3,
+                "endLine": 5,
+                "endColumn": 24,
+                "startOffset": 100,
+                "endOffset": 121
+              }
             }
           ]
         }
-      ]
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 5,
+        "endColumn": 24,
+        "startOffset": 0,
+        "endOffset": 121
+      }
     },
     {
       "type": "List",
@@ -84,6 +146,7 @@
       "start": 1,
       "items": [
         {
+          "checked": null,
           "blocks": [
             {
               "type": "Paragraph",
@@ -92,11 +155,20 @@
                   "type": "Text",
                   "value": "Ordered list item 1"
                 }
-              ]
+              ],
+              "position": {
+                "startLine": 7,
+                "startColumn": 4,
+                "endLine": 7,
+                "endColumn": 23,
+                "startOffset": 126,
+                "endOffset": 145
+              }
             }
           ]
         },
         {
+          "checked": null,
           "blocks": [
             {
               "type": "Paragraph",
@@ -105,11 +177,20 @@
                   "type": "Text",
                   "value": "Ordered list item 2"
                 }
-              ]
+              ],
+              "position": {
+                "startLine": 8,
+                "startColumn": 4,
+                "endLine": 8,
+                "endColumn": 23,
+                "startOffset": 149,
+                "endOffset": 168
+              }
             }
           ]
         },
         {
+          "checked": null,
           "blocks": [
             {
               "type": "Paragraph",
@@ -118,11 +199,28 @@
                   "type": "Text",
                   "value": "Ordered list item 3"
                 }
-              ]
+              ],
+              "position": {
+                "startLine": 9,
+                "startColumn": 4,
+                "endLine": 9,
+                "endColumn": 23,
+                "startOffset": 172,
+                "endOffset": 191
+              }
             }
           ]
         }
-      ]
+      ],
+      "position": {
+        "startLine": 7,
+        "startColumn": 1,
+        "endLine": 9,
+        "endColumn": 23,
+        "startOffset": 123,
+        "endOffset": 191
+      }
     }
-  ]
+  ],
+  "assets": []
 }

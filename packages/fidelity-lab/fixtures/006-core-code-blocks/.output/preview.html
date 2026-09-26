@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>mdtodocs.com Fidelity Lab – Preview</title>
+  <style>
+    body { font-family: 'Newsreader', Georgia, serif; max-width: 816px; margin: 40px auto; padding: 20px; color: #1a1a1a; line-height: 1.6; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Newsreader', Georgia, serif; }
+    code, pre { font-family: 'JetBrains Mono', Consolas, monospace; }
+  </style>
+</head>
+<body>
+<p>Simple unfenced code:</p><div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin:16px 0;overflow-x:auto;">
+        <pre style="margin:0;white-space:pre;overflow-x:auto;"><code style="font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.5;color:#1f2937;">const x = 42;</code></pre>
+      </div><p>Fenced code without language:</p><div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin:16px 0;overflow-x:auto;">
+        <pre style="margin:0;white-space:pre;overflow-x:auto;"><code style="font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.5;color:#1f2937;">function hello() {
+  console.log(&quot;Hello, world!&quot;);
+}</code></pre>
+      </div><p>TypeScript code:</p><div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin:16px 0;overflow-x:auto;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">typescript</div><pre style="margin:0;white-space:pre;overflow-x:auto;"><code style="font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.5;color:#1f2937;">interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+async function authenticate(credentials: LoginRequest): Promise&lt;AuthToken&gt; {
+  const response = await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Authentication failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}</code></pre>
+      </div><p>Python code:</p><div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin:16px 0;overflow-x:auto;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">python</div><pre style="margin:0;white-space:pre;overflow-x:auto;"><code style="font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.5;color:#1f2937;">def fibonacci(n: int) -&gt; list[int]:
+    &quot;&quot;&quot;Generate fibonacci sequence up to n terms.&quot;&quot;&quot;
+    if n &lt;= 0:
+        return []
+    sequence = [0, 1]
+    for _ in range(2, n):
+        sequence.append(sequence[-1] + sequence[-2])
+    return sequence[:n]</code></pre>
+      </div><p>SQL code:</p><div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin:16px 0;overflow-x:auto;">
+        <div style="font-size:11px;color:#6b7280;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">sql</div><pre style="margin:0;white-space:pre;overflow-x:auto;"><code style="font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.5;color:#1f2937;">SELECT u.name, COUNT(o.id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.created_at &gt; '2024-01-01'
+GROUP BY u.name
+HAVING COUNT(o.id) &gt; 5
+ORDER BY order_count DESC;</code></pre>
+      </div>
+</body>
+</html>

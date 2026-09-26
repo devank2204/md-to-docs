@@ -1,4 +1,4 @@
-# FOLIO Engineering Architecture
+# mdtodocs.com Engineering Architecture
 
 ## Architecture
 
@@ -35,7 +35,7 @@ Relevant ecosystem:
 - remark-gfm
 - remark-math
 
-The parser should produce a semantic source tree which is then normalized into FOLIO IR.
+The parser should produce a semantic source tree which is then normalized into mdtodocs.com IR.
 
 ---
 
@@ -196,7 +196,7 @@ Study:
 - renderer patterns
 - style systems
 
-Then integrate only what fits FOLIO's architecture and licensing requirements.
+Then integrate only what fits mdtodocs.com's architecture and licensing requirements.
 
 ---
 

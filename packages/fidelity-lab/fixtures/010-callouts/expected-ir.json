@@ -1,0 +1,226 @@
+{
+  "version": "1.0.0",
+  "metadata": {},
+  "blocks": [
+    {
+      "type": "Callout",
+      "calloutType": "note",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "This is important background information that the reader should be aware of."
+            }
+          ],
+          "position": {
+            "startLine": 1,
+            "startColumn": 3,
+            "endLine": 2,
+            "endColumn": 79,
+            "startOffset": 2,
+            "endOffset": 88
+          }
+        }
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 2,
+        "endColumn": 79,
+        "startOffset": 0,
+        "endOffset": 88
+      }
+    },
+    {
+      "type": "Callout",
+      "calloutType": "warning",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "Never commit API keys or secrets to version control."
+            }
+          ],
+          "position": {
+            "startLine": 4,
+            "startColumn": 3,
+            "endLine": 5,
+            "endColumn": 55,
+            "startOffset": 92,
+            "endOffset": 157
+          }
+        }
+      ],
+      "position": {
+        "startLine": 4,
+        "startColumn": 1,
+        "endLine": 5,
+        "endColumn": 55,
+        "startOffset": 90,
+        "endOffset": 157
+      }
+    },
+    {
+      "type": "Callout",
+      "calloutType": "tip",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "Use environment variables for configuration that changes between deployments."
+            }
+          ],
+          "position": {
+            "startLine": 7,
+            "startColumn": 3,
+            "endLine": 8,
+            "endColumn": 80,
+            "startOffset": 161,
+            "endOffset": 247
+          }
+        }
+      ],
+      "position": {
+        "startLine": 7,
+        "startColumn": 1,
+        "endLine": 8,
+        "endColumn": 80,
+        "startOffset": 159,
+        "endOffset": 247
+      }
+    },
+    {
+      "type": "Callout",
+      "calloutType": "caution",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "This operation will permanently delete all user data. There is no undo."
+            }
+          ],
+          "position": {
+            "startLine": 10,
+            "startColumn": 3,
+            "endLine": 11,
+            "endColumn": 74,
+            "startOffset": 251,
+            "endOffset": 335
+          }
+        }
+      ],
+      "position": {
+        "startLine": 10,
+        "startColumn": 1,
+        "endLine": 11,
+        "endColumn": 74,
+        "startOffset": 249,
+        "endOffset": 335
+      }
+    },
+    {
+      "type": "Callout",
+      "calloutType": "important",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "All API endpoints require authentication after v2.0."
+            }
+          ],
+          "position": {
+            "startLine": 13,
+            "startColumn": 3,
+            "endLine": 14,
+            "endColumn": 55,
+            "startOffset": 339,
+            "endOffset": 406
+          }
+        }
+      ],
+      "position": {
+        "startLine": 13,
+        "startColumn": 1,
+        "endLine": 14,
+        "endColumn": 55,
+        "startOffset": 337,
+        "endOffset": 406
+      }
+    },
+    {
+      "type": "Callout",
+      "calloutType": "warning",
+      "title": "Warning",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": " The database migration is irreversible. Back up your data first."
+            }
+          ],
+          "position": {
+            "startLine": 16,
+            "startColumn": 3,
+            "endLine": 16,
+            "endColumn": 80,
+            "startOffset": 410,
+            "endOffset": 487
+          }
+        }
+      ],
+      "position": {
+        "startLine": 16,
+        "startColumn": 1,
+        "endLine": 16,
+        "endColumn": 80,
+        "startOffset": 408,
+        "endOffset": 487
+      }
+    },
+    {
+      "type": "Callout",
+      "calloutType": "note",
+      "title": "Note",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": " This feature is only available in the Enterprise plan."
+            }
+          ],
+          "position": {
+            "startLine": 18,
+            "startColumn": 3,
+            "endLine": 18,
+            "endColumn": 67,
+            "startOffset": 491,
+            "endOffset": 555
+          }
+        }
+      ],
+      "position": {
+        "startLine": 18,
+        "startColumn": 1,
+        "endLine": 18,
+        "endColumn": 67,
+        "startOffset": 489,
+        "endOffset": 555
+      }
+    }
+  ],
+  "assets": []
+}

@@ -1,8 +1,8 @@
-# FOLIO Fidelity Benchmark
+# mdtodocs.com Fidelity Benchmark
 
 ## Purpose
 
-Build a permanent corpus that measures whether FOLIO actually produces destination-ready documents.
+Build a permanent corpus that measures whether mdtodocs.com actually produces destination-ready documents.
 
 The benchmark is part of the product moat.
 
@@ -152,7 +152,7 @@ Benchmark against:
 - Pandoc
 - MarkCopy
 - representative Markdown→DOCX implementations
-- FOLIO
+- mdtodocs.com
 
 Do not use competitor scores as marketing claims without rigorous methodology.
 
@@ -190,7 +190,7 @@ Does the destination behave correctly when edited?
 
 ## Degradation
 
-When perfect preservation is impossible, did FOLIO make the best controlled transformation and explain it?
+When perfect preservation is impossible, did mdtodocs.com make the best controlled transformation and explain it?
 
 ---
 

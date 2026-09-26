@@ -1,0 +1,1179 @@
+{
+  "version": "1.0.0",
+  "metadata": {},
+  "blocks": [
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Simple table:"
+        }
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 14,
+        "startOffset": 0,
+        "endOffset": 13
+      }
+    },
+    {
+      "type": "Table",
+      "headerRows": 1,
+      "rows": [
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Name"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Role"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Team"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Alice"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Engineer"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Platform"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Bob"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Designer"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Product"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Carol"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Manager"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Engineering"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "align": [
+        null,
+        null,
+        null
+      ],
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 7,
+        "endColumn": 34,
+        "startOffset": 15,
+        "endOffset": 152
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Table with alignment:"
+        }
+      ],
+      "position": {
+        "startLine": 9,
+        "startColumn": 1,
+        "endLine": 9,
+        "endColumn": 22,
+        "startOffset": 154,
+        "endOffset": 175
+      }
+    },
+    {
+      "type": "Table",
+      "headerRows": 1,
+      "rows": [
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Left"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Center"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Right"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "L1"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "C1"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "R1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "L2"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "C2"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "R2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "L3"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "C3"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "R3"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "align": [
+        "left",
+        "center",
+        "right"
+      ],
+      "position": {
+        "startLine": 11,
+        "startColumn": 1,
+        "endLine": 15,
+        "endColumn": 17,
+        "startOffset": 177,
+        "endOffset": 277
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Table with inline formatting:"
+        }
+      ],
+      "position": {
+        "startLine": 17,
+        "startColumn": 1,
+        "endLine": 17,
+        "endColumn": 30,
+        "startOffset": 279,
+        "endOffset": 308
+      }
+    },
+    {
+      "type": "Table",
+      "headerRows": 1,
+      "rows": [
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Feature"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Status"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Notes"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Strong",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Authentication"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "✅ Done"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Uses "
+                    },
+                    {
+                      "type": "InlineCode",
+                      "value": "JWT"
+                    },
+                    {
+                      "type": "Text",
+                      "value": " tokens"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Emphasis",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Authorization"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "🔄 In Progress"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Link",
+                      "url": "https://example.com",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "RBAC"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Text",
+                      "value": " based"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Strike",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Legacy Auth"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "❌ Removed"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Deprecated in v2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "align": [
+        null,
+        null,
+        null
+      ],
+      "position": {
+        "startLine": 19,
+        "startColumn": 1,
+        "endLine": 23,
+        "endColumn": 51,
+        "startOffset": 310,
+        "endOffset": 534
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Wide table (many columns):"
+        }
+      ],
+      "position": {
+        "startLine": 25,
+        "startColumn": 1,
+        "endLine": 25,
+        "endColumn": 27,
+        "startOffset": 536,
+        "endOffset": 562
+      }
+    },
+    {
+      "type": "Table",
+      "headerRows": 1,
+      "rows": [
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "API"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Method"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Auth"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Rate Limit"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Cache"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Response"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Status"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "/users"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "GET"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "JWT"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "100/min"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "5min"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "JSON"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Active"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "/users/:id"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "GET"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "JWT"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "200/min"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "2min"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "JSON"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Active"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "/auth/login"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "POST"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "None"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "10/min"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "None"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "JSON"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Active"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "/auth/refresh"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "POST"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Refresh"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "20/min"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "None"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "JSON"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Active"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "align": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "position": {
+        "startLine": 27,
+        "startColumn": 1,
+        "endLine": 32,
+        "endColumn": 67,
+        "startOffset": 564,
+        "endOffset": 917
+      }
+    }
+  ],
+  "assets": []
+}

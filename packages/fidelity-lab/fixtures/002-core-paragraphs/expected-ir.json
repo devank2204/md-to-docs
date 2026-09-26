@@ -1,5 +1,6 @@
 {
   "version": "1.0.0",
+  "metadata": {},
   "blocks": [
     {
       "type": "Paragraph",
@@ -47,7 +48,15 @@
           "type": "Text",
           "value": " text."
         }
-      ]
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 98,
+        "startOffset": 0,
+        "endOffset": 97
+      }
     },
     {
       "type": "Paragraph",
@@ -56,7 +65,16 @@
           "type": "Text",
           "value": "This is a second paragraph. It should be separated by a blank line."
         }
-      ]
+      ],
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 3,
+        "endColumn": 68,
+        "startOffset": 99,
+        "endOffset": 166
+      }
     }
-  ]
+  ],
+  "assets": []
 }

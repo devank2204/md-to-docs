@@ -1,0 +1,200 @@
+{
+  "version": "1.0.0",
+  "metadata": {},
+  "blocks": [
+    {
+      "type": "Blockquote",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "This is a simple blockquote."
+            }
+          ],
+          "position": {
+            "startLine": 1,
+            "startColumn": 3,
+            "endLine": 1,
+            "endColumn": 31,
+            "startOffset": 2,
+            "endOffset": 30
+          }
+        }
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 31,
+        "startOffset": 0,
+        "endOffset": 30
+      }
+    },
+    {
+      "type": "Blockquote",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "This is a blockquote with "
+            },
+            {
+              "type": "Strong",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "bold"
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "value": " and "
+            },
+            {
+              "type": "Emphasis",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "italic"
+                }
+              ]
+            },
+            {
+              "type": "Text",
+              "value": " text."
+            }
+          ],
+          "position": {
+            "startLine": 3,
+            "startColumn": 3,
+            "endLine": 3,
+            "endColumn": 56,
+            "startOffset": 34,
+            "endOffset": 87
+          }
+        }
+      ],
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 3,
+        "endColumn": 56,
+        "startOffset": 32,
+        "endOffset": 87
+      }
+    },
+    {
+      "type": "Blockquote",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "Multiple paragraphs in a blockquote."
+            }
+          ],
+          "position": {
+            "startLine": 5,
+            "startColumn": 3,
+            "endLine": 5,
+            "endColumn": 39,
+            "startOffset": 91,
+            "endOffset": 127
+          }
+        },
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "Second paragraph here."
+            }
+          ],
+          "position": {
+            "startLine": 7,
+            "startColumn": 3,
+            "endLine": 7,
+            "endColumn": 25,
+            "startOffset": 132,
+            "endOffset": 154
+          }
+        }
+      ],
+      "position": {
+        "startLine": 5,
+        "startColumn": 1,
+        "endLine": 7,
+        "endColumn": 25,
+        "startOffset": 89,
+        "endOffset": 154
+      }
+    },
+    {
+      "type": "Blockquote",
+      "blocks": [
+        {
+          "type": "Paragraph",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "Nested blockquote level 1"
+            }
+          ],
+          "position": {
+            "startLine": 9,
+            "startColumn": 3,
+            "endLine": 9,
+            "endColumn": 28,
+            "startOffset": 158,
+            "endOffset": 183
+          }
+        },
+        {
+          "type": "Blockquote",
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Nested level 2"
+                }
+              ],
+              "position": {
+                "startLine": 11,
+                "startColumn": 4,
+                "endLine": 11,
+                "endColumn": 18,
+                "startOffset": 189,
+                "endOffset": 203
+              }
+            }
+          ],
+          "position": {
+            "startLine": 11,
+            "startColumn": 2,
+            "endLine": 11,
+            "endColumn": 18,
+            "startOffset": 187,
+            "endOffset": 203
+          }
+        }
+      ],
+      "position": {
+        "startLine": 9,
+        "startColumn": 1,
+        "endLine": 11,
+        "endColumn": 18,
+        "startOffset": 156,
+        "endOffset": 203
+      }
+    }
+  ],
+  "assets": []
+}

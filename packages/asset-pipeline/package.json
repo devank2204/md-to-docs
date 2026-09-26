@@ -1,0 +1,12 @@
+{
+  "name": "@mdtodocs/asset-pipeline",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@mdtodocs/compiler-core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  }
+}

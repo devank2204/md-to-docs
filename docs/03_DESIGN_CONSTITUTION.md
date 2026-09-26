@@ -1,10 +1,10 @@
-# FOLIO Design Constitution
+# mdtodocs.com Design Constitution
 
 ## Core law
 
 > **Hide complexity, not capability.**
 
-FOLIO can be extremely sophisticated underneath while remaining extremely simple above.
+mdtodocs.com can be extremely sophisticated underneath while remaining extremely simple above.
 
 ## Primary mental model
 
@@ -143,7 +143,7 @@ The goal is clarity.
 
 # Quiet intelligence
 
-FOLIO should not constantly announce its intelligence.
+mdtodocs.com should not constantly announce its intelligence.
 
 Bad:
 
@@ -191,11 +191,11 @@ Do not use a permanent diagnostics dashboard as the primary mechanism.
 
 The empty state has exactly one job:
 
-> Get Markdown into FOLIO.
+> Get Markdown into mdtodocs.com.
 
 Primary hierarchy:
 
-1. FOLIO
+1. mdtodocs.com
 2. Markdown → Document
 3. Paste Markdown here
 4. Browse file

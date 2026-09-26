@@ -1,0 +1,570 @@
+{
+  "version": "1.0.0",
+  "metadata": {},
+  "blocks": [
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Nested ordered inside unordered:"
+        }
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 33,
+        "startOffset": 0,
+        "endOffset": 32
+      }
+    },
+    {
+      "type": "List",
+      "ordered": false,
+      "items": [
+        {
+          "checked": null,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Item A"
+                }
+              ],
+              "position": {
+                "startLine": 3,
+                "startColumn": 3,
+                "endLine": 3,
+                "endColumn": 9,
+                "startOffset": 36,
+                "endOffset": 42
+              }
+            },
+            {
+              "type": "List",
+              "ordered": true,
+              "start": 1,
+              "items": [
+                {
+                  "checked": null,
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Sub-item 1"
+                        }
+                      ],
+                      "position": {
+                        "startLine": 4,
+                        "startColumn": 6,
+                        "endLine": 4,
+                        "endColumn": 16,
+                        "startOffset": 48,
+                        "endOffset": 58
+                      }
+                    }
+                  ]
+                },
+                {
+                  "checked": null,
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Sub-item 2"
+                        }
+                      ],
+                      "position": {
+                        "startLine": 5,
+                        "startColumn": 6,
+                        "endLine": 5,
+                        "endColumn": 16,
+                        "startOffset": 64,
+                        "endOffset": 74
+                      }
+                    }
+                  ]
+                },
+                {
+                  "checked": null,
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Sub-item 3"
+                        }
+                      ],
+                      "position": {
+                        "startLine": 6,
+                        "startColumn": 6,
+                        "endLine": 6,
+                        "endColumn": 16,
+                        "startOffset": 80,
+                        "endOffset": 90
+                      }
+                    }
+                  ]
+                }
+              ],
+              "position": {
+                "startLine": 4,
+                "startColumn": 3,
+                "endLine": 6,
+                "endColumn": 16,
+                "startOffset": 45,
+                "endOffset": 90
+              }
+            }
+          ]
+        },
+        {
+          "checked": null,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Item B"
+                }
+              ],
+              "position": {
+                "startLine": 7,
+                "startColumn": 3,
+                "endLine": 7,
+                "endColumn": 9,
+                "startOffset": 93,
+                "endOffset": 99
+              }
+            },
+            {
+              "type": "List",
+              "ordered": true,
+              "start": 1,
+              "items": [
+                {
+                  "checked": null,
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Sub-item 1"
+                        }
+                      ],
+                      "position": {
+                        "startLine": 8,
+                        "startColumn": 6,
+                        "endLine": 8,
+                        "endColumn": 16,
+                        "startOffset": 105,
+                        "endOffset": 115
+                      }
+                    }
+                  ]
+                },
+                {
+                  "checked": null,
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Sub-item 2"
+                        }
+                      ],
+                      "position": {
+                        "startLine": 9,
+                        "startColumn": 6,
+                        "endLine": 9,
+                        "endColumn": 16,
+                        "startOffset": 121,
+                        "endOffset": 131
+                      }
+                    }
+                  ]
+                }
+              ],
+              "position": {
+                "startLine": 8,
+                "startColumn": 3,
+                "endLine": 9,
+                "endColumn": 16,
+                "startOffset": 102,
+                "endOffset": 131
+              }
+            }
+          ]
+        }
+      ],
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 9,
+        "endColumn": 16,
+        "startOffset": 34,
+        "endOffset": 131
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Deeply nested:"
+        }
+      ],
+      "position": {
+        "startLine": 11,
+        "startColumn": 1,
+        "endLine": 11,
+        "endColumn": 15,
+        "startOffset": 133,
+        "endOffset": 147
+      }
+    },
+    {
+      "type": "List",
+      "ordered": true,
+      "start": 1,
+      "items": [
+        {
+          "checked": null,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "First level"
+                }
+              ],
+              "position": {
+                "startLine": 13,
+                "startColumn": 4,
+                "endLine": 13,
+                "endColumn": 15,
+                "startOffset": 152,
+                "endOffset": 163
+              }
+            },
+            {
+              "type": "List",
+              "ordered": false,
+              "items": [
+                {
+                  "checked": null,
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Second level unordered"
+                        }
+                      ],
+                      "position": {
+                        "startLine": 14,
+                        "startColumn": 6,
+                        "endLine": 14,
+                        "endColumn": 28,
+                        "startOffset": 169,
+                        "endOffset": 191
+                      }
+                    },
+                    {
+                      "type": "List",
+                      "ordered": true,
+                      "start": 1,
+                      "items": [
+                        {
+                          "checked": null,
+                          "blocks": [
+                            {
+                              "type": "Paragraph",
+                              "inlines": [
+                                {
+                                  "type": "Text",
+                                  "value": "Third level ordered"
+                                }
+                              ],
+                              "position": {
+                                "startLine": 15,
+                                "startColumn": 9,
+                                "endLine": 15,
+                                "endColumn": 28,
+                                "startOffset": 200,
+                                "endOffset": 219
+                              }
+                            },
+                            {
+                              "type": "List",
+                              "ordered": false,
+                              "items": [
+                                {
+                                  "checked": null,
+                                  "blocks": [
+                                    {
+                                      "type": "Paragraph",
+                                      "inlines": [
+                                        {
+                                          "type": "Text",
+                                          "value": "Fourth level"
+                                        }
+                                      ],
+                                      "position": {
+                                        "startLine": 16,
+                                        "startColumn": 11,
+                                        "endLine": 16,
+                                        "endColumn": 23,
+                                        "startOffset": 230,
+                                        "endOffset": 242
+                                      }
+                                    }
+                                  ]
+                                }
+                              ],
+                              "position": {
+                                "startLine": 16,
+                                "startColumn": 9,
+                                "endLine": 16,
+                                "endColumn": 23,
+                                "startOffset": 228,
+                                "endOffset": 242
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "position": {
+                        "startLine": 15,
+                        "startColumn": 6,
+                        "endLine": 16,
+                        "endColumn": 23,
+                        "startOffset": 197,
+                        "endOffset": 242
+                      }
+                    }
+                  ]
+                },
+                {
+                  "checked": null,
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Another second level"
+                        }
+                      ],
+                      "position": {
+                        "startLine": 17,
+                        "startColumn": 6,
+                        "endLine": 17,
+                        "endColumn": 26,
+                        "startOffset": 248,
+                        "endOffset": 268
+                      }
+                    }
+                  ]
+                }
+              ],
+              "position": {
+                "startLine": 14,
+                "startColumn": 4,
+                "endLine": 17,
+                "endColumn": 26,
+                "startOffset": 167,
+                "endOffset": 268
+              }
+            }
+          ]
+        },
+        {
+          "checked": null,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Back to first level"
+                }
+              ],
+              "position": {
+                "startLine": 18,
+                "startColumn": 4,
+                "endLine": 18,
+                "endColumn": 23,
+                "startOffset": 272,
+                "endOffset": 291
+              }
+            }
+          ]
+        }
+      ],
+      "position": {
+        "startLine": 13,
+        "startColumn": 1,
+        "endLine": 18,
+        "endColumn": 23,
+        "startOffset": 149,
+        "endOffset": 291
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Task lists:"
+        }
+      ],
+      "position": {
+        "startLine": 20,
+        "startColumn": 1,
+        "endLine": 20,
+        "endColumn": 12,
+        "startOffset": 293,
+        "endOffset": 304
+      }
+    },
+    {
+      "type": "List",
+      "ordered": false,
+      "items": [
+        {
+          "checked": true,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Implement authentication"
+                }
+              ],
+              "position": {
+                "startLine": 22,
+                "startColumn": 7,
+                "endLine": 22,
+                "endColumn": 31,
+                "startOffset": 312,
+                "endOffset": 336
+              }
+            }
+          ]
+        },
+        {
+          "checked": true,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Add user registration"
+                }
+              ],
+              "position": {
+                "startLine": 23,
+                "startColumn": 7,
+                "endLine": 23,
+                "endColumn": 28,
+                "startOffset": 343,
+                "endOffset": 364
+              }
+            }
+          ]
+        },
+        {
+          "checked": false,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Add refresh tokens"
+                }
+              ],
+              "position": {
+                "startLine": 24,
+                "startColumn": 7,
+                "endLine": 24,
+                "endColumn": 25,
+                "startOffset": 371,
+                "endOffset": 389
+              }
+            }
+          ]
+        },
+        {
+          "checked": false,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Write integration tests"
+                }
+              ],
+              "position": {
+                "startLine": 25,
+                "startColumn": 7,
+                "endLine": 25,
+                "endColumn": 30,
+                "startOffset": 396,
+                "endOffset": 419
+              }
+            }
+          ]
+        },
+        {
+          "checked": false,
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Deploy to staging"
+                }
+              ],
+              "position": {
+                "startLine": 26,
+                "startColumn": 7,
+                "endLine": 26,
+                "endColumn": 24,
+                "startOffset": 426,
+                "endOffset": 443
+              }
+            }
+          ]
+        }
+      ],
+      "position": {
+        "startLine": 22,
+        "startColumn": 1,
+        "endLine": 26,
+        "endColumn": 24,
+        "startOffset": 306,
+        "endOffset": 443
+      }
+    }
+  ],
+  "assets": []
+}

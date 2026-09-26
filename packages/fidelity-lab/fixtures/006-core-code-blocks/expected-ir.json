@@ -1,0 +1,155 @@
+{
+  "version": "1.0.0",
+  "metadata": {},
+  "blocks": [
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Simple unfenced code:"
+        }
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 22,
+        "startOffset": 0,
+        "endOffset": 21
+      }
+    },
+    {
+      "type": "CodeBlock",
+      "value": "const x = 42;",
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 3,
+        "endColumn": 18,
+        "startOffset": 23,
+        "endOffset": 40
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Fenced code without language:"
+        }
+      ],
+      "position": {
+        "startLine": 5,
+        "startColumn": 1,
+        "endLine": 5,
+        "endColumn": 30,
+        "startOffset": 42,
+        "endOffset": 71
+      }
+    },
+    {
+      "type": "CodeBlock",
+      "value": "function hello() {\n  console.log(\"Hello, world!\");\n}",
+      "position": {
+        "startLine": 7,
+        "startColumn": 1,
+        "endLine": 11,
+        "endColumn": 4,
+        "startOffset": 73,
+        "endOffset": 133
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "TypeScript code:"
+        }
+      ],
+      "position": {
+        "startLine": 13,
+        "startColumn": 1,
+        "endLine": 13,
+        "endColumn": 17,
+        "startOffset": 135,
+        "endOffset": 151
+      }
+    },
+    {
+      "type": "CodeBlock",
+      "language": "typescript",
+      "value": "interface User {\n  id: string;\n  name: string;\n  email: string;\n}\n\nasync function authenticate(credentials: LoginRequest): Promise<AuthToken> {\n  const response = await fetch('/api/auth', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify(credentials),\n  });\n\n  if (!response.ok) {\n    throw new Error(`Authentication failed: ${response.statusText}`);\n  }\n\n  return response.json();\n}",
+      "position": {
+        "startLine": 15,
+        "startColumn": 1,
+        "endLine": 35,
+        "endColumn": 4,
+        "startOffset": 153,
+        "endOffset": 604
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Python code:"
+        }
+      ],
+      "position": {
+        "startLine": 37,
+        "startColumn": 1,
+        "endLine": 37,
+        "endColumn": 13,
+        "startOffset": 606,
+        "endOffset": 618
+      }
+    },
+    {
+      "type": "CodeBlock",
+      "language": "python",
+      "value": "def fibonacci(n: int) -> list[int]:\n    \"\"\"Generate fibonacci sequence up to n terms.\"\"\"\n    if n <= 0:\n        return []\n    sequence = [0, 1]\n    for _ in range(2, n):\n        sequence.append(sequence[-1] + sequence[-2])\n    return sequence[:n]",
+      "position": {
+        "startLine": 39,
+        "startColumn": 1,
+        "endLine": 48,
+        "endColumn": 4,
+        "startOffset": 620,
+        "endOffset": 880
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "SQL code:"
+        }
+      ],
+      "position": {
+        "startLine": 50,
+        "startColumn": 1,
+        "endLine": 50,
+        "endColumn": 10,
+        "startOffset": 882,
+        "endOffset": 891
+      }
+    },
+    {
+      "type": "CodeBlock",
+      "language": "sql",
+      "value": "SELECT u.name, COUNT(o.id) as order_count\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nWHERE u.created_at > '2024-01-01'\nGROUP BY u.name\nHAVING COUNT(o.id) > 5\nORDER BY order_count DESC;",
+      "position": {
+        "startLine": 52,
+        "startColumn": 1,
+        "endLine": 60,
+        "endColumn": 4,
+        "startOffset": 893,
+        "endOffset": 1097
+      }
+    }
+  ],
+  "assets": []
+}

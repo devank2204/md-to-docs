@@ -30,7 +30,7 @@ Every meaningful diagnostic should answer:
 1. What happened?
 2. Why?
 3. What was preserved?
-4. What did FOLIO do?
+4. What did mdtodocs.com do?
 5. What can the user do?
 
 ---
@@ -65,7 +65,7 @@ Primary UI:
 
 Inspector:
 
-> Word does not support native Mermaid rendering. FOLIO converted the diagram to SVG while retaining source provenance.
+> Word does not support native Mermaid rendering. mdtodocs.com converted the diagram to SVG while retaining source provenance.
 
 ---
 

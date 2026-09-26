@@ -1,4 +1,4 @@
-# FOLIO UI Specification
+# mdtodocs.com UI Specification
 
 ## Active workspace
 
@@ -6,7 +6,7 @@ Current established composition:
 
 ```text
 ┌────────────────────────────────────────────────────────────┐
-│ FOLIO   document.md       Ready       Docs Word PDF [CTA] │
+│ mdtodocs.com   document.md       Ready       Docs Word PDF [CTA] │
 ├──────────────────┬─────────────────────────────────────────┤
 │                  │                                         │
 │ Markdown Source  │             Document Preview            │
@@ -25,7 +25,7 @@ The document preview should occupy the greatest visual territory.
 
 Keep:
 
-- FOLIO identity
+- mdtodocs.com identity
 - current document name
 - current readiness state
 - destination selector
@@ -198,7 +198,7 @@ Do not show:
 The central first-use interaction is:
 
 ```text
-FOLIO
+mdtodocs.com
 
 Markdown → Document
 

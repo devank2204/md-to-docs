@@ -1,5 +1,6 @@
 {
   "version": "1.0.0",
+  "metadata": {},
   "blocks": [
     {
       "type": "Paragraph",
@@ -30,7 +31,16 @@
           "type": "Text",
           "value": " right here."
         }
-      ]
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 2,
+        "endColumn": 39,
+        "startOffset": 0,
+        "endOffset": 78
+      }
     }
-  ]
+  ],
+  "assets": []
 }

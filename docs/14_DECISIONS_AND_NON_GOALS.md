@@ -4,7 +4,7 @@
 
 ### 1. Product category
 
-FOLIO is a destination-aware document compiler, not merely a file converter.
+mdtodocs.com is a destination-aware document compiler, not merely a file converter.
 
 ### 2. Core promise
 

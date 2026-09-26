@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/compiler-core" },
+    { "path": "./packages/capability-graph" },
+    { "path": "./packages/renderers" },
+    { "path": "./packages/asset-pipeline" },
+    { "path": "./packages/validation" },
+    { "path": "./packages/fidelity-lab" },
+    { "path": "./apps/web" }
+  ]
+}

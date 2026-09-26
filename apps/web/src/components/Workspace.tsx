@@ -1,36 +1,160 @@
-import { useState, useMemo } from 'react';
-import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@folio/compiler-core';
-import type { DestinationType } from '@folio/capability-graph';
-import { renderToHtml } from '@folio/renderers';
+import { useState, useEffect } from 'react';
+import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
+import type { Block } from '@mdtodocs/compiler-core';
+import type { DestinationType } from '@mdtodocs/capability-graph';
+import { renderToHtml } from '@mdtodocs/renderers';
+import { validateDocument } from '@mdtodocs/validation';
+import { resolveAssets } from '@mdtodocs/asset-pipeline';
+import { FidelityCheckPanel } from './FidelityCheckPanel';
+import { DocumentInspector } from './DocumentInspector';
 
 interface WorkspaceProps {
   markdown: string;
   onInput: (markdown: string) => void;
+  destination: DestinationType;
+  onDestinationChange: (dest: DestinationType) => void;
 }
 
-export function Workspace({ markdown, onInput }: WorkspaceProps) {
-  const [destination, setDestination] = useState<DestinationType>('google-docs');
+interface DocumentStats {
+  headings: number;
+  paragraphs: number;
+  lists: number;
+  tables: number;
+  codeBlocks: number;
+  images: number;
+  blockquotes: number;
+  callouts: number;
+}
+
+function countElements(blocks: Block[]): DocumentStats {
+  const stats: DocumentStats = {
+    headings: 0,
+    paragraphs: 0,
+    lists: 0,
+    tables: 0,
+    codeBlocks: 0,
+    images: 0,
+    blockquotes: 0,
+    callouts: 0,
+  };
+
+  for (const block of blocks) {
+    switch (block.type) {
+      case 'Heading': stats.headings++; break;
+      case 'Paragraph': stats.paragraphs++; break;
+      case 'List': stats.lists++; break;
+      case 'Table': stats.tables++; break;
+      case 'CodeBlock': stats.codeBlocks++; break;
+      case 'ImageBlock': stats.images++; break;
+      case 'Blockquote':
+        stats.blockquotes++;
+        // Count nested elements
+        const nested = countElements(block.blocks);
+        Object.keys(nested).forEach((key) => {
+          stats[key as keyof DocumentStats] += nested[key as keyof DocumentStats];
+        });
+        break;
+      case 'Callout':
+        stats.callouts++;
+        const calloutNested = countElements(block.blocks);
+        Object.keys(calloutNested).forEach((key) => {
+          stats[key as keyof DocumentStats] += calloutNested[key as keyof DocumentStats];
+        });
+        break;
+    }
+  }
+
+  return stats;
+}
+
+function formatStats(stats: DocumentStats): string {
+  const parts: string[] = [];
+  if (stats.headings > 0) parts.push(`${stats.headings} heading${stats.headings !== 1 ? 's' : ''}`);
+  if (stats.tables > 0) parts.push(`${stats.tables} table${stats.tables !== 1 ? 's' : ''}`);
+  if (stats.codeBlocks > 0) parts.push(`${stats.codeBlocks} code block${stats.codeBlocks !== 1 ? 's' : ''}`);
+  if (stats.images > 0) parts.push(`${stats.images} image${stats.images !== 1 ? 's' : ''}`);
+  if (stats.lists > 0) parts.push(`${stats.lists} list${stats.lists !== 1 ? 's' : ''}`);
+  if (stats.callouts > 0) parts.push(`${stats.callouts} callout${stats.callouts !== 1 ? 's' : ''}`);
+  return parts.join(' · ');
+}
+
+const DEST_LABELS: Record<DestinationType, string> = {
+  'google-docs': 'Google Docs',
+  'word': 'Word (.docx)',
+  'pdf': 'PDF',
+  'clipboard': 'Clipboard',
+};
+
+export function Workspace({ markdown, onInput, destination, onDestinationChange }: WorkspaceProps) {
+  const [isFidelityPanelOpen, setIsFidelityPanelOpen] = useState(false);
+  const [isInspectorOpen, setIsInspectorOpen] = useState(false);
+  const [isCompiling, setIsCompiling] = useState(false);
+  const [compiledState, setCompiledState] = useState<{
+    htmlContent: string;
+    diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
+    stats: any;
+    validationReport: any;
+  }>({
+    htmlContent: '',
+    diagnostics: [],
+    stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0 },
+    validationReport: null,
+  });
   
   const words = markdown.trim().split(/\s+/).filter(w => w.length > 0).length;
   const lines = markdown.split('\n').length;
 
-  const { htmlContent, diagnostics } = useMemo(() => {
-    try {
-      const collector = new DiagnosticsCollector();
-      let doc = parseMarkdown(markdown);
-      doc = planRepresentation(doc, destination, collector);
-      return {
-        htmlContent: renderToHtml(doc),
-        diagnostics: collector.getAll()
-      };
-    } catch (e) {
-      console.error(e);
-      return {
-        htmlContent: '<div class="text-error">Error compiling markdown.</div>',
-        diagnostics: []
-      };
+  useEffect(() => {
+    let isMounted = true;
+    
+    async function compile() {
+      if (isMounted) setIsCompiling(true);
+      try {
+        const collector = new DiagnosticsCollector();
+        let doc = parseMarkdown(markdown);
+        
+        // Count before planner optimizations (like table->list)
+        const docStats = countElements(doc.blocks);
+        
+        // Resolve assets asynchronously
+        doc = await resolveAssets(doc);
+        
+        doc = planRepresentation(doc, destination, collector);
+        const validationReport = validateDocument(doc, destination);
+        
+        if (isMounted) {
+          setCompiledState({
+            htmlContent: renderToHtml(doc),
+            diagnostics: collector.getAll(),
+            stats: docStats,
+            validationReport,
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        if (isMounted) {
+          setCompiledState({
+            htmlContent: '<div style="color:#ef4444;">Error compiling markdown.</div>',
+            diagnostics: [],
+            stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0 },
+            validationReport: null,
+          });
+        }
+      } finally {
+        if (isMounted) setIsCompiling(false);
+      }
     }
+
+    compile();
+
+    return () => {
+      isMounted = false;
+    };
   }, [markdown, destination]);
+
+  const { htmlContent, diagnostics, stats, validationReport } = compiledState;
+  const warnings = diagnostics.filter(d => d.severity === 'warning' || d.severity === 'error');
+  const statsText = formatStats(stats);
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)]">
@@ -59,7 +183,7 @@ export function Workspace({ markdown, onInput }: WorkspaceProps) {
             />
           </div>
           <div className="px-space-md py-space-xs bg-surface-container-low border-t border-outline-variant/30 flex items-center justify-between font-code-sm text-code-sm text-secondary shrink-0">
-            <span className="text-label-sm font-label-sm text-secondary">CommonMark compliant</span>
+            <span className="text-label-sm font-label-sm text-secondary">CommonMark + GFM</span>
             <span className="text-label-sm font-label-sm text-secondary flex items-center gap-space-xxs">
               <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
               Auto-synced
@@ -76,22 +200,31 @@ export function Workspace({ markdown, onInput }: WorkspaceProps) {
                 <span>Document Preview</span>
               </span>
               <span className="text-outline-variant">·</span>
-              
-              <div className="flex bg-surface-container rounded p-0.5">
-                <button 
-                  onClick={() => setDestination('google-docs')}
-                  className={`px-space-xs py-space-xxs rounded font-code-sm text-code-sm ${destination === 'google-docs' ? 'bg-surface text-on-surface shadow-sm' : 'text-secondary hover:text-on-surface transition-colors'}`}>
-                  Google Docs
-                </button>
-                <button 
-                  onClick={() => setDestination('word')}
-                  className={`px-space-xs py-space-xxs rounded font-code-sm text-code-sm ${destination === 'word' ? 'bg-surface text-on-surface shadow-sm' : 'text-secondary hover:text-on-surface transition-colors'}`}>
-                  Word (.docx)
-                </button>
-              </div>
 
+              <div className="flex bg-surface-container rounded p-0.5">
+                {(['google-docs', 'word', 'pdf', 'clipboard'] as DestinationType[]).map((dest) => (
+                  <button
+                    key={dest}
+                    onClick={() => onDestinationChange(dest)}
+                    className={`px-space-xs py-space-xxs rounded font-code-sm text-code-sm ${
+                      destination === dest
+                        ? 'bg-surface text-on-surface shadow-sm'
+                        : 'text-secondary hover:text-on-surface transition-colors'
+                    }`}
+                  >
+                    {DEST_LABELS[dest]}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex items-center gap-space-md">
+              <button 
+                onClick={() => setIsInspectorOpen(true)}
+                className="flex items-center gap-space-xxs text-secondary hover:text-on-surface transition-colors font-code-sm text-code-sm px-space-xs py-space-xxs rounded bg-surface-container-low border border-outline-variant/30 shadow-xs"
+              >
+                <span className="material-symbols-outlined text-[16px]">info</span>
+                Details
+              </button>
               <div className="flex items-center gap-space-xs bg-surface rounded p-space-xxs shadow-xs">
                 <button className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container hover:text-on-surface transition-colors"><span className="material-symbols-outlined text-[16px]">remove</span></button>
                 <span className="tabular-nums font-medium text-on-surface px-space-xs">100%</span>
@@ -101,32 +234,65 @@ export function Workspace({ markdown, onInput }: WorkspaceProps) {
           </div>
 
           <div className="flex-1 flex justify-center p-space-lg overflow-y-auto">
-            {/* Diagnostics Panel (if any) */}
-            {diagnostics.length > 0 && (
-              <div className="w-full max-w-[816px] mb-space-md bg-surface-container border border-outline-variant/30 rounded p-space-md">
-                <h3 className="font-code-sm text-code-sm font-medium text-on-surface mb-space-xs flex items-center gap-space-xs">
-                  <span className="material-symbols-outlined text-[14px] text-error">warning</span>
-                  Representation Planner Interventions
-                </h3>
-                <ul className="space-y-space-xs">
-                  {diagnostics.map(diag => (
-                    <li key={diag.id} className="font-code-sm text-code-sm text-secondary bg-surface p-space-xs rounded border border-outline-variant/20 flex flex-col gap-1">
-                      <span className="font-medium text-on-surface">{diag.message}</span>
-                      {diag.suggestedAction && <span className="text-secondary/80">↳ {diag.suggestedAction}</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             {/* The Document Canvas */}
-            <div className="w-full max-w-[816px] bg-surface-container-lowest p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate">
-              <div 
-                className="relative z-10 flex flex-col space-y-space-md font-body-md text-on-surface [&>h1]:font-headline-xl [&>h1]:text-headline-xl [&>h2]:font-headline-lg [&>h2]:text-headline-lg [&>h3]:font-headline-md [&>h3]:text-headline-md"
-                dangerouslySetInnerHTML={{ __html: htmlContent }} 
+            <div className="w-full max-w-[816px] bg-surface-container-lowest p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30">
+              <div
+                className="relative z-10 flex flex-col font-body-md text-on-surface [&>h1]:font-headline-xl [&>h1]:text-headline-xl [&>h2]:font-headline-lg [&>h2]:text-headline-lg [&>h3]:font-headline-md [&>h3]:text-headline-md"
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
             </div>
           </div>
+        </div>
+      </div>
+
+      <FidelityCheckPanel 
+        isOpen={isFidelityPanelOpen} 
+        onClose={() => setIsFidelityPanelOpen(false)} 
+        report={validationReport}
+        diagnostics={diagnostics}
+      />
+
+      <DocumentInspector
+        isOpen={isInspectorOpen}
+        onClose={() => setIsInspectorOpen(false)}
+        report={validationReport}
+        diagnostics={diagnostics}
+        stats={stats}
+      />
+
+      {/* Status Bar */}
+      <div className="fixed bottom-0 left-0 right-0 h-7 bg-surface-container-low border-t border-outline-variant/20 flex items-center justify-between px-space-md font-code-sm text-code-sm text-secondary z-40">
+        <div className="flex items-center gap-space-sm">
+          <button 
+            onClick={() => setIsFidelityPanelOpen(!isFidelityPanelOpen)}
+            className="flex items-center gap-space-xxs hover:text-on-surface transition-colors focus:outline-none"
+          >
+            {isCompiling ? (
+              <span className="flex items-center gap-space-xxs text-secondary">
+                <span className="material-symbols-outlined text-[13px] animate-spin">refresh</span>
+                Compiling...
+              </span>
+            ) : warnings.length === 0 ? (
+              <span className="flex items-center gap-space-xxs text-primary">
+                <span className="material-symbols-outlined text-[13px]">check_circle</span>
+                Everything preserved {validationReport && `(${validationReport.summary.fidelityScore}%)`}
+              </span>
+            ) : (
+              <span className="flex items-center gap-space-xxs text-error">
+                <span className="material-symbols-outlined text-[13px]">warning</span>
+                {warnings.length} {warnings.length === 1 ? 'issue' : 'issues'} {validationReport && `(${validationReport.summary.fidelityScore}%)`}
+              </span>
+            )}
+          </button>
+          {statsText && !isCompiling && (
+            <>
+              <span className="text-outline-variant">·</span>
+              <span>{statsText}</span>
+            </>
+          )}
+        </div>
+        <div className="flex items-center gap-space-sm">
+          <span>Target: {DEST_LABELS[destination]}</span>
         </div>
       </div>
     </div>

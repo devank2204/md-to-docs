@@ -1,13 +1,13 @@
 {
-  "name": "@folio/fidelity-lab",
+  "name": "@mdtodocs/fidelity-lab",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "test": "tsx src/runner.ts"
   },
   "dependencies": {
-    "@folio/compiler-core": "workspace:*",
-    "@folio/renderers": "workspace:*"
+    "@mdtodocs/compiler-core": "workspace:*",
+    "@mdtodocs/renderers": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

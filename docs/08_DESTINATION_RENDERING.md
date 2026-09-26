@@ -6,7 +6,7 @@ Different destinations are not interchangeable render targets.
 
 They have different semantics, layout systems, and capabilities.
 
-FOLIO must compile toward each destination intentionally.
+mdtodocs.com must compile toward each destination intentionally.
 
 ---
 

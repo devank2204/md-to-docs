@@ -1,0 +1,13 @@
+{
+  "name": "@mdtodocs/validation",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@mdtodocs/compiler-core": "workspace:*",
+    "@mdtodocs/capability-graph": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  }
+}

@@ -1,4 +1,4 @@
-# FOLIO Command Palette
+# mdtodocs.com Command Palette
 
 ## Purpose
 

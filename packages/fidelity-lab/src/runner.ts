@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { parseMarkdown } from '@folio/compiler-core';
-import { renderToHtml, renderToDocxBlob } from '@folio/renderers';
+import { parseMarkdown } from '@mdtodocs/compiler-core';
+import { renderToHtml, renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
 import pc from 'picocolors';
 
 const FIXTURES_DIR = new URL('../fixtures', import.meta.url).pathname;
@@ -12,7 +12,7 @@ async function runFixtures() {
   let failed = 0;
   let generated = 0;
 
-  console.log(pc.cyan('\nStarting FOLIO Fidelity Lab...\n'));
+  console.log(pc.cyan('\nStarting mdtodocs Fidelity Lab...\n'));
 
   for (const dir of dirs) {
     const fixturePath = path.join(FIXTURES_DIR, dir);
@@ -25,9 +25,9 @@ async function runFixtures() {
       const inputPath = path.join(fixturePath, 'input.md');
       const expectedIrPath = path.join(fixturePath, 'expected-ir.json');
       const outputDir = path.join(fixturePath, '.output');
-      
+
       const markdown = await fs.readFile(inputPath, 'utf-8');
-      
+
       // 1. Parse to Document IR
       const doc = parseMarkdown(markdown);
       const actualIr = JSON.stringify(doc, null, 2);
@@ -50,20 +50,26 @@ async function runFixtures() {
           await fs.writeFile(expectedIrPath, actualIr);
           console.log(pc.yellow('GENERATED EXPECTED IR'));
           generated++;
-          continue;
+          // Continue to render outputs even when generating
+        } else {
+          throw err;
         }
-        throw err;
       }
 
-      // 3. Render Destinations
+      // 3. Render all destinations
       const html = renderToHtml(doc);
-      await fs.writeFile(path.join(outputDir, 'google.html'), html);
+      await fs.writeFile(path.join(outputDir, 'preview.html'), wrapHtml(html, 'Preview'));
+
+      const clipboardHtml = renderToClipboardHtml(doc);
+      await fs.writeFile(path.join(outputDir, 'clipboard.html'), wrapHtml(clipboardHtml, 'Clipboard'));
 
       const docxBlob = await renderToDocxBlob(doc);
       const buffer = Buffer.from(await docxBlob.arrayBuffer());
       await fs.writeFile(path.join(outputDir, 'document.docx'), buffer);
 
-      if (irMatches) {
+      if (generated > 0 && !irMatches) {
+        // Already counted as generated
+      } else if (irMatches) {
         console.log(pc.green('PASS'));
         passed++;
       } else {
@@ -77,11 +83,29 @@ async function runFixtures() {
   }
 
   console.log('\n---');
-  console.log(`Passed: ${pc.green(passed)} | Failed: ${pc.red(failed)} | Generated: ${pc.yellow(generated)}`);
+  console.log(`Passed: ${pc.green(String(passed))} | Failed: ${pc.red(String(failed))} | Generated: ${pc.yellow(String(generated))}`);
 
   if (failed > 0) {
     process.exit(1);
   }
+}
+
+function wrapHtml(body: string, title: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>mdtodocs Fidelity Lab – ${title}</title>
+  <style>
+    body { font-family: 'Newsreader', Georgia, serif; max-width: 816px; margin: 40px auto; padding: 20px; color: #1a1a1a; line-height: 1.6; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Newsreader', Georgia, serif; }
+    code, pre { font-family: 'JetBrains Mono', Consolas, monospace; }
+  </style>
+</head>
+<body>
+${body}
+</body>
+</html>`;
 }
 
 runFixtures().catch(err => {

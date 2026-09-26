@@ -1,4 +1,4 @@
-# FOLIO UX Flow
+# mdtodocs.com UX Flow
 
 ## State model
 
@@ -39,7 +39,7 @@ User question:
 
 Show:
 
-- FOLIO
+- mdtodocs.com
 - Markdown → Document
 - concise promise
 - input surface
@@ -170,7 +170,7 @@ Explain:
 
 1. What happened?
 2. What was preserved?
-3. What did FOLIO do?
+3. What did mdtodocs.com do?
 4. What can the user do next?
 
 Avoid raw stack traces in the primary UI.

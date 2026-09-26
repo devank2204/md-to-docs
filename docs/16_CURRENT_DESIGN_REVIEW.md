@@ -6,7 +6,7 @@ The latest reviewed active workspace is considered directionally correct.
 
 It has:
 
-- FOLIO identity
+- mdtodocs.com identity
 - document name
 - ready state
 - destination selector

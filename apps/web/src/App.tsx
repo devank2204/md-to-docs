@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { EmptyState } from './components/EmptyState';
 import { Workspace } from './components/Workspace';
 import { Header } from './components/Header';
+import type { DestinationType } from '@mdtodocs/capability-graph';
 
 export type AppState = 'EMPTY' | 'WORKSPACE';
 
 function App() {
   const [appState, setAppState] = useState<AppState>('EMPTY');
   const [markdown, setMarkdown] = useState<string>('');
+  const [destination, setDestination] = useState<DestinationType>('google-docs');
 
   // Handle global paste to transition to workspace if empty
   useEffect(() => {
@@ -35,12 +37,22 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-surface text-on-surface">
-      <Header appState={appState} markdown={markdown} />
+      <Header
+        appState={appState}
+        markdown={markdown}
+        destination={destination}
+        onDestinationChange={setDestination}
+      />
       <main className="flex-1 flex flex-col mt-12 relative">
         {appState === 'EMPTY' ? (
           <EmptyState onInput={handleInput} />
         ) : (
-          <Workspace markdown={markdown} onInput={handleInput} />
+          <Workspace
+            markdown={markdown}
+            onInput={handleInput}
+            destination={destination}
+            onDestinationChange={setDestination}
+          />
         )}
       </main>
     </div>

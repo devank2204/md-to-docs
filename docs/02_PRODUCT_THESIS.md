@@ -43,7 +43,7 @@ They do not want to learn:
 
 # The compiler mental model
 
-FOLIO should internally think:
+mdtodocs.com should internally think:
 
 ```text
 Source semantics
@@ -85,7 +85,7 @@ Examples:
 
 Not every destination supports every semantic.
 
-FOLIO must not pretend otherwise.
+mdtodocs.com must not pretend otherwise.
 
 When a destination cannot represent a feature natively:
 
@@ -112,7 +112,7 @@ Markdown is the initial source because it is common, structured, developer-frien
 
 # Product personality
 
-FOLIO should feel:
+mdtodocs.com should feel:
 
 - precise
 - calm
@@ -144,4 +144,4 @@ A beautiful editor is not the moat.
 
 The differentiator is:
 
-> **FOLIO understands the document and the destination before deciding how to represent it.**
+> **mdtodocs.com understands the document and the destination before deciding how to represent it.**

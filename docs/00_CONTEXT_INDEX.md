@@ -1,10 +1,10 @@
-# FOLIO Product Context
+# mdtodocs.com Product Context
 
 ## Purpose
 
-This directory is the canonical product, UX, design, architecture, and engineering context for FOLIO.
+This directory is the canonical product, UX, design, architecture, and engineering context for mdtodocs.com.
 
-FOLIO is a destination-aware document compiler whose first visible workflow is:
+mdtodocs.com is a destination-aware document compiler whose first visible workflow is:
 
 **Markdown → professional document → destination**
 

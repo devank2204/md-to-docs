@@ -1,13 +1,13 @@
 {
-  "name": "@folio/renderers",
+  "name": "@mdtodocs/renderers",
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc"
   },
   "dependencies": {
-    "@folio/compiler-core": "workspace:*",
-    "@folio/capability-graph": "workspace:*",
+    "@mdtodocs/compiler-core": "workspace:*",
+    "@mdtodocs/capability-graph": "workspace:*",
     "docx": "^8.2.0"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-# FOLIO Document IR Specification
+# mdtodocs.com Document IR Specification
 
 ## Purpose
 

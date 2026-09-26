@@ -1,7 +1,7 @@
-# FOLIO Product Requirements Document
+# mdtodocs.com Product Requirements Document
 
 **Status:** Canonical working PRD  
-**Product:** FOLIO  
+**Product:** mdtodocs.com  
 **Category:** Destination-aware document compiler / structured-content interoperability tool  
 **Primary source:** Markdown  
 **Initial destinations:** Google Docs, Word/DOCX, PDF
@@ -10,7 +10,7 @@
 
 # 1. Executive Summary
 
-FOLIO turns Markdown into destination-ready professional documents with minimal or zero manual formatting repair.
+mdtodocs.com turns Markdown into destination-ready professional documents with minimal or zero manual formatting repair.
 
 The visible product should feel simple:
 
@@ -22,7 +22,7 @@ The underlying system is intentionally much more sophisticated:
 
 The product's central insight is that users do not primarily have a "conversion" problem. They have a **document cleanup problem**.
 
-A converter that technically produces a DOCX or PDF is not enough. FOLIO should preserve document meaning, structure, editability, layout intent, and destination behavior as far as the target permits.
+A converter that technically produces a DOCX or PDF is not enough. mdtodocs.com should preserve document meaning, structure, editability, layout intent, and destination behavior as far as the target permits.
 
 The product should hide this complexity rather than expose it.
 
@@ -47,7 +47,7 @@ Existing Markdown conversion workflows commonly create output that requires repa
 
 The real cost is **Manual Cleanup Minutes**.
 
-FOLIO should optimize toward:
+mdtodocs.com should optimize toward:
 
 > **Manual Cleanup Minutes → 0**
 
@@ -57,7 +57,7 @@ for normal supported documents.
 
 # 3. Product Thesis
 
-FOLIO is not merely "Markdown to PDF/DOCX."
+mdtodocs.com is not merely "Markdown to PDF/DOCX."
 
 It is a **destination-aware document compiler**.
 
@@ -91,11 +91,11 @@ Renderers must never parse Markdown independently.
 
 # 4. Target User Outcome
 
-A user should be able to bring an existing Markdown document into FOLIO and obtain a professional destination document without manually repairing formatting.
+A user should be able to bring an existing Markdown document into mdtodocs.com and obtain a professional destination document without manually repairing formatting.
 
 The primary mental model must remain simple:
 
-> "I have Markdown. FOLIO understands it. Here is the document. Where do I want it?"
+> "I have Markdown. mdtodocs.com understands it. Here is the document. Where do I want it?"
 
 ---
 
@@ -123,14 +123,14 @@ The primary mental model must remain simple:
 
 ## First use
 
-1. User lands in FOLIO.
+1. User lands in mdtodocs.com.
 2. Immediately understands "Markdown → Document."
 3. Pastes Markdown or drops a `.md` file.
-4. FOLIO analyzes the document.
-5. FOLIO presents the resulting document preview.
+4. mdtodocs.com analyzes the document.
+5. mdtodocs.com presents the resulting document preview.
 6. User chooses Google Docs, Word, or PDF.
 7. User exports/copies.
-8. FOLIO reports success and what was preserved.
+8. mdtodocs.com reports success and what was preserved.
 
 ## Returning use
 
@@ -144,11 +144,11 @@ The interface should remember familiarity without becoming a dashboard.
 
 The empty state has exactly one job:
 
-> **Get Markdown into FOLIO.**
+> **Get Markdown into mdtodocs.com.**
 
 The first-use surface should show only:
 
-- FOLIO identity
+- mdtodocs.com identity
 - `Markdown → Document`
 - concise product promise
 - Markdown input area
@@ -237,7 +237,7 @@ Do not present all destinations as competing primary actions. Destination select
 
 # 10. Progressive Disclosure
 
-FOLIO should have three information layers.
+mdtodocs.com should have three information layers.
 
 ## Layer 1: Immediate cognition
 
@@ -318,7 +318,7 @@ Implementation terminology can appear here when useful, not in the primary works
 
 # 12. Contextual Intelligence
 
-FOLIO should reveal intelligence next to the object it explains.
+mdtodocs.com should reveal intelligence next to the object it explains.
 
 Examples:
 

@@ -2,7 +2,7 @@
 
 ## Role
 
-Treat the FOLIO context documents as the product constitution.
+Treat the mdtodocs.com context documents as the product constitution.
 
 Do not infer product requirements from generic SaaS conventions.
 

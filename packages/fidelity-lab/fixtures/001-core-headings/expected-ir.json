@@ -1,5 +1,6 @@
 {
   "version": "1.0.0",
+  "metadata": {},
   "blocks": [
     {
       "type": "Heading",
@@ -9,7 +10,15 @@
           "type": "Text",
           "value": "Heading 1"
         }
-      ]
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 12,
+        "startOffset": 0,
+        "endOffset": 11
+      }
     },
     {
       "type": "Heading",
@@ -19,7 +28,15 @@
           "type": "Text",
           "value": "Heading 2"
         }
-      ]
+      ],
+      "position": {
+        "startLine": 2,
+        "startColumn": 1,
+        "endLine": 2,
+        "endColumn": 13,
+        "startOffset": 12,
+        "endOffset": 24
+      }
     },
     {
       "type": "Heading",
@@ -29,7 +46,15 @@
           "type": "Text",
           "value": "Heading 3"
         }
-      ]
+      ],
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 3,
+        "endColumn": 14,
+        "startOffset": 25,
+        "endOffset": 38
+      }
     },
     {
       "type": "Heading",
@@ -39,7 +64,15 @@
           "type": "Text",
           "value": "Heading 4"
         }
-      ]
+      ],
+      "position": {
+        "startLine": 4,
+        "startColumn": 1,
+        "endLine": 4,
+        "endColumn": 15,
+        "startOffset": 39,
+        "endOffset": 53
+      }
     },
     {
       "type": "Heading",
@@ -49,7 +82,15 @@
           "type": "Text",
           "value": "Heading 5"
         }
-      ]
+      ],
+      "position": {
+        "startLine": 5,
+        "startColumn": 1,
+        "endLine": 5,
+        "endColumn": 16,
+        "startOffset": 54,
+        "endOffset": 69
+      }
     },
     {
       "type": "Heading",
@@ -59,7 +100,16 @@
           "type": "Text",
           "value": "Heading 6"
         }
-      ]
+      ],
+      "position": {
+        "startLine": 6,
+        "startColumn": 1,
+        "endLine": 6,
+        "endColumn": 17,
+        "startOffset": 70,
+        "endOffset": 86
+      }
     }
-  ]
+  ],
+  "assets": []
 }
