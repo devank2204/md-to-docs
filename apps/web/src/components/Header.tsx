@@ -3,6 +3,8 @@ import type { AppState } from '../App';
 import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
 import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
 import type { DestinationType } from '@mdtodocs/capability-graph';
+import { SegmentedControl } from './interior/segmented-control';
+import { LoadingButton } from './interior/loading-button';
 
 interface HeaderProps {
   appState: AppState;
@@ -39,46 +41,35 @@ export function Header({ appState, markdown, destination, onDestinationChange }:
 
   const handleCopyFormatted = async () => {
     if (!markdown) return;
-    try {
-      setCopying(true);
-      const collector = new DiagnosticsCollector();
-      let doc = parseMarkdown(markdown);
-      doc = planRepresentation(doc, destination, collector);
-      const html = renderToClipboardHtml(doc);
-      const htmlBlob = new Blob([html], { type: 'text/html' });
-      const plainBlob = new Blob([markdown], { type: 'text/plain' });
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': plainBlob }),
-      ]);
-      setCopySuccess(true);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setCopying(false);
-      setTimeout(() => setCopySuccess(false), 2500);
-    }
+    const collector = new DiagnosticsCollector();
+    let doc = parseMarkdown(markdown);
+    doc = planRepresentation(doc, destination, collector);
+    const html = renderToClipboardHtml(doc);
+    const htmlBlob = new Blob([html], { type: 'text/html' });
+    const plainBlob = new Blob([markdown], { type: 'text/plain' });
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': plainBlob }),
+    ]);
   };
 
   const handlePrintPdf = () => {
     window.print();
   };
 
-  const primaryAction = () => {
+  const primaryAction = async () => {
     switch (destination) {
       case 'google-docs':
       case 'clipboard':
-        return handleCopyFormatted();
+        return await handleCopyFormatted();
       case 'word':
-        return handleDownloadDocx();
+        return await handleDownloadDocx();
       case 'pdf':
-        return handlePrintPdf();
+        handlePrintPdf();
+        return Promise.resolve();
     }
   };
 
   const primaryLabel = () => {
-    if (copySuccess) return '✓ Copied!';
-    if (copying) return 'Copying…';
-    if (downloading) return 'Compiling…';
     switch (destination) {
       case 'google-docs': return 'Copy for Google Docs';
       case 'clipboard': return 'Copy formatted';
@@ -88,8 +79,6 @@ export function Header({ appState, markdown, destination, onDestinationChange }:
   };
 
   const primaryIcon = () => {
-    if (copySuccess) return 'check_circle';
-    if (downloading) return 'refresh';
     switch (destination) {
       case 'google-docs':
       case 'clipboard':
@@ -116,42 +105,27 @@ export function Header({ appState, markdown, destination, onDestinationChange }:
       {appState === 'WORKSPACE' && (
         <div className="flex items-center gap-space-md">
           {/* Destination Selector */}
-          <div className="flex items-center bg-surface-container p-space-xxs rounded border border-outline-variant/30" role="tablist">
-            {([
-              { id: 'google-docs' as DestinationType, label: 'Google Docs' },
-              { id: 'word' as DestinationType, label: 'Word' },
-              { id: 'pdf' as DestinationType, label: 'PDF' },
-              { id: 'clipboard' as DestinationType, label: 'Copy' },
-            ]).map((dest) => (
-              <button
-                key={dest.id}
-                onClick={() => onDestinationChange(dest.id)}
-                role="tab"
-                aria-selected={destination === dest.id}
-                className={`px-space-sm py-space-xxs font-code-sm text-code-sm rounded transition-colors ${
-                  destination === dest.id
-                    ? 'bg-surface text-on-surface font-medium shadow-sm'
-                    : 'text-secondary hover:text-on-surface'
-                }`}
-              >
-                {dest.label}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            options={[
+              { value: 'google-docs', label: 'Google Docs' },
+              { value: 'word', label: 'Word' },
+              { value: 'pdf', label: 'PDF' },
+              { value: 'clipboard', label: 'Copy' },
+            ]}
+            label="Destination"
+            value={destination}
+            onValueChange={(val) => onDestinationChange(val as DestinationType)}
+          />
 
           {/* Primary Action */}
-          <button
-            onClick={primaryAction}
-            disabled={downloading || copying}
-            className={`flex items-center gap-space-xs px-space-md py-space-xs rounded font-code-sm text-code-sm font-medium shadow-sm cursor-pointer transition-colors ${
-              copySuccess
-                ? 'bg-[#22c55e] text-white'
-                : 'bg-primary text-on-primary hover:bg-secondary-fixed-dim hover:text-on-secondary-fixed'
-            }`}
+          <LoadingButton
+            onAction={primaryAction}
+            successLabel="✓ Copied!"
+            pendingLabel={destination === 'word' ? 'Compiling…' : 'Copying…'}
+            idleIcon={<span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>}
           >
-            <span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>
-            <span>{primaryLabel()}</span>
-          </button>
+            {primaryLabel() ?? 'Export'}
+          </LoadingButton>
         </div>
       )}
     </header>

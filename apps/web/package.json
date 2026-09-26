@@ -15,6 +15,7 @@
     "@mdtodocs/compiler-core": "workspace:*",
     "@mdtodocs/renderers": "workspace:*",
     "@mdtodocs/validation": "workspace:*",
+    "motion": "^13.4.4",
     "prismjs": "^1.30.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

@@ -7,6 +7,7 @@ import { validateDocument } from '@mdtodocs/validation';
 import { resolveAssets } from '@mdtodocs/asset-pipeline';
 import { FidelityCheckPanel } from './FidelityCheckPanel';
 import { DocumentInspector } from './DocumentInspector';
+import { SegmentedControl } from './interior/segmented-control';
 
 interface WorkspaceProps {
   markdown: string;
@@ -220,21 +221,17 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
               </span>
               <span className="text-outline-variant">·</span>
 
-              <div className="flex bg-surface-container rounded p-0.5">
-                {(['google-docs', 'word', 'pdf', 'clipboard'] as DestinationType[]).map((dest) => (
-                  <button
-                    key={dest}
-                    onClick={() => onDestinationChange(dest)}
-                    className={`px-space-xs py-space-xxs rounded font-code-sm text-code-sm ${
-                      destination === dest
-                        ? 'bg-surface text-on-surface shadow-sm'
-                        : 'text-secondary hover:text-on-surface transition-colors'
-                    }`}
-                  >
-                    {DEST_LABELS[dest]}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                options={[
+                  { value: 'google-docs', label: 'Google Docs' },
+                  { value: 'word', label: 'Word' },
+                  { value: 'pdf', label: 'PDF' },
+                  { value: 'clipboard', label: 'Copy' },
+                ]}
+                label="Destination Preview"
+                value={destination}
+                onValueChange={(val) => onDestinationChange(val as DestinationType)}
+              />
             </div>
             <div className="flex items-center gap-space-md">
               <button 
