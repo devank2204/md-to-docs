@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "blocks": [
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Check out "
+        },
+        {
+          "type": "Link",
+          "url": "https://google.com",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "Google"
+            }
+          ]
+        },
+        {
+          "type": "Text",
+          "value": ".\nThis is some "
+        },
+        {
+          "type": "InlineCode",
+          "value": "inline code"
+        },
+        {
+          "type": "Text",
+          "value": " right here."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "version": "1.0.0",
+  "blocks": [
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "This is a standard paragraph with "
+        },
+        {
+          "type": "Strong",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "strong"
+            }
+          ]
+        },
+        {
+          "type": "Text",
+          "value": " text, "
+        },
+        {
+          "type": "Emphasis",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "emphasized"
+            }
+          ]
+        },
+        {
+          "type": "Text",
+          "value": " text, and "
+        },
+        {
+          "type": "Strike",
+          "inlines": [
+            {
+              "type": "Text",
+              "value": "strikethrough"
+            }
+          ]
+        },
+        {
+          "type": "Text",
+          "value": " text."
+        }
+      ]
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "This is a second paragraph. It should be separated by a blank line."
+        }
+      ]
+    }
+  ]
+}

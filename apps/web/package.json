@@ -12,6 +12,7 @@
   "dependencies": {
     "@folio/compiler-core": "workspace:*",
     "@folio/renderers": "workspace:*",
+    "@folio/capability-graph": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

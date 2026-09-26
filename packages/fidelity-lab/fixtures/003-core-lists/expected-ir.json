@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "blocks": [
+    {
+      "type": "List",
+      "ordered": false,
+      "items": [
+        {
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Unordered list item 1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Unordered list item 2"
+                }
+              ]
+            },
+            {
+              "type": "List",
+              "ordered": false,
+              "items": [
+                {
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Nested unordered item"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "blocks": [
+                    {
+                      "type": "Paragraph",
+                      "inlines": [
+                        {
+                          "type": "Text",
+                          "value": "Another nested item"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Unordered list item 3"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "List",
+      "ordered": true,
+      "start": 1,
+      "items": [
+        {
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Ordered list item 1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Ordered list item 2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "blocks": [
+            {
+              "type": "Paragraph",
+              "inlines": [
+                {
+                  "type": "Text",
+                  "value": "Ordered list item 3"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

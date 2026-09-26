@@ -38,13 +38,13 @@ export function EmptyState({ onInput }: EmptyStateProps) {
       <div className="w-full max-w-4xl bg-surface-container-lowest rounded-lg shadow-sm hover:shadow transition-all relative overflow-hidden group">
         <div className="relative min-h-[360px] p-space-xl flex flex-col justify-between">
           <textarea
-            className="absolute inset-0 w-full h-full p-space-xl font-code-md text-code-md text-on-surface bg-transparent resize-none focus:outline-none z-20 placeholder-transparent leading-relaxed"
+            className="absolute inset-0 w-full h-full p-space-xl font-code-md text-code-md text-on-surface bg-transparent resize-none focus:outline-none z-10 placeholder-transparent leading-relaxed"
             onChange={(e) => onInput(e.target.value)}
             placeholder=""
             spellCheck="false"
           />
           
-          <div className="relative z-10 pointer-events-none flex flex-col justify-between h-full">
+          <div className="relative z-20 pointer-events-none flex flex-col justify-between h-full">
             <div className="space-y-space-md">
               <div className="font-code-md text-code-md text-secondary/30 select-none space-y-1">
                 <div># Title of your specification or paper</div>

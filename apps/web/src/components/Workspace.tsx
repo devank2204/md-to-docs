@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
-import { parseMarkdown } from '@folio/compiler-core';
+import { useState, useMemo } from 'react';
+import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@folio/compiler-core';
+import type { DestinationType } from '@folio/capability-graph';
 import { renderToHtml } from '@folio/renderers';
 
 interface WorkspaceProps {
@@ -8,18 +9,28 @@ interface WorkspaceProps {
 }
 
 export function Workspace({ markdown, onInput }: WorkspaceProps) {
+  const [destination, setDestination] = useState<DestinationType>('google-docs');
+  
   const words = markdown.trim().split(/\s+/).filter(w => w.length > 0).length;
   const lines = markdown.split('\n').length;
 
-  const htmlContent = useMemo(() => {
+  const { htmlContent, diagnostics } = useMemo(() => {
     try {
-      const doc = parseMarkdown(markdown);
-      return renderToHtml(doc);
+      const collector = new DiagnosticsCollector();
+      let doc = parseMarkdown(markdown);
+      doc = planRepresentation(doc, destination, collector);
+      return {
+        htmlContent: renderToHtml(doc),
+        diagnostics: collector.getAll()
+      };
     } catch (e) {
       console.error(e);
-      return '<div class="text-error">Error compiling markdown.</div>';
+      return {
+        htmlContent: '<div class="text-error">Error compiling markdown.</div>',
+        diagnostics: []
+      };
     }
-  }, [markdown]);
+  }, [markdown, destination]);
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)]">
@@ -65,7 +76,20 @@ export function Workspace({ markdown, onInput }: WorkspaceProps) {
                 <span>Document Preview</span>
               </span>
               <span className="text-outline-variant">·</span>
-              <span className="px-space-xs py-space-xxs rounded bg-surface-container text-on-surface font-code-sm text-code-sm">Standard Letter (8.5 × 11 in)</span>
+              
+              <div className="flex bg-surface-container rounded p-0.5">
+                <button 
+                  onClick={() => setDestination('google-docs')}
+                  className={`px-space-xs py-space-xxs rounded font-code-sm text-code-sm ${destination === 'google-docs' ? 'bg-surface text-on-surface shadow-sm' : 'text-secondary hover:text-on-surface transition-colors'}`}>
+                  Google Docs
+                </button>
+                <button 
+                  onClick={() => setDestination('word')}
+                  className={`px-space-xs py-space-xxs rounded font-code-sm text-code-sm ${destination === 'word' ? 'bg-surface text-on-surface shadow-sm' : 'text-secondary hover:text-on-surface transition-colors'}`}>
+                  Word (.docx)
+                </button>
+              </div>
+
             </div>
             <div className="flex items-center gap-space-md">
               <div className="flex items-center gap-space-xs bg-surface rounded p-space-xxs shadow-xs">
@@ -77,6 +101,24 @@ export function Workspace({ markdown, onInput }: WorkspaceProps) {
           </div>
 
           <div className="flex-1 flex justify-center p-space-lg overflow-y-auto">
+            {/* Diagnostics Panel (if any) */}
+            {diagnostics.length > 0 && (
+              <div className="w-full max-w-[816px] mb-space-md bg-surface-container border border-outline-variant/30 rounded p-space-md">
+                <h3 className="font-code-sm text-code-sm font-medium text-on-surface mb-space-xs flex items-center gap-space-xs">
+                  <span className="material-symbols-outlined text-[14px] text-error">warning</span>
+                  Representation Planner Interventions
+                </h3>
+                <ul className="space-y-space-xs">
+                  {diagnostics.map(diag => (
+                    <li key={diag.id} className="font-code-sm text-code-sm text-secondary bg-surface p-space-xs rounded border border-outline-variant/20 flex flex-col gap-1">
+                      <span className="font-medium text-on-surface">{diag.message}</span>
+                      {diag.suggestedAction && <span className="text-secondary/80">↳ {diag.suggestedAction}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* The Document Canvas */}
             <div className="w-full max-w-[816px] bg-surface-container-lowest p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate">
               <div 

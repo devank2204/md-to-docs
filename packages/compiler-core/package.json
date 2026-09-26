@@ -8,7 +8,8 @@
   "dependencies": {
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
-    "mdast-util-to-string": "^4.0.0"
+    "mdast-util-to-string": "^4.0.0",
+    "@folio/capability-graph": "workspace:*"
   },
   "devDependencies": {
     "@types/mdast": "^4.0.4",
