@@ -1,0 +1,221 @@
+{
+  "version": "1.0.0",
+  "metadata": {},
+  "blocks": [
+    {
+      "type": "Heading",
+      "level": 1,
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Mixed Content"
+        }
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 16,
+        "startOffset": 0,
+        "endOffset": 15
+      }
+    },
+    {
+      "type": "Paragraph",
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Here is a paragraph before the diagram."
+        }
+      ],
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 3,
+        "endColumn": 40,
+        "startOffset": 17,
+        "endOffset": 56
+      }
+    },
+    {
+      "type": "DiagramBlock",
+      "diagramType": "mermaid",
+      "source": "classDiagram\n    class Animal\n    class Dog\n    Animal <|-- Dog",
+      "assetId": "asset-1",
+      "position": {
+        "startLine": 5,
+        "startColumn": 1,
+        "endLine": 10,
+        "endColumn": 4,
+        "startOffset": 58,
+        "endOffset": 136
+      }
+    },
+    {
+      "type": "Heading",
+      "level": 2,
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Some Code"
+        }
+      ],
+      "position": {
+        "startLine": 12,
+        "startColumn": 1,
+        "endLine": 12,
+        "endColumn": 13,
+        "startOffset": 138,
+        "endOffset": 150
+      }
+    },
+    {
+      "type": "CodeBlock",
+      "language": "typescript",
+      "value": "console.log(\"Hello\");",
+      "position": {
+        "startLine": 14,
+        "startColumn": 1,
+        "endLine": 16,
+        "endColumn": 4,
+        "startOffset": 152,
+        "endOffset": 191
+      }
+    },
+    {
+      "type": "Table",
+      "headerRows": 1,
+      "rows": [
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Syntax"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Description"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Header"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Title"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "cells": [
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Paragraph"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "blocks": [
+                {
+                  "type": "Paragraph",
+                  "inlines": [
+                    {
+                      "type": "Text",
+                      "value": "Text"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "align": [
+        null,
+        null
+      ],
+      "position": {
+        "startLine": 18,
+        "startColumn": 1,
+        "endLine": 21,
+        "endColumn": 21,
+        "startOffset": 193,
+        "endOffset": 287
+      }
+    },
+    {
+      "type": "ImageBlock",
+      "src": "https://via.placeholder.com/150",
+      "alt": "Alt text",
+      "assetId": "asset-2",
+      "position": {
+        "startLine": 23,
+        "startColumn": 1,
+        "endLine": 23,
+        "endColumn": 45,
+        "startOffset": 289,
+        "endOffset": 333
+      }
+    }
+  ],
+  "assets": [
+    {
+      "id": "asset-1",
+      "type": "diagram-source",
+      "src": "mermaid",
+      "data": "classDiagram\n    class Animal\n    class Dog\n    Animal <|-- Dog"
+    },
+    {
+      "id": "asset-2",
+      "type": "image",
+      "src": "https://via.placeholder.com/150"
+    }
+  ]
+}

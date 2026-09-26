@@ -1,4 +1,5 @@
-import type { Asset, FolioDocument } from '@mdtodocs/compiler-core';
+import type { Asset, FolioDocument, Block, DiagramBlock } from '@mdtodocs/compiler-core';
+import { renderMermaid } from './mermaid';
 
 /**
  * Given a FolioDocument with parsed assets, fetches/processes those assets
@@ -6,7 +7,8 @@ import type { Asset, FolioDocument } from '@mdtodocs/compiler-core';
  */
 export async function resolveAssets(doc: FolioDocument): Promise<FolioDocument> {
   const resolvedAssets: Asset[] = [];
-  
+  const diagramResults = new Map<string, any>();
+
   for (const asset of doc.assets) {
     if (asset.type === 'image') {
       try {
@@ -17,14 +19,64 @@ export async function resolveAssets(doc: FolioDocument): Promise<FolioDocument> 
         // Push original to gracefully degrade
         resolvedAssets.push(asset);
       }
+    } else if (asset.type === 'diagram-source' && asset.src === 'mermaid') {
+      const source = asset.data || '';
+      const result = await renderMermaid(source);
+      
+      if (result.success) {
+        const svgBase64 = btoa(unescape(encodeURIComponent(result.svg)));
+        const dataUri = `data:image/svg+xml;base64,${svgBase64}`;
+        
+        resolvedAssets.push({
+          ...asset,
+          type: 'svg',
+          data: dataUri,
+          mimeType: 'image/svg+xml',
+          dimensions: { width: result.width, height: result.height }
+        });
+      } else {
+        console.warn(`Failed to render Mermaid diagram:`, result.error);
+        resolvedAssets.push(asset);
+      }
+      diagramResults.set(asset.id, result);
     } else {
       resolvedAssets.push(asset);
     }
   }
 
+  function updateBlocks(blocks: Block[]): Block[] {
+    return blocks.map(block => {
+      if (block.type === 'DiagramBlock' && block.assetId) {
+        const result = diagramResults.get(block.assetId);
+        if (result) {
+          return {
+            ...block,
+            renderStatus: result.success ? 'success' : 'error',
+            error: result.success ? undefined : result.error,
+          } as DiagramBlock;
+        }
+      }
+      
+      if (block.type === 'List') {
+        return { ...block, items: block.items.map(item => ({ ...item, blocks: updateBlocks(item.blocks) })) };
+      }
+      if (block.type === 'Blockquote') {
+        return { ...block, blocks: updateBlocks(block.blocks) };
+      }
+      if (block.type === 'Callout') {
+        return { ...block, blocks: updateBlocks(block.blocks) };
+      }
+      if (block.type === 'Table') {
+        return { ...block, rows: block.rows.map(row => ({ ...row, cells: row.cells.map(cell => ({ ...cell, blocks: updateBlocks(cell.blocks) })) })) };
+      }
+      return block;
+    });
+  }
+
   return {
     ...doc,
     assets: resolvedAssets,
+    blocks: updateBlocks(doc.blocks),
   };
 }
 

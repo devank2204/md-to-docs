@@ -141,6 +141,8 @@ export interface DiagramBlock extends BaseBlock {
   diagramType: 'mermaid';
   source: string;
   assetId?: string; // Resolved SVG/PNG asset
+  renderStatus?: 'success' | 'error';
+  error?: { message: string };
 }
 
 export interface MathBlock extends BaseBlock {

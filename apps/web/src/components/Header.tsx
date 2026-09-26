@@ -102,10 +102,15 @@ export function Header({ appState, markdown, destination, onDestinationChange }:
   return (
     <header className="fixed top-0 left-0 right-0 h-12 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-space-md gap-space-md border-t border-outline-variant/30">
       <div className="flex items-center gap-space-md">
-        <a href="/" className="flex items-center gap-space-xs group transition-all duration-300 hover:-translate-y-[1px]">
-          <span className="font-code-lg text-code-lg tracking-wider font-semibold text-primary lowercase transition-all duration-500 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:via-indigo-500 group-hover:to-purple-500">
+        <a href="/" className="flex items-center gap-space-xs group relative transition-transform duration-700 hover:-translate-y-[2px]">
+          <span className="font-code-lg text-code-lg tracking-wider font-semibold text-primary lowercase transition-all duration-700 
+            group-hover:text-transparent group-hover:bg-clip-text 
+            group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-on-tertiary-container group-hover:to-primary
+            group-hover:bg-[length:200%_auto] group-hover:animate-background-pan
+            group-hover:tracking-[0.08em]">
             mdtodocs.com
           </span>
+          <span className="absolute -bottom-1 left-0 w-full h-[2px] rounded-full bg-gradient-to-r from-transparent via-on-tertiary-container to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out origin-center opacity-0 group-hover:opacity-100"></span>
         </a>
       </div>
 

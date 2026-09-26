@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "metadata": {},
+  "blocks": [
+    {
+      "type": "Heading",
+      "level": 1,
+      "inlines": [
+        {
+          "type": "Text",
+          "value": "Invalid Mermaid Diagram"
+        }
+      ],
+      "position": {
+        "startLine": 1,
+        "startColumn": 1,
+        "endLine": 1,
+        "endColumn": 26,
+        "startOffset": 0,
+        "endOffset": 25
+      }
+    },
+    {
+      "type": "DiagramBlock",
+      "diagramType": "mermaid",
+      "source": "this is not valid mermaid\nA --> B --> C?",
+      "assetId": "asset-1",
+      "position": {
+        "startLine": 3,
+        "startColumn": 1,
+        "endLine": 6,
+        "endColumn": 4,
+        "startOffset": 27,
+        "endOffset": 82
+      }
+    }
+  ],
+  "assets": [
+    {
+      "id": "asset-1",
+      "type": "diagram-source",
+      "src": "mermaid",
+      "data": "this is not valid mermaid\nA --> B --> C?"
+    }
+  ]
+}

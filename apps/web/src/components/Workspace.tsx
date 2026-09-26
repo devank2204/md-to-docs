@@ -24,6 +24,8 @@ interface DocumentStats {
   images: number;
   blockquotes: number;
   callouts: number;
+  mermaidRendered: number;
+  mermaidFailed: number;
 }
 
 function countElements(blocks: Block[]): DocumentStats {
@@ -36,6 +38,8 @@ function countElements(blocks: Block[]): DocumentStats {
     images: 0,
     blockquotes: 0,
     callouts: 0,
+    mermaidRendered: 0,
+    mermaidFailed: 0,
   };
 
   for (const block of blocks) {
@@ -46,6 +50,13 @@ function countElements(blocks: Block[]): DocumentStats {
       case 'Table': stats.tables++; break;
       case 'CodeBlock': stats.codeBlocks++; break;
       case 'ImageBlock': stats.images++; break;
+      case 'DiagramBlock': 
+        if ((block as any).renderStatus === 'error') {
+          stats.mermaidFailed++;
+        } else {
+          stats.mermaidRendered++;
+        }
+        break;
       case 'Blockquote':
         stats.blockquotes++;
         // Count nested elements
@@ -75,6 +86,8 @@ function formatStats(stats: DocumentStats): string {
   if (stats.images > 0) parts.push(`${stats.images} image${stats.images !== 1 ? 's' : ''}`);
   if (stats.lists > 0) parts.push(`${stats.lists} list${stats.lists !== 1 ? 's' : ''}`);
   if (stats.callouts > 0) parts.push(`${stats.callouts} callout${stats.callouts !== 1 ? 's' : ''}`);
+  if (stats.mermaidRendered > 0) parts.push(`${stats.mermaidRendered} Mermaid diagram${stats.mermaidRendered !== 1 ? 's' : ''} rendered`);
+  if (stats.mermaidFailed > 0) parts.push(`${stats.mermaidFailed} Mermaid diagram${stats.mermaidFailed !== 1 ? 's' : ''} failed`);
   return parts.join(' · ');
 }
 
@@ -97,7 +110,7 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
   }>({
     htmlContent: '',
     diagnostics: [],
-    stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0 },
+    stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0, mermaidRendered: 0, mermaidFailed: 0 },
     validationReport: null,
   });
   
@@ -113,11 +126,17 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
         const collector = new DiagnosticsCollector();
         let doc = parseMarkdown(markdown);
         
-        // Count before planner optimizations (like table->list)
-        const docStats = countElements(doc.blocks);
-        
         // Resolve assets asynchronously
         doc = await resolveAssets(doc);
+        
+        // Count before planner optimizations (like table->list)
+        const docStats = countElements(doc.blocks);
+        if (docStats.mermaidFailed > 0) {
+          collector.add({
+            severity: 'warning',
+            message: `${docStats.mermaidFailed} Mermaid diagram${docStats.mermaidFailed > 1 ? 's' : ''} could not be rendered`,
+          });
+        }
         
         doc = planRepresentation(doc, destination, collector);
         const validationReport = validateDocument(doc, destination);
@@ -136,7 +155,7 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
           setCompiledState({
             htmlContent: '<div style="color:#ef4444;">Error compiling markdown.</div>',
             diagnostics: [],
-            stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0 },
+            stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0, mermaidRendered: 0, mermaidFailed: 0 },
             validationReport: null,
           });
         }

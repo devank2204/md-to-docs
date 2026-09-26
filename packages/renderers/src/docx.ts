@@ -439,7 +439,10 @@ function renderThematicBreak(): DocxParagraph {
 
 function base64ToUint8Array(base64DataUri: string): Uint8Array {
   const base64Part = base64DataUri.split(',')[1] || base64DataUri;
-  const binaryString = atob(base64Part);
+  if (typeof Buffer !== 'undefined') {
+    return new Uint8Array(Buffer.from(base64Part, 'base64'));
+  }
+  const binaryString = atob(base64Part.trim());
   const len = binaryString.length;
   const bytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
@@ -512,6 +515,21 @@ function renderImageBlock(block: ImageBlock, assets: Asset[]): DocxParagraph[] {
 }
 
 function renderDiagramBlock(block: any, assets: any[]): DocxParagraph[] {
+  if (block.renderStatus === 'error') {
+    return [
+      new DocxParagraph({
+        children: [
+          new TextRun({
+            text: `[Diagram Warning: Mermaid diagram could not be rendered. The original Mermaid source was preserved.]`,
+            color: 'EF4444',
+            italics: true,
+          }),
+        ],
+        alignment: AlignmentType.CENTER,
+      })
+    ];
+  }
+
   const asset = assets.find(a => a.id === block.assetId);
   if (asset && asset.data) {
     try {
@@ -526,20 +544,29 @@ function renderDiagramBlock(block: any, assets: any[]): DocxParagraph[] {
         height = height * ratio;
       }
 
+      const imageExt = asset.type === 'svg' ? 'svg' : 'png';
+
       return [
         new DocxParagraph({
           children: [
             new ImageRun({
-              type: 'png',
+              type: imageExt as any,
               data: imgData,
               transformation: {
                 width: Math.round(width),
                 height: Math.round(height),
               },
+              altText: {
+                title: `Diagram: ${block.diagramType}`,
+                name: `Diagram: ${block.diagramType}`,
+                description: block.source || '',
+              }
             }),
           ],
           alignment: AlignmentType.CENTER,
           spacing: { before: 240, after: 240 },
+          keepNext: false,
+          keepLines: true,
         })
       ];
     } catch (e) {

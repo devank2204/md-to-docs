@@ -29,6 +29,15 @@ export default {
         "headline-sm": [ "17px", { "lineHeight": "24px", "fontWeight": "600" } ],
         "body-md": [ "15px", { "lineHeight": "24px", "fontWeight": "400" } ],
         "code-sm": [ "11px", { "lineHeight": "16px", "fontWeight": "400" } ]
+      },
+      "keyframes": {
+        "background-pan": {
+          "0%": { "backgroundPosition": "0% 50%" },
+          "100%": { "backgroundPosition": "-200% 50%" }
+        }
+      },
+      "animation": {
+        "background-pan": "background-pan 2.5s linear infinite"
       }
     }
   },
