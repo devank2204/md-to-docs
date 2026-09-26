@@ -183,7 +183,7 @@ export function SegmentedControl({
               onClick={() => !option.disabled && select(option.value)}
               onKeyDown={(e) => onKeyDown(e, i)}
               onPointerEnter={() => !option.disabled && setHovered(i)}
-              className="cursor-default rounded-[4px] outline-none focus-visible:bg-primary/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#000]"
+              className="cursor-default rounded-[4px] outline-none focus-visible:bg-primary/[0.06] focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary"
             >
               <span className="sr-only">{option.label}</span>
             </button>

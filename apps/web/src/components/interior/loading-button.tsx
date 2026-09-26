@@ -235,7 +235,7 @@ export function LoadingButton({
   ];
 
   const bgColor = status === 'success' 
-    ? 'bg-[#22c55e] text-white hover:bg-[#22c55e]' 
+    ? 'bg-success text-white hover:bg-success' 
     : 'bg-primary text-on-primary hover:bg-secondary-fixed-dim hover:text-on-secondary-fixed';
 
   return (

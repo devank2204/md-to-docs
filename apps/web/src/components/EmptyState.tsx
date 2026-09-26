@@ -76,14 +76,14 @@ export function EmptyState({ onInput }: EmptyStateProps) {
                   onChange={handleFileChange}
                 />
                 <button 
-                  className="px-space-md py-space-xs bg-surface hover:bg-surface-container text-on-surface rounded font-code-sm text-code-sm shadow-sm transition-all flex items-center gap-space-xs"
+                  className="px-space-md py-space-xs bg-surface hover:bg-surface-container text-on-surface rounded font-code-sm text-code-sm shadow-sm transition-all active:scale-95 flex items-center gap-space-xs"
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <span className="material-symbols-outlined text-[14px]">folder_open</span>
                   <span>Browse file...</span>
                 </button>
                 <button 
-                  className="px-space-md py-space-xs bg-primary text-on-primary hover:bg-surface-variant hover:text-on-surface-variant rounded font-code-sm text-code-sm transition-all flex items-center gap-space-xs"
+                  className="px-space-md py-space-xs bg-primary text-on-primary hover:bg-surface-variant hover:text-on-surface-variant rounded font-code-sm text-code-sm transition-all active:scale-95 flex items-center gap-space-xs"
                   onClick={loadSample}
                 >
                   <span className="material-symbols-outlined text-[14px]">auto_stories</span>

@@ -169,7 +169,7 @@ export function Workspace({
         console.error(e);
         if (isMounted) {
           setCompiledState({
-            htmlContent: '<div style="color:#ef4444;">Error compiling markdown.</div>',
+            htmlContent: '<div class="text-error font-body-md p-space-md bg-error-container/20 rounded border border-error-container/50">Error compiling markdown.</div>',
             diagnostics: [],
             stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0, mermaidRendered: 0, mermaidFailed: 0 },
             validationReport: null,

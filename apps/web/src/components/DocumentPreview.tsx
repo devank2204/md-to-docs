@@ -85,9 +85,9 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             Details
           </button>
           <div className="flex items-center gap-space-xs bg-surface rounded p-space-xxs shadow-xs">
-            <button className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container hover:text-on-surface transition-colors"><span className="material-symbols-outlined text-[16px]">remove</span></button>
+            <button className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container hover:text-on-surface transition-all active:scale-95"><span className="material-symbols-outlined text-[16px]">remove</span></button>
             <span className="tabular-nums font-medium text-on-surface px-space-xs">100%</span>
-            <button className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container hover:text-on-surface transition-colors"><span className="material-symbols-outlined text-[16px]">add</span></button>
+            <button className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container hover:text-on-surface transition-all active:scale-95"><span className="material-symbols-outlined text-[16px]">add</span></button>
           </div>
         </div>
       </div>
