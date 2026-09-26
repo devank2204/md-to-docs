@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import type { AppState } from '../App';
 import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
 import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
@@ -11,21 +11,19 @@ interface HeaderProps {
   markdown: string;
   destination: DestinationType;
   onDestinationChange: (dest: DestinationType) => void;
+  activeTheme: any;
 }
 
-export function Header({ appState, markdown, destination, onDestinationChange }: HeaderProps) {
-  const [downloading, setDownloading] = useState(false);
-  const [copying, setCopying] = useState(false);
-  const [copySuccess, setCopySuccess] = useState(false);
+export function Header({ appState, markdown, destination, onDestinationChange, activeTheme }: HeaderProps) {
+  // State handled internally by LoadingButton
 
   const handleDownloadDocx = async () => {
     if (!markdown) return;
     try {
-      setDownloading(true);
       const collector = new DiagnosticsCollector();
       let doc = parseMarkdown(markdown);
       doc = planRepresentation(doc, 'word', collector);
-      const blob = await renderToDocxBlob(doc);
+      const blob = await renderToDocxBlob(doc, activeTheme);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -34,8 +32,6 @@ export function Header({ appState, markdown, destination, onDestinationChange }:
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
-    } finally {
-      setDownloading(false);
     }
   };
 
@@ -44,7 +40,7 @@ export function Header({ appState, markdown, destination, onDestinationChange }:
     const collector = new DiagnosticsCollector();
     let doc = parseMarkdown(markdown);
     doc = planRepresentation(doc, destination, collector);
-    const html = renderToClipboardHtml(doc);
+    const html = renderToClipboardHtml(doc, activeTheme);
     const htmlBlob = new Blob([html], { type: 'text/html' });
     const plainBlob = new Blob([markdown], { type: 'text/plain' });
     await navigator.clipboard.write([

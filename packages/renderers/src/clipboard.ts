@@ -1,42 +1,202 @@
-import type { FolioDocument, Block, Inline, CalloutType, Asset } from '@mdtodocs/compiler-core';
+import type {
+  FolioDocument,
+  HeadingBlock,
+  ParagraphBlock,
+  ListBlock,
+  BlockquoteBlock,
+  CalloutBlock,
+  CodeBlock,
+  TableBlock,
+  ImageBlock,
+  DiagramBlock,
+  MathBlock,
+  TextInline,
+  StrongInline,
+  EmphasisInline,
+  StrikeInline,
+  InlineCode,
+  LinkInline,
+  InlineImageInline,
+  InlineMath,
+  DocumentTheme
+} from '@mdtodocs/compiler-core';
+import type { CalloutType } from '@mdtodocs/compiler-core';
+import { DocumentRenderer } from './core/Renderer';
+import type { RendererRegistry } from './core/Renderer';
 
-// ─── Clipboard Renderer ─────────────────────────────────────────
-// Produces HTML with inline styles optimized for pasting into
-// Google Docs, Microsoft Word, and other rich-text destinations.
-//
-// Key differences from the preview HTML renderer:
-// - ALL styles are inline (no external CSS, no classes)
-// - Fonts and spacing match destination expectations
-// - Images use absolute URLs or base64 data URIs
-// - Structure prioritizes compatibility over beauty
+// ─── Clipboard Renderer Registry ──────────────────────────────────────
 
-const FONT_STACK = "'Aptos', 'Calibri', 'Arial', sans-serif";
-const CODE_FONT = "'Consolas', 'Courier New', monospace";
-const BASE_SIZE = '11pt';
-const HEADING_SIZES: Record<number, string> = {
-  1: '24pt', 2: '18pt', 3: '14pt', 4: '12pt', 5: '11pt', 6: '10pt',
+const clipboardRegistry: RendererRegistry<string, string> = {
+  blocks: {
+    Heading: (block: HeadingBlock, ctx) => {
+      const size = ctx.theme.typography.headingSizesPt[block.level as keyof typeof ctx.theme.typography.headingSizesPt] || ctx.theme.typography.baseFontSizePt;
+      const weight = block.level <= 2 ? '700' : '600';
+      const marginTop = block.level <= 2 ? `${ctx.theme.spacing.headingSpacingBeforePt * 1.5}pt` : `${ctx.theme.spacing.headingSpacingBeforePt}pt`;
+      const color = `#${ctx.theme.colors.text}`;
+      const font = ctx.theme.typography.headingFont;
+      return `<h${block.level} style="font-family:${font};font-size:${size}pt;font-weight:${weight};color:${color};margin:${marginTop} 0 ${ctx.theme.spacing.headingSpacingAfterPt}pt 0;line-height:${ctx.theme.spacing.lineHeight};">${ctx.renderInlines(block.inlines).join('')}</h${block.level}>`;
+    },
+    Paragraph: (block: ParagraphBlock, ctx) => {
+      const color = `#${ctx.theme.colors.text}`;
+      const font = ctx.theme.typography.bodyFont;
+      const size = ctx.theme.typography.baseFontSizePt;
+      return `<p style="font-family:${font};font-size:${size}pt;color:${color};margin:0 0 ${ctx.theme.spacing.paragraphSpacingPt}pt 0;line-height:${ctx.theme.spacing.lineHeight};">${ctx.renderInlines(block.inlines).join('')}</p>`;
+    },
+    List: (block: ListBlock, ctx) => {
+      const tag = block.ordered ? 'ol' : 'ul';
+      const startAttr = block.ordered && block.start && block.start !== 1 ? ` start="${block.start}"` : '';
+      const listStyle = block.ordered ? 'decimal' : 'disc';
+      const font = ctx.theme.typography.bodyFont;
+      const size = ctx.theme.typography.baseFontSizePt;
+      
+      const items = block.items
+        .map((item) => {
+          const isTask = item.checked !== null && item.checked !== undefined;
+          const inner = ctx.renderBlocks(item.blocks).join('');
+          if (isTask) {
+            const checkbox = item.checked ? '☑ ' : '☐ ';
+            return `<li style="font-family:${font};font-size:${size}pt;list-style:none;margin:2px 0;line-height:${ctx.theme.spacing.lineHeight};">${checkbox}${inner}</li>`;
+          }
+          return `<li style="font-family:${font};font-size:${size}pt;margin:2px 0;line-height:${ctx.theme.spacing.lineHeight};">${inner}</li>`;
+        })
+        .join('');
+      return `<${tag}${startAttr} style="font-family:${font};font-size:${size}pt;list-style-type:${listStyle};padding-left:24px;margin:4px 0 8px 0;">${items}</${tag}>`;
+    },
+    Blockquote: (block: BlockquoteBlock, ctx) => {
+      const inner = ctx.renderBlocks(block.blocks).join('');
+      const border = `#${ctx.theme.colors.blockquoteBorder}`;
+      const color = `#${ctx.theme.colors.blockquoteText}`;
+      return `<blockquote style="border-left:3px solid ${border};padding-left:16px;margin:8px 0;color:${color};font-style:italic;">${inner}</blockquote>`;
+    },
+    Callout: (block: CalloutBlock, ctx) => {
+      const c = ctx.theme.colors.callouts[block.calloutType] || ctx.theme.colors.callouts.note;
+      const icon = getCalloutIcon(block.calloutType);
+      const title = block.title || block.calloutType.charAt(0).toUpperCase() + block.calloutType.slice(1);
+      const inner = ctx.renderBlocks(block.blocks).join('');
+      const font = ctx.theme.typography.bodyFont;
+      const size = ctx.theme.typography.baseFontSizePt;
+      
+      return `<div style="border-left:4px solid #${c.border};background:#${c.bg};padding:10px 14px;margin:8px 0;border-radius:2px;">
+        <p style="font-family:${font};font-size:${size}pt;margin:0 0 4px 0;font-weight:600;color:#${c.text};">${icon} ${escapeHtml(title)}</p>
+        ${inner}
+      </div>`;
+    },
+    CodeBlock: (block: CodeBlock, ctx) => {
+      const bg = `#${ctx.theme.colors.codeBackground}`;
+      const color = `#${ctx.theme.colors.codeText}`;
+      const border = `#${ctx.theme.colors.border}`;
+      const font = ctx.theme.typography.codeFont;
+      const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
+      
+      const langLabel = block.language
+        ? `<div style="font-family:${font};font-size:${size - 1}pt;color:#${ctx.theme.colors.secondary};margin-bottom:2px;">${escapeHtml(block.language)}</div>`
+        : '';
+      return `<div style="background:${bg};border:1px solid ${border};border-radius:4px;padding:10px 14px;margin:8px 0;">
+        ${langLabel}<pre style="font-family:${font};font-size:${size}pt;color:${color};margin:0;white-space:pre-wrap;word-wrap:break-word;line-height:1.5;"><code>${escapeHtml(block.value)}</code></pre>
+      </div>`;
+    },
+    Table: (block: TableBlock, ctx) => {
+      const border = `#${ctx.theme.colors.border}`;
+      const headerBg = `#${ctx.theme.colors.tableHeaderBackground}`;
+      const font = ctx.theme.typography.bodyFont;
+      const size = ctx.theme.typography.baseFontSizePt;
+      
+      const rows = block.rows
+        .map((row, rowIdx) => {
+          const isHeader = rowIdx < block.headerRows;
+          const cellTag = isHeader ? 'th' : 'td';
+          const cells = row.cells
+            .map((cell, cellIdx) => {
+              const align = block.align?.[cellIdx] ?? 'left';
+              const bgStyle = isHeader ? `background:${headerBg};` : '';
+              const fontWeight = isHeader ? 'font-weight:600;' : '';
+              const inner = ctx.renderBlocks(cell.blocks).join('');
+              return `<${cellTag} style="border:1px solid ${border};padding:6px 10px;text-align:${align};${bgStyle}${fontWeight}font-family:${font};font-size:${size}pt;">${inner}</${cellTag}>`;
+            })
+            .join('');
+          return `<tr>${cells}</tr>`;
+        })
+        .join('');
+      return `<table style="border-collapse:collapse;width:100%;margin:8px 0;font-family:${font};font-size:${size}pt;">${rows}</table>`;
+    },
+    ThematicBreak: (_block, ctx) => {
+      const border = `#${ctx.theme.colors.border}`;
+      return `<hr style="border:none;border-top:1px solid ${border};margin:16px 0;" />`;
+    },
+    ImageBlock: (block: ImageBlock, ctx) => {
+      const alt = block.alt ? ` alt="${escapeAttr(block.alt)}"` : ' alt=""';
+      const asset = ctx.assets.find(a => a.id === block.assetId);
+      const src = asset?.data || block.src;
+      return `<p style="text-align:center;margin:8px 0;"><img src="${escapeAttr(src)}"${alt} style="max-width:100%;height:auto;" /></p>`;
+    },
+    DiagramBlock: (block: DiagramBlock, ctx) => {
+      const asset = ctx.assets.find(a => a.id === block.assetId);
+      const src = asset?.data || '';
+      if (src) {
+        return `<p style="text-align:center;margin:8px 0;"><img src="${escapeAttr(src)}" alt="Diagram" style="max-width:100%;height:auto;" /></p>`;
+      }
+      const bg = `#${ctx.theme.colors.codeBackground}`;
+      const font = ctx.theme.typography.codeFont;
+      const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
+      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.source)}</code></pre>`;
+    },
+    MathBlock: (block: MathBlock, ctx) => {
+      const bg = `#${ctx.theme.colors.codeBackground}`;
+      const font = ctx.theme.typography.codeFont;
+      const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
+      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.value)}</code></pre>`;
+    },
+  },
+  inlines: {
+    Text: (inline: TextInline) => escapeHtml(inline.value),
+    Strong: (inline: StrongInline, ctx) => `<strong style="font-weight:700;">${ctx.renderInlines(inline.inlines).join('')}</strong>`,
+    Emphasis: (inline: EmphasisInline, ctx) => `<em style="font-style:italic;">${ctx.renderInlines(inline.inlines).join('')}</em>`,
+    Strike: (inline: StrikeInline, ctx) => `<s style="text-decoration:line-through;">${ctx.renderInlines(inline.inlines).join('')}</s>`,
+    InlineCode: (inline: InlineCode, ctx) => {
+      const bg = `#${ctx.theme.colors.codeBackground}`;
+      const color = `#${ctx.theme.colors.codeText}`;
+      const font = ctx.theme.typography.codeFont;
+      return `<code style="font-family:${font};background:${bg};color:${color};padding:1px 4px;border-radius:2px;">${escapeHtml(inline.value)}</code>`;
+    },
+    Link: (inline: LinkInline, ctx) => {
+      const color = `#${ctx.theme.colors.primary}`;
+      return `<a href="${escapeAttr(inline.url)}" style="color:${color};text-decoration:underline;">${ctx.renderInlines(inline.inlines).join('')}</a>`;
+    },
+    InlineImage: (inline: InlineImageInline, ctx) => {
+      const asset = ctx.assets.find(a => a.id === inline.assetId);
+      const src = asset?.data || inline.src;
+      const alt = inline.alt ? ` alt="${escapeAttr(inline.alt)}"` : ' alt=""';
+      return `<img src="${escapeAttr(src)}"${alt} style="max-height:1em;vertical-align:middle;" />`;
+    },
+    InlineMath: (inline: InlineMath, ctx) => {
+      const bg = `#${ctx.theme.colors.codeBackground}`;
+      const font = ctx.theme.typography.codeFont;
+      return `<code style="font-family:${font};background:${bg};padding:1px 4px;border-radius:2px;">${escapeHtml(inline.value)}</code>`;
+    },
+    Break: () => '<br />',
+  },
+  fallbackBlock: () => '',
+  fallbackInline: () => ''
 };
-const HEADING_WEIGHTS: Record<number, string> = {
-  1: '700', 2: '700', 3: '600', 4: '600', 5: '600', 6: '600',
-};
 
-export function renderToClipboardHtml(doc: FolioDocument): string {
-  let html = `<div style="font-family:${FONT_STACK};font-size:${BASE_SIZE};color:#1a1a1a;line-height:1.6;">`;
+const clipboardRenderer = new DocumentRenderer(clipboardRegistry);
 
-  for (const block of doc.blocks) {
-    html += renderBlock(block, doc.assets);
-  }
-
-  html += '</div>';
-  return html;
+export function renderToClipboardHtml(doc: FolioDocument, theme?: DocumentTheme): string {
+  const innerHtml = clipboardRenderer.render(doc, {}, theme).join('');
+  
+  const font = theme ? theme.typography.bodyFont : "'Aptos', 'Calibri', 'Arial', sans-serif";
+  const size = theme ? theme.typography.baseFontSizePt : 11;
+  const color = theme ? `#${theme.colors.text}` : '#1a1a1a';
+  
+  return `<div style="font-family:${font};font-size:${size}pt;color:${color};line-height:1.6;">${innerHtml}</div>`;
 }
 
 /**
  * Copies the document as rich HTML to the system clipboard.
  * Writes both text/html and text/plain for maximum compatibility.
  */
-export async function copyToClipboard(doc: FolioDocument): Promise<void> {
-  const html = renderToClipboardHtml(doc);
+export async function copyToClipboard(doc: FolioDocument, theme?: DocumentTheme): Promise<void> {
+  const html = renderToClipboardHtml(doc, theme);
   const plainText = extractPlainText(doc);
 
   const htmlBlob = new Blob([html], { type: 'text/html' });
@@ -50,208 +210,60 @@ export async function copyToClipboard(doc: FolioDocument): Promise<void> {
   ]);
 }
 
-// ─── Block Rendering ────────────────────────────────────────────
-
-function renderBlock(block: Block, assets: Asset[]): string {
-  switch (block.type) {
-    case 'Heading': {
-      const size = HEADING_SIZES[block.level] || '11pt';
-      const weight = HEADING_WEIGHTS[block.level] || '600';
-      const marginTop = block.level <= 2 ? '24px' : '16px';
-      return `<h${block.level} style="font-family:${FONT_STACK};font-size:${size};font-weight:${weight};color:#1a1a1a;margin:${marginTop} 0 8px 0;line-height:1.3;">${renderInlines(block.inlines)}</h${block.level}>`;
-    }
-
-    case 'Paragraph':
-      return `<p style="font-family:${FONT_STACK};font-size:${BASE_SIZE};color:#1a1a1a;margin:0 0 8px 0;line-height:1.6;">${renderInlines(block.inlines)}</p>`;
-
-    case 'List': {
-      const tag = block.ordered ? 'ol' : 'ul';
-      const startAttr = block.ordered && block.start && block.start !== 1 ? ` start="${block.start}"` : '';
-      const listStyle = block.ordered ? 'decimal' : 'disc';
-      const items = block.items
-        .map((item) => {
-          const isTask = item.checked !== null && item.checked !== undefined;
-          const inner = item.blocks.map(b => renderBlock(b, assets)).join('');
-          if (isTask) {
-            const checkbox = item.checked ? '☑ ' : '☐ ';
-            return `<li style="font-family:${FONT_STACK};font-size:${BASE_SIZE};list-style:none;margin:2px 0;line-height:1.6;">${checkbox}${inner}</li>`;
-          }
-          return `<li style="font-family:${FONT_STACK};font-size:${BASE_SIZE};margin:2px 0;line-height:1.6;">${inner}</li>`;
-        })
-        .join('');
-      return `<${tag}${startAttr} style="font-family:${FONT_STACK};font-size:${BASE_SIZE};list-style-type:${listStyle};padding-left:24px;margin:4px 0 8px 0;">${items}</${tag}>`;
-    }
-
-    case 'Blockquote': {
-      const inner = block.blocks.map(b => renderBlock(b, assets)).join('');
-      return `<blockquote style="border-left:3px solid #d1d5db;padding-left:16px;margin:8px 0;color:#4b5563;font-style:italic;">${inner}</blockquote>`;
-    }
-
-    case 'Callout': {
-      const colors = getCalloutColors(block.calloutType);
-      const icon = getCalloutIcon(block.calloutType);
-      const title = block.title || block.calloutType.charAt(0).toUpperCase() + block.calloutType.slice(1);
-      const inner = block.blocks.map(b => renderBlock(b, assets)).join('');
-      return `<div style="border-left:4px solid ${colors.border};background:${colors.bg};padding:10px 14px;margin:8px 0;border-radius:2px;">
-        <p style="font-family:${FONT_STACK};font-size:${BASE_SIZE};margin:0 0 4px 0;font-weight:600;color:${colors.text};">${icon} ${escapeHtml(title)}</p>
-        ${inner}
-      </div>`;
-    }
-
-    case 'CodeBlock': {
-      const langLabel = block.language
-        ? `<div style="font-family:${CODE_FONT};font-size:9pt;color:#6b7280;margin-bottom:2px;">${escapeHtml(block.language)}</div>`
-        : '';
-      return `<div style="background:#f8f9fa;border:1px solid #e5e7eb;border-radius:4px;padding:10px 14px;margin:8px 0;">
-        ${langLabel}<pre style="font-family:${CODE_FONT};font-size:10pt;color:#1f2937;margin:0;white-space:pre-wrap;word-wrap:break-word;line-height:1.5;"><code>${escapeHtml(block.value)}</code></pre>
-      </div>`;
-    }
-
-    case 'Table': {
-      const rows = block.rows
-        .map((row, rowIdx) => {
-          const isHeader = rowIdx < block.headerRows;
-          const cellTag = isHeader ? 'th' : 'td';
-          const cells = row.cells
-            .map((cell, cellIdx) => {
-              const align = block.align?.[cellIdx] ?? 'left';
-              const bgStyle = isHeader ? 'background:#f3f4f6;' : '';
-              const fontWeight = isHeader ? 'font-weight:600;' : '';
-              const inner = cell.blocks.map(b => renderBlock(b, assets)).join('');
-              return `<${cellTag} style="border:1px solid #d1d5db;padding:6px 10px;text-align:${align};${bgStyle}${fontWeight}font-family:${FONT_STACK};font-size:${BASE_SIZE};">${inner}</${cellTag}>`;
-            })
-            .join('');
-          return `<tr>${cells}</tr>`;
-        })
-        .join('');
-      return `<table style="border-collapse:collapse;width:100%;margin:8px 0;font-family:${FONT_STACK};font-size:${BASE_SIZE};">${rows}</table>`;
-    }
-
-    case 'ThematicBreak':
-      return '<hr style="border:none;border-top:1px solid #d1d5db;margin:16px 0;" />';
-
-    case 'ImageBlock': {
-      const alt = block.alt ? ` alt="${escapeAttr(block.alt)}"` : ' alt=""';
-      const asset = assets.find(a => a.id === block.assetId);
-      const src = asset?.data || block.src;
-      return `<p style="text-align:center;margin:8px 0;"><img src="${escapeAttr(src)}"${alt} style="max-width:100%;height:auto;" /></p>`;
-    }
-
-    case 'DiagramBlock': {
-      const asset = assets.find(a => a.id === block.assetId);
-      const src = asset?.data || '';
-      if (src) {
-        return `<p style="text-align:center;margin:8px 0;"><img src="${escapeAttr(src)}" alt="Diagram" style="max-width:100%;height:auto;" /></p>`;
-      }
-      return `<pre style="font-family:${CODE_FONT};font-size:10pt;background:#f3f4f6;padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.source)}</code></pre>`;
-    }
-
-    case 'MathBlock':
-      return `<pre style="font-family:${CODE_FONT};font-size:10pt;background:#f3f4f6;padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.value)}</code></pre>`;
-
-    default:
-      return '';
-  }
-}
-
-// ─── Inline Rendering ───────────────────────────────────────────
-
-function renderInlines(inlines: Inline[], assets?: Asset[]): string {
-  return inlines.map(i => renderInline(i, assets)).join('');
-}
-
-function renderInline(inline: Inline, assets?: Asset[]): string {
-  switch (inline.type) {
-    case 'Text':
-      return escapeHtml(inline.value);
-    case 'Strong':
-      return `<strong style="font-weight:700;">${renderInlines(inline.inlines, assets)}</strong>`;
-    case 'Emphasis':
-      return `<em style="font-style:italic;">${renderInlines(inline.inlines, assets)}</em>`;
-    case 'Strike':
-      return `<s style="text-decoration:line-through;">${renderInlines(inline.inlines, assets)}</s>`;
-    case 'InlineCode':
-      return `<code style="font-family:${CODE_FONT};font-size:10pt;background:#f3f4f6;padding:1px 4px;border-radius:2px;">${escapeHtml(inline.value)}</code>`;
-    case 'Link':
-      return `<a href="${escapeAttr(inline.url)}" style="color:#2563eb;text-decoration:underline;">${renderInlines(inline.inlines, assets)}</a>`;
-    case 'InlineImage': {
-      const asset = assets?.find(a => a.id === inline.assetId);
-      const src = asset?.data || inline.src;
-      const alt = inline.alt ? ` alt="${escapeAttr(inline.alt)}"` : ' alt=""';
-      return `<img src="${escapeAttr(src)}"${alt} style="max-height:1em;vertical-align:middle;" />`;
-    }
-    case 'InlineMath':
-      return `<code style="font-family:${CODE_FONT};font-size:10pt;background:#f3f4f6;padding:1px 4px;border-radius:2px;">${escapeHtml(inline.value)}</code>`;
-    case 'Break':
-      return '<br />';
-    default:
-      return '';
-  }
-}
-
 // ─── Plain Text Extraction ──────────────────────────────────────
 
-function extractPlainText(doc: FolioDocument): string {
-  return doc.blocks.map(extractBlockText).join('\n\n');
-}
-
-function extractBlockText(block: Block): string {
-  switch (block.type) {
-    case 'Heading':
-      return extractInlinesText(block.inlines);
-    case 'Paragraph':
-      return extractInlinesText(block.inlines);
-    case 'List':
+const plainTextRegistry: RendererRegistry<string, string> = {
+  blocks: {
+    Heading: (block: HeadingBlock, ctx) => ctx.renderInlines(block.inlines).join(''),
+    Paragraph: (block: ParagraphBlock, ctx) => ctx.renderInlines(block.inlines).join(''),
+    List: (block: ListBlock, ctx) => {
       return block.items
         .map((item, i) => {
           const prefix = block.ordered ? `${(block.start || 1) + i}. ` : '• ';
           const checkbox = item.checked !== null && item.checked !== undefined
             ? (item.checked ? '[x] ' : '[ ] ')
             : '';
-          const text = item.blocks.map(extractBlockText).join('\n');
+          const text = ctx.renderBlocks(item.blocks).join('\n');
           return `${prefix}${checkbox}${text}`;
         })
         .join('\n');
-    case 'Blockquote':
-      return block.blocks.map((b) => `> ${extractBlockText(b)}`).join('\n');
-    case 'Callout': {
+    },
+    Blockquote: (block: BlockquoteBlock, ctx) => block.blocks.map((b) => `> ${ctx.renderBlock(b)}`).join('\n'),
+    Callout: (block: CalloutBlock, ctx) => {
       const title = block.title || block.calloutType.toUpperCase();
-      const body = block.blocks.map(extractBlockText).join('\n');
+      const body = ctx.renderBlocks(block.blocks).join('\n');
       return `[${title}]\n${body}`;
-    }
-    case 'CodeBlock':
-      return block.value;
-    case 'Table':
+    },
+    CodeBlock: (block: CodeBlock) => block.value,
+    Table: (block: TableBlock, ctx) => {
       return block.rows
-        .map((row) =>
-          row.cells.map((cell) => cell.blocks.map(extractBlockText).join(' ')).join(' | ')
-        )
+        .map((row) => row.cells.map((cell) => ctx.renderBlocks(cell.blocks).join(' ')).join(' | '))
         .join('\n');
-    case 'ThematicBreak':
-      return '---';
-    case 'ImageBlock':
-      return `[Image: ${block.alt || block.src}]`;
-    default:
-      return '';
-  }
-}
+    },
+    ThematicBreak: () => '---',
+    ImageBlock: (block: ImageBlock) => `[Image: ${block.alt || block.src}]`,
+    DiagramBlock: (block: DiagramBlock) => `[Diagram: ${block.diagramType}]`,
+    MathBlock: (block: MathBlock) => block.value,
+  },
+  inlines: {
+    Text: (inline: TextInline) => inline.value,
+    Strong: (inline: StrongInline, ctx) => ctx.renderInlines(inline.inlines).join(''),
+    Emphasis: (inline: EmphasisInline, ctx) => ctx.renderInlines(inline.inlines).join(''),
+    Strike: (inline: StrikeInline, ctx) => ctx.renderInlines(inline.inlines).join(''),
+    InlineCode: (inline: InlineCode) => inline.value,
+    Link: (inline: LinkInline, ctx) => ctx.renderInlines(inline.inlines).join(''),
+    InlineImage: (inline: InlineImageInline) => inline.alt || '',
+    InlineMath: (inline: InlineMath) => inline.value,
+    Break: () => '\n',
+  },
+  fallbackBlock: () => '',
+  fallbackInline: () => ''
+};
 
-function extractInlinesText(inlines: Inline[]): string {
-  return inlines
-    .map((inline) => {
-      switch (inline.type) {
-        case 'Text': return inline.value;
-        case 'InlineCode': return inline.value;
-        case 'Strong': return extractInlinesText(inline.inlines);
-        case 'Emphasis': return extractInlinesText(inline.inlines);
-        case 'Strike': return extractInlinesText(inline.inlines);
-        case 'Link': return extractInlinesText(inline.inlines);
-        case 'InlineImage': return inline.alt || '';
-        case 'Break': return '\n';
-        default: return '';
-      }
-    })
-    .join('');
+const plainTextRenderer = new DocumentRenderer(plainTextRegistry);
+
+function extractPlainText(doc: FolioDocument): string {
+  return plainTextRenderer.render(doc).join('\n\n');
 }
 
 // ─── Helpers ────────────────────────────────────────────────────
@@ -266,16 +278,6 @@ function escapeHtml(str: string): string {
 
 function escapeAttr(str: string): string {
   return str.replace(/"/g, '&quot;').replace(/&/g, '&amp;');
-}
-
-function getCalloutColors(type: CalloutType): { bg: string; border: string; text: string } {
-  switch (type) {
-    case 'note': return { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' };
-    case 'tip': return { bg: '#f0fdf4', border: '#22c55e', text: '#166534' };
-    case 'important': return { bg: '#f5f3ff', border: '#8b5cf6', text: '#5b21b6' };
-    case 'warning': return { bg: '#fffbeb', border: '#f59e0b', text: '#92400e' };
-    case 'caution': return { bg: '#fef2f2', border: '#ef4444', text: '#991b1b' };
-  }
 }
 
 function getCalloutIcon(type: CalloutType): string {

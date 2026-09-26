@@ -3,6 +3,8 @@ import { EmptyState } from './components/EmptyState';
 import { Workspace } from './components/Workspace';
 import { Header } from './components/Header';
 import type { DestinationType } from '@mdtodocs/capability-graph';
+import { THEMES } from '@mdtodocs/compiler-core';
+import type { DocumentTheme } from '@mdtodocs/compiler-core';
 
 export type AppState = 'EMPTY' | 'WORKSPACE';
 
@@ -10,8 +12,13 @@ function App() {
   const [appState, setAppState] = useState<AppState>('EMPTY');
   const [markdown, setMarkdown] = useState<string>('');
   const [destination, setDestination] = useState<DestinationType>('google-docs');
+  const [themeId, setThemeId] = useState<keyof typeof THEMES>('default');
+  const [baseFontSize, setBaseFontSize] = useState<number>(THEMES['default'].typography.baseFontSizePt);
 
-  // Handle global paste to transition to workspace if empty
+  const activeTheme: DocumentTheme = {
+    ...THEMES[themeId],
+    typography: { ...THEMES[themeId].typography, baseFontSizePt: baseFontSize },
+  };
   useEffect(() => {
     const handleGlobalPaste = (e: ClipboardEvent) => {
       if (appState === 'EMPTY') {
@@ -42,6 +49,7 @@ function App() {
         markdown={markdown}
         destination={destination}
         onDestinationChange={setDestination}
+        activeTheme={activeTheme}
       />
       <main className="flex-1 flex flex-col mt-12 relative">
         {appState === 'EMPTY' ? (
@@ -52,6 +60,11 @@ function App() {
             onInput={handleInput}
             destination={destination}
             onDestinationChange={setDestination}
+            themeId={themeId}
+            onThemeIdChange={setThemeId}
+            baseFontSize={baseFontSize}
+            onBaseFontSizeChange={setBaseFontSize}
+            activeTheme={activeTheme}
           />
         )}
       </main>

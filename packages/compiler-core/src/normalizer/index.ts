@@ -166,6 +166,27 @@ function normalizeBlock(node: Content, assets: Asset[]): Block | null {
       };
     }
 
+    case 'containerDirective': {
+      const directiveNode = node as any;
+      const lowerName = (directiveNode.name || '').toLowerCase();
+      
+      const calloutType: CalloutType = ['note', 'tip', 'important', 'warning', 'caution'].includes(lowerName) 
+        ? (lowerName as CalloutType) 
+        : 'note';
+
+      const innerBlocks = (directiveNode.children || [])
+        .map((child: any) => normalizeBlock(child, assets))
+        .filter(Boolean) as Block[];
+
+      return {
+        type: 'Callout',
+        calloutType,
+        title: directiveNode.attributes?.title || undefined,
+        blocks: innerBlocks,
+        position,
+      };
+    }
+
     case 'code': {
       if (node.lang === 'mermaid') {
         const assetId = nextAssetId();
@@ -234,6 +255,16 @@ function normalizeBlock(node: Content, assets: Asset[]): Block | null {
         position,
       };
 
+    case 'footnoteDefinition':
+      return {
+        type: 'FootnoteDefinition',
+        identifier: (node as any).identifier,
+        blocks: (node.children || [])
+          .map((child: any) => normalizeBlock(child, assets))
+          .filter(Boolean) as Block[],
+        position,
+      };
+
     default:
       console.warn(`Unsupported block node type: ${node.type}`);
       return null;
@@ -279,6 +310,8 @@ function normalizeInlines(nodes: PhrasingContent[], assets: Asset[]): Inline[] {
         return { type: 'Break' as const };
       case 'inlineMath':
         return { type: 'InlineMath' as const, value: (node as any).value };
+      case 'footnoteReference':
+        return { type: 'FootnoteReference' as const, identifier: (node as any).identifier };
       default:
         console.warn(`Unsupported inline node type: ${(node as any).type}`);
         return { type: 'Text' as const, value: '' } as Inline;

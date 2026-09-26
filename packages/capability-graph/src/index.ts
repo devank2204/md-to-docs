@@ -82,7 +82,17 @@ type CapabilityKey =
   | 'Callout'
   | 'MathBlock'
   | 'DiagramBlock'
-  | 'FootnoteDefinition';
+  | 'FootnoteDefinition'
+  | 'Text'
+  | 'Strong'
+  | 'Emphasis'
+  | 'Strike'
+  | 'InlineCode'
+  | 'Link'
+  | 'InlineImage'
+  | 'Break'
+  | 'InlineMath'
+  | 'FootnoteReference';
 
 const CAPABILITY_MATRIX: Record<CapabilityKey, Record<DestinationType, SupportLevel>> = {
   Heading:             { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
@@ -97,6 +107,16 @@ const CAPABILITY_MATRIX: Record<CapabilityKey, Record<DestinationType, SupportLe
   MathBlock:           { 'google-docs': 'image',   word: 'native',  pdf: 'native',  clipboard: 'image' },
   DiagramBlock:        { 'google-docs': 'image',   word: 'image',   pdf: 'image',   clipboard: 'image' },
   FootnoteDefinition:  { 'google-docs': 'transformed', word: 'native', pdf: 'native', clipboard: 'transformed' },
+  Text:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  Strong:              { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  Emphasis:            { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  Strike:              { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  InlineCode:          { 'google-docs': 'styled',  word: 'styled',  pdf: 'native',  clipboard: 'styled' },
+  Link:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  InlineImage:         { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  Break:               { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  InlineMath:          { 'google-docs': 'image',   word: 'native',  pdf: 'native',  clipboard: 'image' },
+  FootnoteReference:   { 'google-docs': 'transformed', word: 'native', pdf: 'native', clipboard: 'transformed' },
 };
 
 export function evaluateCapability(

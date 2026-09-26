@@ -19,7 +19,8 @@ export interface Asset {
   id: string;
   type: 'image' | 'svg' | 'diagram-source';
   src: string;
-  data?: string; // base64 encoded
+  data?: string; // base64 encoded or data URI
+  raw?: string; // raw string content (e.g. SVG source)
   mimeType?: string;
   dimensions?: { width: number; height: number };
 }
@@ -48,7 +49,8 @@ export type Block =
   | ImageBlock
   | CalloutBlock
   | DiagramBlock
-  | MathBlock;
+  | MathBlock
+  | FootnoteDefinitionBlock;
 
 export interface BaseBlock {
   id?: string;
@@ -161,7 +163,8 @@ export type Inline =
   | LinkInline
   | InlineImageInline
   | BreakInline
-  | InlineMath;
+  | InlineMath
+  | FootnoteReferenceInline;
 
 export interface BaseInline {
   type: string;
@@ -214,4 +217,15 @@ export interface BreakInline extends BaseInline {
 export interface InlineMath extends BaseInline {
   type: 'InlineMath';
   value: string; // LaTeX source
+}
+
+export interface FootnoteDefinitionBlock extends BaseBlock {
+  type: 'FootnoteDefinition';
+  identifier: string;
+  blocks: Block[];
+}
+
+export interface FootnoteReferenceInline extends BaseInline {
+  type: 'FootnoteReference';
+  identifier: string;
 }

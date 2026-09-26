@@ -31,6 +31,7 @@ export async function resolveAssets(doc: FolioDocument): Promise<FolioDocument> 
           ...asset,
           type: 'svg',
           data: dataUri,
+          raw: result.svg, // Store raw SVG string
           mimeType: 'image/svg+xml',
           dimensions: { width: result.width, height: result.height }
         });

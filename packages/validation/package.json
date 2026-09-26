@@ -3,11 +3,20 @@
   "version": "1.0.0",
   "type": "module",
   "main": "src/index.ts",
+  "scripts": {
+    "test": "vitest run"
+  },
   "dependencies": {
+    "@mdtodocs/asset-pipeline": "workspace:*",
+    "@mdtodocs/capability-graph": "workspace:*",
     "@mdtodocs/compiler-core": "workspace:*",
-    "@mdtodocs/capability-graph": "workspace:*"
+    "@mdtodocs/renderers": "workspace:*",
+    "mermaid": "^12.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.5.3"
+    "cheerio": "^1.2.0",
+    "jsdom": "^30.1.1",
+    "typescript": "^5.5.3",
+    "vitest": "^5.0.2"
   }
 }

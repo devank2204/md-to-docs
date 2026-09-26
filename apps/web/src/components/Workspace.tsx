@@ -14,6 +14,11 @@ interface WorkspaceProps {
   onInput: (markdown: string) => void;
   destination: DestinationType;
   onDestinationChange: (dest: DestinationType) => void;
+  themeId: string;
+  onThemeIdChange: (themeId: any) => void;
+  baseFontSize: number;
+  onBaseFontSizeChange: (size: number) => void;
+  activeTheme: any;
 }
 
 interface DocumentStats {
@@ -99,7 +104,17 @@ const DEST_LABELS: Record<DestinationType, string> = {
   'clipboard': 'Clipboard',
 };
 
-export function Workspace({ markdown, onInput, destination, onDestinationChange }: WorkspaceProps) {
+export function Workspace({ 
+  markdown, 
+  onInput, 
+  destination, 
+  onDestinationChange,
+  themeId,
+  onThemeIdChange,
+  baseFontSize,
+  onBaseFontSizeChange,
+  activeTheme
+}: WorkspaceProps) {
   const [isFidelityPanelOpen, setIsFidelityPanelOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
   const [isCompiling, setIsCompiling] = useState(false);
@@ -133,9 +148,12 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
         // Count before planner optimizations (like table->list)
         const docStats = countElements(doc.blocks);
         if (docStats.mermaidFailed > 0) {
+          const firstMermaidBlock = doc.blocks.find(b => b.type === 'DiagramBlock' && b.renderStatus === 'error') as DiagramBlock;
+          const errMsg = firstMermaidBlock?.error?.message || 'Unknown error';
           collector.add({
             severity: 'warning',
             message: `${docStats.mermaidFailed} Mermaid diagram${docStats.mermaidFailed > 1 ? 's' : ''} could not be rendered`,
+            suggestedAction: `Error details: ${errMsg}`,
           });
         }
         
@@ -144,7 +162,7 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
         
         if (isMounted) {
           setCompiledState({
-            htmlContent: renderToHtml(doc),
+            htmlContent: renderToHtml(doc, activeTheme),
             diagnostics: collector.getAll(),
             stats: docStats,
             validationReport,
@@ -170,7 +188,7 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
     return () => {
       isMounted = false;
     };
-  }, [markdown, destination]);
+  }, [markdown, destination, activeTheme]);
 
   const { htmlContent, diagnostics, stats, validationReport } = compiledState;
   const warnings = diagnostics.filter(d => d.severity === 'warning' || d.severity === 'error');
@@ -217,21 +235,50 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
             <div className="flex items-center gap-space-sm">
               <span className="font-medium text-on-surface flex items-center gap-space-xs">
                 <span className="material-symbols-outlined text-[16px] text-primary">auto_stories</span>
-                <span>Document Preview</span>
+                <span>Preview</span>
               </span>
               <span className="text-outline-variant">·</span>
 
               <SegmentedControl
                 options={[
-                  { value: 'google-docs', label: 'Google Docs' },
+                  { value: 'google-docs', label: 'Docs' },
                   { value: 'word', label: 'Word' },
                   { value: 'pdf', label: 'PDF' },
                   { value: 'clipboard', label: 'Copy' },
                 ]}
-                label="Destination Preview"
+                label=""
                 value={destination}
                 onValueChange={(val) => onDestinationChange(val as DestinationType)}
               />
+              
+              <span className="text-outline-variant">·</span>
+              
+              <div className="flex items-center gap-space-xs">
+                <span className="text-secondary">Theme:</span>
+                <select 
+                  className="bg-transparent border border-outline-variant/30 rounded px-2 py-1 text-on-surface focus:outline-none focus:border-primary text-code-sm"
+                  value={themeId}
+                  onChange={(e) => onThemeIdChange(e.target.value)}
+                >
+                  <option value="default">Default</option>
+                  <option value="clean">Clean</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
+
+              <span className="text-outline-variant">·</span>
+
+              <div className="flex items-center gap-space-xs">
+                <span className="text-secondary">Size:</span>
+                <input 
+                  type="number"
+                  min="8"
+                  max="24"
+                  className="w-14 bg-transparent border border-outline-variant/30 rounded px-2 py-1 text-on-surface focus:outline-none focus:border-primary tabular-nums text-code-sm"
+                  value={baseFontSize}
+                  onChange={(e) => onBaseFontSizeChange(parseInt(e.target.value) || 12)}
+                />
+              </div>
             </div>
             <div className="flex items-center gap-space-md">
               <button 
@@ -251,9 +298,9 @@ export function Workspace({ markdown, onInput, destination, onDestinationChange 
 
           <div className="flex-1 flex justify-center p-space-lg overflow-y-auto">
             {/* The Document Canvas */}
-            <div className="w-full max-w-[816px] bg-surface-container-lowest p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30">
+            <div className="w-full max-w-[816px] bg-surface-container-lowest p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate">
               <div
-                className="relative z-10 flex flex-col font-body-md text-on-surface [&>h1]:font-headline-xl [&>h1]:text-headline-xl [&>h2]:font-headline-lg [&>h2]:text-headline-lg [&>h3]:font-headline-md [&>h3]:text-headline-md"
+                className="relative z-10 flex flex-col space-y-space-md font-body-md text-on-surface [&>h1]:font-headline-xl [&>h1]:text-headline-xl [&>h2]:font-headline-lg [&>h2]:text-headline-lg [&>h3]:font-headline-md [&>h3]:text-headline-md"
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
             </div>
