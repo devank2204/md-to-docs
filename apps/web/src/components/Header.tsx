@@ -1,10 +1,10 @@
 
-import type { AppState } from '../App';
+import type { AppState } from '@/App';
 import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
 import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { SegmentedControl } from './interior/segmented-control';
-import { LoadingButton } from './interior/loading-button';
+import { SegmentedControl } from '@/components/interior/segmented-control';
+import { LoadingButton } from '@/components/interior/loading-button';
 
 interface HeaderProps {
   appState: AppState;

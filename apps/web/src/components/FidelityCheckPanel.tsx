@@ -15,7 +15,12 @@ export function FidelityCheckPanel({ report, diagnostics, isOpen, onClose }: Fid
   const infos = diagnostics.filter((d) => d.severity === 'info');
 
   return (
-    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg shadow-[0_12px_48px_rgba(0,0,0,0.15),0_2px_12px_rgba(0,0,0,0.08)] bg-surface rounded-lg border border-outline-variant/30 flex flex-col overflow-hidden transform transition-transform animate-in slide-in-from-bottom-8">
+    <>
+      <div 
+        className="fixed inset-0 bg-black/20 z-40 transition-opacity animate-in fade-in"
+        onClick={onClose}
+      />
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-sm shadow-2xl bg-surface border-l border-outline-variant/30 flex flex-col transform transition-transform animate-in slide-in-from-right">
       {/* Header */}
       <div className="px-space-md py-space-sm bg-surface-container-lowest border-b border-outline-variant/20 flex items-center justify-between">
         <div className="flex flex-col">
@@ -34,7 +39,7 @@ export function FidelityCheckPanel({ report, diagnostics, isOpen, onClose }: Fid
         </button>
       </div>
 
-      <div className="p-space-md flex flex-col gap-space-md max-h-[60vh] overflow-y-auto">
+      <div className="p-space-md flex flex-col gap-space-md flex-1 overflow-y-auto">
         {/* Results summary */}
         <div className="bg-surface-container p-space-sm rounded font-code-sm text-code-sm text-on-surface flex flex-col gap-space-xs">
           <div className="flex items-center justify-between text-secondary pb-space-xs border-b border-outline-variant/20">
@@ -98,6 +103,7 @@ export function FidelityCheckPanel({ report, diagnostics, isOpen, onClose }: Fid
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

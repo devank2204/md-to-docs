@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { EmptyState } from './components/EmptyState';
-import { Workspace } from './components/Workspace';
-import { Header } from './components/Header';
+import { EmptyState } from '@/components/EmptyState';
+import { Workspace } from '@/components/Workspace';
+import { Header } from '@/components/Header';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { THEMES } from '@mdtodocs/compiler-core';
 import type { DocumentTheme } from '@mdtodocs/compiler-core';
