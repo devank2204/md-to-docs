@@ -312,6 +312,8 @@ function normalizeInlines(nodes: PhrasingContent[], assets: Asset[]): Inline[] {
         return { type: 'InlineMath' as const, value: (node as any).value };
       case 'footnoteReference':
         return { type: 'FootnoteReference' as const, identifier: (node as any).identifier };
+      case 'textDirective':
+        return { type: 'Text' as const, value: `:${(node as any).name}` };
       default:
         console.warn(`Unsupported inline node type: ${(node as any).type}`);
         return { type: 'Text' as const, value: '' } as Inline;
