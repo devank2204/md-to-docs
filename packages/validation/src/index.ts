@@ -1,4 +1,5 @@
-import type { FolioDocument, Block } from '@mdtodocs/compiler-core';
+import { visit } from 'unist-util-visit';
+import type { Root } from 'mdast';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { evaluateCapability } from '@mdtodocs/capability-graph';
 
@@ -23,53 +24,41 @@ export interface ValidationResult {
   message?: string;
 }
 
-export function validateDocument(doc: FolioDocument, destination: DestinationType): ValidationReport {
+export function validateDocument(doc: Root, destination: DestinationType): ValidationReport {
   const results: ValidationResult[] = [];
   
-  function walkBlocks(blocks: Block[]) {
-    for (const block of blocks) {
-      const cap = evaluateCapability(block.type, block, destination);
-      
-      let status: ValidationResult['status'] = 'preserved';
-      let message = cap.reason;
+  visit(doc, (node: any) => {
+    if (!node.type) return;
 
-      if (cap.support === 'native') {
-        status = 'preserved';
-      } else if (cap.support === 'styled' || cap.support === 'image' || cap.support === 'text') {
-        // Technically these are transformations to simulate support
-        status = 'transformed';
-      } else if (cap.support === 'transformed') {
-        status = 'degraded'; // Degraded because structural integrity changed (e.g. Table -> List)
-      } else {
-        status = 'unsupported';
-      }
+    const cap = evaluateCapability(node.type, node, destination);
+    
+    let status: ValidationResult['status'] = 'preserved';
+    let message = cap.reason;
 
-      // If it's a styled element but it's fundamentally native enough (e.g., Blockquote on styled)
-      // let's consider it preserved for fidelity score if it requires no polyfill
-      if (!cap.requiresPolyfill && cap.support === 'styled') {
-          status = 'preserved';
-      }
-
-      results.push({
-        nodeId: block.id,
-        element: block.type,
-        status,
-        message,
-      });
-
-      // Recurse
-      if ('blocks' in block && Array.isArray(block.blocks)) {
-        walkBlocks(block.blocks);
-      }
-      if (block.type === 'List') {
-        for (const item of block.items) {
-          walkBlocks(item.blocks);
-        }
-      }
+    if (cap.support === 'native') {
+      status = 'preserved';
+    } else if (cap.support === 'styled' || cap.support === 'image' || cap.support === 'text') {
+      // Technically these are transformations to simulate support
+      status = 'transformed';
+    } else if (cap.support === 'transformed') {
+      status = 'degraded'; // Degraded because structural integrity changed (e.g. Table -> List)
+    } else {
+      status = 'unsupported';
     }
-  }
 
-  walkBlocks(doc.blocks);
+    // If it's a styled element but it's fundamentally native enough (e.g., Blockquote on styled)
+    // let's consider it preserved for fidelity score if it requires no polyfill
+    if (!cap.requiresPolyfill && cap.support === 'styled') {
+        status = 'preserved';
+    }
+
+    results.push({
+      nodeId: node.id || Math.random().toString(36).substr(2, 9),
+      element: node.type,
+      status,
+      message,
+    });
+  });
 
   const total = results.length;
   const preserved = results.filter(r => r.status === 'preserved').length;

@@ -1,36 +1,17 @@
-import type {
-  FolioDocument,
-  HeadingBlock,
-  ParagraphBlock,
-  ListBlock,
-  BlockquoteBlock,
-  CodeBlock,
-  TableBlock,
-  ImageBlock,
-  DiagramBlock,
-  MathBlock,
-  CalloutBlock,
-  CalloutType,
-  TextInline,
-  StrongInline,
-  EmphasisInline,
-  StrikeInline,
-  InlineCode,
-  LinkInline,
-  InlineImageInline,
-  InlineMath,
-  DocumentTheme
-} from '@mdtodocs/compiler-core';
-
+import type { Root, Heading, Paragraph, List, Blockquote, Code, Table as MdTable, Image, Text, Strong, Emphasis, Delete, InlineCode, Link, Node } from 'mdast';
+import type { DocumentTheme } from '@mdtodocs/compiler-core';
+import type { ResolvedAsset } from '@mdtodocs/asset-pipeline';
+import { DocumentRenderer } from './core/Renderer';
+import type { RendererRegistry } from './core/Renderer';
 import {
   Document as DocxDocument,
   Paragraph as DocxParagraph,
   TextRun,
   HeadingLevel,
   Packer,
-  Table,
-  TableRow,
-  TableCell,
+  Table as DocxTable,
+  TableRow as DocxTableRow,
+  TableCell as DocxTableCell,
   WidthType,
   BorderStyle,
   AlignmentType,
@@ -41,417 +22,303 @@ import {
   ImageRun,
 } from 'docx';
 
-import { DocumentRenderer } from './core/Renderer';
-import type { RendererRegistry } from './core/Renderer';
-
-type DocxElement = DocxParagraph | Table;
-type DocxInlineElement = TextRun | ExternalHyperlink | ImageRun;
-
-// ─── Constants & Helpers ────────────────────────────────────────
-
-const HEADING_MAP: Record<number, (typeof HeadingLevel)[keyof typeof HeadingLevel]> = {
-  1: HeadingLevel.HEADING_1,
-  2: HeadingLevel.HEADING_2,
-  3: HeadingLevel.HEADING_3,
-  4: HeadingLevel.HEADING_4,
-  5: HeadingLevel.HEADING_5,
-  6: HeadingLevel.HEADING_6,
-};
-
-function base64ToUint8Array(base64DataUri: string): Uint8Array {
-  const base64Part = base64DataUri.split(',')[1] || base64DataUri;
-  if (typeof Buffer !== 'undefined') {
-    return new Uint8Array(Buffer.from(base64Part, 'base64'));
+function parseDataUri(dataUri: string): { type: 'png' | 'jpg' | 'gif' | 'bmp' | 'svg', data: Uint8Array } {
+  // Extract mime type and base64 string
+  const match = dataUri.match(/^data:image\/(png|jpeg|jpg|gif|bmp|svg\+xml);base64,(.+)$/);
+  
+  if (match) {
+    let type = match[1];
+    if (type === 'jpeg') type = 'jpg';
+    if (type === 'svg+xml') type = 'svg';
+    
+    const base64 = match[2];
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return { type: type as any, data: bytes };
   }
-  const binaryString = atob(base64Part.trim());
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
+  
+  // Fallback to old behavior if it's not a standard data URI (e.g. raw base64)
+  const binaryString = atob(dataUri);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  return bytes;
+  return { type: 'png', data: bytes };
 }
 
 function extractTextFromRun(run: TextRun): string {
-  try {
-    const root = (run as any).root;
-    if (root && Array.isArray(root)) {
-      for (const child of root) {
-        if (child && typeof child === 'object' && 'root' in child) {
-          const innerRoot = (child as any).root;
-          if (typeof innerRoot === 'string') return innerRoot;
-          if (Array.isArray(innerRoot)) {
-            for (const part of innerRoot) {
-              if (typeof part === 'string') return part;
-              if (part?.root && typeof part.root === 'string') return part.root;
-            }
-          }
-        }
-      }
-    }
-  } catch {}
-  return '';
-}
-
-function getCalloutTextIcon(type: CalloutType): string {
-  switch (type) {
-    case 'note': return 'ℹ';
-    case 'tip': return '💡';
-    case 'important': return '❗';
-    case 'warning': return '⚠';
-    case 'caution': return '🔴';
-  }
+  // @ts-ignore - reaching into docx internal structure
+  return run.root[0].root;
 }
 
 function extractFirstFont(fontStack: string): string {
   return fontStack.split(',')[0].replace(/['"]/g, '').trim();
 }
 
-// ─── DOCX Renderer Registry ──────────────────────────────────────
+function getCalloutTextIcon(type: string): string {
+  switch (type) {
+    case 'tip': return '💡';
+    case 'warning': return '⚠️';
+    case 'caution': return '🛑';
+    case 'important': return '❗';
+    case 'note':
+    default:
+      return '📝';
+  }
+}
 
-const docxRegistry: RendererRegistry<DocxElement[], DocxInlineElement[]> = {
-  blocks: {
-    Heading: (block: HeadingBlock, ctx) => {
-      const spacingBefore = block.level <= 2 ? ctx.theme.spacing.headingSpacingBeforePt * 1.5 * 20 : ctx.theme.spacing.headingSpacingBeforePt * 20;
-      const spacingAfter = ctx.theme.spacing.headingSpacingAfterPt * 20;
-      return [
-        new DocxParagraph({
-          heading: HEADING_MAP[block.level] || HeadingLevel.HEADING_1,
-          children: ctx.renderInlines(block.inlines).flat(),
-          spacing: { before: spacingBefore, after: spacingAfter },
-        })
-      ];
+type DocxInlineNode = TextRun | ExternalHyperlink | ImageRun;
+type DocxNode = DocxParagraph | DocxTable | DocxInlineNode;
+
+const docxRegistry: RendererRegistry<DocxNode[]> = {
+  nodes: {
+    heading: (block: Heading, ctx) => {
+      let level: any;
+      switch (block.depth) {
+        case 1: level = HeadingLevel.HEADING_1; break;
+        case 2: level = HeadingLevel.HEADING_2; break;
+        case 3: level = HeadingLevel.HEADING_3; break;
+        case 4: level = HeadingLevel.HEADING_4; break;
+        case 5: level = HeadingLevel.HEADING_5; break;
+        case 6: level = HeadingLevel.HEADING_6; break;
+        default: level = HeadingLevel.HEADING_1;
+      }
+      return [new DocxParagraph({ children: ctx.renderNodes(block.children).flat() as DocxInlineNode[], heading: level })];
     },
-    Paragraph: (block: ParagraphBlock, ctx) => {
-      const indentLevel = ctx.state.indentLevel || 0;
-      return [
-        new DocxParagraph({
-          children: ctx.renderInlines(block.inlines).flat(),
-          spacing: { after: ctx.theme.spacing.paragraphSpacingPt * 20 },
-          indent: indentLevel > 0 ? { left: convertInchesToTwip(0.5 * indentLevel) } : undefined,
-        })
-      ];
+    paragraph: (block: Paragraph, ctx) => {
+      return [new DocxParagraph({ children: ctx.renderNodes(block.children).flat() as DocxInlineNode[] })];
     },
-    List: (block: ListBlock, ctx) => {
-      const indentLevel = ctx.state.indentLevel || 0;
-      const result: DocxElement[] = [];
+    list: (block: List, ctx) => {
       const reference = block.ordered ? 'mdtodocs-ordered-list' : 'mdtodocs-unordered-list';
-
-      for (const item of block.items) {
-        const isTask = item.checked !== null && item.checked !== undefined;
-        
-        for (let i = 0; i < item.blocks.length; i++) {
-          const child = item.blocks[i];
-
-          if (child.type === 'Paragraph' && i === 0) {
-            const inlineChildren = ctx.renderInlines((child as ParagraphBlock).inlines).flat();
-
-            if (isTask) {
-              const checkChar = item.checked ? '☑' : '☐';
-              inlineChildren.unshift(
-                new TextRun({ text: checkChar + ' ', font: 'Segoe UI Symbol' })
-              );
-            }
-
-            result.push(
-              new DocxParagraph({
-                children: inlineChildren,
-                numbering: isTask ? undefined : { reference, level: indentLevel },
-                indent: isTask ? { left: convertInchesToTwip(0.5 * (indentLevel + 1)) } : undefined,
-                spacing: { after: 60 },
-              })
-            );
-          } else if (child.type === 'List') {
-            const nestedCtx = { ...ctx, state: { ...ctx.state, indentLevel: indentLevel + 1 } };
-            result.push(...nestedCtx.renderBlock(child));
-          } else {
-            const nestedCtx = { ...ctx, state: { ...ctx.state, indentLevel: indentLevel + 1 } };
-            result.push(...nestedCtx.renderBlock(child));
+      return block.children.flatMap((item: any) => {
+        return item.children.flatMap((c: Node, idx: number) => {
+          if (c.type === 'paragraph' && idx === 0) {
+            const p = c as Paragraph;
+            return [new DocxParagraph({
+              children: ctx.renderNodes(p.children).flat() as DocxInlineNode[],
+              numbering: { reference, level: Math.min(ctx.state.indentLevel || 0, 8) }
+            })];
           }
+          const nestedCtx = { ...ctx, state: { ...ctx.state, indentLevel: (ctx.state.indentLevel || 0) + 1 } };
+          return nestedCtx.renderNode(c);
+        });
+      });
+    },
+    blockquote: (block: Blockquote, ctx) => {
+      return block.children.flatMap(c => {
+        if (c.type === 'paragraph') {
+          const p = c as Paragraph;
+          return [new DocxParagraph({
+            children: ctx.renderNodes(p.children).flat() as DocxInlineNode[],
+            border: { left: { color: ctx.theme.colors.border, space: 10, size: 20, style: BorderStyle.SINGLE } },
+            indent: { left: 360 }
+          })];
         }
-      }
-      return result;
+        return ctx.renderNode(c);
+      });
     },
-    Blockquote: (block: BlockquoteBlock, ctx) => {
-      const result: DocxElement[] = [];
-      const indentLevel = ctx.state.indentLevel || 0;
-      const borderColor = ctx.theme.colors.blockquoteBorder;
-      const textColor = ctx.theme.colors.blockquoteText;
-
-      for (const child of block.blocks) {
-        if (child.type === 'Paragraph') {
-          result.push(
-            new DocxParagraph({
-              children: ctx.renderInlines((child as ParagraphBlock).inlines).flat(),
-              indent: { left: convertInchesToTwip(0.5) },
-              border: { left: { style: BorderStyle.SINGLE, size: 6, space: 10, color: borderColor } },
-              spacing: { after: ctx.theme.spacing.paragraphSpacingPt * 20 },
-              run: { color: textColor, italics: true },
-            })
-          );
-        } else {
-          const nestedCtx = { ...ctx, state: { ...ctx.state, indentLevel: indentLevel + 1 } };
-          result.push(...nestedCtx.renderBlock(child));
-        }
-      }
-      return result;
-    },
-    Callout: (block: CalloutBlock, ctx) => {
-      const colors = ctx.theme.colors.callouts[block.calloutType] || ctx.theme.colors.callouts.note;
-      const icon = getCalloutTextIcon(block.calloutType);
-      const result: DocxElement[] = [];
-
-      const titleText = block.title || block.calloutType.charAt(0).toUpperCase() + block.calloutType.slice(1);
-      result.push(
-        new DocxParagraph({
-          children: [new TextRun({ text: `${icon} ${titleText}`, bold: true, color: colors.text, size: ctx.theme.typography.baseFontSizePt * 2 })],
-          border: { left: { style: BorderStyle.SINGLE, size: 8, space: 10, color: colors.border } },
-          shading: { type: ShadingType.CLEAR, color: 'auto', fill: colors.bg },
-          indent: { left: convertInchesToTwip(0.25) },
-          spacing: { before: 120, after: 40 },
-        })
-      );
-
-      for (const child of block.blocks) {
-        if (child.type === 'Paragraph') {
-          result.push(
-            new DocxParagraph({
-              children: ctx.renderInlines((child as ParagraphBlock).inlines).flat(),
-              border: { left: { style: BorderStyle.SINGLE, size: 8, space: 10, color: colors.border } },
-              shading: { type: ShadingType.CLEAR, color: 'auto', fill: colors.bg },
-              indent: { left: convertInchesToTwip(0.25) },
-              spacing: { after: ctx.theme.spacing.paragraphSpacingPt * 20 },
-            })
-          );
-        } else {
-          result.push(...ctx.renderBlock(child));
-        }
-      }
-      return result;
-    },
-    CodeBlock: (block: CodeBlock, ctx) => {
-      const lines = block.value.split('\n');
-      const result: DocxParagraph[] = [];
-      const codeFont = extractFirstFont(ctx.theme.typography.codeFont);
-      const bg = ctx.theme.colors.codeBackground;
-      const color = ctx.theme.colors.codeText;
-      const borderColor = ctx.theme.colors.border;
-      const sizeHalfPts = (ctx.theme.typography.baseFontSizePt - 1) * 2;
-
-      if (block.language) {
-        result.push(
-          new DocxParagraph({
-            children: [new TextRun({ text: block.language, font: codeFont, size: sizeHalfPts - 2, color: ctx.theme.colors.secondary })],
-            shading: { type: ShadingType.CLEAR, color: 'auto', fill: bg },
-            spacing: { before: 160, after: 0 },
-            indent: { left: convertInchesToTwip(0.25), right: convertInchesToTwip(0.25) },
-            border: {
-              top: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-              left: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-              right: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-            },
-          })
-        );
-      }
-
-      for (let i = 0; i < lines.length; i++) {
-        const isFirst = i === 0 && !block.language;
-        const isLast = i === lines.length - 1;
-        result.push(
-          new DocxParagraph({
-            children: [new TextRun({ text: lines[i] || ' ', font: codeFont, size: sizeHalfPts, color })],
-            shading: { type: ShadingType.CLEAR, color: 'auto', fill: bg },
-            spacing: { before: isFirst ? 160 : 0, after: isLast ? 160 : 0, line: 276 },
-            indent: { left: convertInchesToTwip(0.25), right: convertInchesToTwip(0.25) },
-            border: {
-              top: isFirst ? { style: BorderStyle.SINGLE, size: 1, color: borderColor } : undefined,
-              bottom: isLast ? { style: BorderStyle.SINGLE, size: 1, color: borderColor } : undefined,
-              left: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-              right: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-            },
-          })
-        );
-      }
-      return result;
-    },
-    Table: (block: TableBlock, ctx) => {
-      const borderColor = ctx.theme.colors.border;
-      const headerBg = ctx.theme.colors.tableHeaderBackground;
+    containerDirective: (block: any /* ContainerDirective */, ctx) => {
+      const type = block.attributes?.type || 'note';
+      const colors = ctx.theme.colors.callouts[type as keyof typeof ctx.theme.colors.callouts] || ctx.theme.colors.callouts.note;
       
-      const rows = block.rows.map((row, rowIdx) => {
-        const isHeader = rowIdx < block.headerRows;
-        const cells = row.cells.map((cell, cellIdx) => {
-          const align = block.align?.[cellIdx] ?? null;
-          const alignment = align === 'center'
-            ? AlignmentType.CENTER
-            : align === 'right'
-              ? AlignmentType.RIGHT
-              : AlignmentType.LEFT;
-
-          const cellCtx = isHeader ? { ...ctx, state: { ...ctx.state, parentBold: true } } : ctx;
-
-          const paragraphs = cell.blocks.map((b) => {
-            if (b.type === 'Paragraph') {
-              return new DocxParagraph({
-                children: cellCtx.renderInlines((b as ParagraphBlock).inlines).flat(),
-                alignment,
-                spacing: { before: 40, after: 40 },
-              });
-            }
-            return new DocxParagraph({ children: [new TextRun({ text: '' })] });
+      const content = block.children.flatMap((c: Node) => {
+        if (c.type === 'paragraph') {
+          const p = c as Paragraph;
+          return new DocxParagraph({
+            children: ctx.renderNodes(p.children).flat() as DocxInlineNode[],
+            shading: { type: ShadingType.CLEAR, color: 'auto', fill: colors.bg }
           });
+        }
+        return ctx.renderNode(c);
+      });
+      
+      return [
+        new DocxTable({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: {
+            top: { style: BorderStyle.NONE, size: 0, color: 'auto' },
+            bottom: { style: BorderStyle.NONE, size: 0, color: 'auto' },
+            right: { style: BorderStyle.NONE, size: 0, color: 'auto' },
+            left: { style: BorderStyle.SINGLE, size: 24, color: colors.border },
+          },
+          rows: [
+            new DocxTableRow({
+              children: [
+                new DocxTableCell({
+                  shading: { type: ShadingType.CLEAR, color: 'auto', fill: colors.bg },
+                  margins: { left: 200, right: 200, top: 100, bottom: 100 },
+                  children: [
+                    new DocxParagraph({
+                      children: [new TextRun({ text: `${getCalloutTextIcon(type)} ${type.toUpperCase()}`, bold: true, color: colors.text })],
+                      shading: { type: ShadingType.CLEAR, color: 'auto', fill: colors.bg }
+                    }),
+                    ...content,
+                  ],
+                })
+              ]
+            })
+          ]
+        })
+      ];
+    },
+    code: (block: Code, ctx) => {
+      if (block.lang === 'mermaid') {
+        const asset = (block.data as any)?.resolvedAsset as ResolvedAsset | undefined;
+        if (asset && asset.data) {
+          try {
+            const parsed = parseDataUri(asset.data);
+            const imageOptions: any = {
+              type: parsed.type,
+              data: parsed.data,
+              transformation: { width: 500, height: 300 },
+            };
+            if (parsed.type === 'svg') {
+              imageOptions.fallback = {
+                type: 'png',
+                data: parseDataUri('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=').data
+              };
+            }
+            return [
+              new DocxParagraph({
+                children: [
+                  new ImageRun(imageOptions),
+                ],
+                alignment: AlignmentType.CENTER,
+              })
+            ];
+          } catch(e) {}
+        }
+        return [new DocxParagraph({ children: [new TextRun({ text: `[Diagram: mermaid]` })], alignment: AlignmentType.CENTER })];
+      }
+      
+      const codeFont = extractFirstFont(ctx.theme.typography.codeFont);
+      const sizeHalfPts = ctx.theme.typography.baseFontSizePt * 2;
+      const lines = block.value.split('\n');
+      
+      const docxLines = lines.map((line, i) => {
+        const isFirst = i === 0 && !block.lang;
+        const isLast = i === lines.length - 1;
+        
+        return new DocxParagraph({
+          children: [new TextRun({ text: line || ' ', font: codeFont, size: sizeHalfPts })],
+          style: 'CodeBlock',
+          shading: { type: ShadingType.CLEAR, color: 'auto', fill: ctx.theme.colors.codeBackground },
+          spacing: { before: isFirst ? 120 : 0, after: isLast ? 120 : 0 },
+        });
+      });
+      
+      const header = block.lang ? [
+        new DocxParagraph({
+          children: [new TextRun({ text: block.lang, font: codeFont, size: sizeHalfPts - 2, color: ctx.theme.colors.secondary })],
+          style: 'CodeBlock',
+          shading: { type: ShadingType.CLEAR, color: 'auto', fill: ctx.theme.colors.codeBackground },
+          spacing: { before: 120, after: 0 },
+        })
+      ] : [];
 
-          return new TableCell({
-            children: paragraphs.length > 0 ? paragraphs : [new DocxParagraph({ children: [new TextRun({ text: '' })] })],
-            shading: isHeader ? { type: ShadingType.CLEAR, color: 'auto', fill: headerBg } : undefined,
-            borders: {
-              top: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-              bottom: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-              left: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-              right: { style: BorderStyle.SINGLE, size: 1, color: borderColor },
-            },
+      return [...header, ...docxLines];
+    },
+    table: (block: MdTable, ctx) => {
+      const rows = block.children.map((row: any, rowIdx: number) => {
+        const isHeader = rowIdx === 0;
+        
+        const cells = row.children.map((cell: any) => {
+          const paragraphs = cell.children.map((b: Node) => {
+            if (b.type === 'paragraph') {
+              const p = b as Paragraph;
+              return new DocxParagraph({ children: ctx.renderNodes(p.children).flat() as DocxInlineNode[] });
+            }
+            return ctx.renderNode(b);
+          }).flat() as DocxParagraph[];
+          
+          if (paragraphs.length === 0) {
+            paragraphs.push(new DocxParagraph({ children: [] }));
+          }
+
+          return new DocxTableCell({
+            children: paragraphs,
+            shading: isHeader ? { type: ShadingType.CLEAR, color: 'auto', fill: 'F3F4F6' } : undefined,
+            margins: { left: 100, right: 100, top: 100, bottom: 100 },
           });
         });
-
-        return new TableRow({
+        
+        return new DocxTableRow({
           children: cells,
           tableHeader: isHeader,
         });
       });
-
-      return [new Table({
+      
+      return [new DocxTable({
         rows,
         width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
+          bottom: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
+          left: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
+          right: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
+          insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
+          insideVertical: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
+        }
       })];
     },
-    ThematicBreak: (_block, ctx) => {
-      return [
-        new DocxParagraph({
-          children: [],
-          border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border, space: 8 } },
-          spacing: { before: 240, after: 240 },
-        })
-      ];
+    thematicBreak: () => {
+      return [new DocxParagraph({
+        children: [],
+        border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: 'E5E7EB', space: 1 } },
+        spacing: { before: 240, after: 240 }
+      })];
     },
-    ImageBlock: (block: ImageBlock, ctx) => {
-      const asset = ctx.assets.find(a => a.id === block.assetId);
-      const altText = block.alt || 'Image';
-      
+    image: (block: Image, ctx) => {
+      const asset = (block.data as any)?.resolvedAsset as ResolvedAsset | undefined;
       if (asset && asset.data) {
         try {
-          const imgData = base64ToUint8Array(asset.data);
+          const parsed = parseDataUri(asset.data);
           let width = asset.dimensions?.width || 500;
-          let height = asset.dimensions?.height || 500;
+          let height = asset.dimensions?.height || 300;
           
-          const MAX_WIDTH = 600; 
+          const MAX_WIDTH = 600;
           if (width > MAX_WIDTH) {
             const ratio = MAX_WIDTH / width;
             width = MAX_WIDTH;
             height = height * ratio;
           }
 
+          const imageOptions: any = {
+            type: parsed.type,
+            data: parsed.data,
+            transformation: { width: Math.round(width), height: Math.round(height) },
+            altText: {
+              title: block.alt || 'Image',
+              name: block.alt || 'Image',
+              description: block.alt || '',
+            }
+          };
+          if (parsed.type === 'svg') {
+            imageOptions.fallback = {
+              type: 'png',
+              data: parseDataUri('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=').data
+            };
+          }
+
           return [
             new DocxParagraph({
               children: [
-                new ImageRun({
-                  type: 'png',
-                  data: imgData,
-                  transformation: {
-                    width: Math.round(width),
-                    height: Math.round(height),
-                  },
-                }),
+                new ImageRun(imageOptions),
               ],
               alignment: AlignmentType.CENTER,
-              spacing: { before: 160, after: 160 },
-            }),
+              spacing: { before: 240, after: 240 },
+            })
           ];
         } catch (e) {
           console.warn("Failed to embed image in docx", e);
         }
       }
-
-      return [
-        new DocxParagraph({
-          children: [
-            new TextRun({ text: `[Image: ${altText}]`, color: ctx.theme.colors.secondary, italics: true, size: ctx.theme.typography.baseFontSizePt * 2 - 2 }),
-            new TextRun({ text: `  (${block.src})`, color: '9CA3AF', size: 16 }),
-          ],
-          alignment: AlignmentType.CENTER,
-          spacing: { before: 160, after: 160 },
-        })
-      ];
+      return [new DocxParagraph({ children: [new TextRun({ text: `[Image: ${block.alt || block.url}]`, color: ctx.theme.colors.secondary, italics: true })] })];
     },
-    DiagramBlock: (block: DiagramBlock, ctx) => {
-      if (block.renderStatus === 'error') {
-        return [
-          new DocxParagraph({
-            children: [
-              new TextRun({
-                text: `[Diagram Warning: Mermaid diagram could not be rendered. The original Mermaid source was preserved.]`,
-                color: ctx.theme.colors.callouts.caution.text,
-                italics: true,
-              }),
-            ],
-            alignment: AlignmentType.CENTER,
-          })
-        ];
-      }
-
-      const asset = ctx.assets.find(a => a.id === block.assetId);
-      if (asset && asset.data) {
-        try {
-          const imgData = base64ToUint8Array(asset.data);
-          let width = asset.dimensions?.width || 500;
-          let height = asset.dimensions?.height || 500;
-          
-          const MAX_WIDTH = 600; 
-          if (width > MAX_WIDTH) {
-            const ratio = MAX_WIDTH / width;
-            width = MAX_WIDTH;
-            height = height * ratio;
-          }
-
-          const imageExt = asset.type === 'svg' ? 'svg' : 'png';
-
-          return [
-            new DocxParagraph({
-              children: [
-                new ImageRun({
-                  type: imageExt as any,
-                  data: imgData,
-                  transformation: {
-                    width: Math.round(width),
-                    height: Math.round(height),
-                  },
-                  altText: {
-                    title: `Diagram: ${block.diagramType}`,
-                    name: `Diagram: ${block.diagramType}`,
-                    description: block.source || '',
-                  }
-                }),
-              ],
-              alignment: AlignmentType.CENTER,
-              spacing: { before: 240, after: 240 },
-              keepNext: false,
-              keepLines: true,
-            })
-          ];
-        } catch (e) {
-          console.warn("Failed to embed diagram in docx", e);
-        }
-      }
-      
-      return [
-        new DocxParagraph({
-          children: [
-            new TextRun({ text: `[Diagram: ${block.diagramType}]`, color: ctx.theme.colors.secondary, italics: true }),
-          ],
-          alignment: AlignmentType.CENTER,
-        })
-      ];
-    },
-    MathBlock: (block: MathBlock) => {
+    math: (block: any /* Math */) => {
       return [
         new DocxParagraph({
           children: [new TextRun({ text: block.value, font: 'Cambria Math' })],
@@ -459,33 +326,31 @@ const docxRegistry: RendererRegistry<DocxElement[], DocxInlineElement[]> = {
           spacing: { before: 120, after: 120 },
         })
       ];
-    }
-  },
-  inlines: {
-    Text: (inline: TextInline, ctx) => [new TextRun({ text: inline.value, bold: ctx.state.parentBold })],
-    Strong: (inline: StrongInline, ctx) => {
-      const nestedCtx = { ...ctx, state: { ...ctx.state, parentBold: true } };
-      return nestedCtx.renderInlines(inline.inlines).flat();
     },
-    Emphasis: (inline: EmphasisInline, ctx) => {
-      const runs = ctx.renderInlines(inline.inlines).flat();
-      return runs.map((run) => {
+    text: (inline: Text, ctx) => [new TextRun({ text: inline.value, bold: ctx.state.parentBold })],
+    strong: (inline: Strong, ctx) => {
+      const nestedCtx = { ...ctx, state: { ...ctx.state, parentBold: true } };
+      return nestedCtx.renderNodes(inline.children).flat();
+    },
+    emphasis: (inline: Emphasis, ctx) => {
+      const runs = ctx.renderNodes(inline.children).flat();
+      return runs.map((run: any) => {
         if (run instanceof TextRun) {
           return new TextRun({ text: extractTextFromRun(run), bold: ctx.state.parentBold, italics: true });
         }
         return run;
       });
     },
-    Strike: (inline: StrikeInline, ctx) => {
-      const runs = ctx.renderInlines(inline.inlines).flat();
-      return runs.map((run) => {
+    delete: (inline: Delete, ctx) => {
+      const runs = ctx.renderNodes(inline.children).flat();
+      return runs.map((run: any) => {
         if (run instanceof TextRun) {
           return new TextRun({ text: extractTextFromRun(run), bold: ctx.state.parentBold, strike: true });
         }
         return run;
       });
     },
-    InlineCode: (inline: InlineCode, ctx) => {
+    inlineCode: (inline: InlineCode, ctx) => {
       return [
         new TextRun({
           text: inline.value,
@@ -495,10 +360,10 @@ const docxRegistry: RendererRegistry<DocxElement[], DocxInlineElement[]> = {
         })
       ];
     },
-    Link: (inline: LinkInline, ctx) => {
-      const linkChildren = ctx.renderInlines(inline.inlines).flat();
-      const textRuns = linkChildren.filter((r): r is TextRun => r instanceof TextRun).map(
-        (run) => new TextRun({
+    link: (inline: Link, ctx) => {
+      const linkChildren = ctx.renderNodes(inline.children).flat();
+      const textRuns = linkChildren.filter((r: any): r is TextRun => r instanceof TextRun).map(
+        (run: any) => new TextRun({
           text: extractTextFromRun(run),
           style: 'Hyperlink',
           color: ctx.theme.colors.primary,
@@ -511,11 +376,11 @@ const docxRegistry: RendererRegistry<DocxElement[], DocxInlineElement[]> = {
       }
       return textRuns;
     },
-    InlineImage: (inline: InlineImageInline, ctx) => {
-      const asset = ctx.assets.find(a => a.id === inline.assetId);
+    image_inline: (inline: Image, ctx) => {
+      const asset = (inline.data as any)?.resolvedAsset as ResolvedAsset | undefined;
       if (asset && asset.data) {
         try {
-          const imgData = base64ToUint8Array(asset.data);
+          const parsed = parseDataUri(asset.data);
           let width = asset.dimensions?.width || 20;
           let height = asset.dimensions?.height || 20;
           
@@ -526,12 +391,20 @@ const docxRegistry: RendererRegistry<DocxElement[], DocxInlineElement[]> = {
             width = width * ratio;
           }
 
-          return [
-            new ImageRun({
+          const imageOptions: any = {
+            type: parsed.type,
+            data: parsed.data,
+            transformation: { width: Math.round(width), height: Math.round(height) },
+          };
+          if (parsed.type === 'svg') {
+            imageOptions.fallback = {
               type: 'png',
-              data: imgData,
-              transformation: { width: Math.round(width), height: Math.round(height) },
-            }),
+              data: parseDataUri('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=').data
+            };
+          }
+
+          return [
+            new ImageRun(imageOptions),
           ];
         } catch (e) {
           console.warn("Failed to embed inline image in docx", e);
@@ -539,20 +412,17 @@ const docxRegistry: RendererRegistry<DocxElement[], DocxInlineElement[]> = {
       }
       return [new TextRun({ text: `[${inline.alt || 'image'}]`, color: ctx.theme.colors.secondary, italics: true })];
     },
-    InlineMath: (inline: InlineMath) => [new TextRun({ text: inline.value, font: 'Cambria Math', italics: true })],
-    Break: () => [new TextRun({ break: 1 })],
+    inlineMath: (inline: any /* InlineMath */) => [new TextRun({ text: inline.value, font: 'Cambria Math', italics: true })],
+    break: () => [new TextRun({ break: 1 })],
   },
-  fallbackBlock: () => [],
-  fallbackInline: () => []
+  fallbackNode: () => []
 };
 
-const docxRenderer = new DocumentRenderer(docxRegistry);
+const docxRenderer = new DocumentRenderer<DocxNode[]>(docxRegistry);
 
-export async function renderToDocxBlob(doc: FolioDocument, theme?: DocumentTheme): Promise<Blob> {
+export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme): Promise<Blob> {
   const children = docxRenderer.render(doc, { indentLevel: 0 }, theme).flat();
   
-  // Create styles based on theme
-
   const docxDoc = new DocxDocument({
     styles: {
       default: {
@@ -649,7 +519,7 @@ export async function renderToDocxBlob(doc: FolioDocument, theme?: DocumentTheme
             margin: { top: convertInchesToTwip(1), right: convertInchesToTwip(1), bottom: convertInchesToTwip(1), left: convertInchesToTwip(1) },
           },
         },
-        children,
+        children: children as any,
       },
     ],
   });

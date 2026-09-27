@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
+    const code = `
+flowchart TD
+    API1["POST /hq_es_shipments_search/list<br/>(with slot.apt + cs.st filters)"]
+    `;
+    try {
+      const { svg } = await mermaid.render('graph1', code);
+      console.log("SUCCESS");
+      document.body.innerHTML = svg;
+    } catch (e) {
+      console.error("ERROR", e);
+      document.body.innerHTML = "ERROR: " + e.message;
+    }
+  </script>
+</head>
+<body></body>
+</html>

@@ -71,52 +71,48 @@ export interface Capability {
 }
 
 type CapabilityKey =
-  | 'Heading'
-  | 'Paragraph'
-  | 'List'
-  | 'Blockquote'
-  | 'CodeBlock'
-  | 'Table'
-  | 'ThematicBreak'
-  | 'ImageBlock'
-  | 'Callout'
-  | 'MathBlock'
-  | 'DiagramBlock'
-  | 'FootnoteDefinition'
-  | 'Text'
-  | 'Strong'
-  | 'Emphasis'
-  | 'Strike'
-  | 'InlineCode'
-  | 'Link'
-  | 'InlineImage'
-  | 'Break'
-  | 'InlineMath'
-  | 'FootnoteReference';
+  | 'heading'
+  | 'paragraph'
+  | 'list'
+  | 'blockquote'
+  | 'code'
+  | 'table'
+  | 'thematicBreak'
+  | 'image'
+  | 'containerDirective' // For Callouts
+  | 'math'
+  | 'footnoteDefinition'
+  | 'text'
+  | 'strong'
+  | 'emphasis'
+  | 'delete' // mdast strike
+  | 'inlineCode'
+  | 'link'
+  | 'break'
+  | 'inlineMath'
+  | 'footnoteReference';
 
 const CAPABILITY_MATRIX: Record<CapabilityKey, Record<DestinationType, SupportLevel>> = {
-  Heading:             { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  Paragraph:           { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  List:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  Blockquote:          { 'google-docs': 'styled',  word: 'styled',  pdf: 'styled',  clipboard: 'styled' },
-  CodeBlock:           { 'google-docs': 'styled',  word: 'styled',  pdf: 'native',  clipboard: 'styled' },
-  Table:               { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'styled' },
-  ThematicBreak:       { 'google-docs': 'styled',  word: 'styled',  pdf: 'native',  clipboard: 'styled' },
-  ImageBlock:          { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  Callout:             { 'google-docs': 'styled',  word: 'styled',  pdf: 'styled',  clipboard: 'styled' },
-  MathBlock:           { 'google-docs': 'image',   word: 'native',  pdf: 'native',  clipboard: 'image' },
-  DiagramBlock:        { 'google-docs': 'image',   word: 'image',   pdf: 'image',   clipboard: 'image' },
-  FootnoteDefinition:  { 'google-docs': 'transformed', word: 'native', pdf: 'native', clipboard: 'transformed' },
-  Text:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  Strong:              { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  Emphasis:            { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  Strike:              { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  InlineCode:          { 'google-docs': 'styled',  word: 'styled',  pdf: 'native',  clipboard: 'styled' },
-  Link:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  InlineImage:         { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  Break:               { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
-  InlineMath:          { 'google-docs': 'image',   word: 'native',  pdf: 'native',  clipboard: 'image' },
-  FootnoteReference:   { 'google-docs': 'transformed', word: 'native', pdf: 'native', clipboard: 'transformed' },
+  heading:             { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  paragraph:           { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  list:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  blockquote:          { 'google-docs': 'styled',  word: 'styled',  pdf: 'styled',  clipboard: 'styled' },
+  code:                { 'google-docs': 'styled',  word: 'styled',  pdf: 'native',  clipboard: 'styled' },
+  table:               { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'styled' },
+  thematicBreak:       { 'google-docs': 'styled',  word: 'styled',  pdf: 'native',  clipboard: 'styled' },
+  image:               { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  containerDirective:  { 'google-docs': 'styled',  word: 'styled',  pdf: 'styled',  clipboard: 'styled' },
+  math:                { 'google-docs': 'image',   word: 'native',  pdf: 'native',  clipboard: 'image' },
+  footnoteDefinition:  { 'google-docs': 'transformed', word: 'native', pdf: 'native', clipboard: 'transformed' },
+  text:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  strong:              { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  emphasis:            { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  delete:              { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  inlineCode:          { 'google-docs': 'styled',  word: 'styled',  pdf: 'native',  clipboard: 'styled' },
+  link:                { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  break:               { 'google-docs': 'native',  word: 'native',  pdf: 'native',  clipboard: 'native' },
+  inlineMath:          { 'google-docs': 'image',   word: 'native',  pdf: 'native',  clipboard: 'image' },
+  footnoteReference:   { 'google-docs': 'transformed', word: 'native', pdf: 'native', clipboard: 'transformed' },
 };
 
 export function evaluateCapability(
@@ -135,14 +131,14 @@ export function evaluateCapability(
     const support = matrixEntry[destination];
 
     // Specific constraint checks
-    if (blockType === 'Table') {
-      const cols = blockData.rows?.[0]?.cells?.length || 0;
+    if (blockType === 'table') {
+      const cols = blockData.children?.[0]?.children?.length || 0;
       if (cols > profile.maxTableColumns) {
         return {
           support: 'transformed',
           requiresPolyfill: true,
           reason: `Table has ${cols} columns, exceeding the ${profile.maxTableColumns}-column limit for ${profile.name}`,
-          transformTo: 'List',
+          transformTo: 'list',
         };
       }
     }

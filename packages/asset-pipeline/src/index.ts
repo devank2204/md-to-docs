@@ -1,100 +1,71 @@
-import type { Asset, FolioDocument, Block, DiagramBlock } from '@mdtodocs/compiler-core';
+import { visit } from 'unist-util-visit';
+import type { Root } from 'mdast';
 import { renderMermaid } from './mermaid';
 
-/**
- * Given a FolioDocument with parsed assets, fetches/processes those assets
- * to embed them directly via data URIs and determine their dimensions.
- */
-export async function resolveAssets(doc: FolioDocument): Promise<FolioDocument> {
-  const resolvedAssets: Asset[] = [];
-  const diagramResults = new Map<string, any>();
+export async function resolveAssets(doc: Root): Promise<Root> {
+  const promises: Promise<void>[] = [];
 
-  for (const asset of doc.assets) {
-    if (asset.type === 'image') {
-      try {
-        const resolved = await processImage(asset);
-        resolvedAssets.push(resolved);
-      } catch (err) {
-        console.warn(`Failed to process image asset ${asset.src}:`, err);
-        // Push original to gracefully degrade
-        resolvedAssets.push(asset);
-      }
-    } else if (asset.type === 'diagram-source' && asset.src === 'mermaid') {
-      const source = asset.data || '';
-      const result = await renderMermaid(source);
-      
-      if (result.success) {
-        const svgBase64 = btoa(unescape(encodeURIComponent(result.svg)));
-        const dataUri = `data:image/svg+xml;base64,${svgBase64}`;
-        
-        resolvedAssets.push({
-          ...asset,
-          type: 'svg',
-          data: dataUri,
-          raw: result.svg, // Store raw SVG string
-          mimeType: 'image/svg+xml',
-          dimensions: { width: result.width, height: result.height }
-        });
-      } else {
-        console.warn(`Failed to render Mermaid diagram:`, result.error);
-        resolvedAssets.push(asset);
-      }
-      diagramResults.set(asset.id, result);
-    } else {
-      resolvedAssets.push(asset);
+  visit(doc, (node: any) => {
+    if (node.type === 'image') {
+      promises.push(
+        processImage(node.url).then((resolved) => {
+          node.data = node.data || {};
+          node.data.resolvedAsset = resolved;
+        }).catch((err) => {
+          console.warn(`Failed to process image asset ${node.url}:`, err);
+        })
+      );
+    } else if (node.type === 'code' && node.lang === 'mermaid') {
+      promises.push(
+        renderMermaid(node.value).then((result) => {
+          node.data = node.data || {};
+          if (result.success) {
+            const svgBase64 = btoa(unescape(encodeURIComponent(result.svg)));
+            const dataUri = `data:image/svg+xml;base64,${svgBase64}`;
+            node.data.resolvedAsset = {
+              type: 'svg',
+              data: dataUri,
+              raw: result.svg,
+              mimeType: 'image/svg+xml',
+              dimensions: { width: result.width, height: result.height }
+            };
+            node.data.renderStatus = 'success';
+          } else {
+            console.warn(`Failed to render Mermaid diagram:`, result.error);
+            node.data.renderStatus = 'error';
+            node.data.error = result.error;
+          }
+        })
+      );
     }
-  }
+  });
 
-  function updateBlocks(blocks: Block[]): Block[] {
-    return blocks.map(block => {
-      if (block.type === 'DiagramBlock' && block.assetId) {
-        const result = diagramResults.get(block.assetId);
-        if (result) {
-          return {
-            ...block,
-            renderStatus: result.success ? 'success' : 'error',
-            error: result.success ? undefined : result.error,
-          } as DiagramBlock;
-        }
-      }
-      
-      if (block.type === 'List') {
-        return { ...block, items: block.items.map(item => ({ ...item, blocks: updateBlocks(item.blocks) })) };
-      }
-      if (block.type === 'Blockquote') {
-        return { ...block, blocks: updateBlocks(block.blocks) };
-      }
-      if (block.type === 'Callout') {
-        return { ...block, blocks: updateBlocks(block.blocks) };
-      }
-      if (block.type === 'Table') {
-        return { ...block, rows: block.rows.map(row => ({ ...row, cells: row.cells.map(cell => ({ ...cell, blocks: updateBlocks(cell.blocks) })) })) };
-      }
-      return block;
-    });
-  }
-
-  return {
-    ...doc,
-    assets: resolvedAssets,
-    blocks: updateBlocks(doc.blocks),
-  };
+  await Promise.all(promises);
+  return doc;
 }
 
-async function processImage(asset: Asset): Promise<Asset> {
+export interface ResolvedAsset {
+  type: 'image' | 'svg' | 'diagram-source';
+  data: string;
+  raw?: string;
+  mimeType?: string;
+  dimensions: { width: number; height: number };
+}
+
+async function processImage(src: string): Promise<ResolvedAsset> {
   // If it's already a data URI, we just need to get dimensions
-  if (asset.src.startsWith('data:')) {
-    const dim = await getImageDimensions(asset.src);
+  if (src.startsWith('data:')) {
+    const dim = await getImageDimensions(src);
     return {
-      ...asset,
-      data: asset.src, // Store the full data URI
+      type: 'image',
+      data: src, // Store the full data URI
       dimensions: dim,
     };
   }
 
   // Otherwise, fetch it and convert to Data URI
   try {
-    const response = await fetch(asset.src);
+    const response = await fetch(src);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status} fetching image`);
     }
@@ -104,7 +75,7 @@ async function processImage(asset: Asset): Promise<Asset> {
     const dimensions = await getImageDimensions(dataUri);
 
     return {
-      ...asset,
+      type: 'image',
       mimeType: blob.type,
       data: dataUri,
       dimensions,
@@ -125,7 +96,7 @@ function blobToDataUri(blob: Blob): Promise<string> {
 
 function getImageDimensions(src: string): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
-    const img = new Image();
+    const img = new globalThis.Image();
     img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
     img.onerror = reject;
     img.src = src;

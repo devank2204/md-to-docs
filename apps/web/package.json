@@ -15,13 +15,22 @@
     "@mdtodocs/compiler-core": "workspace:*",
     "@mdtodocs/renderers": "workspace:*",
     "@mdtodocs/validation": "workspace:*",
+    "@tailwindcss/typography": "^0.5.20",
+    "katex": "^0.18.9",
+    "mermaid": "^12.0.0",
     "motion": "^13.4.4",
     "prismjs": "^1.30.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-simple-code-editor": "^0.14.1"
+    "react-markdown": "^10.1.0",
+    "react-simple-code-editor": "^0.14.1",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@types/mdast": "^4.0.4",
     "@types/node": "^24.13.3",
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19.2.18",

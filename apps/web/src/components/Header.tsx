@@ -1,6 +1,7 @@
 
 import type { AppState } from '@/App';
 import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
+import { resolveAssets } from '@mdtodocs/asset-pipeline';
 import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { SegmentedControl } from '@/components/interior/segmented-control';
@@ -22,6 +23,7 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
     try {
       const collector = new DiagnosticsCollector();
       let doc = parseMarkdown(markdown);
+      doc = await resolveAssets(doc);
       doc = planRepresentation(doc, 'word', collector);
       const blob = await renderToDocxBlob(doc, activeTheme);
       const url = URL.createObjectURL(blob);
@@ -39,6 +41,7 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
     if (!markdown) return;
     const collector = new DiagnosticsCollector();
     let doc = parseMarkdown(markdown);
+    doc = await resolveAssets(doc);
     doc = planRepresentation(doc, destination, collector);
     const html = renderToClipboardHtml(doc, activeTheme);
     const htmlBlob = new Blob([html], { type: 'text/html' });

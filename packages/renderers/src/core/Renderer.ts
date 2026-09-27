@@ -1,77 +1,54 @@
-import type { FolioDocument, Block, Inline, Asset, DocumentTheme } from '@mdtodocs/compiler-core';
+import type { DocumentTheme } from '@mdtodocs/compiler-core';
+import type { Root, Node } from 'mdast';
 import { DEFAULT_THEME } from '@mdtodocs/compiler-core';
 
-export interface RendererContext<TBlockOut, TInlineOut> {
+export interface RendererContext<TNodeOut> {
   theme: DocumentTheme;
-  assets: Asset[];
-  renderBlock: (block: Block) => TBlockOut;
-  renderInline: (inline: Inline) => TInlineOut;
-  renderBlocks: (blocks: Block[]) => TBlockOut[];
-  renderInlines: (inlines: Inline[]) => TInlineOut[];
+  renderNode: (node: Node) => TNodeOut;
+  renderNodes: (nodes: Node[]) => TNodeOut[];
   
   // Custom state for specific renderers (e.g., list nesting depth)
   state: Record<string, any>;
 }
 
-export type BlockRenderer<TBlock, TBlockOut, TInlineOut> = (
-  block: TBlock,
-  context: RendererContext<TBlockOut, TInlineOut>
-) => TBlockOut;
+export type NodeRenderer<TNode extends Node, TNodeOut> = (
+  node: TNode,
+  context: RendererContext<TNodeOut>
+) => TNodeOut;
 
-export type InlineRenderer<TInline, TBlockOut, TInlineOut> = (
-  inline: TInline,
-  context: RendererContext<TBlockOut, TInlineOut>
-) => TInlineOut;
-
-export interface RendererRegistry<TBlockOut, TInlineOut> {
-  blocks: Record<string, BlockRenderer<any, TBlockOut, TInlineOut>>;
-  inlines: Record<string, InlineRenderer<any, TBlockOut, TInlineOut>>;
-  fallbackBlock?: BlockRenderer<Block, TBlockOut, TInlineOut>;
-  fallbackInline?: InlineRenderer<Inline, TBlockOut, TInlineOut>;
+export interface RendererRegistry<TNodeOut> {
+  nodes: Record<string, NodeRenderer<any, TNodeOut>>;
+  fallbackNode?: NodeRenderer<Node, TNodeOut>;
 }
 
-export class DocumentRenderer<TBlockOut, TInlineOut> {
-  registry: RendererRegistry<TBlockOut, TInlineOut>;
+export class DocumentRenderer<TNodeOut> {
+  registry: RendererRegistry<TNodeOut>;
   
-  constructor(registry: RendererRegistry<TBlockOut, TInlineOut>) {
+  constructor(registry: RendererRegistry<TNodeOut>) {
     this.registry = registry;
   }
 
-  render(doc: FolioDocument, initialState: Record<string, any> = {}, theme: DocumentTheme = DEFAULT_THEME): TBlockOut[] {
-    const context = this.createContext(doc.assets, initialState, theme);
-    return context.renderBlocks(doc.blocks);
+  render(doc: Root, initialState: Record<string, any> = {}, theme: DocumentTheme = DEFAULT_THEME): TNodeOut[] {
+    const context = this.createContext(initialState, theme);
+    return context.renderNodes(doc.children);
   }
 
-  private createContext(assets: Asset[], initialState: Record<string, any>, theme: DocumentTheme): RendererContext<TBlockOut, TInlineOut> {
-    const context: RendererContext<TBlockOut, TInlineOut> = {
+  private createContext(initialState: Record<string, any>, theme: DocumentTheme): RendererContext<TNodeOut> {
+    const context: RendererContext<TNodeOut> = {
       theme,
-      assets,
       state: initialState,
-      renderBlock: (block: Block) => {
-        const handler = this.registry.blocks[block.type];
+      renderNode: (node: Node) => {
+        const handler = this.registry.nodes[node.type];
         if (handler) {
-          return handler(block, context);
+          return handler(node, context);
         }
-        if (this.registry.fallbackBlock) {
-          return this.registry.fallbackBlock(block, context);
+        if (this.registry.fallbackNode) {
+          return this.registry.fallbackNode(node, context);
         }
-        throw new Error(`No renderer registered for block type: ${block.type}`);
+        throw new Error(`No renderer registered for node type: ${node.type}`);
       },
-      renderInline: (inline: Inline) => {
-        const handler = this.registry.inlines[inline.type];
-        if (handler) {
-          return handler(inline, context);
-        }
-        if (this.registry.fallbackInline) {
-          return this.registry.fallbackInline(inline, context);
-        }
-        throw new Error(`No renderer registered for inline type: ${inline.type}`);
-      },
-      renderBlocks: (blocks: Block[]) => {
-        return blocks.map(context.renderBlock);
-      },
-      renderInlines: (inlines: Inline[]) => {
-        return inlines.map(context.renderInline);
+      renderNodes: (nodes: Node[]) => {
+        return nodes.map(context.renderNode);
       }
     };
     return context;

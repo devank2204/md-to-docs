@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseMarkdown } from '@mdtodocs/compiler-core';
-import { renderToHtml, renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
+import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
 import pc from 'picocolors';
 
 const FIXTURES_DIR = new URL('../fixtures', import.meta.url).pathname;
@@ -57,7 +57,7 @@ async function runFixtures() {
       }
 
       // 3. Render all destinations
-      const html = renderToHtml(doc);
+      const html = '<p>HTML preview rendering via ReactMarkdown is handled by frontend</p>';
       await fs.writeFile(path.join(outputDir, 'preview.html'), wrapHtml(html, 'Preview'));
 
       const clipboardHtml = renderToClipboardHtml(doc);

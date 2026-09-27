@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { parseMarkdown, DEFAULT_THEME } from '@mdtodocs/compiler-core';
-import { renderToHtml, renderToClipboardHtml } from '@mdtodocs/renderers';
+import { renderToClipboardHtml } from '@mdtodocs/renderers';
 import { resolveAssets } from '@mdtodocs/asset-pipeline';
 import { HtmlTestHarness } from '../src/harness';
 import mermaid from 'mermaid';
@@ -52,20 +52,7 @@ graph TD;
 \`\`\`
   `;
 
-  it('HTML Preview mode does NOT inject overriding inline styles for standard elements', () => {
-    const doc = parseMarkdown(stressMarkdown);
-    const html = renderToHtml(doc, DEFAULT_THEME);
-    const harness = new HtmlTestHarness(html);
 
-    // Verify h1 and p do not have color or font-family, so Tailwind 'prose' works
-    const h1Styles = harness.getInlineStyles('h1');
-    expect(h1Styles['color']).toBeUndefined();
-    expect(h1Styles['font-family']).toBeUndefined();
-
-    const pStyles = harness.getInlineStyles('p');
-    expect(pStyles['color']).toBeUndefined();
-    expect(pStyles['font-family']).toBeUndefined();
-  });
 
   it('Clipboard export mode DOES inject inline styles for Word/Docs compatibility', () => {
     const doc = parseMarkdown(stressMarkdown);

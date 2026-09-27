@@ -11,7 +11,7 @@ export default {
       "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
       "spacing": { "margin-desktop": "2rem", "space-xxs": "0.125rem", "space-xs": "0.25rem", "space-lg": "1rem", "space-sm": "0.5rem", "margin-tablet": "1.5rem", "space-xl": "1.5rem", "space-md": "0.75rem", "gutter": "1rem", "margin": "1rem", "space-xxl": "2rem", "gutter-desktop": "1.5rem" },
       "fontFamily": {
-        "label-sm": [ "JetBrains Mono" ], "code-lg": [ "JetBrains Mono" ], "display-lg": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "display-lg-mobile": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "headline-lg": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "headline-xl": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "body-sm": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "label-md": [ "JetBrains Mono" ], "headline-xl-mobile": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "body-lg": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "code-md": [ "JetBrains Mono" ], "headline-md": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "headline-sm": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "body-md": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "code-sm": [ "JetBrains Mono" ]
+        "label-sm": [ "JetBrains Mono" ], "code-lg": [ "JetBrains Mono" ], "display-lg": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "display-lg-mobile": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "headline-lg": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "headline-xl": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "body-sm": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "label-md": [ "JetBrains Mono" ], "headline-xl-mobile": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "body-lg": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "code-md": [ "JetBrains Mono" ], "headline-md": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "headline-sm": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "body-md": [ ["Söhne", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Ubuntu", "Cantarell", "Noto Sans", "sans-serif"] ], "code-sm": [ "JetBrains Mono" ], "serif": [ "Newsreader", "serif" ]
       },
       "fontSize": {
         "label-sm": [ "10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" } ],
@@ -38,8 +38,68 @@ export default {
       },
       "animation": {
         "background-pan": "background-pan 2.5s linear infinite"
+      },
+      typography: {
+        DEFAULT: {
+          css: {
+            '--tw-prose-body': '#1b1c1a',
+            '--tw-prose-headings': '#000000',
+            '--tw-prose-links': '#000000',
+            '--tw-prose-bold': '#000000',
+            '--tw-prose-code': '#1b1c1a',
+            '--tw-prose-pre-code': '#1b1c1a',
+            '--tw-prose-pre-bg': '#f4f3f0',
+            '--tw-prose-quotes': '#44474a',
+            'code::before': { content: '""' },
+            'code::after': { content: '""' },
+            code: {
+              backgroundColor: '#f4f3f0',
+              padding: '0.2rem 0.4rem',
+              borderRadius: '0.25rem',
+              fontWeight: '400',
+              fontFamily: '"JetBrains Mono", monospace',
+            },
+            pre: {
+              backgroundColor: '#f4f3f0',
+              color: '#1b1c1a',
+              fontFamily: '"JetBrains Mono", monospace',
+              border: '1px solid #e3e2df',
+            },
+            'pre code': {
+              backgroundColor: 'transparent',
+              padding: '0',
+            },
+            table: {
+              fontSize: '13px',
+              fontFamily: '"JetBrains Mono", monospace',
+            },
+            'thead th': {
+              backgroundColor: '#f4f3f0',
+              padding: '0.5rem',
+              borderBottom: '2px solid #e3e2df',
+            },
+            'tbody td': {
+              padding: '0.5rem',
+              borderBottom: '1px solid #e3e2df',
+            },
+            blockquote: {
+              borderLeftWidth: '4px',
+              borderLeftColor: '#c5c6c9',
+              backgroundColor: '#f4f3f0',
+              padding: '1rem',
+              fontStyle: 'normal',
+              color: '#1b1c1a',
+              fontWeight: '400',
+              quotes: 'none'
+            },
+            'blockquote p:first-of-type::before': { content: 'none' },
+            'blockquote p:last-of-type::after': { content: 'none' }
+          }
+        }
       }
     }
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };

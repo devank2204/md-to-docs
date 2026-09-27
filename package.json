@@ -20,5 +20,10 @@
   "bugs": {
     "url": "https://github.com/devank2204/md-to-docs/issues"
   },
-  "homepage": "https://github.com/devank2204/md-to-docs#readme"
+  "homepage": "https://github.com/devank2204/md-to-docs#readme",
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.20",
+    "mermaid": "^12.0.0",
+    "unist-util-visit": "^5.1.0"
+  }
 }
