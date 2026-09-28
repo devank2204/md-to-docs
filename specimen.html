@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-on-surface": "#f2f1ee", "on-error": "#ffffff", "surface-container": "#efeeeb", "tertiary": "#000000", "primary-container": "#1b1c1d", "background": "#faf9f6", "surface-tint": "#5e5e5f", "surface-dim": "#dbdad7", "primary-fixed-dim": "#c7c6c7", "surface-bright": "#faf9f6", "on-tertiary-fixed-variant": "#783022", "on-secondary": "#ffffff", "secondary": "#53606c", "primary-fixed": "#e3e2e3", "surface-variant": "#e3e2df", "on-tertiary": "#ffffff", "on-primary-container": "#848485", "on-tertiary-fixed": "#3e0501", "on-surface": "#1b1c1a", "on-background": "#1b1c1a", "inverse-surface": "#2f312f", "on-tertiary-container": "#c46b59", "error-container": "#ffdad6", "on-secondary-fixed-variant": "#3c4854", "surface": "#faf9f6", "outline": "#75777a", "surface-container-highest": "#e3e2df", "inverse-primary": "#c7c6c7", "tertiary-fixed": "#ffdad3", "surface-container-lowest": "#ffffff", "surface-container-high": "#e9e8e5", "outline-variant": "#c5c6c9", "surface-container-low": "#f4f3f0", "secondary-container": "#d7e4f3", "on-surface-variant": "#44474a", "tertiary-container": "#3e0501", "primary": "#000000", "on-secondary-container": "#596672", "secondary-fixed-dim": "#bbc8d6", "secondary-fixed": "#d7e4f3", "on-primary-fixed-variant": "#464748", "on-error-container": "#93000a", "tertiary-fixed-dim": "#ffb4a5", "on-primary": "#ffffff", "on-primary-fixed": "#1b1c1d", "error": "#ba1a1a", "on-secondary-fixed": "#111d27" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-xl": "1.5rem", "gutter": "1rem", "space-xxl": "2rem", "space-xs": "0.25rem", "space-lg": "1rem", "gutter-desktop": "1.5rem", "space-sm": "0.5rem", "space-xxs": "0.125rem", "margin-desktop": "2rem", "margin-tablet": "1.5rem", "margin": "1rem", "space-md": "0.75rem" }, "fontFamily": { "display-lg": [ "Newsreader" ], "code-lg": [ "JetBrains Mono" ], "label-md": [ "JetBrains Mono" ], "body-md": [ "Newsreader" ], "body-lg": [ "Newsreader" ], "headline-xl": [ "Newsreader" ], "headline-sm": [ "Newsreader" ], "headline-xl-mobile": [ "Newsreader" ], "code-md": [ "JetBrains Mono" ], "body-sm": [ "Newsreader" ], "label-sm": [ "JetBrains Mono" ], "code-sm": [ "JetBrains Mono" ], "headline-lg": [ "Newsreader" ], "display-lg-mobile": [ "Newsreader" ], "headline-md": [ "Newsreader" ] }, "fontSize": { "display-lg": [ "44px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "400" } ], "code-lg": [ "14px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" } ], "body-md": [ "15px", { "lineHeight": "24px", "fontWeight": "400" } ], "body-lg": [ "18px", { "lineHeight": "28px", "fontWeight": "400" } ], "headline-xl": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "400" } ], "headline-sm": [ "17px", { "lineHeight": "24px", "fontWeight": "600" } ], "headline-xl-mobile": [ "26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "code-md": [ "12px", { "lineHeight": "18px", "fontWeight": "400" } ], "body-sm": [ "13px", { "lineHeight": "20px", "fontWeight": "400" } ], "label-sm": [ "10px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" } ], "code-sm": [ "11px", { "lineHeight": "16px", "fontWeight": "400" } ], "headline-lg": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "display-lg-mobile": [ "32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "400" } ], "headline-md": [ "20px", { "lineHeight": "28px", "fontWeight": "500" } ] } } } };</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low z-50 flex flex-col justify-between py-space-lg"><div class="flex flex-col"><div class="px-space-xl pb-space-lg"><div class="flex items-center gap-space-sm mb-space-xs"><div class="w-4 h-6 bg-primary flex items-center justify-center"><div class="w-1 h-3 bg-surface-container-lowest"></div></div><div class="flex flex-col"><span class="font-label-md text-label-md text-on-surface tracking-tight uppercase font-semibold">mdtodocs</span><span class="font-code-sm text-code-sm text-secondary tracking-widest uppercase">ratification spec</span></div></div></div><div class="px-space-xl py-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">Brand Architecture</span></div><nav class="flex flex-col px-space-md py-space-xs gap-space-xxs" data-active-classes="bg-surface-container-highest text-on-surface font-semibold"><a aria-current="page" class="flex items-center justify-between px-space-md py-space-sm rounded transition-colors bg-surface-container-highest text-on-surface font-semibold" data-path="core-geometry" href="#"><span class="flex items-center gap-space-sm"><span class="font-label-sm text-label-sm text-outline">01</span><span>Core Geometry</span></span><span class="font-code-sm text-code-sm text-outline">1:1.618</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-surface-variant font-code-md text-code-md hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="optical-grid" href="#"><span class="flex items-center gap-space-sm"><span class="font-label-sm text-label-sm text-outline">02</span><span>Optical Grid</span></span><span class="font-code-sm text-code-sm text-outline">4px pt</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-surface-variant font-code-md text-code-md hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="wordmark-lockup" href="#"><span class="flex items-center gap-space-sm"><span class="font-label-sm text-label-sm text-outline">03</span><span>Wordmark Lockup</span></span><span class="font-code-sm text-code-sm text-outline">Kerning</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-surface-variant font-code-md text-code-md hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="micro-favicon-tab-validation" href="#"><span class="flex items-center gap-space-sm"><span class="font-label-sm text-label-sm text-outline">04</span><span>Micro-Favicon Tab Validation</span></span><span class="font-code-sm text-code-sm text-outline">16px</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-surface-variant font-code-md text-code-md hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="substrate-matrices" href="#"><span class="flex items-center gap-space-sm"><span class="font-label-sm text-label-sm text-outline">05</span><span>Substrate Matrices</span></span><span class="font-code-sm text-code-sm text-outline">Paper/Ink</span></a><a class="flex items-center justify-between px-space-md py-space-sm rounded text-on-surface-variant font-code-md text-code-md hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="cli-ide-applications" href="#"><span class="flex items-center gap-space-sm"><span class="font-label-sm text-label-sm text-outline">06</span><span>CLI &amp; IDE Applications</span></span><span class="font-code-sm text-code-sm text-outline">TTY</span></a></nav></div><div class="px-space-xl flex flex-col gap-space-xs"><div class="bg-surface-container-high p-space-sm rounded flex flex-col gap-space-xxs"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm uppercase text-outline">Compiler Hook</span><span class="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span></div><span class="font-code-sm text-code-sm text-on-surface">tex-v4.1.9-paged</span><span class="font-code-sm text-code-sm text-secondary">sync: verified</span></div><div class="flex items-center justify-between pt-space-xs text-outline font-code-sm text-code-sm"><span>ISO 216 / A4</span><span>DPI: 1200</span></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/90 backdrop-blur-md z-40 flex items-center justify-between px-space-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs font-code-md text-code-md text-on-surface-variant"><span class="text-on-surface font-semibold">keystone-monolith</span><span class="text-outline">/</span><span>specifications</span><span class="text-outline">/</span><span class="text-on-surface">ratification-v2.4</span></div><div class="hidden xl:flex items-center gap-space-xs px-space-sm py-space-xxs bg-surface-container-low rounded"><span class="font-label-sm text-label-sm uppercase text-secondary">STATUS</span><span class="font-code-sm text-code-sm text-on-surface font-medium">CANONICAL</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-md"><div class="flex flex-col text-right hidden sm:flex"><span class="font-code-sm text-code-sm text-outline uppercase">Release Telemetry</span><span class="font-code-md text-code-md text-on-surface font-medium">REV-8924f · 0ms drift</span></div><div class="h-6 w-px bg-outline-variant hidden sm:block"></div><div class="flex items-center gap-space-xs"><span class="px-space-xs py-space-xxs font-code-sm text-code-sm bg-surface-container-high text-on-surface-variant rounded">SHA: 7c3e1a</span><span class="px-space-xs py-space-xxs font-code-sm text-code-sm bg-primary text-on-primary rounded">FINAL</span></div></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/></div></header><main class="w-full pt-16 bg-background min-h-screen"><div class="flex flex-col w-full text-on-surface">
+<!-- Document Header Strip / Status Telemetry -->
+<section class="bg-surface-container-low px-space-xl py-space-md">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-space-sm font-code-sm text-code-sm text-secondary">
+<div class="flex items-center gap-space-md">
+<span class="bg-primary text-on-primary px-space-xs py-space-xxs rounded-none font-semibold">SPECIMEN // v3.0</span>
+<span class="tracking-widest uppercase">SYS: MONOLITHIC COMPILER GEOMETRY</span>
+<span class="text-outline">/</span>
+<span class="text-on-surface">RATIFIED: 2025.Q1</span>
+</div>
+<div class="flex items-center gap-space-lg">
+<span class="flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span> STATUS: CANONICAL RATIFICATION</span>
+<span class="hidden sm:inline text-outline">ARCHIVAL REF: MDD-SPEC-8924</span>
+</div>
+</div>
+</section>
+<!-- Section 1: Executive Specification & Rejected Paradigms -->
+<section class="px-space-xl py-space-xxl max-w-7xl mx-auto w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<!-- Title Block -->
+<div class="lg:col-span-8 flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs font-code-sm text-code-sm text-outline uppercase tracking-widest">
+<span>01.0</span>
+<span>//</span>
+<span>Executive Specification</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">
+          The Keystone Monolith: An Architectural Mark for Document Compilation
+        </h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-3xl leading-relaxed">
+          The document compilation pipeline from Markdown to typographically ratified manuscripts demands an immutable visual signature. We reject the ephemeral vernacular of modern software branding—dismissing whimsical glyphs, procedural arrowheads, folded paper corners, and algorithmic sparkle tropes.
+        </p>
+</div>
+<!-- Quick Metrics Aside -->
+<div class="lg:col-span-4 bg-surface-container p-space-lg flex flex-col justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-space-xs">Geometric Invariants</div>
+<div class="font-code-lg text-code-lg text-on-surface font-semibold">Square Aspect 1:1.000</div>
+<div class="font-code-sm text-code-sm text-secondary mt-space-xxs">Optical balance calibrated for sub-millimeter hot-metal press plates and 16px raster grids.</div>
+</div>
+<div class="mt-space-lg pt-space-md bg-surface-container-high p-space-sm">
+<div class="font-label-sm text-label-sm text-outline uppercase">Compiler Verification</div>
+<div class="font-code-md text-code-md text-on-surface font-medium">AST-to-Ink Parity: 100%</div>
+</div>
+</div>
+</div>
+<!-- Rejected Paradigms Panel -->
+<div class="mt-space-xxl bg-surface-container-low p-space-xl">
+<div class="font-label-sm text-label-sm uppercase tracking-widest text-outline mb-space-md">Structural Rationale &amp; Rejected Paradigms</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-space-lg">
+<div class="bg-surface p-space-md flex flex-col gap-space-xs">
+<div class="font-code-md text-code-md text-error flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-base">close</span>
+<span>NO LITERAL SHEETS</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Folded document dog-ears belong to desktop OS iconography from 1984. They imply static dead media rather than living programmatic compilation.
+          </p>
+</div>
+<div class="bg-surface p-space-md flex flex-col gap-space-xs">
+<div class="font-code-md text-code-md text-error flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-base">close</span>
+<span>NO CONVERSION ARROWS</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Bidirectional kinetic arrows reduce compiler engineering to crude file swapping. Compilation is architectural synthesis, not horizontal dragging.
+          </p>
+</div>
+<div class="bg-surface p-space-md flex flex-col gap-space-xs">
+<div class="font-code-md text-code-md text-error flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-base">close</span>
+<span>NO SYNTAX PUNCTUATION</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Brackets, hashes (#), and curly braces ({}) date immediately and reduce the brand mark to an ephemeral IDE plugin rather than an institutional standard.
+          </p>
+</div>
+<div class="bg-surface p-space-md flex flex-col gap-space-xs">
+<div class="font-code-md text-code-md text-error flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-base">close</span>
+<span>NO SYNTHETIC HALOS</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            AI sparks and soft radial glows obfuscate structural incompetence. The mark must function in unyielding high-density carbon ink on limestone substrate.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Four Radical Concept Explorations -->
+<section class="bg-surface-container py-space-xxl px-space-xl">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div>
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-outline">02.0 // Typographic Laboratory</span>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-space-xxs">Four Structural Concept Explorations</h2>
+</div>
+<div class="font-code-sm text-code-sm text-secondary">
+          STANDARDIZED 1:1 CANVASES // RATIO EVALUATION
+        </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-lg">
+<!-- Concept D: Selected -->
+<div class="bg-surface-container-lowest p-space-md flex flex-col justify-between shadow-sm relative">
+<div class="absolute top-space-sm right-space-sm bg-primary text-on-primary px-space-xs py-space-xxs font-code-sm text-code-sm uppercase font-semibold">
+            Canonical Selected
+          </div>
+<div>
+<div class="aspect-square bg-surface-container-low flex items-center justify-center p-space-md mb-space-md">
+<img alt="Concept D: The Keystone Monolith" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<div class="font-code-sm text-code-sm text-outline uppercase">Concept D // Canonical</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-space-xxs">The Keystone Monolith</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-space-xs">
+              Dual precision negative incisions carved into a solid carbon mass. Emergent 'M' foundation counter-weighted by an architectural keystone wedge. Total gravitas.
+            </p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-low p-space-xs flex justify-between font-code-sm text-code-sm text-on-surface">
+<span>OPTICAL STABILITY</span>
+<span class="font-semibold">99.8%</span>
+</div>
+</div>
+<!-- Concept B -->
+<div class="bg-surface-container-lowest p-space-md flex flex-col justify-between opacity-80 hover:opacity-100 transition-opacity">
+<div>
+<div class="aspect-square bg-surface-container-low flex items-center justify-center p-space-md mb-space-md">
+<img alt="Concept B: The Cadence Monolith" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WeclesIvPJILfrizZOcpci4tBxkNxQ0QvVX9DPsL1At3M0dTr3U2mW5gd1Ee4RCjWXTV4SAKIbvALGL-hMF1Et0Dg38mXd6Ps1-D-7MD0NESdjAqfpNrkKJwUu0p9qM6AQM5e9NIXJvrosFk9fHLcUJh62TpPunNEdP90zgcxHs9SF_mbgv134XlacBSg8aoosKllsQh1gyAvkcY6EEAeUIWyQeD4pErhpDKQgohNOR6x73hEkd76nfWQ"/>
+</div>
+<div class="font-code-sm text-code-sm text-outline uppercase">Concept B // Rejected</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-space-xxs">The Cadence Monolith</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-space-xs">
+              Tri-columnar progression depicting raw AST tokens resolving into a monolithic vertical right spine. Strong narrative, but fragile at 16px raster.
+            </p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-low p-space-xs flex justify-between font-code-sm text-code-sm text-outline">
+<span>OPTICAL STABILITY</span>
+<span>82.4%</span>
+</div>
+</div>
+<!-- Concept A -->
+<div class="bg-surface-container-lowest p-space-md flex flex-col justify-between opacity-80 hover:opacity-100 transition-opacity">
+<div>
+<div class="aspect-square bg-surface-container-low flex items-center justify-center p-space-md mb-space-md">
+<img alt="Concept A: The Monolithic Aperture" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xmdo_4NoMXe3LCmRp0JeTSwiKollo_rU3qBgHHBHEtIWNcKX8BAYocxo4t5g_TllUM3iRpee91eGPqc3I1UhO1d4O5BX7siQhsJX6iSmVhLDh8DR9cdg-Uu2OCbGnp2O7um3qoFwvf-gm8XWW7NVpEoZZ_H_18z0ARTL6cQ9Jv7H8pqfGkXU_AUxFDCQl6GFLy-L9G_QFwbpqKTE7RfUoxsqY-Av99c7CiUkyyC1qGAu-L6l1CYIKyT48E"/>
+</div>
+<div class="font-code-sm text-code-sm text-outline uppercase">Concept A // Rejected</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-space-xxs">The Monolithic Aperture</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-space-xs">
+              Inverted-V monumental gateway with a continuous upper canopy. Evokes Roman aqueducts and architectural pylons, but lacks explicit document resonance.
+            </p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-low p-space-xs flex justify-between font-code-sm text-code-sm text-outline">
+<span>OPTICAL STABILITY</span>
+<span>88.1%</span>
+</div>
+</div>
+<!-- Concept C -->
+<div class="bg-surface-container-lowest p-space-md flex flex-col justify-between opacity-80 hover:opacity-100 transition-opacity">
+<div>
+<div class="aspect-square bg-surface-container-low flex items-center justify-center p-space-md mb-space-md">
+<img alt="Concept C: Step Matrix" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XSgf2WWLQIv8mPBXxbcKDCZpdEfSqbgvQwWcnNXi5BecyyyXSCsukiZqdRGwwN319fLB3uviSx7AW-QKGuL1NOpBOIc9C4FX3UupfuwCNNgqTIiL9NA5HJeBYOijQ13wfzCN0l10Avn5gEBMjdr99VICENvar4lfKF4MuiTk7GSYF0fnGax32t54Xq-R5fHYrcr69kBt3GDKShxq0stUbIs7V9H_HSQA2_UjM71h0jMCcb_t5a2e4rs4PE"/>
+</div>
+<div class="font-code-sm text-code-sm text-outline uppercase">Concept C // Rejected</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-space-xxs">The Step Resolution Matrix</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-space-xs">
+              Interlocking orthogonal planes inspired by brutalist facade rhythm. Highly structural, but communicates modular construction over unified compilation.
+            </p>
+</div>
+<div class="mt-space-md pt-space-xs bg-surface-container-low p-space-xs flex justify-between font-code-sm text-code-sm text-outline">
+<span>OPTICAL STABILITY</span>
+<span>79.5%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Canonical Geometry & Optical Proportion -->
+<section class="px-space-xl py-space-xxl max-w-7xl mx-auto w-full">
+<div class="flex flex-col gap-space-xs mb-space-xl">
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-outline">03.0 // Mathematical Blueprint</span>
+<h2 class="font-headline-xl text-headline-xl text-on-surface">Canonical Geometry &amp; Optical Proportion</h2>
+<p class="font-body-md text-body-md text-secondary max-w-2xl">
+        Precision schematics of Concept D rendered across a 4px architectural baseline grid. Zero optical distortion across physical letterpress and digital render engines.
+      </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- Large Schematic Canvas -->
+<div class="lg:col-span-7 bg-surface-container-lowest p-space-lg shadow-sm relative">
+<div class="flex items-center justify-between font-code-sm text-code-sm text-outline mb-space-md">
+<span>CANVAS: 512×512 PT</span>
+<span>SUBSTRATE: ARCHIVAL CARTON</span>
+<span>GRID: 4PT OPTICAL CADENCE</span>
+</div>
+<!-- Schematic Representation with Technical Overlay Annotations -->
+<div class="relative bg-surface-container-low aspect-square flex items-center justify-center p-space-xl overflow-hidden">
+<!-- Background Coordinate System Lines -->
+<div class="absolute inset-0 grid grid-cols-8 grid-rows-8 opacity-20 pointer-events-none">
+<div class="bg-outline/20 m-space-xxs"></div>
+<div class="bg-outline/20 m-space-xxs"></div>
+<div class="bg-outline/20 m-space-xxs"></div>
+<div class="bg-outline/20 m-space-xxs"></div>
+<div class="bg-outline/20 m-space-xxs"></div>
+<div class="bg-outline/20 m-space-xxs"></div>
+<div class="bg-outline/20 m-space-xxs"></div>
+<div class="bg-outline/20 m-space-xxs"></div>
+</div>
+<img alt="Concept D: The Keystone Monolith Optical Blueprint" class="w-80 h-80 object-contain relative z-10" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+<!-- Overlaid Dimension Callouts -->
+<div class="absolute top-6 left-6 font-code-sm text-code-sm bg-primary text-on-primary px-space-xs py-space-xxs z-20">
+            W: 288px
+          </div>
+<div class="absolute bottom-6 right-6 font-code-sm text-code-sm bg-primary text-on-primary px-space-xs py-space-xxs z-20">
+            RECIPROCAL ARCH: 45°
+          </div>
+<div class="absolute top-1/2 left-4 -translate-y-1/2 font-code-sm text-code-sm bg-surface-container-highest text-on-surface px-space-xs py-space-xxs z-20">
+            SLIT: 40px
+          </div>
+</div>
+<div class="mt-space-md flex flex-wrap items-center justify-between font-code-sm text-code-sm text-secondary gap-space-sm pt-space-xs bg-surface-container-low p-space-xs">
+<span>COORDINATE APEX: (256, 128)</span>
+<span>TENSION TOLERANCE: ±0.002</span>
+<span>VIRTUAL INK BLEED: 0.00%</span>
+</div>
+</div>
+<!-- Geometry Breakdown Breakdown -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg">
+<div class="bg-surface-container-low p-space-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">The Dual-Incisions Architecture</h3>
+<p class="font-body-md text-body-md text-secondary leading-relaxed">
+            The canonical mark operates through subtraction rather than addition. Starting from an unyielding carbon square (288×288pt), two calculated operations occur:
+          </p>
+<ul class="mt-space-md flex flex-col gap-space-sm font-code-md text-code-md text-on-surface">
+<li class="bg-surface p-space-sm flex gap-space-sm items-start">
+<span class="font-semibold text-primary">01.</span>
+<span><strong>Upper Vertical Channel:</strong> A precise 40px channel descends down the midline, halting at the optical focal center.</span>
+</li>
+<li class="bg-surface p-space-sm flex gap-space-sm items-start">
+<span class="font-semibold text-primary">02.</span>
+<span><strong>Reciprocal Base Arch:</strong> An exact 45° geometric arch is excised from the base, rising upward to meet the channel's arrest point.</span>
+</li>
+</ul>
+</div>
+<div class="bg-primary text-on-primary p-space-lg">
+<span class="font-label-sm text-label-sm text-on-primary-container uppercase tracking-wider">The "Aha" Moment</span>
+<h4 class="font-headline-sm text-headline-sm text-on-primary mt-space-xxs mb-space-xs">Emergent Structural Double-Read</h4>
+<p class="font-body-md text-body-md text-primary-fixed-dim leading-relaxed">
+            Upon initial glance, the mind perceives a monolithic stone gate—authoritative, architectural, immovable. On second evaluation, the eye uncovers the optical suspended keystone and recognizes the distinct rhythmic cadence of an emergent <strong>‘M’</strong> embracing an integrated vertical <strong>‘D’</strong> axis.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Wordmark & System Lockup -->
+<section class="bg-surface-container py-space-xxl px-space-xl">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div>
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-outline">04.0 // Typographic Integration</span>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-space-xxs">Wordmark &amp; System Lockups</h2>
+<p class="font-body-md text-body-md text-secondary max-w-2xl">
+          Wordmark set in calibrated Swiss grotesk. Disciplined lowercase execution with -0.03em tracking. The top-level domain (.com) is relegated to quiet secondary metadata.
+        </p>
+</div>
+<!-- Lockup Demonstrations -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-lg">
+<!-- Variant A: Inline Horizontal (Primary App Header) -->
+<div class="bg-surface-container-lowest p-space-lg flex flex-col justify-between shadow-sm">
+<div class="font-code-sm text-code-sm text-outline uppercase mb-space-lg">Lockup 01 // Horizontal Inline (Primary)</div>
+<div class="py-space-xl px-space-md bg-surface-container-low flex items-center justify-center gap-space-md">
+<!-- Mark -->
+<div class="w-8 h-8 flex-shrink-0">
+<img alt="Mark" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<!-- Typography -->
+<div class="flex items-baseline gap-space-xxs">
+<span class="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
+<span class="font-code-sm text-code-sm text-outline font-normal">.com</span>
+</div>
+</div>
+<div class="mt-space-lg font-code-sm text-code-sm text-secondary">
+            Usage: Web headers, CLI prompt banners, documentation mastheads.
+          </div>
+</div>
+<!-- Variant B: Stacked Emblem -->
+<div class="bg-surface-container-lowest p-space-lg flex flex-col justify-between shadow-sm">
+<div class="font-code-sm text-code-sm text-outline uppercase mb-space-lg">Lockup 02 // Stacked Emblem</div>
+<div class="py-space-xl px-space-md bg-surface-container-low flex flex-col items-center justify-center gap-space-sm">
+<!-- Mark -->
+<div class="w-14 h-14">
+<img alt="Mark" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<!-- Typography -->
+<div class="flex flex-col items-center">
+<span class="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
+<span class="font-code-sm text-code-sm text-secondary tracking-widest uppercase">COMPILER ENGINE</span>
+</div>
+</div>
+<div class="mt-space-lg font-code-sm text-code-sm text-secondary">
+            Usage: Title page ratifications, ISO certification covers, package packaging.
+          </div>
+</div>
+<!-- Variant C: Micro Compact -->
+<div class="bg-surface-container-lowest p-space-lg flex flex-col justify-between shadow-sm">
+<div class="font-code-sm text-code-sm text-outline uppercase mb-space-lg">Lockup 03 // Micro Architectural Tag</div>
+<div class="py-space-xl px-space-md bg-surface-container-low flex items-center justify-center">
+<div class="bg-primary text-on-primary px-space-sm py-space-xs flex items-center gap-space-sm">
+<div class="w-4 h-4 bg-on-primary flex items-center justify-center">
+<div class="w-1 h-2 bg-primary"></div>
+</div>
+<span class="font-code-sm text-code-sm tracking-widest font-semibold uppercase">MDTD::CORE</span>
+</div>
+</div>
+<div class="mt-space-lg font-code-sm text-code-sm text-secondary">
+            Usage: IDE status bars, micro status toasts, telemetry chips.
+          </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Micro-Favicon & Multi-Scale Optical Test -->
+<section class="px-space-xl py-space-xxl max-w-7xl mx-auto w-full">
+<div class="flex flex-col gap-space-xs mb-space-xl">
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-outline">05.0 // Optical Multi-Scale Validation</span>
+<h2 class="font-headline-xl text-headline-xl text-on-surface">Multi-Scale Raster &amp; Micro-Favicon Benchmark</h2>
+<p class="font-body-md text-body-md text-secondary max-w-2xl">
+        A true architectural mark must survive sub-pixel decimation. Verified clarity across 16×16 hardware matrices through 64×64 display densities without edge blurring.
+      </p>
+</div>
+<!-- Scaled Matrix Strip -->
+<div class="bg-surface-container-low p-space-xl flex flex-wrap items-end justify-around gap-space-xl mb-space-xl">
+<!-- 16px -->
+<div class="flex flex-col items-center gap-space-sm">
+<div class="w-4 h-4 bg-surface-container-lowest p-0.5 flex items-center justify-center shadow-sm">
+<img alt="16px" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<div class="text-center font-code-sm text-code-sm">
+<div class="text-on-surface font-semibold">16×16</div>
+<div class="text-outline">Favicon</div>
+</div>
+</div>
+<!-- 24px -->
+<div class="flex flex-col items-center gap-space-sm">
+<div class="w-6 h-6 bg-surface-container-lowest p-0.5 flex items-center justify-center shadow-sm">
+<img alt="24px" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<div class="text-center font-code-sm text-code-sm">
+<div class="text-on-surface font-semibold">24×24</div>
+<div class="text-outline">Menu Bar</div>
+</div>
+</div>
+<!-- 32px -->
+<div class="flex flex-col items-center gap-space-sm">
+<div class="w-8 h-8 bg-surface-container-lowest p-1 flex items-center justify-center shadow-sm">
+<img alt="32px" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<div class="text-center font-code-sm text-code-sm">
+<div class="text-on-surface font-semibold">32×32</div>
+<div class="text-outline">Retina Tab</div>
+</div>
+</div>
+<!-- 48px -->
+<div class="flex flex-col items-center gap-space-sm">
+<div class="w-12 h-12 bg-surface-container-lowest p-1.5 flex items-center justify-center shadow-sm">
+<img alt="48px" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<div class="text-center font-code-sm text-code-sm">
+<div class="text-on-surface font-semibold">48×48</div>
+<div class="text-outline">Dock Icon</div>
+</div>
+</div>
+<!-- 64px -->
+<div class="flex flex-col items-center gap-space-sm">
+<div class="w-16 h-16 bg-surface-container-lowest p-2 flex items-center justify-center shadow-sm">
+<img alt="64px" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<div class="text-center font-code-sm text-code-sm">
+<div class="text-on-surface font-semibold">64×64</div>
+<div class="text-outline">Desktop Matrix</div>
+</div>
+</div>
+</div>
+<!-- Live Browser Tab Simulation -->
+<div class="bg-primary-container p-space-md text-on-primary">
+<div class="font-code-sm text-code-sm text-on-primary-container uppercase tracking-wider mb-space-sm">
+        Live Environment Simulation // macOS Chrome Tab Strip
+      </div>
+<!-- Tab Bar Mock -->
+<div class="bg-inverse-surface rounded-t-lg pt-space-xs px-space-xs flex items-center gap-space-xxs">
+<!-- Window Controls -->
+<div class="flex items-center gap-1.5 px-space-sm">
+<span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-[#27c93f] inline-block"></span>
+</div>
+<!-- Active Tab -->
+<div class="bg-primary text-on-primary px-space-md py-space-xs rounded-t-md flex items-center gap-space-sm max-w-xs shadow-sm">
+<div class="w-4 h-4 flex-shrink-0 bg-surface-container-lowest p-0.5">
+<img alt="Favicon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<span class="font-code-sm text-code-sm truncate font-medium">mdtodocs — compiler v2.4</span>
+<span class="material-symbols-outlined text-sm opacity-50 ml-auto cursor-pointer hover:opacity-100">close</span>
+</div>
+<!-- Inactive Tab -->
+<div class="text-on-primary-container px-space-md py-space-xs rounded-t-md flex items-center gap-space-sm max-w-xs opacity-60">
+<span class="font-code-sm text-code-sm truncate">RFC-8924: Typographic Spec</span>
+</div>
+</div>
+<!-- Tab Content Placeholder Area -->
+<div class="bg-primary p-space-lg flex items-center justify-between font-code-sm text-code-sm text-on-primary-container">
+<span>https://mdtodocs.com/spec/ratified-v3.0</span>
+<span class="text-on-primary">STATUS: 200 OK (CACHED VIA ARCHIVE)</span>
+</div>
+</div>
+</section>
+<!-- Section 6: Substrate & Context Variations -->
+<section class="bg-surface-container py-space-xxl px-space-xl">
+<div class="max-w-7xl mx-auto flex flex-col gap-space-xl">
+<div>
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-outline">06.0 // Substrate Realization</span>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-space-xxs">Substrate &amp; Context Matrices</h2>
+<p class="font-body-md text-body-md text-secondary max-w-2xl">
+          Verifying high-contrast fidelity across physical paper, terminal interfaces, and compiled formal manuscripts.
+        </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-xl">
+<!-- Substrate 1: Archival Limestone Paper (Editorial PDF Header) -->
+<div class="bg-surface-container-lowest p-space-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between font-code-sm text-code-sm text-outline mb-space-lg">
+<span>SUBSTRATE A // ARCHIVAL LIMESTONE (#FAF9F6)</span>
+<span>120GSM HEAVY VELLUM</span>
+</div>
+<!-- Simulated Document Page Header -->
+<div class="p-space-lg bg-surface flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-sm bg-surface-container-high p-space-xs">
+<div class="flex items-center gap-space-xs">
+<div class="w-5 h-5">
+<img alt="Mark" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UZR-W7quR4EdgkFfu7b1TJ-QLaLlFU6ljnmvF-QxsjBqY2H2rRyaNHxCn4ExwXFQ6HmYnMnrhMJzXnyNkcMQBt5UGeUGSqF0oEXfpXAawc2rMF9jffuiiR5SjoBC1WfIRqQUXDoVV8Zw3Bzddyh1WWldqC0_uNuYpN4T5J67K80IM11kQ-kZ-KSN1_xzMjt2ARR1wMrtNVxFz2IpWlNSCqUHhttNQ_-vEVXRT3J0T4CWr8A49OH-L-Cl5_"/>
+</div>
+<span class="font-code-sm text-code-sm font-semibold tracking-tight text-on-surface">mdtodocs</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">ISO 216 SECTION 4.2</span>
+</div>
+<h4 class="font-headline-lg text-headline-lg text-on-surface">Treatise on Structural Line-Breaks</h4>
+<p class="font-body-sm text-body-sm text-secondary leading-relaxed">
+                The canonical keystone symbol sits quietly in the manuscript running head without generating cognitive friction. It acts as an authoritative institutional seal rather than a commercial billboard.
+              </p>
+</div>
+</div>
+<div class="mt-space-lg font-code-sm text-code-sm text-secondary">
+            Document Integration: 100% legibility at 18pt vertical running-head position.
+          </div>
+</div>
+<!-- Substrate 2: Obsidian Carbon Console (CLI Invocation) -->
+<div class="bg-primary-container p-space-xl shadow-sm flex flex-col justify-between text-on-primary">
+<div>
+<div class="flex items-center justify-between font-code-sm text-code-sm text-on-primary-container mb-space-lg">
+<span>SUBSTRATE B // OBSIDIAN CARBON (#121314)</span>
+<span>VT100 / XTERM-256COLOR</span>
+</div>
+<!-- Terminal Output Window -->
+<div class="bg-primary p-space-lg font-code-md text-code-md flex flex-col gap-space-xs leading-relaxed">
+<div class="text-on-primary-container">
+<span class="text-outline">$</span> mdtodocs compile RFC-042.md --target word,pdf --ratify
+              </div>
+<div class="text-primary-fixed mt-space-xs">
+                [PARSER] AST generated in 4.12ms (1,482 nodes)
+              </div>
+<div class="text-primary-fixed">
+                [KERNEL] Applying Keystone Monolith typographic engine...
+              </div>
+<div class="text-secondary-fixed">
+                [OUTPUT] target/dist/RFC-042.pdf (1200 DPI archival)
+              </div>
+<div class="text-secondary-fixed">
+                [OUTPUT] target/dist/RFC-042.docx (Calibrated tables)
+              </div>
+<div class="mt-space-xs text-on-primary font-semibold flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-[#27c93f]"></span> COMPILATION RATIFIED: 0 WARN / 0 ERR (142ms)
+              </div>
+</div>
+</div>
+<div class="mt-space-lg font-code-sm text-code-sm text-on-primary-container">
+            CLI Terminal Matrix: Guaranteed parity across high-contrast dark shell themes.
+          </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Ratification Signature Block -->
+<section class="px-space-xl py-space-xxl max-w-7xl mx-auto w-full">
+<div class="bg-surface-container-high p-space-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-space-lg">
+<div class="flex flex-col gap-space-xxs">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">ARCHITECTURAL RATIFICATION RECORD</span>
+<div class="font-headline-md text-headline-md text-on-surface">Signed &amp; Sealed into Canonical Baseline</div>
+<div class="font-code-sm text-code-sm text-secondary">HASH: 7c3e1a8924f0c42 · MDTODOCS PUBLISHING CORP · MARCH 2025</div>
+</div>
+<div class="flex items-center gap-space-md">
+<button class="bg-primary text-on-primary px-space-lg py-space-sm font-code-sm text-code-sm hover:bg-secondary transition-colors" onclick="alert('Canonical Spec JSON exported to clipboard.')">
+          EXPORT SPEC DATA
+        </button>
+<button class="bg-surface-container-highest text-on-surface px-space-lg py-space-sm font-code-sm text-code-sm hover:bg-surface-variant transition-colors" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+          BACK TO APEX
+        </button>
+</div>
+</div>
+</section>
+</div></main></div></body></html>

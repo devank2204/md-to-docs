@@ -14,10 +14,13 @@ function App() {
   const themeId = useStore(state => state.themeId);
   const baseFontSize = useStore(state => state.baseFontSize);
   
+  const documentSignature = useStore(state => state.documentSignature);
+  
   const setMarkdown = useStore(state => state.setMarkdown);
   const setDestination = useStore(state => state.setDestination);
   const setThemeId = useStore(state => state.setThemeId);
   const setBaseFontSize = useStore(state => state.setBaseFontSize);
+  const setDocumentSignature = useStore(state => state.setDocumentSignature);
 
   const appState: AppState = markdown.trim().length > 0 ? 'WORKSPACE' : 'EMPTY';
 
@@ -51,6 +54,7 @@ function App() {
         destination={destination}
         onDestinationChange={setDestination}
         activeTheme={activeTheme}
+        documentSignature={documentSignature}
       />
       <main className="flex-1 flex flex-col mt-12 relative">
         {appState === 'EMPTY' ? (
@@ -66,6 +70,8 @@ function App() {
             baseFontSize={baseFontSize}
             onBaseFontSizeChange={setBaseFontSize}
             activeTheme={activeTheme}
+            documentSignature={documentSignature}
+            onDocumentSignatureChange={setDocumentSignature}
           />
         )}
       </main>

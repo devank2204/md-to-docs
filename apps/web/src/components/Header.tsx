@@ -13,9 +13,10 @@ interface HeaderProps {
   destination: DestinationType;
   onDestinationChange: (dest: DestinationType) => void;
   activeTheme: any;
+  documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
 }
 
-export function Header({ appState, markdown, destination, onDestinationChange, activeTheme }: HeaderProps) {
+export function Header({ appState, markdown, destination, onDestinationChange, activeTheme, documentSignature }: HeaderProps) {
   // State handled internally by LoadingButton
 
   const handleDownloadDocx = async () => {
@@ -25,7 +26,7 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
       let doc = parseMarkdown(markdown);
       doc = await resolveAssets(doc);
       doc = planRepresentation(doc, 'word', collector);
-      const blob = await renderToDocxBlob(doc, activeTheme);
+      const blob = await renderToDocxBlob(doc, activeTheme, documentSignature);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -43,7 +44,7 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
     let doc = parseMarkdown(markdown);
     doc = await resolveAssets(doc);
     doc = planRepresentation(doc, destination, collector);
-    const html = renderToClipboardHtml(doc, activeTheme);
+    const html = renderToClipboardHtml(doc, activeTheme, documentSignature);
     const htmlBlob = new Blob([html], { type: 'text/html' });
     const plainBlob = new Blob([markdown], { type: 'text/plain' });
     await navigator.clipboard.write([
@@ -91,13 +92,13 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
     <header className="fixed top-0 left-0 right-0 h-12 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-space-md gap-space-md border-t border-outline-variant/30">
       <div className="flex items-center gap-space-md">
         <a href="/" className="flex items-center gap-space-xs group transition-transform duration-700 hover:-translate-y-[1px]">
-          <span className="font-code-lg text-code-lg tracking-wider font-semibold text-primary lowercase transition-all duration-700 
-            group-hover:text-transparent group-hover:bg-clip-text 
-            group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-outline group-hover:to-primary
-            group-hover:bg-[length:200%_auto] group-hover:animate-background-pan
-            group-hover:tracking-[0.08em]">
-            mdtodocs.com
-          </span>
+          <div className="flex items-center gap-space-sm">
+            <img src="/mark.png" alt="Logo" className="w-8 h-8 object-contain" />
+            <div className="flex items-baseline gap-space-xxs mt-0.5">
+              <span className="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
+              <span className="font-code-sm text-code-sm text-outline font-normal">.com</span>
+            </div>
+          </div>
         </a>
       </div>
 

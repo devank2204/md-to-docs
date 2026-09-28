@@ -22,6 +22,8 @@ interface WorkspaceProps {
   baseFontSize: number;
   onBaseFontSizeChange: (size: number) => void;
   activeTheme: any;
+  documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
+  onDocumentSignatureChange: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
 }
 
 interface DocumentStats {
@@ -92,7 +94,9 @@ export function Workspace({
   onThemeIdChange,
   baseFontSize,
   onBaseFontSizeChange,
-  activeTheme
+  activeTheme,
+  documentSignature,
+  onDocumentSignatureChange
 }: WorkspaceProps) {
   const [isFidelityPanelOpen, setIsFidelityPanelOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
@@ -185,6 +189,8 @@ export function Workspace({
           onBaseFontSizeChange={onBaseFontSizeChange}
           isCompiling={isCompiling}
           onOpenInspector={() => setIsInspectorOpen(true)}
+          documentSignature={documentSignature}
+          onDocumentSignatureChange={onDocumentSignatureChange}
         />
       </div>
 

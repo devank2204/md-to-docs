@@ -18,6 +18,8 @@ interface DocumentPreviewProps {
   onBaseFontSizeChange: (size: number) => void;
   isCompiling: boolean;
   onOpenInspector: () => void;
+  documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
+  onDocumentSignatureChange: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
 }
 
 const MermaidPreview = ({ code }: { code: string }) => {
@@ -30,7 +32,7 @@ const MermaidPreview = ({ code }: { code: string }) => {
       theme: 'neutral',
       securityLevel: 'strict',
     });
-    
+
     let isMounted = true;
     mermaid.render(id.current, code)
       .then(res => {
@@ -58,6 +60,8 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   onBaseFontSizeChange,
   isCompiling,
   onOpenInspector,
+  documentSignature,
+  onDocumentSignatureChange,
 }) => {
   return (
     <div className="col-span-12 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-full">
@@ -80,12 +84,12 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             value={destination}
             onValueChange={(val) => onDestinationChange(val as DestinationType)}
           />
-          
+
           <span className="text-outline-variant">·</span>
-          
+
           <div className="flex items-center gap-space-xs">
             <span className="text-secondary">Theme:</span>
-            <select 
+            <select
               className="bg-transparent border border-outline-variant/30 rounded px-2 py-1 text-on-surface focus:outline-none focus:border-primary text-code-sm"
               value={themeId}
               onChange={(e) => onThemeIdChange(e.target.value)}
@@ -100,7 +104,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
           <div className="flex items-center gap-space-xs">
             <span className="text-secondary">Size:</span>
-            <input 
+            <input
               type="number"
               min="8"
               max="24"
@@ -109,9 +113,31 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
               onChange={(e) => onBaseFontSizeChange(parseInt(e.target.value) || 12)}
             />
           </div>
+
+          <span className="text-outline-variant">·</span>
+
+          <div className="flex items-center gap-space-xs" title="A small mdtodocs signature is added to your exported document.">
+            <span className="text-secondary">Document signature:</span>
+            <select
+              className="bg-transparent border border-outline-variant/30 rounded px-2 py-1 text-on-surface focus:outline-none focus:border-primary text-code-sm"
+              value={documentSignature.enabled ? documentSignature.placement : 'off'}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === 'off') {
+                  onDocumentSignatureChange({ ...documentSignature, enabled: false });
+                } else {
+                  onDocumentSignatureChange({ enabled: true, placement: val as 'every-page' | 'last-page' });
+                }
+              }}
+            >
+              <option value="off">Off</option>
+              <option value="every-page">Every page</option>
+              <option value="last-page">Last page</option>
+            </select>
+          </div>
         </div>
         <div className="flex items-center gap-space-md">
-          <button 
+          <button
             onClick={onOpenInspector}
             className="flex items-center gap-space-xxs text-secondary hover:text-on-surface transition-colors font-code-sm text-code-sm px-space-xs py-space-xxs rounded bg-surface-container-low border border-outline-variant/30 shadow-xs"
           >
@@ -128,17 +154,29 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
       <div className="flex-1 flex justify-center p-space-lg overflow-y-auto">
         <div className="w-full max-w-[816px] bg-surface-container-lowest transition-colors duration-500 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate max-w-none">
+          {/* Creative Bookmark Watermark */}
+          {/* <div className="absolute top-0 right-12 z-50 group">
+            <div className="w-10 h-[170px] bg-primary shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex flex-col items-center pt-6 transform -translate-y-4 hover:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] relative">
+              <div
+                className="text-on-primary font-code-sm text-[12px] tracking-[0.1em] font-medium opacity-90 uppercase"
+                style={{ writingMode: 'vertical-rl'}}
+              >
+                MDTD::CORE
+              </div>
+            </div>
+          </div> */}
+
           {isCompiling && (
             <div className="absolute inset-0 bg-surface-container-lowest/50 flex items-center justify-center rounded z-20">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
           <div className="relative z-10 font-serif text-on-surface [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
-            <ReactMarkdown 
-              remarkPlugins={[remarkGfm, remarkMath]} 
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeKatex]}
               components={{
-                code({node, inline, className, children, ...props}: any) {
+                code({ node, inline, className, children, ...props }: any) {
                   const match = /language-(\w+)/.exec(className || '');
                   if (!inline && match && match[1] === 'mermaid') {
                     return <MermaidPreview code={String(children).replace(/\n$/, '')} />;
@@ -149,6 +187,12 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             >
               {markdown}
             </ReactMarkdown>
+            
+            {documentSignature.enabled && (
+              <div className="mt-12 text-right text-secondary/60 font-['Caveat',cursive] text-2xl select-none" style={{ pageBreakInside: 'avoid' }}>
+                made with mdtodocs.com
+              </div>
+            )}
           </div>
         </div>
       </div>

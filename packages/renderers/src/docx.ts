@@ -20,6 +20,7 @@ import {
   convertInchesToTwip,
   LevelFormat,
   ImageRun,
+  Footer,
 } from 'docx';
 
 function parseDataUri(dataUri: string): { type: 'png' | 'jpg' | 'gif' | 'bmp' | 'svg', data: Uint8Array } {
@@ -420,8 +421,28 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
 
 const docxRenderer = new DocumentRenderer<DocxNode[]>(docxRegistry);
 
-export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme): Promise<Blob> {
+export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme, signature?: { enabled: boolean; placement: 'every-page' | 'last-page' }): Promise<Blob> {
   const children = docxRenderer.render(doc, { indentLevel: 0 }, theme).flat();
+  
+  let footerConfig = undefined;
+  
+  if (signature?.enabled) {
+    const signaturePara = new DocxParagraph({
+      children: [new TextRun({ text: "made with mdtodocs.com", font: 'Caveat', size: 24, color: '888888' })],
+      alignment: AlignmentType.RIGHT,
+    });
+    
+    if (signature.placement === 'every-page') {
+      footerConfig = {
+        default: new Footer({
+          children: [signaturePara],
+        }),
+      };
+    } else {
+      children.push(new DocxParagraph({ children: [] })); // spacer
+      children.push(signaturePara);
+    }
+  }
   
   const docxDoc = new DocxDocument({
     styles: {
@@ -519,6 +540,7 @@ export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme): Promis
             margin: { top: convertInchesToTwip(1), right: convertInchesToTwip(1), bottom: convertInchesToTwip(1), left: convertInchesToTwip(1) },
           },
         },
+        footers: footerConfig,
         children: children as any,
       },
     ],

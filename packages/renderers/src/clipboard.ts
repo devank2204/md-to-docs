@@ -144,11 +144,22 @@ const clipboardRegistry: RendererRegistry<string> = {
 
 const clipboardRenderer = new DocumentRenderer<string>(clipboardRegistry);
 
-export function renderToClipboardHtml(doc: Root, theme?: DocumentTheme): string {
+export function renderToClipboardHtml(doc: Root, theme?: DocumentTheme, signature?: { enabled: boolean; placement: 'every-page' | 'last-page' }): string {
   const childrenHtml = clipboardRenderer.render(doc, {}, theme).join('\n');
+  
+  let signatureHtml = '';
+  if (signature?.enabled) {
+    signatureHtml = `
+      <div style="margin-top: 48px; text-align: right; color: #888; font-family: 'Caveat', 'Cedarville Cursive', cursive; font-size: 24px; user-select: none;">
+        made with mdtodocs.com
+      </div>
+    `;
+  }
+
   return `
     <div style="max-width:800px;margin:0 auto;">
       ${childrenHtml}
+      ${signatureHtml}
     </div>
   `;
 }
