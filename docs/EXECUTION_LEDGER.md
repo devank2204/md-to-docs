@@ -42,16 +42,35 @@ This ledger tracks the progressive implementation and verification of the `md.to
 ---
 
 ## Prompt 2: Test Harness Stabilization & Fidelity Isolation
-* **Status:** Queued
+* **Status:** Complete
 * **Scope and Intended Behavior:**
-  - Provide jsdom mocks for `SVGElement.prototype.getBBox` in `@mdtodocs/validation` test configuration so Mermaid tests pass deterministically in CI/local runs.
-  - Fix `stress.test.ts` to access AST properties correctly.
-  - Isolate `fidelity-lab` runner so `.output/` does not dirty tracked repository files or auto-generate snapshots unexpectedly.
-* **Files Changed:** (None yet)
-* **Tests Executed:** (Pending)
+  - Provide isolated jsdom mocks for `SVGElement.prototype.getBBox`, `getScreenCTM`, `createSVGPoint`, and `createSVGMatrix` in `@mdtodocs/validation` test configuration so Mermaid tests pass deterministically in CI/local runs.
+  - Fix `stress.test.ts` to inspect node-attached AST data rather than non-existent `doc.assets`.
+  - Fix Windows file URL resolution bug in `packages/fidelity-lab/src/runner.ts` using `fileURLToPath`.
+  - Isolate `fidelity-lab` output generation to `process.env.FIDELITY_OUTPUT_DIR || path.join(os.tmpdir(), 'mdtodocs-fidelity-output')` so running tests never touches or dirties tracked git repository files.
+  - Guard snapshot generation in `runner.ts` behind an explicit `--update` / `-u` CLI flag to prevent accidental fixture mutations.
+* **Files Changed:**
+  - `packages/validation/tests/setup.ts` (Created SVG/DOM mocks for jsdom)
+  - `packages/validation/vitest.config.ts` (Configured `setupFiles: ['./tests/setup.ts']`)
+  - `packages/validation/tests/stress.test.ts` (Fixed AST node assertion for mermaid diagrams)
+  - `packages/fidelity-lab/src/runner.ts` (Cross-platform path resolution, isolated output dir, guarded snapshot update)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 4/4 test files, 5/5 tests passed in 7.60s**)
+    - `tests/mermaid.test.ts` (PASSED)
+    - `tests/mermaid-integration.test.ts` (PASSED)
+    - `tests/mermaid-test-2.test.ts` (PASSED)
+    - `tests/stress.test.ts` (PASSED)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: Isolated execution verified**; output written to OS temporary directory without touching or modifying any tracked git files)
+  - `git status --short` (Verified 100% clean fixture tree, zero unintended tracked changes)
 * **Acceptance Criteria:**
-  - [ ] All `@mdtodocs/validation` tests pass cleanly.
-  - [ ] `fidelity-lab` test runner can run without dirtying git working tree.
+  - [x] All `@mdtodocs/validation` tests pass cleanly without jsdom getBBox errors.
+  - [x] `fidelity-lab` test runner runs without dirtying or modifying the git working tree.
+  - [x] Windows file URL resolution in `runner.ts` works cross-platform.
+  - [x] Accidental fixture auto-generation is prevented unless `--update` is explicitly provided.
+* **Regressions & Unresolved Issues:**
+  - `fidelity-lab` fixtures (`expected-ir.json`) still contain the pre-commit `beff8e7` Document IR structure, whereas `parseMarkdown` outputs remark mdast. Re-aligning the IR or fixture baselines will be addressed in architectural planning.
+* **Next Allowed Prompt:** Prompt 3 — Pipeline Consolidation & Live Workspace Optimization (Debouncing compilation, caching image assets, removing dead `renderToClipboardHtml` keystroke calls, and passing compiled state to export).
 
 ---
 
