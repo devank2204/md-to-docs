@@ -161,7 +161,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                 className="text-on-primary font-code-sm text-[12px] tracking-[0.1em] font-medium opacity-90 uppercase"
                 style={{ writingMode: 'vertical-rl'}}
               >
-                MDTD::CORE
+                mdtodocs
               </div>
             </div>
           </div> */}

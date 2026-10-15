@@ -1,10 +1,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
 import { parseMarkdown } from '@mdtodocs/compiler-core';
 import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
 import pc from 'picocolors';
 
-const FIXTURES_DIR = new URL('../fixtures', import.meta.url).pathname;
+const FIXTURES_DIR = fileURLToPath(new URL('../fixtures', import.meta.url));
+const OUTPUT_BASE_DIR = process.env.FIDELITY_OUTPUT_DIR || path.join(os.tmpdir(), 'mdtodocs-fidelity-output');
+const isUpdateMode = process.argv.includes('--update') || process.argv.includes('-u');
 
 async function runFixtures() {
   const dirs = await fs.readdir(FIXTURES_DIR);
@@ -13,6 +17,8 @@ async function runFixtures() {
   let generated = 0;
 
   console.log(pc.cyan('\nStarting mdtodocs Fidelity Lab...\n'));
+  console.log(pc.dim(`Fixtures source: ${FIXTURES_DIR}`));
+  console.log(pc.dim(`Isolated output: ${OUTPUT_BASE_DIR}\n`));
 
   for (const dir of dirs) {
     const fixturePath = path.join(FIXTURES_DIR, dir);
@@ -24,7 +30,7 @@ async function runFixtures() {
     try {
       const inputPath = path.join(fixturePath, 'input.md');
       const expectedIrPath = path.join(fixturePath, 'expected-ir.json');
-      const outputDir = path.join(fixturePath, '.output');
+      const outputDir = path.join(OUTPUT_BASE_DIR, dir);
 
       const markdown = await fs.readFile(inputPath, 'utf-8');
 
@@ -32,7 +38,7 @@ async function runFixtures() {
       const doc = parseMarkdown(markdown);
       const actualIr = JSON.stringify(doc, null, 2);
 
-      // Ensure output dir exists
+      // Ensure isolated output dir exists
       await fs.mkdir(outputDir, { recursive: true });
 
       // 2. Validate IR matches expected
@@ -46,11 +52,15 @@ async function runFixtures() {
         }
       } catch (err: any) {
         if (err.code === 'ENOENT') {
-          // Auto-generate expected IR if it doesn't exist
-          await fs.writeFile(expectedIrPath, actualIr);
-          console.log(pc.yellow('GENERATED EXPECTED IR'));
-          generated++;
-          // Continue to render outputs even when generating
+          if (isUpdateMode) {
+            await fs.writeFile(expectedIrPath, actualIr);
+            console.log(pc.yellow('GENERATED EXPECTED IR'));
+            generated++;
+          } else {
+            console.log(pc.red('FAIL (Missing expected-ir.json — run with --update to generate)'));
+            failed++;
+            continue;
+          }
         } else {
           throw err;
         }

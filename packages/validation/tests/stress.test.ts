@@ -72,16 +72,22 @@ graph TD;
     let doc = parseMarkdown(stressMarkdown);
     
     // We expect resolveAssets to not throw an uncaught promise rejection
-    // even though jsdom doesn't support getBBox
     doc = await resolveAssets(doc);
     
-    const diagram = doc.assets.find(a => a.type === 'diagram-source' || a.type === 'svg');
-    expect(diagram).toBeDefined();
+    // Find the mermaid code node in the AST
+    const mermaidNode = doc.children.find(
+      (node: any) => node.type === 'code' && node.lang === 'mermaid'
+    ) as any;
 
-    // Since jsdom fails to render mermaid (due to getBBox missing), 
-    // it should gracefully return success: false and preserve the source for fallback
-    // Or if it somehow succeeds, it should contain the SVG.
-    // We just want to ensure it completes without taking the system down.
-    expect(Array.isArray(doc.assets)).toBe(true);
+    expect(mermaidNode).toBeDefined();
+    expect(mermaidNode.data).toBeDefined();
+    expect(['success', 'error']).toContain(mermaidNode.data.renderStatus);
+
+    if (mermaidNode.data.renderStatus === 'success') {
+      expect(mermaidNode.data.resolvedAsset).toBeDefined();
+      expect(mermaidNode.data.resolvedAsset.type).toBe('svg');
+    } else {
+      expect(mermaidNode.data.error).toBeDefined();
+    }
   });
 });

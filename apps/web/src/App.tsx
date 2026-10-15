@@ -42,6 +42,19 @@ function App() {
     return () => window.removeEventListener('paste', handleGlobalPaste);
   }, [appState, setMarkdown]);
 
+  useEffect(() => {
+    if (!markdown.trim()) {
+      document.title = 'mdtodocs — Markdown to Documents';
+      return;
+    }
+    const match = markdown.match(/^#\s+(.+)$/m);
+    if (match && match[1]?.trim()) {
+      document.title = `${match[1].trim()} — mdtodocs`;
+    } else {
+      document.title = 'mdtodocs — Markdown to Documents';
+    }
+  }, [markdown]);
+
   const handleInput = (newMarkdown: string) => {
     setMarkdown(newMarkdown);
   };
