@@ -9,7 +9,8 @@
     "@mdtodocs/asset-pipeline": "workspace:*",
     "@mdtodocs/capability-graph": "workspace:*",
     "@mdtodocs/compiler-core": "workspace:*",
-    "docx": "^8.2.0"
+    "docx": "^8.2.0",
+    "katex": "^0.18.9"
   },
   "devDependencies": {
     "@types/mdast": "^4.0.4",

@@ -1,6 +1,7 @@
 import type { DocumentTheme } from '@mdtodocs/compiler-core';
 import type { Root, Heading, Paragraph, List, Blockquote, Code, Table as MdTable, Image, Text, Strong, Emphasis, Delete, InlineCode, Link } from 'mdast';
 import type { ResolvedAsset } from '@mdtodocs/asset-pipeline';
+import katex from 'katex';
 import { DocumentRenderer } from './core/Renderer';
 import type { RendererRegistry } from './core/Renderer';
 
@@ -106,11 +107,17 @@ const clipboardRegistry: RendererRegistry<string> = {
       const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
       return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.value)}</code></pre>`;
     },
-    math: (block: any /* Math */, ctx) => {
-      const bg = `#${ctx.theme.colors.codeBackground}`;
-      const font = ctx.theme.typography.codeFont;
-      const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
-      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.value)}</code></pre>`;
+    math: (block: any /* Math */) => {
+      try {
+        const rendered = katex.renderToString(block.value, {
+          displayMode: true,
+          throwOnError: false,
+          output: 'htmlAndMathml',
+        });
+        return `<div class="math-display" style="text-align:center;margin:18px 0;overflow-x:auto;padding:4px 0;">${rendered}</div>`;
+      } catch {
+        return `<div class="math-display math-error" style="text-align:center;margin:18px 0;font-family:monospace;color:#b91c1c;">$$${escapeHtml(block.value)}$$</div>`;
+      }
     },
     text: (inline: Text) => escapeHtml(inline.value),
     strong: (inline: Strong, ctx) => `<strong style="font-weight:700;">${ctx.renderNodes(inline.children).join('')}</strong>`,
@@ -132,10 +139,17 @@ const clipboardRegistry: RendererRegistry<string> = {
       const alt = inline.alt ? ` alt="${escapeAttr(inline.alt)}"` : ' alt=""';
       return `<img src="${escapeAttr(src)}"${alt} style="max-height:1em;vertical-align:middle;" />`;
     },
-    inlineMath: (inline: any /* InlineMath */, ctx) => {
-      const bg = `#${ctx.theme.colors.codeBackground}`;
-      const font = ctx.theme.typography.codeFont;
-      return `<code style="font-family:${font};background:${bg};padding:1px 4px;border-radius:2px;">${escapeHtml(inline.value)}</code>`;
+    inlineMath: (inline: any /* InlineMath */) => {
+      try {
+        const rendered = katex.renderToString(inline.value, {
+          displayMode: false,
+          throwOnError: false,
+          output: 'htmlAndMathml',
+        });
+        return `<span class="math-inline" style="display:inline-block;vertical-align:baseline;margin:0 2px;">${rendered}</span>`;
+      } catch {
+        return `<code class="math-error" style="font-family:monospace;background:#fee2e2;color:#b91c1c;padding:1px 4px;border-radius:2px;">$${escapeHtml(inline.value)}$</code>`;
+      }
     },
     break: () => '<br />',
   },

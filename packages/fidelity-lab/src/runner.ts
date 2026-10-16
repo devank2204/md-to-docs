@@ -57,7 +57,7 @@ async function runFixtures() {
             console.log(pc.yellow('GENERATED EXPECTED IR'));
             generated++;
           } else {
-            console.log(pc.red('FAIL (Missing expected-ir.json — run with --update to generate)'));
+            console.log(pc.red('FAIL (Missing expected-ir.json: run with --update to generate)'));
             failed++;
             continue;
           }

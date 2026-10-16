@@ -6,6 +6,7 @@ import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { SegmentedControl } from '@/components/interior/segmented-control';
 import { LoadingButton } from '@/components/interior/loading-button';
+import { useStore } from '@/store';
 
 interface HeaderProps {
   appState: AppState;
@@ -17,15 +18,22 @@ interface HeaderProps {
 }
 
 export function Header({ appState, markdown, destination, onDestinationChange, activeTheme, documentSignature }: HeaderProps) {
-  // State handled internally by LoadingButton
+  const compiledDoc = useStore(state => state.compiledDoc);
 
   const handleDownloadDocx = async () => {
     if (!markdown) return;
     try {
       const collector = new DiagnosticsCollector();
-      let doc = parseMarkdown(markdown);
-      doc = await resolveAssets(doc);
-      doc = planRepresentation(doc, 'word', collector);
+      let doc: any;
+      if (compiledDoc) {
+        // Deep clone the already-resolved AST to avoid mutating store state
+        doc = structuredClone(compiledDoc);
+        doc = planRepresentation(doc, 'word', collector);
+      } else {
+        doc = parseMarkdown(markdown);
+        doc = await resolveAssets(doc);
+        doc = planRepresentation(doc, 'word', collector);
+      }
       const blob = await renderToDocxBlob(doc, activeTheme, documentSignature);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -34,22 +42,29 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error(e);
+      console.error('Failed to download .docx:', e);
     }
   };
 
   const handleCopyFormatted = async () => {
     if (!markdown) return;
-    const collector = new DiagnosticsCollector();
-    let doc = parseMarkdown(markdown);
-    doc = await resolveAssets(doc);
-    doc = planRepresentation(doc, destination, collector);
-    const html = renderToClipboardHtml(doc, activeTheme, documentSignature);
-    const htmlBlob = new Blob([html], { type: 'text/html' });
-    const plainBlob = new Blob([markdown], { type: 'text/plain' });
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': plainBlob }),
-    ]);
+    try {
+      let doc = compiledDoc;
+      if (!doc) {
+        const collector = new DiagnosticsCollector();
+        doc = parseMarkdown(markdown);
+        doc = await resolveAssets(doc);
+        doc = planRepresentation(doc, destination, collector);
+      }
+      const html = renderToClipboardHtml(doc, activeTheme, documentSignature);
+      const htmlBlob = new Blob([html], { type: 'text/html' });
+      const plainBlob = new Blob([markdown], { type: 'text/plain' });
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': plainBlob }),
+      ]);
+    } catch (e) {
+      console.error('Failed to copy formatted document:', e);
+    }
   };
 
   const handlePrintPdf = () => {
@@ -121,7 +136,7 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
           <LoadingButton
             onAction={primaryAction}
             successLabel="✓ Copied!"
-            pendingLabel={destination === 'word' ? 'Compiling…' : 'Copying…'}
+            pendingLabel={destination === 'word' ? 'Compiling...' : 'Copying...'}
             idleIcon={<span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>}
           >
             {primaryLabel() ?? 'Export'}

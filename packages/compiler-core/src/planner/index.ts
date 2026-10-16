@@ -25,6 +25,10 @@ export function planRepresentation(
       });
 
       const listNode = transformTableToList(node as Table);
+      (listNode as any).data = {
+        polyfill: 'table-to-list',
+        reason: cap.reason,
+      };
       if (parent && index !== undefined) {
         parent.children[index] = listNode;
       }
@@ -39,6 +43,13 @@ export function planRepresentation(
       });
     }
 
+    if ((node.type === 'math' || node.type === 'inlineMath') && (destination === 'google-docs' || destination === 'clipboard')) {
+      collector.add({
+        severity: 'info',
+        message: `${node.type === 'math' ? 'Display equation' : 'Inline equation'} formatted with MathML and KaTeX for ${destination === 'google-docs' ? 'Google Docs' : 'clipboard'}`,
+      });
+    }
+
     if (cap.support === 'unsupported' && node.type === 'image') {
       collector.add({
         severity: 'warning',
@@ -49,6 +60,9 @@ export function planRepresentation(
         type: 'link',
         url: node.url,
         title: node.title,
+        data: {
+          polyfill: 'image-to-link',
+        },
         children: [{ type: 'text', value: node.alt || 'Image' }],
       };
       if (parent && index !== undefined) {

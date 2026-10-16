@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { THEMES } from '@mdtodocs/compiler-core';
 
+import type { Root } from 'mdast';
+
 export interface AppState {
   markdown: string;
   destination: DestinationType;
@@ -12,12 +14,16 @@ export interface AppState {
     enabled: boolean;
     placement: 'every-page' | 'last-page';
   };
+  compiledDoc: Root | null;
+  isCompiling: boolean;
   
   setMarkdown: (markdown: string) => void;
   setDestination: (destination: DestinationType) => void;
   setThemeId: (themeId: keyof typeof THEMES) => void;
   setBaseFontSize: (size: number) => void;
   setDocumentSignature: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
+  setCompiledDoc: (doc: Root | null) => void;
+  setIsCompiling: (isCompiling: boolean) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -31,12 +37,16 @@ export const useStore = create<AppState>()(
         enabled: false,
         placement: 'last-page'
       },
+      compiledDoc: null,
+      isCompiling: false,
       
       setMarkdown: (markdown) => set({ markdown }),
       setDestination: (destination) => set({ destination }),
       setThemeId: (themeId) => set({ themeId }),
       setBaseFontSize: (baseFontSize) => set({ baseFontSize }),
       setDocumentSignature: (documentSignature) => set({ documentSignature }),
+      setCompiledDoc: (compiledDoc) => set({ compiledDoc }),
+      setIsCompiling: (isCompiling) => set({ isCompiling }),
     }),
     {
       name: 'md-to-docs-storage',
