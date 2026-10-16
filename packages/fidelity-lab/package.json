@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "jszip": "^3.10.1",
     "picocolors": "^1.1.1",
     "tsx": "^4.23.15"
   }

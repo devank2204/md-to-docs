@@ -2,15 +2,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 import { parseMarkdown } from '@mdtodocs/compiler-core';
 import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
+import JSZip from 'jszip';
 import pc from 'picocolors';
-
-const require = createRequire(import.meta.url);
-const docxPath = require.resolve('docx', { paths: [path.dirname(require.resolve('@mdtodocs/renderers'))] });
-const jszipPath = require.resolve('jszip', { paths: [docxPath] });
-const JSZip = require(jszipPath);
 
 const FIXTURES_DIR = fileURLToPath(new URL('../fixtures', import.meta.url));
 const OUTPUT_BASE_DIR = process.env.FIDELITY_OUTPUT_DIR || path.join(os.tmpdir(), 'mdtodocs-fidelity-output');
@@ -619,6 +614,46 @@ async function verifyMermaidAssetPreservation(): Promise<{ passed: boolean; fail
         assertion: 'Mermaid Resolved Asset in DOCX',
         expected: 'word/document.xml contains <w:drawing> image element',
         actual: 'No drawing/image element found in DOCX document.xml'
+      });
+    }
+
+    // Assert Mermaid syntax failure diagnostics handling
+    const errorDoc: any = {
+      type: 'root',
+      children: [
+        {
+          type: 'code',
+          lang: 'mermaid',
+          value: 'invalid syntax flowchart\nA --> ??',
+          data: {
+            renderStatus: 'error',
+            error: { message: 'Parse error on line 2' }
+          }
+        }
+      ]
+    };
+
+    const errorHtml = renderToClipboardHtml(errorDoc);
+    if (!errorHtml.includes('invalid syntax flowchart')) {
+      failures.push({
+        fixture: 'mermaid-asset-preservation',
+        assertion: 'Mermaid Syntax Error Diagnostics in HTML',
+        expected: 'HTML contains fallback code block preserving source',
+        actual: 'Fallback code block missing in clipboard HTML output'
+      });
+    }
+
+    const errorDocxBlob = await renderToDocxBlob(errorDoc);
+    const errorBuffer = Buffer.from(await errorDocxBlob.arrayBuffer());
+    const errorZip = await JSZip.loadAsync(errorBuffer);
+    const errorDocXml = await errorZip.file('word/document.xml')?.async('text');
+
+    if (!errorDocXml || !errorDocXml.includes('[Diagram: mermaid]')) {
+      failures.push({
+        fixture: 'mermaid-asset-preservation',
+        assertion: 'Mermaid Syntax Error Diagnostics in DOCX',
+        expected: 'word/document.xml contains [Diagram: mermaid] fallback indicator',
+        actual: 'Fallback text indicator missing in DOCX document.xml'
       });
     }
   } catch (err: any) {
