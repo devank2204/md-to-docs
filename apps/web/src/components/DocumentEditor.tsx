@@ -9,7 +9,7 @@ interface DocumentEditorProps {
 
 export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInput, words, lines }) => {
   return (
-    <div className="col-span-12 lg:col-span-4 bg-surface flex flex-col justify-between border-r border-outline-variant/20 h-auto min-h-[350px] lg:h-full lg:min-h-0 overflow-hidden">
+    <div data-editor-pane className="col-span-12 md:col-span-5 lg:col-span-4 bg-surface flex flex-col justify-between border-r border-outline-variant/20 h-auto min-h-[350px] md:h-full md:min-h-0 overflow-hidden">
       <div className="flex flex-col flex-1 overflow-hidden min-h-0">
         <div className="px-space-md py-space-xs bg-surface-container-low flex items-center justify-between font-code-sm text-code-sm text-secondary border-b border-outline-variant/30 shrink-0">
           <div className="flex items-center gap-space-xs">

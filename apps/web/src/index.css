@@ -81,7 +81,7 @@
 @media print {
   /* Hide application UI chromes */
   header,
-  .col-span-12.lg\:col-span-4,
+  [data-editor-pane],
   [data-print-hide],
   aside,
   nav,
@@ -111,7 +111,7 @@
   }
 
   /* Expand preview container to 100% printable page */
-  .col-span-12.lg\:col-span-8 {
+  [data-preview-pane] {
     width: 100% !important;
     max-width: 100% !important;
     padding: 0 !important;

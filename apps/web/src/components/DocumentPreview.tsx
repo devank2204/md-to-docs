@@ -290,7 +290,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   }, [destination]);
 
   return (
-    <div className="col-span-12 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-auto min-h-[600px] lg:h-full lg:min-h-0 overflow-hidden">
+    <div data-preview-pane className="col-span-12 md:col-span-7 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-auto min-h-[600px] md:h-full md:min-h-0 overflow-hidden">
       <div className="w-full flex flex-wrap items-center justify-between text-secondary font-code-sm text-code-sm pb-space-sm px-space-xs border-b border-outline-variant/20 mb-space-sm shrink-0 gap-space-sm" data-print-hide>
         <div className="flex flex-wrap items-center gap-space-sm">
           <span className="font-medium text-on-surface flex items-center gap-space-xs">
@@ -438,8 +438,13 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                   );
                 },
                 pre({ children, ...props }: any) {
+                  const child = Array.isArray(children) ? children[0] : children;
+                  const className = child?.props?.className || '';
+                  if (typeof className === 'string' && className.includes('language-mermaid')) {
+                    return <>{children}</>;
+                  }
                   return (
-                    <pre className="w-full max-w-full overflow-x-auto p-4 rounded bg-surface-container-low/70 border border-outline-variant/30 font-code-sm text-code-sm leading-relaxed" {...props}>
+                    <pre className="w-full max-w-full overflow-x-auto p-4 rounded bg-surface-container-low/70 border border-outline-variant/30 font-code-sm text-code-sm leading-relaxed my-4" {...props}>
                       {children}
                     </pre>
                   );

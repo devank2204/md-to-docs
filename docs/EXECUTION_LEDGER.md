@@ -351,30 +351,31 @@ This ledger tracks the progressive implementation and verification of the `md.to
 ## Task P11: Workspace Scroll Restoration & Interactive Sanity Suite
 * **Status:** Complete
 * **Scope and Intended Behavior:**
-  - Investigate and fix root causes of blocked scrolling across the application workspace.
+  - Investigate and fix root causes of blocked scrolling and layout degradation across the application workspace.
   - Fix grid item height propagation: CSS Grid items default to `min-height: auto`. In `DocumentPreview.tsx` and `DocumentEditor.tsx`, root elements expanded to match full content height instead of being constrained by the grid row, making inner scroll containers calculate `clientHeight === scrollHeight` with zero scrollable delta.
-  - Add `min-h-0 overflow-hidden` and responsive height styling (`h-auto min-h-[350px] lg:h-full lg:min-h-0`) to `DocumentEditor.tsx`.
-  - Add `min-h-0 overflow-hidden` and responsive height styling (`h-auto min-h-[600px] lg:h-full lg:min-h-0`) to `DocumentPreview.tsx`, and add `min-h-0` to the preview scroll container.
-  - Constrain `Workspace.tsx` outer container with `overflow-hidden` and inner grid with `min-h-0`.
+  - Fix split-screen breakpoint: The desktop split pane was previously gated behind `lg` (1024px). Users snapping windows side-by-side on standard 1080p monitors have viewports of 958px-960px, which caused the editor and preview to collapse into a vertical stack with nested competing scrollbars. Lowered split-pane threshold to `md` (768px) with `md:col-span-5` and `md:col-span-7` (`lg:col-span-4` and `lg:col-span-8`), keeping the panes side-by-side on all half-screen desktop and tablet viewports without outer vertical stacking or double scrollbars.
+  - Fix Mermaid container nesting: In `DocumentPreview.tsx`, `<pre>` was wrapping `<MermaidDiagram>`, causing double outer borders, monospace font styling, and clipped rendering. Prevented `<pre>` from wrapping `language-mermaid` code blocks.
+  - Add `data-editor-pane` and `data-preview-pane` data attributes to cleanly target print styles without fragile Tailwind class names.
   - Replace `::-webkit-scrollbar { display: none; }` in `index.css` with sleek, modern 8px custom scrollbars (`scrollbar-width: thin` and subtle semi-transparent thumbs) so users can see scroll progress and drag scrollbars.
-  - Execute full interactive browser sanity suite covering split-pane layout, zoom scaling (125%, 100%), destination switching (Docs, Word, PDF, Copy), theme changes, inspector drawer tabs, real-time editing, document clearing, sample loading, and DOCX download with zero console errors.
+  - Execute full interactive browser sanity suite covering split-pane layout at 958px and 1920px, preview and editor scrolling, zoom scaling, destination switching, inspector drawer tabs, document clearing, sample loading, and DOCX download with zero console errors.
 * **Files Changed:**
-  - `apps/web/src/components/Workspace.tsx` (Added overflow-hidden to workspace container and min-h-0 to grid)
-  - `apps/web/src/components/DocumentPreview.tsx` (Added min-h-0, overflow-hidden, and responsive height to preview container)
-  - `apps/web/src/components/DocumentEditor.tsx` (Added min-h-0, overflow-hidden, and responsive height to editor container)
-  - `apps/web/src/index.css` (Replaced scrollbar hiding with sleek, modern custom scrollbars)
+  - `apps/web/src/components/Workspace.tsx` (Added overflow-hidden to workspace container, min-h-0 to grid, and set md:overflow-hidden)
+  - `apps/web/src/components/DocumentPreview.tsx` (Added min-h-0, overflow-hidden, md:col-span-7 responsive height, data-preview-pane, and removed pre wrapper from Mermaid diagrams)
+  - `apps/web/src/components/DocumentEditor.tsx` (Added min-h-0, overflow-hidden, md:col-span-5 responsive height, and data-editor-pane)
+  - `apps/web/src/index.css` (Replaced scrollbar hiding with sleek, modern custom scrollbars and calibrated print selectors)
   - `docs/EXECUTION_LEDGER.md` (Updated tracker)
 * **Tests Executed and Results:**
-  - Interactive Browser Sanity Suite: **PASS** (13/13 actions verified, preview and editor scrolling verified > 0, zero console errors)
+  - Interactive Browser Sanity Suite: **PASS** (13/13 actions verified, side-by-side layout verified at 958px and 1920px, preview and editor scrolling verified > 0, zero console errors)
   - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
   - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 11/11 test files, 46/46 tests passed**)
   - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed with 0 snapshot mutations**)
   - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
-  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 7.65s)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 16.14s)
 * **Acceptance Criteria:**
   - [x] Both preview container and editor textarea scroll smoothly via mouse wheel, trackpad, and scrollbar dragging.
   - [x] Sleek, visible custom scrollbars indicate position across Chrome, Edge, and Firefox.
-  - [x] Mobile and desktop viewport heights adapt cleanly without overlapping or squishing.
+  - [x] Side-by-side split screen works cleanly down to 768px (including 958px/960px half-screen desktop windows) without vertical stacking or double scrollbars.
+  - [x] Mermaid diagrams render cleanly without enclosing pre container or duplicate borders.
   - [x] Full round of browser sanity checks passes with zero console errors.
   - [x] All 46 validation tests and 17 fidelity lab fixtures pass.
   - [x] Web linter and production build succeed with zero errors.

@@ -241,7 +241,7 @@ export function Workspace({
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
-      <div className="w-full grid grid-cols-12 h-full min-h-0 overflow-y-auto lg:overflow-hidden">
+      <div className="w-full grid grid-cols-12 h-full min-h-0 overflow-y-auto md:overflow-hidden">
         <DocumentEditor
           markdown={markdown}
           onInput={onInput}
