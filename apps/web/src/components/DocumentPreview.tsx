@@ -290,7 +290,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   }, [destination]);
 
   return (
-    <div className="col-span-12 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-full">
+    <div data-preview-pane className="col-span-12 md:col-span-7 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-auto min-h-[600px] md:h-full md:min-h-0 overflow-hidden">
       <div className="w-full flex flex-wrap items-center justify-between text-secondary font-code-sm text-code-sm pb-space-sm px-space-xs border-b border-outline-variant/20 mb-space-sm shrink-0 gap-space-sm" data-print-hide>
         <div className="flex flex-wrap items-center gap-space-sm">
           <span className="font-medium text-on-surface flex items-center gap-space-xs">
@@ -392,10 +392,10 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 flex justify-center p-space-lg overflow-y-auto">
+      <div className="flex-1 flex justify-center items-start p-space-lg overflow-y-auto min-h-0">
         <div
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-          className="w-full max-w-[816px] min-w-0 bg-surface-container-lowest transition-all duration-300 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate box-border break-words [overflow-wrap:anywhere]"
+          className="w-full max-w-[816px] min-w-0 bg-surface-container-lowest transition-all duration-300 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col h-auto min-h-[1056px] relative border border-outline-variant/30 prose prose-slate box-border break-words [overflow-wrap:anywhere] mb-space-xxl"
         >
           {isCompiling && (
             <div className="absolute inset-0 bg-surface-container-lowest/50 flex items-center justify-center rounded z-20">
@@ -438,8 +438,13 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                   );
                 },
                 pre({ children, ...props }: any) {
+                  const child = Array.isArray(children) ? children[0] : children;
+                  const className = child?.props?.className || '';
+                  if (typeof className === 'string' && className.includes('language-mermaid')) {
+                    return <>{children}</>;
+                  }
                   return (
-                    <pre className="w-full max-w-full overflow-x-auto p-4 rounded bg-surface-container-low/70 border border-outline-variant/30 font-code-sm text-code-sm leading-relaxed" {...props}>
+                    <pre className="w-full max-w-full overflow-x-auto p-4 rounded bg-surface-container-low/70 border border-outline-variant/30 font-code-sm text-code-sm leading-relaxed my-4" {...props}>
                       {children}
                     </pre>
                   );

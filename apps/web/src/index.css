@@ -21,8 +21,25 @@
   }
 }
 
+/* Custom scrollbar styling: subtle, elegant, visible on scroll */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(140, 140, 140, 0.3) transparent;
+}
+
 ::-webkit-scrollbar {
-  display: none;
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 140, 140, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 140, 140, 0.5);
 }
 
 /* KaTeX and equation typography calibration */
@@ -64,7 +81,7 @@
 @media print {
   /* Hide application UI chromes */
   header,
-  .col-span-12.lg\:col-span-4,
+  [data-editor-pane],
   [data-print-hide],
   aside,
   nav,
@@ -94,7 +111,7 @@
   }
 
   /* Expand preview container to 100% printable page */
-  .col-span-12.lg\:col-span-8 {
+  [data-preview-pane] {
     width: 100% !important;
     max-width: 100% !important;
     padding: 0 !important;
