@@ -60,3 +60,83 @@
   font-size: 0.85em;
 }
 
+/* Print calibration: Hide web UI chrome, expand preview, avoid page split bugs */
+@media print {
+  /* Hide application UI chromes */
+  header,
+  .col-span-12.lg\:col-span-4,
+  [data-print-hide],
+  aside,
+  nav,
+  button,
+  input,
+  select,
+  .fixed.bottom-0 {
+    display: none !important;
+  }
+
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Expand preview container to 100% printable page */
+  .col-span-12.lg\:col-span-8 {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Target the paper sheet: remove box shadow, border, scale transform */
+  .prose {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+    min-height: auto !important;
+  }
+
+  /* Page boundaries: prevent orphaned headings, split tables, split callouts */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  table, pre, blockquote, .mermaid-preview, figure, .callout {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  @page {
+    size: letter portrait;
+    margin: 0.75in;
+  }
+}
+
+

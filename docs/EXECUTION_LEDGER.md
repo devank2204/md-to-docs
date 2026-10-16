@@ -304,7 +304,46 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Callout directives recognize proper directive names and render type-specific icons and colors.
   - [x] DOCX callouts enforce `cantSplit: true` to prevent page split ruptures.
   - [x] All 35 validation tests and 17 fidelity lab fixtures pass.
-* **Next Allowed Prompt:** Prompt 9: Destination Diagnostics & Capability Inspector UI
+* **Next Allowed Prompt:** Task P10: Stabilization & Polish
+
+---
+
+## Task P10: Stabilization & Polish
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Investigate and resolve root causes of document overflow across live preview, clipboard HTML, DOCX, and print/PDF exports.
+  - Fix DOCX image and Mermaid diagram overflow by bounding dimensions strictly to standard printable page width (6.5 inches / 468 pt / 5,943,600 EMUs / 9360 twips) and capping maximum height.
+  - Sanitize tabs (`\t`) in DOCX code blocks to 4 spaces to prevent Word tab stops from pushing code past page margins.
+  - Fix Clipboard HTML overflow by adding `word-break:break-word` and `overflow-wrap:break-word` to table cells, callouts, and document wrappers, and `white-space:pre-wrap` to `<pre>` blocks.
+  - Fix Standalone HTML print pagination and overflow with `@media print` page-break-inside rules and word-break styling.
+  - Fix Live Preview container overflow by constraining page card width (`max-w-[816px]`), wrapping tables in horizontal scroll containers, and applying `break-words` and `[overflow-wrap:anywhere]`.
+  - Fix Print / PDF export by introducing `@media print` CSS hiding all UI chrome (editor, toolbars, header, status bar, zoom controls) and printing document content cleanly at 100% printable width.
+  - Improve editor and workspace responsiveness with soft wrap, vertical scrolling, and clear actions.
+  - Add comprehensive regression test suite in `packages/validation/tests/overflow-protection.test.ts` without mutating test snapshots.
+* **Files Changed:**
+  - `packages/renderers/src/docx.ts` (Calibrated image and diagram max bounds to 468 pt / 6.5 inches; sanitized tabs in code blocks)
+  - `packages/renderers/src/clipboard.ts` (Added word-break and overflow-wrap to table cells and callouts; pre-wrap to pre blocks; structured container wrapper)
+  - `packages/renderers/src/html.ts` (Added word-break, pre-wrap, and @media print page-break-inside rules)
+  - `apps/web/src/components/DocumentPreview.tsx` (Enforced max-w-[816px] page bounds, table overflow container, pre overflow-x-auto, break-words)
+  - `apps/web/src/components/DocumentEditor.tsx` (Added soft wrap, clean overflow, and clear document action)
+  - `apps/web/src/components/Workspace.tsx` (Responsive workspace grid layout)
+  - `apps/web/src/index.css` (Complete @media print stylesheet for clean PDF export)
+  - `packages/validation/tests/overflow-protection.test.ts` (Added 5 regression test assertions for overflow protection)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 11/11 test files, 46/46 tests passed**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed with 0 snapshot mutations**)
+  - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 14.16s)
+* **Acceptance Criteria:**
+  - [x] Wide tables, unbroken strings, long URLs, and code lines wrap or scroll cleanly without clipping or breaking layout.
+  - [x] Images and Mermaid diagrams are bounded to printable margins in DOCX and live preview.
+  - [x] Print / PDF export prints only the document without UI chrome.
+  - [x] Regression tests verify overflow protection across clipboard HTML, DOCX, and standalone HTML.
+  - [x] All 46 validation tests and 17 fidelity lab fixtures pass.
+  - [x] Oxlint and web production build succeed with zero errors.
+
 
 ---
 

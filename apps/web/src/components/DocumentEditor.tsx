@@ -22,13 +22,27 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
             <span>{words} words</span>
             <span>·</span>
             <span>{lines} lines</span>
+            {markdown.length > 0 && (
+              <>
+                <span>·</span>
+                <button
+                  onClick={() => onInput('')}
+                  title="Clear document"
+                  className="text-[11px] hover:text-error transition-colors px-1.5 py-0.5 rounded hover:bg-surface-container active:scale-95"
+                >
+                  Clear
+                </button>
+              </>
+            )}
           </div>
         </div>
         <textarea
-          className="w-full h-full p-space-md font-code-md text-code-md text-on-surface bg-transparent resize-none focus:outline-none leading-relaxed"
+          className="w-full h-full p-space-md font-code-md text-code-md text-on-surface bg-transparent resize-none focus:outline-none leading-relaxed overflow-y-auto"
           value={markdown}
           onChange={(e) => onInput(e.target.value)}
           spellCheck="false"
+          wrap="soft"
+          placeholder="Type or paste Markdown here..."
         />
       </div>
       <div className="px-space-md py-space-xs bg-surface-container-low border-t border-outline-variant/30 flex items-center justify-between font-code-sm text-code-sm text-secondary shrink-0">

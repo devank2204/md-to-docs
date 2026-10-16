@@ -206,10 +206,26 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
         if (asset && asset.data) {
           try {
             const parsed = parseDataUri(asset.data);
+            const MAX_DIAGRAM_WIDTH = 468; // 6.5 inches printable width in docx
+            const MAX_DIAGRAM_HEIGHT = 450;
+            let width = asset.dimensions?.width || 468;
+            let height = asset.dimensions?.height || 280;
+
+            if (width > MAX_DIAGRAM_WIDTH) {
+              const ratio = MAX_DIAGRAM_WIDTH / width;
+              width = MAX_DIAGRAM_WIDTH;
+              height = height * ratio;
+            }
+            if (height > MAX_DIAGRAM_HEIGHT) {
+              const ratio = MAX_DIAGRAM_HEIGHT / height;
+              height = MAX_DIAGRAM_HEIGHT;
+              width = width * ratio;
+            }
+
             const imageOptions: any = {
               type: parsed.type,
               data: parsed.data,
-              transformation: { width: 500, height: 300 },
+              transformation: { width: Math.round(width), height: Math.round(height) },
             };
             if (parsed.type === 'svg') {
               imageOptions.fallback = {
@@ -237,9 +253,10 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
       const docxLines = lines.map((line, i) => {
         const isFirst = i === 0 && !block.lang;
         const isLast = i === lines.length - 1;
+        const sanitizedLine = line.replace(/\t/g, '    ');
         
         return new DocxParagraph({
-          children: [new TextRun({ text: line || ' ', font: codeFont, size: sizeHalfPts })],
+          children: [new TextRun({ text: sanitizedLine || ' ', font: codeFont, size: sizeHalfPts })],
           style: 'CodeBlock',
           shading: { type: ShadingType.CLEAR, color: 'auto', fill: ctx.theme.colors.codeBackground },
           spacing: { before: isFirst ? 120 : 0, after: isLast ? 120 : 0 },
@@ -367,14 +384,20 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
       if (asset && asset.data) {
         try {
           const parsed = parseDataUri(asset.data);
-          let width = asset.dimensions?.width || 500;
+          const MAX_WIDTH = 468; // 6.5 inches printable width in docx (468 pt)
+          const MAX_HEIGHT = 550; // Max printable height
+          let width = asset.dimensions?.width || 468;
           let height = asset.dimensions?.height || 300;
           
-          const MAX_WIDTH = 600;
           if (width > MAX_WIDTH) {
             const ratio = MAX_WIDTH / width;
             width = MAX_WIDTH;
             height = height * ratio;
+          }
+          if (height > MAX_HEIGHT) {
+            const ratio = MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+            width = width * ratio;
           }
 
           const imageOptions: any = {

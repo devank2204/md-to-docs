@@ -135,7 +135,7 @@ const htmlRegistry: RendererRegistry<string> = {
 
         const cells = row.children.map((cell: any, colIdx: number) => {
           const colAlign = block.align?.[colIdx] || 'left';
-          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:${colAlign};">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
+          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:${colAlign};word-break:break-word;overflow-wrap:break-word;vertical-align:top;">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
         });
 
         const rowHtml = `<tr>${cells.join('')}</tr>`;
@@ -149,7 +149,7 @@ const htmlRegistry: RendererRegistry<string> = {
       const theadHtml = headerRows.length > 0 ? `<thead>${headerRows.join('')}</thead>` : '';
       const tbodyHtml = bodyRows.length > 0 ? `<tbody>${bodyRows.join('')}</tbody>` : '';
 
-      return `<table style="font-family:${font};font-size:${size}pt;color:${color};width:100%;border-collapse:collapse;margin-bottom:16px;">
+      return `<table style="font-family:${font};font-size:${size}pt;color:${color};width:100%;border-collapse:collapse;margin-bottom:16px;table-layout:auto;">
         ${theadHtml}${tbodyHtml}
       </table>`;
     },
@@ -174,10 +174,10 @@ const htmlRegistry: RendererRegistry<string> = {
               const svgText = atob(asset.data.replace('data:image/svg+xml;base64,', ''));
               return `<div class="diagram-mermaid" style="text-align:center;margin:24px 0;overflow-x:auto;">${svgText}</div>`;
             } catch {
-              return `<div class="diagram-mermaid" style="text-align:center;margin:24px 0;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;" /></div>`;
+              return `<div class="diagram-mermaid" style="text-align:center;margin:24px 0;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;height:auto;" /></div>`;
             }
           }
-          return `<div class="diagram-mermaid" style="text-align:center;margin:24px 0;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;" /></div>`;
+          return `<div class="diagram-mermaid" style="text-align:center;margin:24px 0;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;height:auto;" /></div>`;
         }
         return `<div class="diagram-mermaid diagram-unrendered" style="text-align:center;margin:24px 0;"><pre style="display:inline-block;text-align:left;background:#f3f4f6;padding:12px;border-radius:4px;"><code>${escapeHtml(block.value)}</code></pre></div>`;
       }
@@ -186,7 +186,7 @@ const htmlRegistry: RendererRegistry<string> = {
       const font = ctx.theme.typography.codeFont;
       const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
       const langHeader = block.lang ? `<div style="font-size:10px;text-transform:uppercase;color:#9ca3af;margin-bottom:4px;user-select:none;">${escapeHtml(block.lang)}</div>` : '';
-      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:14px;overflow-x:auto;border-radius:6px;line-height:1.45;">${langHeader}<code>${escapeHtml(block.value)}</code></pre>`;
+      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:14px;overflow-x:auto;border-radius:6px;line-height:1.45;white-space:pre-wrap;word-break:break-word;">${langHeader}<code>${escapeHtml(block.value)}</code></pre>`;
     },
     math: (block: any /* Math */) => {
       try {
@@ -281,15 +281,20 @@ export function renderToHtml(doc: Root, options?: HtmlRendererOptions): string {
       padding: 0 24px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
-    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
-    th, td { border: 1px solid #d1d5db; padding: 8px 12px; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; table-layout: auto; }
+    th, td { border: 1px solid #d1d5db; padding: 8px 12px; word-break: break-word; overflow-wrap: break-word; vertical-align: top; }
     th { background: #f3f4f6; font-weight: 700; }
-    pre { overflow-x: auto; }
+    pre { overflow-x: auto; white-space: pre-wrap; word-break: break-word; max-width: 100%; }
     img, svg { max-width: 100%; height: auto; }
     @media print {
       body { max-width: 100%; margin: 0; padding: 0; }
-      @page { margin: 1in; }
+      @page { margin: 0.75in; size: letter portrait; }
+      h1, h2, h3, h4, h5, h6 { page-break-after: avoid; break-after: avoid; }
+      table, pre, blockquote, figure, .callout, .diagram-mermaid { page-break-inside: avoid; break-inside: avoid; }
+      tr { page-break-inside: avoid; break-inside: avoid; }
     }
   </style>
 </head>

@@ -87,7 +87,7 @@ const clipboardRegistry: RendererRegistry<string> = {
       const font = ctx.theme.typography.bodyFont;
       const size = ctx.theme.typography.baseFontSizePt;
       
-      return `<div style="font-family:${font};font-size:${size}pt;background-color:#${colors.bg};border-left:4px solid #${colors.border};color:#${colors.text};padding:12px 16px;margin-bottom:16px;border-radius:0 4px 4px 0;">
+      return `<div style="font-family:${font};font-size:${size}pt;background-color:#${colors.bg};border-left:4px solid #${colors.border};color:#${colors.text};padding:12px 16px;margin-bottom:16px;border-radius:0 4px 4px 0;word-break:break-word;overflow-wrap:break-word;">
         <strong>${getCalloutTextIcon(type)} ${type.charAt(0).toUpperCase() + type.slice(1)}</strong><br/>
         ${ctx.renderNodes(block.children).join('')}
       </div>`;
@@ -115,7 +115,7 @@ const clipboardRegistry: RendererRegistry<string> = {
 
         const cells = row.children.map((cell: any, colIdx: number) => {
           const colAlign = block.align?.[colIdx] || 'left';
-          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:${colAlign};">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
+          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:${colAlign};word-break:break-word;overflow-wrap:break-word;vertical-align:top;">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
         });
 
         const rowHtml = `<tr>${cells.join('')}</tr>`;
@@ -129,7 +129,7 @@ const clipboardRegistry: RendererRegistry<string> = {
       const theadHtml = headerRows.length > 0 ? `<thead>${headerRows.join('')}</thead>` : '';
       const tbodyHtml = bodyRows.length > 0 ? `<tbody>${bodyRows.join('')}</tbody>` : '';
 
-      return `<table style="font-family:${font};font-size:${size}pt;color:${color};width:100%;border-collapse:collapse;margin-bottom:16px;">
+      return `<table style="font-family:${font};font-size:${size}pt;color:${color};width:100%;border-collapse:collapse;margin-bottom:16px;table-layout:auto;">
         ${theadHtml}${tbodyHtml}
       </table>`;
     },
@@ -145,13 +145,13 @@ const clipboardRegistry: RendererRegistry<string> = {
       if (isMermaid) {
         const asset = (block.data as any)?.resolvedAsset as ResolvedAsset | undefined;
         if (asset && asset.data) {
-          return `<div style="text-align:center;margin-bottom:16px;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;" /></div>`;
+          return `<div style="text-align:center;margin-bottom:16px;overflow-x:auto;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;height:auto;" /></div>`;
         }
       }
       const bg = `#${ctx.theme.colors.codeBackground}`;
       const font = ctx.theme.typography.codeFont;
       const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
-      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.value)}</code></pre>`;
+      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;white-space:pre-wrap;word-break:break-word;line-height:1.45;"><code>${escapeHtml(block.value)}</code></pre>`;
     },
     math: (block: any /* Math */) => {
       try {
@@ -223,8 +223,10 @@ export function renderToClipboardHtml(doc: Root, theme?: DocumentTheme, signatur
 
   return `
     <div style="max-width:800px;margin:0 auto;">
-      ${childrenHtml}
-      ${signatureHtml}
+      <div style="word-break:break-word;overflow-wrap:break-word;">
+        ${childrenHtml}
+        ${signatureHtml}
+      </div>
     </div>
   `;
 }
