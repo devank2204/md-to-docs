@@ -344,42 +344,40 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] All 46 validation tests and 17 fidelity lab fixtures pass.
   - [x] Oxlint and web production build succeed with zero errors.
 
+* **Next Allowed Prompt:** Task P11: Workspace Scroll Restoration & Interactive Sanity Suite
 
 ---
 
-## Prompt 9: Destination Diagnostics & Capability Inspector UI
+## Task P11: Workspace Scroll Restoration & Interactive Sanity Suite
 * **Status:** Complete
 * **Scope and Intended Behavior:**
-  - Calibrate `DESTINATIONS` profiles in `@mdtodocs/capability-graph` to accurately reflect verified support for Mermaid, math equations, callouts, task lists, and footnotes across all export destinations.
-  - Enhance `evaluateCapability` with precise evaluations for Mermaid code blocks (vector SVG assets), task lists (ballot glyphs), wide tables (linearization), math/KaTeX formulas, callouts, footnotes, and structural nodes (`root`, `tableRow`, `tableCell`).
-  - Export `FEATURE_CAPABILITIES` providing a canonical cross-destination capability comparison matrix covering typography, structure, data, assets, and advanced categories.
-  - Implement `detectActivePolyfills` in `@mdtodocs/validation` detecting active wide table linearization, MathML & KaTeX formula typesetting, Mermaid vector asset preservation, callout table protection, task list ballot glyph mapping, and footnote superscript runs.
-  - Attach `activePolyfills` to `ValidationReport` returned by `validateDocument`.
-  - Redesign `DocumentInspector.tsx` into an interactive slide-over drawer featuring:
-    - Quick destination switcher pills (`Docs`, `Word`, `PDF`, `Copy`) with real-time fidelity recalculation.
-    - 3 interactive tabs:
-      - Diagnostics & Health: color-coded fidelity score gauge, preserved/transformed/degraded/unsupported breakdown pills, active polyfill cards, and compiler diagnostics.
-      - Capability Matrix: category filter chips (Typography, Structure, Advanced, Assets), per-feature status badges (Native, Styled, Transformed, Vector Asset), cross-destination support dots, and polyfill notes.
-      - Audit & Metrics: element count grid (headings, paragraphs, lists, task lists, tables, code blocks, mermaid, math, callouts, blockquotes, footnotes, images), words, reading time, and export recommendation.
-  - Wire `countElements` in `Workspace.tsx` to track full element metrics and pass destination props to `DocumentInspector`.
-  - Add comprehensive unit test suite in `packages/validation/tests/capability-inspector.test.ts` (6 tests).
+  - Investigate and fix root causes of blocked scrolling across the application workspace.
+  - Fix grid item height propagation: CSS Grid items default to `min-height: auto`. In `DocumentPreview.tsx` and `DocumentEditor.tsx`, root elements expanded to match full content height instead of being constrained by the grid row, making inner scroll containers calculate `clientHeight === scrollHeight` with zero scrollable delta.
+  - Add `min-h-0 overflow-hidden` and responsive height styling (`h-auto min-h-[350px] lg:h-full lg:min-h-0`) to `DocumentEditor.tsx`.
+  - Add `min-h-0 overflow-hidden` and responsive height styling (`h-auto min-h-[600px] lg:h-full lg:min-h-0`) to `DocumentPreview.tsx`, and add `min-h-0` to the preview scroll container.
+  - Constrain `Workspace.tsx` outer container with `overflow-hidden` and inner grid with `min-h-0`.
+  - Replace `::-webkit-scrollbar { display: none; }` in `index.css` with sleek, modern 8px custom scrollbars (`scrollbar-width: thin` and subtle semi-transparent thumbs) so users can see scroll progress and drag scrollbars.
+  - Execute full interactive browser sanity suite covering split-pane layout, zoom scaling (125%, 100%), destination switching (Docs, Word, PDF, Copy), theme changes, inspector drawer tabs, real-time editing, document clearing, sample loading, and DOCX download with zero console errors.
 * **Files Changed:**
-  - `packages/capability-graph/src/index.ts` (Calibrated destination profiles, expanded evaluateCapability, exported FEATURE_CAPABILITIES)
-  - `packages/validation/src/index.ts` (Added detectActivePolyfills and attached activePolyfills to ValidationReport)
-  - `packages/validation/tests/capability-inspector.test.ts` (Added 6 unit tests for capability matrix, destination profiles, mermaid/table capability evaluation, active polyfills, and validation report)
-  - `apps/web/src/components/DocumentInspector.tsx` (Complete redesign with destination switcher, 3 tabs for Diagnostics, Matrix, and Audit)
-  - `apps/web/src/components/Workspace.tsx` (Enhanced countElements to track full element metrics and wired destination controls to DocumentInspector)
+  - `apps/web/src/components/Workspace.tsx` (Added overflow-hidden to workspace container and min-h-0 to grid)
+  - `apps/web/src/components/DocumentPreview.tsx` (Added min-h-0, overflow-hidden, and responsive height to preview container)
+  - `apps/web/src/components/DocumentEditor.tsx` (Added min-h-0, overflow-hidden, and responsive height to editor container)
+  - `apps/web/src/index.css` (Replaced scrollbar hiding with sleek, modern custom scrollbars)
   - `docs/EXECUTION_LEDGER.md` (Updated tracker)
 * **Tests Executed and Results:**
-  - `npx pnpm --filter @mdtodocs/capability-graph build` (**PASS: 0 errors**)
-  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 10/10 test files, 41/41 tests passed**)
-  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed**)
+  - Interactive Browser Sanity Suite: **PASS** (13/13 actions verified, preview and editor scrolling verified > 0, zero console errors)
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 11/11 test files, 46/46 tests passed**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed with 0 snapshot mutations**)
   - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
-  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.48s)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 7.65s)
 * **Acceptance Criteria:**
-  - [x] Destination profiles accurately declare format capabilities.
-  - [x] Active polyfills are detected and displayed with counts, severity, and descriptions.
-  - [x] Interactive Destination Diagnostics and Capability Inspector UI provides 3 dedicated tabs (Diagnostics, Matrix, Audit).
-  - [x] All 41 validation tests and 17 fidelity lab fixtures pass.
+  - [x] Both preview container and editor textarea scroll smoothly via mouse wheel, trackpad, and scrollbar dragging.
+  - [x] Sleek, visible custom scrollbars indicate position across Chrome, Edge, and Firefox.
+  - [x] Mobile and desktop viewport heights adapt cleanly without overlapping or squishing.
+  - [x] Full round of browser sanity checks passes with zero console errors.
+  - [x] All 46 validation tests and 17 fidelity lab fixtures pass.
+  - [x] Web linter and production build succeed with zero errors.
+
 
 
