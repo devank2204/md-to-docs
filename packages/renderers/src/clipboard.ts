@@ -39,12 +39,28 @@ const clipboardRegistry: RendererRegistry<string> = {
       const font = ctx.theme.typography.bodyFont;
       const size = ctx.theme.typography.baseFontSizePt;
       const color = `#${ctx.theme.colors.text}`;
-      
+      const isTaskList = block.children.some((item: any) => typeof item.checked === 'boolean');
+
       const items = block.children.map((item: any) => {
-        return `<li style="margin-bottom:8px;">${ctx.renderNodes(item.children).join('')}</li>`;
+        const isTask = typeof item.checked === 'boolean';
+        const taskBox = isTask ? (item.checked ? '☑ ' : '☐ ') : '';
+        const itemContent = item.children.map((child: any, idx: number) => {
+          if (isTask && idx === 0 && child.type === 'paragraph') {
+            const p = child as Paragraph;
+            const pFont = ctx.theme.typography.bodyFont;
+            const pSize = ctx.theme.typography.baseFontSizePt;
+            const pColor = `#${ctx.theme.colors.text}`;
+            const lineHeight = ctx.theme.spacing.lineHeight;
+            return `<p style="font-family:${pFont};font-size:${pSize}pt;color:${pColor};line-height:${lineHeight};margin-bottom:16px;">${taskBox}${ctx.renderNodes(p.children).join('')}</p>`;
+          }
+          return ctx.renderNode(child);
+        }).join('');
+        const itemStyle = isTask ? 'margin-bottom:8px;list-style-type:none;' : 'margin-bottom:8px;';
+        return `<li style="${itemStyle}">${itemContent}</li>`;
       });
-      
-      return `<${tag} style="font-family:${font};font-size:${size}pt;color:${color};margin-bottom:16px;padding-left:24px;">${items.join('')}</${tag}>`;
+
+      const listPadding = isTaskList ? 'padding-left:0;list-style:none;' : 'padding-left:24px;';
+      return `<${tag} style="font-family:${font};font-size:${size}pt;color:${color};margin-bottom:16px;${listPadding}">${items.join('')}</${tag}>`;
     },
     blockquote: (block: Blockquote, ctx) => {
       const font = ctx.theme.typography.bodyFont;
@@ -69,22 +85,34 @@ const clipboardRegistry: RendererRegistry<string> = {
       const size = ctx.theme.typography.baseFontSizePt - 1;
       const color = `#${ctx.theme.colors.text}`;
       const borderColor = `#${ctx.theme.colors.border}`;
-      
-      const rows = block.children.map((row: any, rowIdx: number) => {
+
+      const headerRows: string[] = [];
+      const bodyRows: string[] = [];
+
+      block.children.forEach((row: any, rowIdx: number) => {
         const isHeader = rowIdx === 0;
         const cellTag = isHeader ? 'th' : 'td';
         const bg = isHeader ? '#f3f4f6' : 'transparent';
         const fontWeight = isHeader ? '700' : '400';
-        
-        const cells = row.children.map((cell: any) => {
-          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:left;">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
+
+        const cells = row.children.map((cell: any, colIdx: number) => {
+          const colAlign = block.align?.[colIdx] || 'left';
+          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:${colAlign};">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
         });
-        
-        return `<tr>${cells.join('')}</tr>`;
+
+        const rowHtml = `<tr>${cells.join('')}</tr>`;
+        if (isHeader) {
+          headerRows.push(rowHtml);
+        } else {
+          bodyRows.push(rowHtml);
+        }
       });
-      
+
+      const theadHtml = headerRows.length > 0 ? `<thead>${headerRows.join('')}</thead>` : '';
+      const tbodyHtml = bodyRows.length > 0 ? `<tbody>${bodyRows.join('')}</tbody>` : '';
+
       return `<table style="font-family:${font};font-size:${size}pt;color:${color};width:100%;border-collapse:collapse;margin-bottom:16px;">
-        <tbody>${rows.join('')}</tbody>
+        ${theadHtml}${tbodyHtml}
       </table>`;
     },
     thematicBreak: () => '<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />',

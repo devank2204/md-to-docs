@@ -200,4 +200,39 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Test failures identify the failing fixture, assertion, expected behavior, actual behavior, and artifact path.
   - [x] The build and test results are reported accurately.
   - [x] Limitations recorded honestly: DOCX XML assertions verify OpenXML structural conformance rather than Word visual rendering; PDF rendering is omitted as no server-side renderer exists in the codebase.
-* **Queued Work:** Prompt 6: Word / DOCX Table Calibration & Heading/List Nesting Fidelity.
+* **Next Allowed Prompt:** Prompt 6: Word / DOCX Table Calibration & Heading/List Nesting Fidelity
+
+---
+
+## Prompt 6: Word / DOCX Table Calibration & Heading/List Nesting Fidelity
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Calibrate DOCX tables to standard printable page width (6.5 inches / 9360 twips) with proportional column width calculations based on cell content length.
+  - Enforce minimum column widths (720 twips / 0.5 inch) and exact total width distribution.
+  - Configure repeating header rows (`tableHeader: true`) and prevent row splitting across page breaks (`cantSplit: true`) on all DOCX table rows.
+  - Calibrate cell padding margins (`margins: { left: 140, right: 140, top: 120, bottom: 120 }`).
+  - Respect column alignments (`left`, `center`, `right`) across both DOCX paragraphs (`AlignmentType`) and Clipboard HTML cells (`text-align`).
+  - Add semantic `<thead>` and `<tbody>` separation for clipboard HTML tables.
+  - Define complete paragraph styles for `Heading1` through `Heading6` with calibrated point sizes, fonts, text colors, `keepNext: true`, and proportional spacing before/after.
+  - Add task list checkbox support with universal ballot box glyphs (`☑ ` for checked, `☐ ` for unchecked) across both DOCX (`mdtodocs-task-list` numbering reference) and Clipboard HTML (`list-style-type: none`).
+  - Support list nesting up to level 8 (9 levels) with proper indentations.
+* **Files Changed:**
+  - `packages/renderers/src/docx.ts` (Dynamic table column width calculation, cantSplit, tableHeader, column alignment, cell padding margins, complete Heading1-Heading6 styles, and task list numbering)
+  - `packages/renderers/src/clipboard.ts` (Column alignment support in table cells, thead/tbody structure, and task list item formatting with ballot box symbols)
+  - `packages/validation/tests/table-calibration.test.ts` (Added 7 unit and regression test assertions covering DOCX table XML, widths, alignments, margins, heading styles 1-6, task lists, and clipboard HTML)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 7/7 test files, 24/24 tests passed**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.50s)
+* **Acceptance Criteria:**
+  - [x] Word / DOCX tables have proportional column widths totaling 9360 twips with 720 twips minimum per column.
+  - [x] Table rows do not awkwardly split across page breaks (`cantSplit: true`).
+  - [x] Table header rows repeat cleanly across page breaks (`tableHeader: true`).
+  - [x] Table cells have calibrated padding margins (top/bottom: 120 twips, left/right: 140 twips).
+  - [x] Markdown column alignments (`left`, `center`, `right`) are respected in DOCX paragraphs and Clipboard HTML cells.
+  - [x] Full heading hierarchy (Heading 1 to Heading 6) is styled in DOCX with proper fonts, sizes, keepNext, and spacing.
+  - [x] Task lists render ballot boxes (`☑ ` / `☐ `) in DOCX and clipboard HTML without redundant bullets.
+  - [x] Regression test suite in `@mdtodocs/validation` asserts all table, heading, and list capabilities.
+* **Queued Work:** Next queued prompt or milestone.

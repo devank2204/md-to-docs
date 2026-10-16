@@ -71,6 +71,15 @@ function getCalloutTextIcon(type: string): string {
   }
 }
 
+function getNodeTextLength(node: any): number {
+  if (!node) return 0;
+  if (typeof node.value === 'string') return node.value.length;
+  if (Array.isArray(node.children)) {
+    return node.children.reduce((acc: number, child: any) => acc + getNodeTextLength(child), 0);
+  }
+  return 0;
+}
+
 type DocxInlineNode = TextRun | ExternalHyperlink | ImageRun;
 type DocxNode = DocxParagraph | DocxTable | DocxInlineNode;
 
@@ -93,13 +102,21 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
       return [new DocxParagraph({ children: ctx.renderNodes(block.children).flat() as DocxInlineNode[] })];
     },
     list: (block: List, ctx) => {
-      const reference = block.ordered ? 'mdtodocs-ordered-list' : 'mdtodocs-unordered-list';
+      const defaultReference = block.ordered ? 'mdtodocs-ordered-list' : 'mdtodocs-unordered-list';
       return block.children.flatMap((item: any) => {
+        const isTask = typeof item.checked === 'boolean';
+        const taskBox = isTask ? (item.checked ? '☑ ' : '☐ ') : '';
+        const reference = isTask ? 'mdtodocs-task-list' : defaultReference;
+
         return item.children.flatMap((c: Node, idx: number) => {
           if (c.type === 'paragraph' && idx === 0) {
             const p = c as Paragraph;
+            const inlines = ctx.renderNodes(p.children).flat() as DocxInlineNode[];
+            const runsWithTask = isTask
+              ? [new TextRun({ text: taskBox }), ...inlines]
+              : inlines;
             return [new DocxParagraph({
-              children: ctx.renderNodes(p.children).flat() as DocxInlineNode[],
+              children: runsWithTask,
               numbering: { reference, level: Math.min(ctx.state.indentLevel || 0, 8) }
             })];
           }
@@ -223,38 +240,93 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
       return [...header, ...docxLines];
     },
     table: (block: MdTable, ctx) => {
+      let numCols = 0;
+      for (const row of block.children) {
+        if (row.children && row.children.length > numCols) {
+          numCols = row.children.length;
+        }
+      }
+      if (numCols === 0) numCols = 1;
+
+      const totalTableTwips = convertInchesToTwip(6.5); // 9360 twips
+      const minColWidth = Math.min(720, Math.floor(totalTableTwips / numCols));
+
+      const colMaxLens: number[] = [];
+      for (let c = 0; c < numCols; c++) {
+        let maxLen = 0;
+        for (const row of block.children) {
+          const cell = row.children?.[c];
+          if (cell) {
+            const len = getNodeTextLength(cell);
+            if (len > maxLen) maxLen = len;
+          }
+        }
+        colMaxLens.push(Math.max(maxLen, 4));
+      }
+
+      const weights = colMaxLens.map(len => Math.max(8, Math.min(len, 60)));
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0) || 1;
+      const extraTwips = Math.max(0, totalTableTwips - (numCols * minColWidth));
+
+      const colWidths: number[] = weights.map(w => minColWidth + Math.floor((w / totalWeight) * extraTwips));
+      const currentTotal = colWidths.reduce((a, b) => a + b, 0);
+      const diff = totalTableTwips - currentTotal;
+      if (diff > 0 && colWidths.length > 0) {
+        colWidths[colWidths.length - 1] += diff;
+      }
+
       const rows = block.children.map((row: any, rowIdx: number) => {
         const isHeader = rowIdx === 0;
-        
-        const cells = row.children.map((cell: any) => {
-          const paragraphs = cell.children.map((b: Node) => {
-            if (b.type === 'paragraph') {
-              const p = b as Paragraph;
-              return new DocxParagraph({ children: ctx.renderNodes(p.children).flat() as DocxInlineNode[] });
-            }
-            return ctx.renderNode(b);
-          }).flat() as DocxParagraph[];
-          
-          if (paragraphs.length === 0) {
-            paragraphs.push(new DocxParagraph({ children: [] }));
+
+        const cells = row.children.map((cell: any, cellIdx: number) => {
+          const colAlign = block.align?.[cellIdx];
+          let cellAlignment: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.LEFT;
+          if (colAlign === 'center') {
+            cellAlignment = AlignmentType.CENTER;
+          } else if (colAlign === 'right') {
+            cellAlignment = AlignmentType.RIGHT;
           }
+
+          const rendered = ctx.renderNodes(cell.children).flat();
+          const paragraphs: DocxParagraph[] = [];
+          const pendingInlines: DocxInlineNode[] = [];
+
+          for (const item of rendered) {
+            if (item instanceof DocxParagraph) {
+              if (pendingInlines.length > 0) {
+                paragraphs.push(new DocxParagraph({ children: [...pendingInlines], alignment: cellAlignment }));
+                pendingInlines.length = 0;
+              }
+              paragraphs.push(item);
+            } else {
+              pendingInlines.push(item as DocxInlineNode);
+            }
+          }
+          if (pendingInlines.length > 0 || paragraphs.length === 0) {
+            paragraphs.push(new DocxParagraph({ children: pendingInlines, alignment: cellAlignment }));
+          }
+
+          const colWidth = colWidths[cellIdx] || minColWidth;
 
           return new DocxTableCell({
             children: paragraphs,
+            width: { size: colWidth, type: WidthType.DXA },
             shading: isHeader ? { type: ShadingType.CLEAR, color: 'auto', fill: 'F3F4F6' } : undefined,
-            margins: { left: 100, right: 100, top: 100, bottom: 100 },
+            margins: { left: 140, right: 140, top: 120, bottom: 120 },
           });
         });
-        
+
         return new DocxTableRow({
           children: cells,
           tableHeader: isHeader,
+          cantSplit: true,
         });
       });
-      
+
       return [new DocxTable({
         rows,
-        width: { size: 100, type: WidthType.PERCENTAGE },
+        width: { size: totalTableTwips, type: WidthType.DXA },
+        columnWidths: colWidths,
         borders: {
           top: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
           bottom: { style: BorderStyle.SINGLE, size: 4, color: ctx.theme.colors.border },
@@ -461,7 +533,7 @@ export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme, signatu
           run: { font: theme ? extractFirstFont(theme.typography.codeFont) : 'Consolas', size: 20 },
           paragraph: { spacing: { before: 40, after: 40, line: 276 } },
         },
-        // Setup heading styles
+        // Setup heading styles (Heading 1 through Heading 6)
         {
           id: 'Heading1',
           name: 'Heading 1',
@@ -471,7 +543,12 @@ export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme, signatu
           run: { 
             size: theme ? theme.typography.headingSizesPt[1] * 2 : 48, 
             bold: true,
-            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial'
+            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial',
+            color: theme ? theme.colors.text : '1A1A1A',
+          },
+          paragraph: {
+            spacing: { before: 360, after: 160 },
+            keepNext: true,
           },
         },
         {
@@ -483,7 +560,12 @@ export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme, signatu
           run: { 
             size: theme ? theme.typography.headingSizesPt[2] * 2 : 36, 
             bold: true,
-            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial'
+            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial',
+            color: theme ? theme.colors.text : '1A1A1A',
+          },
+          paragraph: {
+            spacing: { before: 280, after: 120 },
+            keepNext: true,
           },
         },
         {
@@ -495,7 +577,63 @@ export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme, signatu
           run: { 
             size: theme ? theme.typography.headingSizesPt[3] * 2 : 28, 
             bold: true,
-            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial'
+            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial',
+            color: theme ? theme.colors.text : '1A1A1A',
+          },
+          paragraph: {
+            spacing: { before: 240, after: 100 },
+            keepNext: true,
+          },
+        },
+        {
+          id: 'Heading4',
+          name: 'Heading 4',
+          basedOn: 'Normal',
+          next: 'Normal',
+          quickFormat: true,
+          run: { 
+            size: theme ? theme.typography.headingSizesPt[4] * 2 : 24, 
+            bold: true,
+            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial',
+            color: theme ? theme.colors.text : '1A1A1A',
+          },
+          paragraph: {
+            spacing: { before: 200, after: 80 },
+            keepNext: true,
+          },
+        },
+        {
+          id: 'Heading5',
+          name: 'Heading 5',
+          basedOn: 'Normal',
+          next: 'Normal',
+          quickFormat: true,
+          run: { 
+            size: theme ? theme.typography.headingSizesPt[5] * 2 : 22, 
+            bold: true,
+            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial',
+            color: theme ? theme.colors.text : '1A1A1A',
+          },
+          paragraph: {
+            spacing: { before: 160, after: 60 },
+            keepNext: true,
+          },
+        },
+        {
+          id: 'Heading6',
+          name: 'Heading 6',
+          basedOn: 'Normal',
+          next: 'Normal',
+          quickFormat: true,
+          run: { 
+            size: theme ? theme.typography.headingSizesPt[6] * 2 : 20, 
+            bold: true,
+            font: theme ? extractFirstFont(theme.typography.headingFont) : 'Arial',
+            color: theme ? theme.colors.text : '1A1A1A',
+          },
+          paragraph: {
+            spacing: { before: 140, after: 40 },
+            keepNext: true,
           },
         },
       ],
@@ -524,6 +662,16 @@ export async function renderToDocxBlob(doc: Root, theme?: DocumentTheme, signatu
               style: { paragraph: { indent: { left: convertInchesToTwip(0.5 * (i + 1)), hanging: convertInchesToTwip(0.25) } } },
             };
           }),
+        },
+        {
+          reference: 'mdtodocs-task-list',
+          levels: Array.from({ length: 9 }, (_, i) => ({
+            level: i,
+            format: LevelFormat.NONE,
+            text: '',
+            alignment: AlignmentType.START,
+            style: { paragraph: { indent: { left: convertInchesToTwip(0.35 * (i + 1)), hanging: 0 } } },
+          })),
         },
       ],
     },
