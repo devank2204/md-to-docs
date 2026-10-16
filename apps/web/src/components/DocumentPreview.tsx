@@ -12,7 +12,7 @@ import mermaid from 'mermaid';
 interface DocumentPreviewProps {
   markdown: string;
   destination: DestinationType;
-  onDestinationChange: (dest: DestinationType) => void;
+  onDestinationChange?: (dest: DestinationType) => void;
   themeId: string;
   onThemeIdChange: (themeId: string) => void;
   baseFontSize: number;
@@ -299,9 +299,19 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
           </span>
           <span className="text-outline-variant">·</span>
 
-          <span className="text-[11px] font-semibold text-on-surface uppercase tracking-wider bg-surface px-2 py-0.5 rounded border border-outline-variant/30">
-            {destination === 'google-docs' ? 'Google Docs' : destination === 'word' ? 'Word' : destination === 'pdf' ? 'PDF' : 'Clipboard'}
-          </span>
+          <div className="flex items-center gap-space-xs">
+            <span className="text-secondary text-[11px]">Target:</span>
+            <select
+              className="bg-transparent border border-outline-variant/30 rounded px-2 py-0.5 text-on-surface focus:outline-none focus:border-primary text-code-sm font-semibold text-[11px]"
+              value={destination}
+              onChange={(e) => onDestinationChange?.(e.target.value as DestinationType)}
+            >
+              <option value="google-docs">Docs</option>
+              <option value="word">Word</option>
+              <option value="pdf">PDF</option>
+              <option value="clipboard">Copy</option>
+            </select>
+          </div>
 
           <span className="text-outline-variant">·</span>
 
