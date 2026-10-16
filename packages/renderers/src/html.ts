@@ -35,6 +35,18 @@ function getNodePlainText(node: any): string {
   return '';
 }
 
+function getCalloutTextIcon(type: string): string {
+  switch (type.toLowerCase()) {
+    case 'tip': return '💡';
+    case 'warning': return '⚠️';
+    case 'caution': return '🛑';
+    case 'important': return '❗';
+    case 'note':
+    default:
+      return '📝';
+  }
+}
+
 const htmlRegistry: RendererRegistry<string> = {
   nodes: {
     heading: (block: Heading, ctx) => {
@@ -91,15 +103,20 @@ const htmlRegistry: RendererRegistry<string> = {
       return `<blockquote style="font-family:${font};font-size:${size}pt;color:${color};border-left:4px solid ${border};margin:0 0 16px 0;padding:8px 16px;background:#f9fafb;border-radius:0 4px 4px 0;">${ctx.renderNodes(block.children).join('')}</blockquote>`;
     },
     containerDirective: (block: any /* ContainerDirective */, ctx) => {
-      const type = block.attributes?.type || 'note';
+      const type = (block.name || block.attributes?.type || 'note').toLowerCase();
       const colors = ctx.theme.colors.callouts[type as keyof typeof ctx.theme.colors.callouts] || ctx.theme.colors.callouts.note;
       const font = ctx.theme.typography.bodyFont;
       const size = ctx.theme.typography.baseFontSizePt;
-
       return `<div class="callout callout-${type}" style="font-family:${font};font-size:${size}pt;background-color:#${colors.bg};border-left:4px solid #${colors.border};color:#${colors.text};padding:12px 16px;margin-bottom:16px;border-radius:0 4px 4px 0;">
-        <strong style="text-transform:capitalize;">${type}</strong><br/>
+        <strong style="text-transform:capitalize;">${getCalloutTextIcon(type)} ${type}</strong><br/>
         ${ctx.renderNodes(block.children).join('')}
       </div>`;
+    },
+    footnoteDefinition: (block: any, ctx) => {
+      const label = escapeHtml(block.label || block.identifier);
+      const color = `#${ctx.theme.colors.secondary}`;
+      const border = `#${ctx.theme.colors.border}`;
+      return `<div class="footnote-definition" id="fn-${block.identifier}" style="font-size:0.85em;color:${color};margin-top:12px;padding-left:12px;border-left:2px solid ${border};"><sup style="font-weight:700;">[${label}]</sup> ${ctx.renderNodes(block.children).join('')}</div>`;
     },
     table: (block: MdTable, ctx) => {
       const font = ctx.theme.typography.bodyFont;
@@ -214,6 +231,11 @@ const htmlRegistry: RendererRegistry<string> = {
       } catch {
         return `<code class="math-error" style="font-family:monospace;background:#fee2e2;color:#b91c1c;padding:1px 4px;border-radius:2px;">$${escapeHtml(inline.value)}$</code>`;
       }
+    },
+    footnoteReference: (inline: any, ctx) => {
+      const label = escapeHtml(inline.label || inline.identifier);
+      const color = `#${ctx.theme.colors.primary}`;
+      return `<sup><a href="#fn-${inline.identifier}" id="fnref-${inline.identifier}" style="color:${color};text-decoration:none;">[${label}]</a></sup>`;
     },
     break: () => '<br />',
   },

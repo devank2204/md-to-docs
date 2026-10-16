@@ -139,7 +139,7 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
       });
     },
     containerDirective: (block: any /* ContainerDirective */, ctx) => {
-      const type = block.attributes?.type || 'note';
+      const type = (block.name || block.attributes?.type || 'note').toLowerCase();
       const colors = ctx.theme.colors.callouts[type as keyof typeof ctx.theme.colors.callouts] || ctx.theme.colors.callouts.note;
       
       const content = block.children.flatMap((c: Node) => {
@@ -164,10 +164,11 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
           },
           rows: [
             new DocxTableRow({
+              cantSplit: true,
               children: [
                 new DocxTableCell({
                   shading: { type: ShadingType.CLEAR, color: 'auto', fill: colors.bg },
-                  margins: { left: 200, right: 200, top: 100, bottom: 100 },
+                  margins: { left: 200, right: 200, top: 120, bottom: 120 },
                   children: [
                     new DocxParagraph({
                       children: [new TextRun({ text: `${getCalloutTextIcon(type)} ${type.toUpperCase()}`, bold: true, color: colors.text })],
@@ -181,6 +182,23 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
           ]
         })
       ];
+    },
+    footnoteDefinition: (block: any, ctx) => {
+      const label = block.label || block.identifier;
+      return block.children.flatMap((c: Node) => {
+        if (c.type === 'paragraph') {
+          const p = c as Paragraph;
+          return [new DocxParagraph({
+            children: [
+              new TextRun({ text: `[${label}] `, superScript: true, bold: true, color: ctx.theme.colors.secondary }),
+              ...(ctx.renderNodes(p.children).flat() as DocxInlineNode[])
+            ],
+            spacing: { before: 80, after: 80 },
+            indent: { left: 360 }
+          })];
+        }
+        return ctx.renderNode(c);
+      });
     },
     code: (block: Code, ctx) => {
       if (block.lang === 'mermaid') {
@@ -481,6 +499,13 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
       return [new TextRun({ text: `[${inline.alt || 'image'}]`, color: ctx.theme.colors.secondary, italics: true })];
     },
     inlineMath: (inline: any /* InlineMath */) => [new TextRun({ text: inline.value, font: 'Cambria Math', italics: true })],
+    footnoteReference: (inline: any, ctx) => [
+      new TextRun({
+        text: `[${inline.label || inline.identifier}]`,
+        superScript: true,
+        color: ctx.theme.colors.primary,
+      })
+    ],
     break: () => [new TextRun({ break: 1 })],
   },
   fallbackNode: () => []

@@ -272,4 +272,37 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Standalone `html.ts` renderer is implemented, exported, and tested.
   - [x] Mermaid SVG injection injects pure SVG into HTML without rasterization.
   - [x] All 30 validation tests and 17 fidelity lab fixtures pass.
-* **Queued Work:** Prompt 8: GFM Footnotes & Callout Styling Fidelity.
+* **Next Allowed Prompt:** Prompt 8: GFM Footnotes & Callout Styling Fidelity
+
+---
+
+## Prompt 8: GFM Footnotes & Callout Styling Fidelity
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Add GitHub Flavored Markdown (GFM) footnotes support across DOCX, Clipboard HTML, and Standalone HTML renderers:
+    - Render `footnoteReference` as superscript run (`superScript: true`) in DOCX and `<sup><a href="#fn-X">[X]</a></sup>` in HTML.
+    - Render `footnoteDefinition` as indented block with superscript identifier across DOCX, Clipboard HTML, and Standalone HTML.
+  - Elevate Callout Styling Fidelity:
+    - Fix directive name resolution where `remark-directive` stores block directive names on `node.name` rather than `node.attributes.type`.
+    - Add type-specific icons (`📝 Note`, `💡 Tip`, `⚠️ Warning`, `🛑 Caution`, `❗ Important`) across all renderers.
+    - Set `cantSplit: true` on callout table rows in DOCX to prevent page break ruptures.
+    - Harmonize border-left accent colors and soft background tints across DOCX, Clipboard HTML, and Standalone HTML.
+  - Implement comprehensive regression test suite in `packages/validation/tests/footnotes-and-callouts.test.ts`.
+* **Files Changed:**
+  - `packages/renderers/src/docx.ts` (Added footnote reference superscript runs, footnote definition indented blocks, callout type resolution fix, callout text icons, and cantSplit row setting)
+  - `packages/renderers/src/clipboard.ts` (Added footnote references, footnote definitions, callout icons, and callout colors)
+  - `packages/renderers/src/html.ts` (Added footnote references, footnote definitions, and callout icons)
+  - `packages/validation/tests/footnotes-and-callouts.test.ts` (Added 5 tests for DOCX footnotes/callouts, HTML footnotes, standalone HTML callouts, cantSplit, and callout icons)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 9/9 test files, 35/35 tests passed**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.51s)
+* **Acceptance Criteria:**
+  - [x] Footnote references and definitions render across DOCX, Clipboard HTML, and Standalone HTML without crashing or omitting references.
+  - [x] Callout directives recognize proper directive names and render type-specific icons and colors.
+  - [x] DOCX callouts enforce `cantSplit: true` to prevent page split ruptures.
+  - [x] All 35 validation tests and 17 fidelity lab fixtures pass.
+* **Next Allowed Prompt:** Prompt 9: Destination Diagnostics & Capability Inspector UI
+
