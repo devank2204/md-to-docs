@@ -5,7 +5,7 @@ import { visit } from 'unist-util-visit';
 import type { Root } from 'mdast';
 import { resolveAssets } from '@mdtodocs/asset-pipeline';
 import { validateDocument } from '@mdtodocs/validation';
-import { renderToClipboardHtml } from '@mdtodocs/renderers/src/clipboard';
+import { useStore } from '@/store';
 import { FidelityCheckPanel } from '@/components/FidelityCheckPanel';
 import { DocumentInspector } from '@/components/DocumentInspector';
 import { DocumentEditor } from '@/components/DocumentEditor';
@@ -100,70 +100,78 @@ export function Workspace({
 }: WorkspaceProps) {
   const [isFidelityPanelOpen, setIsFidelityPanelOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
-  const [isCompiling, setIsCompiling] = useState(false);
+  
+  const setCompiledDoc = useStore(state => state.setCompiledDoc);
+  const isCompiling = useStore(state => state.isCompiling);
+  const setIsCompiling = useStore(state => state.setIsCompiling);
+
   const [compiledState, setCompiledState] = useState<{
     diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
     stats: any;
     validationReport: any;
-    htmlContent: string;
   }>({
     diagnostics: [],
     stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0, mermaidRendered: 0, mermaidFailed: 0 },
     validationReport: null,
-    htmlContent: '',
   });
 
   const words = markdown.trim().split(/\s+/).filter(w => w.length > 0).length;
   const lines = markdown.split('\n').length;
 
   useEffect(() => {
-    let isMounted = true;
+    const controller = new AbortController();
 
-    async function compile() {
-      if (isMounted) setIsCompiling(true);
+    const timeoutId = setTimeout(async () => {
+      if (controller.signal.aborted) return;
+      setIsCompiling(true);
+
       try {
         const collector = new DiagnosticsCollector();
         let doc = parseMarkdown(markdown);
+        if (controller.signal.aborted) return;
 
-        // Resolve assets asynchronously
-        doc = await resolveAssets(doc);
+        // Resolve assets asynchronously with abort signal
+        doc = await resolveAssets(doc, controller.signal);
+        if (controller.signal.aborted) return;
 
         // Count before planner optimizations
         const docStats = countElements(doc);
 
         doc = planRepresentation(doc, destination, collector);
-        const validationReport = validateDocument(doc, destination);
-        const htmlContent = renderToClipboardHtml(doc, activeTheme);
+        if (controller.signal.aborted) return;
 
-        if (isMounted) {
+        const validationReport = validateDocument(doc, destination);
+
+        if (!controller.signal.aborted) {
           setCompiledState({
             diagnostics: collector.getAll(),
             stats: docStats,
             validationReport,
-            htmlContent,
           });
+          setCompiledDoc(doc);
         }
-      } catch (e) {
-        console.error(e);
-        if (isMounted) {
+      } catch (e: any) {
+        if (!controller.signal.aborted) {
+          console.error('Compilation error:', e);
           setCompiledState({
             diagnostics: [],
             stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0, mermaidRendered: 0, mermaidFailed: 0 },
             validationReport: null,
-            htmlContent: '',
           });
+          setCompiledDoc(null);
         }
       } finally {
-        if (isMounted) setIsCompiling(false);
+        if (!controller.signal.aborted) {
+          setIsCompiling(false);
+        }
       }
-    }
-
-    compile();
+    }, 250);
 
     return () => {
-      isMounted = false;
+      clearTimeout(timeoutId);
+      controller.abort();
     };
-  }, [markdown, destination, activeTheme]);
+  }, [markdown, destination, activeTheme, setCompiledDoc, setIsCompiling]);
 
   const { diagnostics, stats, validationReport } = compiledState;
   const warnings = diagnostics.filter(d => d.severity === 'warning' || d.severity === 'error');

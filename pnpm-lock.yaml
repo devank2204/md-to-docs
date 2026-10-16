@@ -199,6 +199,9 @@ importers:
       docx:
         specifier: ^8.2.0
         version: 8.6.0
+      katex:
+        specifier: ^0.18.9
+        version: 0.18.9
     devDependencies:
       '@types/mdast':
         specifier: ^4.0.4

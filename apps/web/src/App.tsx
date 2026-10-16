@@ -44,14 +44,14 @@ function App() {
 
   useEffect(() => {
     if (!markdown.trim()) {
-      document.title = 'mdtodocs — Markdown to Documents';
+      document.title = 'mdtodocs: Markdown to Documents';
       return;
     }
     const match = markdown.match(/^#\s+(.+)$/m);
     if (match && match[1]?.trim()) {
-      document.title = `${match[1].trim()} — mdtodocs`;
+      document.title = `${match[1].trim()} | mdtodocs`;
     } else {
-      document.title = 'mdtodocs — Markdown to Documents';
+      document.title = 'mdtodocs: Markdown to Documents';
     }
   }, [markdown]);
 

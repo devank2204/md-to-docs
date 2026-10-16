@@ -24,3 +24,39 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+/* KaTeX and equation typography calibration */
+.katex-display {
+  margin: 1.25rem 0 !important;
+  text-align: center !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 0.5rem 0 !important;
+}
+
+.katex {
+  font-size: 1.05em !important;
+  text-rendering: auto;
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  text-align: initial;
+  max-width: 100%;
+}
+
+.math-inline {
+  display: inline-block;
+  vertical-align: baseline;
+  margin: 0 0.15em;
+}
+
+.katex-error {
+  color: #b91c1c !important;
+  background-color: #fee2e2;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+}
+

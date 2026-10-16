@@ -1,4 +1,4 @@
-# md.to.docs — Baseline Repository Audit
+# md.to.docs: Baseline Repository Audit
 
 **Date:** October 16, 2026  
 **Auditor:** Staff Frontend & Document-Rendering Engineer  

@@ -1,4 +1,4 @@
-# md.to.docs — Execution Ledger
+# md.to.docs: Execution Ledger
 
 This ledger tracks the progressive implementation and verification of the `md.to.docs` compiler and web application across discrete, auditable prompts.
 
@@ -37,7 +37,7 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - `@mdtodocs/validation` Vitest tests are currently failing in the working repository due to jsdom SVG method limitations and an incorrect AST assumption in `stress.test.ts`.
   - `packages/fidelity-lab` has tracked binary `.docx` files in `.output/` that will cause git pollution if run naively.
   - Visible preview is completely decoupled from compiler planner and destination renderers.
-* **Next Allowed Prompt:** Prompt 2 — Test Harness Stabilization & Fidelity Isolation (Fixing jsdom SVG/Mermaid mocks in `@mdtodocs/validation` and isolating `fidelity-lab` output generation to prevent dirtying tracked git files).
+* **Next Allowed Prompt:** Prompt 2: Test Harness Stabilization & Fidelity Isolation (Fixing jsdom SVG/Mermaid mocks in `@mdtodocs/validation` and isolating `fidelity-lab` output generation to prevent dirtying tracked git files).
 
 ---
 
@@ -70,26 +70,89 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Accidental fixture auto-generation is prevented unless `--update` is explicitly provided.
 * **Regressions & Unresolved Issues:**
   - `fidelity-lab` fixtures (`expected-ir.json`) still contain the pre-commit `beff8e7` Document IR structure, whereas `parseMarkdown` outputs remark mdast. Re-aligning the IR or fixture baselines will be addressed in architectural planning.
-* **Next Allowed Prompt:** Prompt 3 — Pipeline Consolidation & Live Workspace Optimization (Debouncing compilation, caching image assets, removing dead `renderToClipboardHtml` keystroke calls, and passing compiled state to export).
+* **Next Allowed Prompt:** Prompt 3: Pipeline Consolidation & Live Workspace Optimization (Debouncing compilation, caching image assets, removing dead `renderToClipboardHtml` keystroke calls, and passing compiled state to export).
 
 ---
 
 ## Prompt 3: Pipeline Consolidation & Live Workspace Optimization
-* **Status:** Queued
+* **Status:** Complete
 * **Scope and Intended Behavior:**
-  - Introduce debounce and `AbortController` cancellation to the live compilation effect in `Workspace.tsx`.
-  - Cache fetched image blobs/URIs in `@mdtodocs/asset-pipeline` to stop redundant HTTP requests.
-  - Remove dead `renderToClipboardHtml` calculation from the live keystroke loop.
+  - Introduce 250ms debouncing and `AbortController` cancellation to the live compilation effect in `Workspace.tsx`.
+  - Cache fetched image blobs/URIs in `@mdtodocs/asset-pipeline` via in-memory `imageCache` map with error eviction to stop redundant HTTP requests on typing.
+  - Remove dead `renderToClipboardHtml` calculation from the live keystroke loop in `Workspace.tsx`.
+  - Store in-memory `compiledDoc: Root | null` and `isCompiling: boolean` in Zustand (`useStore`), excluded from localStorage persistence.
   - Pass compiled document state from `Workspace.tsx` to `Header.tsx` to eliminate duplicate parsing and asset fetching on export.
-* **Files Changed:** (None yet)
-* **Tests Executed:** (Pending)
+* **Files Changed:**
+  - `packages/asset-pipeline/src/index.ts` (In-memory image cache, AbortSignal support, graceful fallback dimensions)
+  - `apps/web/src/store/index.ts` (Added in-memory `compiledDoc` and `isCompiling` to state)
+  - `apps/web/src/components/Workspace.tsx` (250ms debounce, AbortController, removed dead clipboard HTML calculation, shared `compiledDoc` with store)
+  - `apps/web/src/components/Header.tsx` (Reused `compiledDoc` during export to eliminate redundant parsing and asset loading)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, TypeScript 5.5 + Vite bundled cleanly in 3.29s)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 4/4 test files, 5/5 tests passed in 7.78s**)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**, 5 oxlint warnings)
+* **Acceptance Criteria:**
+  - [x] Typing in editor does not trigger compilation until 250ms quiet period.
+  - [x] In-flight compilations are canceled via `AbortController` when new keystrokes arrive.
+  - [x] Remote images are cached and not re-fetched on every keystroke.
+  - [x] Dead `renderToClipboardHtml` call is eliminated from `Workspace.tsx`.
+  - [x] `Header.tsx` reuses already-compiled AST and resolved assets for Google Docs and Word exports.
+* **Next Allowed Prompt:** Prompt 4: Preview & Export Unification (Aligning `DocumentPreview.tsx` to render the destination-planned document representation and adding diagram action controls for SVG/PNG).
 
 ---
 
 ## Prompt 4: Preview & Export Unification
-* **Status:** Queued
+* **Status:** Completed
 * **Scope and Intended Behavior:**
   - Align `DocumentPreview.tsx` to render the destination-planned document representation so capability polyfills and warnings are accurately visualized.
-  - Add diagram action controls (copy SVG, download SVG/PNG) to Mermaid diagram blocks.
-* **Files Changed:** (None yet)
-* **Tests Executed:** (Pending)
+  - Add diagram action controls (copy SVG, copy Mermaid code, download SVG, download PNG via high-res canvas) to Mermaid diagram blocks with error display and interactive zoom.
+* **Files Changed:**
+  - `packages/compiler-core/src/planner/index.ts` (Attached `data.polyfill = 'table-to-list'` on linearized table AST nodes and `data.polyfill = 'image-to-link'` on fallback links)
+  - `apps/web/src/components/DocumentPreview.tsx` (Injected destination planning remark plugin into `ReactMarkdown`; customized `ul` and `a` renderers for visual polyfill notifications; implemented interactive `MermaidDiagram` action controls for Copy SVG, Copy Source, Download SVG, Download PNG at 2x scale, and error fallback UI)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/compiler-core build` (**PASS: 0 errors**, TypeScript compiled cleanly)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, TypeScript 5.5 + Vite production bundle succeeded)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**, 0 warnings in `DocumentPreview.tsx`)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 4/4 test files, 5/5 tests passed in 6.73s**)
+* **Acceptance Criteria:**
+  - [x] Destination-planned transformations (e.g. table linearization) are reflected directly in the live preview.
+  - [x] Destination polyfills and degradation warnings are styled and visibly distinct in preview.
+  - [x] Mermaid diagrams offer copy SVG and copy source actions with clipboard feedback.
+  - [x] Mermaid diagrams offer direct SVG and rasterized 2x high-resolution PNG download options.
+  - [x] Diagram syntax errors fail gracefully with collapsible source preview.
+* **Next Allowed Prompt:** Prompt 5: Math & Equation Rendering Accuracy / Quality Benchmark (Evaluating KaTeX math rendering, inline/display equation alignment, and destination-specific math export fidelity).
+
+---
+
+## Prompt 5: Math & Equation Rendering Accuracy / Quality Benchmark
+* **Status:** Completed
+* **Scope and Intended Behavior:**
+  - Validate and optimize KaTeX math equation rendering in live preview and clipboard/HTML exporters.
+  - Implement dual MathML (`<math xmlns="http://www.w3.org/1998/Math/MathML">`) and KaTeX HTML markup in `renderToClipboardHtml` for Google Docs native formula translation and rich visual clipboard previews.
+  - Address display vs. inline math alignment and baseline typography across target destinations.
+  - Ensure syntax error resilience via safe KaTeX options and try/catch fallback markup.
+  - Add automated test coverage in `@mdtodocs/validation` for math parsing, rendering, error tolerance, and export.
+* **Files Changed:**
+  - `packages/renderers/package.json` (Added `katex` dependency)
+  - `packages/renderers/src/clipboard.ts` (Implemented dual MathML and KaTeX HTML rendering with centered display math and baseline-aligned inline math)
+  - `packages/compiler-core/src/planner/index.ts` (Added math destination planning diagnostic notifications for Google Docs and clipboard)
+  - `apps/web/src/components/DocumentPreview.tsx` (Configured safe `rehypeKatex` options with `strict: false, throwOnError: false`)
+  - `apps/web/src/index.css` (Added calibrated KaTeX and math typography rules for `.katex-display`, `.katex`, `.math-inline`, and `.katex-error`)
+  - `packages/validation/tests/math.test.ts` (Created comprehensive 5-test suite for math parsing, clipboard HTML, error tolerance, destination planning, and Word export)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**, TypeScript compiled cleanly)
+  - `npx pnpm --filter @mdtodocs/compiler-core build` (**PASS: 0 errors**, TypeScript compiled cleanly)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, TypeScript 5.5 + Vite production bundle succeeded in 10.37s)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**, 0 warnings in modified files)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 5/5 test files, 10/10 tests passed in 19.40s**)
+* **Acceptance Criteria:**
+  - [x] Inline math ($...$) and display math ($$...$$) render accurately in live preview without layout jitter.
+  - [x] Display equations are centered with horizontal overflow scrolling and vertical breathing room.
+  - [x] Inline equations align naturally with the text baseline typography.
+  - [x] Clipboard HTML exports MathML `<math>` tags for Google Docs formula compatibility alongside visual KaTeX HTML.
+  - [x] LaTeX syntax errors degrade safely to styled fallback blocks without breaking or crashing the application.
+  - [x] Automated test suite covers math parsing, clipboard rendering, error recovery, and Word export.
+* **Next Allowed Prompt:** Prompt 6: Word / DOCX Table Calibration & Heading/List Nesting Fidelity (Ensuring repeating table headers, column width calculations, nested list indentations, and heading style hierarchies in DOCX export).
