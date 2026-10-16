@@ -328,28 +328,23 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
         })
       ];
     },
-    text: (inline: Text, ctx) => [new TextRun({ text: inline.value, bold: ctx.state.parentBold })],
+    text: (inline: Text, ctx) => [new TextRun({
+      text: inline.value,
+      bold: ctx.state.parentBold,
+      italics: ctx.state.parentItalics,
+      strike: ctx.state.parentStrike,
+    })],
     strong: (inline: Strong, ctx) => {
       const nestedCtx = { ...ctx, state: { ...ctx.state, parentBold: true } };
       return nestedCtx.renderNodes(inline.children).flat();
     },
     emphasis: (inline: Emphasis, ctx) => {
-      const runs = ctx.renderNodes(inline.children).flat();
-      return runs.map((run: any) => {
-        if (run instanceof TextRun) {
-          return new TextRun({ text: extractTextFromRun(run), bold: ctx.state.parentBold, italics: true });
-        }
-        return run;
-      });
+      const nestedCtx = { ...ctx, state: { ...ctx.state, parentItalics: true } };
+      return nestedCtx.renderNodes(inline.children).flat();
     },
     delete: (inline: Delete, ctx) => {
-      const runs = ctx.renderNodes(inline.children).flat();
-      return runs.map((run: any) => {
-        if (run instanceof TextRun) {
-          return new TextRun({ text: extractTextFromRun(run), bold: ctx.state.parentBold, strike: true });
-        }
-        return run;
-      });
+      const nestedCtx = { ...ctx, state: { ...ctx.state, parentStrike: true } };
+      return nestedCtx.renderNodes(inline.children).flat();
     },
     inlineCode: (inline: InlineCode, ctx) => {
       return [

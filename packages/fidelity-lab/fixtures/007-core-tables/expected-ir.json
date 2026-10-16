@@ -1,1165 +1,1716 @@
 {
-  "version": "1.0.0",
-  "metadata": {},
-  "blocks": [
+  "type": "root",
+  "children": [
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "paragraph",
+      "children": [
         {
-          "type": "Text",
-          "value": "Simple table:"
+          "type": "text",
+          "value": "Simple table:",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 14,
+              "offset": 13
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 1,
-        "startColumn": 1,
-        "endLine": 1,
-        "endColumn": 14,
-        "startOffset": 0,
-        "endOffset": 13
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 14,
+          "offset": 13
+        }
       }
     },
     {
-      "type": "Table",
-      "headerRows": 1,
-      "rows": [
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Name"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Role"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Team"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Alice"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Engineer"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Platform"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Bob"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Designer"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Product"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Carol"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Manager"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Engineering"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      "type": "table",
       "align": [
         null,
         null,
         null
       ],
-      "position": {
-        "startLine": 3,
-        "startColumn": 1,
-        "endLine": 7,
-        "endColumn": 34,
-        "startOffset": 15,
-        "endOffset": 152
-      }
-    },
-    {
-      "type": "Paragraph",
-      "inlines": [
+      "children": [
         {
-          "type": "Text",
-          "value": "Table with alignment:"
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Name",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 3,
+                      "offset": 19
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 7,
+                      "offset": 23
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 17
+                },
+                "end": {
+                  "line": 3,
+                  "column": 8,
+                  "offset": 24
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Role",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 10,
+                      "offset": 26
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 14,
+                      "offset": 30
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 8,
+                  "offset": 24
+                },
+                "end": {
+                  "line": 3,
+                  "column": 15,
+                  "offset": 31
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Team",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 17,
+                      "offset": 33
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 21,
+                      "offset": 37
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 15,
+                  "offset": 31
+                },
+                "end": {
+                  "line": 3,
+                  "column": 23,
+                  "offset": 39
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 17
+            },
+            "end": {
+              "line": 3,
+              "column": 23,
+              "offset": 39
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Alice",
+                  "position": {
+                    "start": {
+                      "line": 5,
+                      "column": 3,
+                      "offset": 64
+                    },
+                    "end": {
+                      "line": 5,
+                      "column": 8,
+                      "offset": 69
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 62
+                },
+                "end": {
+                  "line": 5,
+                  "column": 9,
+                  "offset": 70
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Engineer",
+                  "position": {
+                    "start": {
+                      "line": 5,
+                      "column": 11,
+                      "offset": 72
+                    },
+                    "end": {
+                      "line": 5,
+                      "column": 19,
+                      "offset": 80
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 9,
+                  "offset": 70
+                },
+                "end": {
+                  "line": 5,
+                  "column": 20,
+                  "offset": 81
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Platform",
+                  "position": {
+                    "start": {
+                      "line": 5,
+                      "column": 22,
+                      "offset": 83
+                    },
+                    "end": {
+                      "line": 5,
+                      "column": 30,
+                      "offset": 91
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 20,
+                  "offset": 81
+                },
+                "end": {
+                  "line": 5,
+                  "column": 32,
+                  "offset": 93
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 62
+            },
+            "end": {
+              "line": 5,
+              "column": 32,
+              "offset": 93
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Bob",
+                  "position": {
+                    "start": {
+                      "line": 6,
+                      "column": 3,
+                      "offset": 97
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 6,
+                      "offset": 100
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 6,
+                  "column": 1,
+                  "offset": 95
+                },
+                "end": {
+                  "line": 6,
+                  "column": 7,
+                  "offset": 101
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Designer",
+                  "position": {
+                    "start": {
+                      "line": 6,
+                      "column": 9,
+                      "offset": 103
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 17,
+                      "offset": 111
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 6,
+                  "column": 7,
+                  "offset": 101
+                },
+                "end": {
+                  "line": 6,
+                  "column": 18,
+                  "offset": 112
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Product",
+                  "position": {
+                    "start": {
+                      "line": 6,
+                      "column": 20,
+                      "offset": 114
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 27,
+                      "offset": 121
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 6,
+                  "column": 18,
+                  "offset": 112
+                },
+                "end": {
+                  "line": 6,
+                  "column": 29,
+                  "offset": 123
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 6,
+              "column": 1,
+              "offset": 95
+            },
+            "end": {
+              "line": 6,
+              "column": 29,
+              "offset": 123
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Carol",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 3,
+                      "offset": 127
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 8,
+                      "offset": 132
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 1,
+                  "offset": 125
+                },
+                "end": {
+                  "line": 7,
+                  "column": 9,
+                  "offset": 133
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Manager",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 11,
+                      "offset": 135
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 18,
+                      "offset": 142
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 9,
+                  "offset": 133
+                },
+                "end": {
+                  "line": 7,
+                  "column": 19,
+                  "offset": 143
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Engineering",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 21,
+                      "offset": 145
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 32,
+                      "offset": 156
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 19,
+                  "offset": 143
+                },
+                "end": {
+                  "line": 7,
+                  "column": 34,
+                  "offset": 158
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 1,
+              "offset": 125
+            },
+            "end": {
+              "line": 7,
+              "column": 34,
+              "offset": 158
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 9,
-        "startColumn": 1,
-        "endLine": 9,
-        "endColumn": 22,
-        "startOffset": 154,
-        "endOffset": 175
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 17
+        },
+        "end": {
+          "line": 7,
+          "column": 34,
+          "offset": 158
+        }
       }
     },
     {
-      "type": "Table",
-      "headerRows": 1,
-      "rows": [
+      "type": "paragraph",
+      "children": [
         {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Left"
-                    }
-                  ]
-                }
-              ]
+          "type": "text",
+          "value": "Table with alignment:",
+          "position": {
+            "start": {
+              "line": 9,
+              "column": 1,
+              "offset": 162
             },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Center"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Right"
-                    }
-                  ]
-                }
-              ]
+            "end": {
+              "line": 9,
+              "column": 22,
+              "offset": 183
             }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "L1"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "C1"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "R1"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "L2"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "C2"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "R2"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "L3"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "C3"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "R3"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          }
         }
       ],
+      "position": {
+        "start": {
+          "line": 9,
+          "column": 1,
+          "offset": 162
+        },
+        "end": {
+          "line": 9,
+          "column": 22,
+          "offset": 183
+        }
+      }
+    },
+    {
+      "type": "table",
       "align": [
         "left",
         "center",
         "right"
       ],
-      "position": {
-        "startLine": 11,
-        "startColumn": 1,
-        "endLine": 15,
-        "endColumn": 17,
-        "startOffset": 177,
-        "endOffset": 277
-      }
-    },
-    {
-      "type": "Paragraph",
-      "inlines": [
+      "children": [
         {
-          "type": "Text",
-          "value": "Table with inline formatting:"
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Left",
+                  "position": {
+                    "start": {
+                      "line": 11,
+                      "column": 3,
+                      "offset": 189
+                    },
+                    "end": {
+                      "line": 11,
+                      "column": 7,
+                      "offset": 193
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 1,
+                  "offset": 187
+                },
+                "end": {
+                  "line": 11,
+                  "column": 8,
+                  "offset": 194
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Center",
+                  "position": {
+                    "start": {
+                      "line": 11,
+                      "column": 10,
+                      "offset": 196
+                    },
+                    "end": {
+                      "line": 11,
+                      "column": 16,
+                      "offset": 202
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 8,
+                  "offset": 194
+                },
+                "end": {
+                  "line": 11,
+                  "column": 17,
+                  "offset": 203
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Right",
+                  "position": {
+                    "start": {
+                      "line": 11,
+                      "column": 19,
+                      "offset": 205
+                    },
+                    "end": {
+                      "line": 11,
+                      "column": 24,
+                      "offset": 210
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 17,
+                  "offset": 203
+                },
+                "end": {
+                  "line": 11,
+                  "column": 26,
+                  "offset": 212
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 11,
+              "column": 1,
+              "offset": 187
+            },
+            "end": {
+              "line": 11,
+              "column": 26,
+              "offset": 212
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "L1",
+                  "position": {
+                    "start": {
+                      "line": 13,
+                      "column": 3,
+                      "offset": 241
+                    },
+                    "end": {
+                      "line": 13,
+                      "column": 5,
+                      "offset": 243
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 13,
+                  "column": 1,
+                  "offset": 239
+                },
+                "end": {
+                  "line": 13,
+                  "column": 6,
+                  "offset": 244
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "C1",
+                  "position": {
+                    "start": {
+                      "line": 13,
+                      "column": 8,
+                      "offset": 246
+                    },
+                    "end": {
+                      "line": 13,
+                      "column": 10,
+                      "offset": 248
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 13,
+                  "column": 6,
+                  "offset": 244
+                },
+                "end": {
+                  "line": 13,
+                  "column": 11,
+                  "offset": 249
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "R1",
+                  "position": {
+                    "start": {
+                      "line": 13,
+                      "column": 13,
+                      "offset": 251
+                    },
+                    "end": {
+                      "line": 13,
+                      "column": 15,
+                      "offset": 253
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 13,
+                  "column": 11,
+                  "offset": 249
+                },
+                "end": {
+                  "line": 13,
+                  "column": 17,
+                  "offset": 255
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 13,
+              "column": 1,
+              "offset": 239
+            },
+            "end": {
+              "line": 13,
+              "column": 17,
+              "offset": 255
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "L2",
+                  "position": {
+                    "start": {
+                      "line": 14,
+                      "column": 3,
+                      "offset": 259
+                    },
+                    "end": {
+                      "line": 14,
+                      "column": 5,
+                      "offset": 261
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 14,
+                  "column": 1,
+                  "offset": 257
+                },
+                "end": {
+                  "line": 14,
+                  "column": 6,
+                  "offset": 262
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "C2",
+                  "position": {
+                    "start": {
+                      "line": 14,
+                      "column": 8,
+                      "offset": 264
+                    },
+                    "end": {
+                      "line": 14,
+                      "column": 10,
+                      "offset": 266
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 14,
+                  "column": 6,
+                  "offset": 262
+                },
+                "end": {
+                  "line": 14,
+                  "column": 11,
+                  "offset": 267
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "R2",
+                  "position": {
+                    "start": {
+                      "line": 14,
+                      "column": 13,
+                      "offset": 269
+                    },
+                    "end": {
+                      "line": 14,
+                      "column": 15,
+                      "offset": 271
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 14,
+                  "column": 11,
+                  "offset": 267
+                },
+                "end": {
+                  "line": 14,
+                  "column": 17,
+                  "offset": 273
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 14,
+              "column": 1,
+              "offset": 257
+            },
+            "end": {
+              "line": 14,
+              "column": 17,
+              "offset": 273
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "L3",
+                  "position": {
+                    "start": {
+                      "line": 15,
+                      "column": 3,
+                      "offset": 277
+                    },
+                    "end": {
+                      "line": 15,
+                      "column": 5,
+                      "offset": 279
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 15,
+                  "column": 1,
+                  "offset": 275
+                },
+                "end": {
+                  "line": 15,
+                  "column": 6,
+                  "offset": 280
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "C3",
+                  "position": {
+                    "start": {
+                      "line": 15,
+                      "column": 8,
+                      "offset": 282
+                    },
+                    "end": {
+                      "line": 15,
+                      "column": 10,
+                      "offset": 284
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 15,
+                  "column": 6,
+                  "offset": 280
+                },
+                "end": {
+                  "line": 15,
+                  "column": 11,
+                  "offset": 285
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "R3",
+                  "position": {
+                    "start": {
+                      "line": 15,
+                      "column": 13,
+                      "offset": 287
+                    },
+                    "end": {
+                      "line": 15,
+                      "column": 15,
+                      "offset": 289
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 15,
+                  "column": 11,
+                  "offset": 285
+                },
+                "end": {
+                  "line": 15,
+                  "column": 17,
+                  "offset": 291
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 15,
+              "column": 1,
+              "offset": 275
+            },
+            "end": {
+              "line": 15,
+              "column": 17,
+              "offset": 291
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 17,
-        "startColumn": 1,
-        "endLine": 17,
-        "endColumn": 30,
-        "startOffset": 279,
-        "endOffset": 308
+        "start": {
+          "line": 11,
+          "column": 1,
+          "offset": 187
+        },
+        "end": {
+          "line": 15,
+          "column": 17,
+          "offset": 291
+        }
       }
     },
     {
-      "type": "Table",
-      "headerRows": 1,
-      "rows": [
+      "type": "paragraph",
+      "children": [
         {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Feature"
-                    }
-                  ]
-                }
-              ]
+          "type": "text",
+          "value": "Table with inline formatting:",
+          "position": {
+            "start": {
+              "line": 17,
+              "column": 1,
+              "offset": 295
             },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Status"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Notes"
-                    }
-                  ]
-                }
-              ]
+            "end": {
+              "line": 17,
+              "column": 30,
+              "offset": 324
             }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Strong",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "Authentication"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "✅ Done"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Uses "
-                    },
-                    {
-                      "type": "InlineCode",
-                      "value": "JWT"
-                    },
-                    {
-                      "type": "Text",
-                      "value": " tokens"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Emphasis",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "Authorization"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "🔄 In Progress"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Link",
-                      "url": "https://example.com",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "RBAC"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Text",
-                      "value": " based"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Strike",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "Legacy Auth"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "❌ Removed"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Deprecated in v2"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          }
         }
       ],
+      "position": {
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 295
+        },
+        "end": {
+          "line": 17,
+          "column": 30,
+          "offset": 324
+        }
+      }
+    },
+    {
+      "type": "table",
       "align": [
         null,
         null,
         null
       ],
-      "position": {
-        "startLine": 19,
-        "startColumn": 1,
-        "endLine": 23,
-        "endColumn": 51,
-        "startOffset": 310,
-        "endOffset": 534
-      }
-    },
-    {
-      "type": "Paragraph",
-      "inlines": [
+      "children": [
         {
-          "type": "Text",
-          "value": "Wide table (many columns):"
-        }
-      ],
-      "position": {
-        "startLine": 25,
-        "startColumn": 1,
-        "endLine": 25,
-        "endColumn": 27,
-        "startOffset": 536,
-        "endOffset": 562
-      }
-    },
-    {
-      "type": "Table",
-      "headerRows": 1,
-      "rows": [
-        {
-          "cells": [
+          "type": "tableRow",
+          "children": [
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "API"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Method"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Auth"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Rate Limit"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Cache"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Response"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Status"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "/users"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "GET"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JWT"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "100/min"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "5min"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JSON"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Active"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "/users/"
+                  "type": "text",
+                  "value": "Feature",
+                  "position": {
+                    "start": {
+                      "line": 19,
+                      "column": 3,
+                      "offset": 330
                     },
-                    {
-                      "type": "Text",
-                      "value": ":id"
+                    "end": {
+                      "line": 19,
+                      "column": 10,
+                      "offset": 337
                     }
-                  ]
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 19,
+                  "column": 1,
+                  "offset": 328
+                },
+                "end": {
+                  "line": 19,
+                  "column": 11,
+                  "offset": 338
+                }
+              }
             },
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "GET"
+                  "type": "text",
+                  "value": "Status",
+                  "position": {
+                    "start": {
+                      "line": 19,
+                      "column": 13,
+                      "offset": 340
+                    },
+                    "end": {
+                      "line": 19,
+                      "column": 19,
+                      "offset": 346
                     }
-                  ]
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 19,
+                  "column": 11,
+                  "offset": 338
+                },
+                "end": {
+                  "line": 19,
+                  "column": 20,
+                  "offset": 347
+                }
+              }
             },
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JWT"
+                  "type": "text",
+                  "value": "Notes",
+                  "position": {
+                    "start": {
+                      "line": 19,
+                      "column": 22,
+                      "offset": 349
+                    },
+                    "end": {
+                      "line": 19,
+                      "column": 27,
+                      "offset": 354
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "200/min"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 19,
+                  "column": 20,
+                  "offset": 347
+                },
+                "end": {
+                  "line": 19,
+                  "column": 29,
+                  "offset": 356
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "2min"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JSON"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Active"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 19,
+              "column": 1,
+              "offset": 328
+            },
+            "end": {
+              "line": 19,
+              "column": 29,
+              "offset": 356
+            }
+          }
         },
         {
-          "cells": [
+          "type": "tableRow",
+          "children": [
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
+                  "type": "strong",
+                  "children": [
                     {
-                      "type": "Text",
-                      "value": "/auth/login"
+                      "type": "text",
+                      "value": "Authentication",
+                      "position": {
+                        "start": {
+                          "line": 21,
+                          "column": 5,
+                          "offset": 383
+                        },
+                        "end": {
+                          "line": 21,
+                          "column": 19,
+                          "offset": 397
+                        }
+                      }
                     }
-                  ]
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 21,
+                      "column": 3,
+                      "offset": 381
+                    },
+                    "end": {
+                      "line": 21,
+                      "column": 21,
+                      "offset": 399
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 21,
+                  "column": 1,
+                  "offset": 379
+                },
+                "end": {
+                  "line": 21,
+                  "column": 22,
+                  "offset": 400
+                }
+              }
             },
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "POST"
+                  "type": "text",
+                  "value": "✅ Done",
+                  "position": {
+                    "start": {
+                      "line": 21,
+                      "column": 24,
+                      "offset": 402
+                    },
+                    "end": {
+                      "line": 21,
+                      "column": 30,
+                      "offset": 408
                     }
-                  ]
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 21,
+                  "column": 22,
+                  "offset": 400
+                },
+                "end": {
+                  "line": 21,
+                  "column": 31,
+                  "offset": 409
+                }
+              }
             },
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "None"
+                  "type": "text",
+                  "value": "Uses ",
+                  "position": {
+                    "start": {
+                      "line": 21,
+                      "column": 33,
+                      "offset": 411
+                    },
+                    "end": {
+                      "line": 21,
+                      "column": 38,
+                      "offset": 416
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
+                  }
+                },
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "10/min"
+                  "type": "inlineCode",
+                  "value": "JWT",
+                  "position": {
+                    "start": {
+                      "line": 21,
+                      "column": 38,
+                      "offset": 416
+                    },
+                    "end": {
+                      "line": 21,
+                      "column": 43,
+                      "offset": 421
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
+                  }
+                },
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "None"
+                  "type": "text",
+                  "value": " tokens",
+                  "position": {
+                    "start": {
+                      "line": 21,
+                      "column": 43,
+                      "offset": 421
+                    },
+                    "end": {
+                      "line": 21,
+                      "column": 50,
+                      "offset": 428
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JSON"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 21,
+                  "column": 31,
+                  "offset": 409
+                },
+                "end": {
+                  "line": 21,
+                  "column": 52,
+                  "offset": 430
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Active"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 21,
+              "column": 1,
+              "offset": 379
+            },
+            "end": {
+              "line": 21,
+              "column": 52,
+              "offset": 430
+            }
+          }
         },
         {
-          "cells": [
+          "type": "tableRow",
+          "children": [
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
+                  "type": "emphasis",
+                  "children": [
                     {
-                      "type": "Text",
-                      "value": "/auth/refresh"
+                      "type": "text",
+                      "value": "Authorization",
+                      "position": {
+                        "start": {
+                          "line": 22,
+                          "column": 4,
+                          "offset": 435
+                        },
+                        "end": {
+                          "line": 22,
+                          "column": 17,
+                          "offset": 448
+                        }
+                      }
                     }
-                  ]
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 22,
+                      "column": 3,
+                      "offset": 434
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 18,
+                      "offset": 449
+                    }
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 22,
+                  "column": 1,
+                  "offset": 432
+                },
+                "end": {
+                  "line": 22,
+                  "column": 19,
+                  "offset": 450
+                }
+              }
             },
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "POST"
+                  "type": "text",
+                  "value": "🔄 In Progress",
+                  "position": {
+                    "start": {
+                      "line": 22,
+                      "column": 21,
+                      "offset": 452
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 35,
+                      "offset": 466
                     }
-                  ]
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 22,
+                  "column": 19,
+                  "offset": 450
+                },
+                "end": {
+                  "line": 22,
+                  "column": 36,
+                  "offset": 467
+                }
+              }
             },
             {
-              "blocks": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
+                  "type": "link",
+                  "title": null,
+                  "url": "https://example.com",
+                  "children": [
                     {
-                      "type": "Text",
-                      "value": "Refresh"
+                      "type": "text",
+                      "value": "RBAC",
+                      "position": {
+                        "start": {
+                          "line": 22,
+                          "column": 39,
+                          "offset": 470
+                        },
+                        "end": {
+                          "line": 22,
+                          "column": 43,
+                          "offset": 474
+                        }
+                      }
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 22,
+                      "column": 38,
+                      "offset": 469
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 65,
+                      "offset": 496
+                    }
+                  }
+                },
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "20/min"
+                  "type": "text",
+                  "value": " based",
+                  "position": {
+                    "start": {
+                      "line": 22,
+                      "column": 65,
+                      "offset": 496
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 71,
+                      "offset": 502
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "None"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 22,
+                  "column": 36,
+                  "offset": 467
+                },
+                "end": {
+                  "line": 22,
+                  "column": 73,
+                  "offset": 504
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JSON"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Active"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 22,
+              "column": 1,
+              "offset": 432
+            },
+            "end": {
+              "line": 22,
+              "column": 73,
+              "offset": 504
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "delete",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Legacy Auth",
+                      "position": {
+                        "start": {
+                          "line": 23,
+                          "column": 5,
+                          "offset": 510
+                        },
+                        "end": {
+                          "line": 23,
+                          "column": 16,
+                          "offset": 521
+                        }
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 23,
+                      "column": 3,
+                      "offset": 508
+                    },
+                    "end": {
+                      "line": 23,
+                      "column": 18,
+                      "offset": 523
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 23,
+                  "column": 1,
+                  "offset": 506
+                },
+                "end": {
+                  "line": 23,
+                  "column": 19,
+                  "offset": 524
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "❌ Removed",
+                  "position": {
+                    "start": {
+                      "line": 23,
+                      "column": 21,
+                      "offset": 526
+                    },
+                    "end": {
+                      "line": 23,
+                      "column": 30,
+                      "offset": 535
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 23,
+                  "column": 19,
+                  "offset": 524
+                },
+                "end": {
+                  "line": 23,
+                  "column": 31,
+                  "offset": 536
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Deprecated in v2",
+                  "position": {
+                    "start": {
+                      "line": 23,
+                      "column": 33,
+                      "offset": 538
+                    },
+                    "end": {
+                      "line": 23,
+                      "column": 49,
+                      "offset": 554
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 23,
+                  "column": 31,
+                  "offset": 536
+                },
+                "end": {
+                  "line": 23,
+                  "column": 51,
+                  "offset": 556
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 23,
+              "column": 1,
+              "offset": 506
+            },
+            "end": {
+              "line": 23,
+              "column": 51,
+              "offset": 556
+            }
+          }
         }
       ],
+      "position": {
+        "start": {
+          "line": 19,
+          "column": 1,
+          "offset": 328
+        },
+        "end": {
+          "line": 23,
+          "column": 51,
+          "offset": 556
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Wide table (many columns):",
+          "position": {
+            "start": {
+              "line": 25,
+              "column": 1,
+              "offset": 560
+            },
+            "end": {
+              "line": 25,
+              "column": 27,
+              "offset": 586
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 25,
+          "column": 1,
+          "offset": 560
+        },
+        "end": {
+          "line": 25,
+          "column": 27,
+          "offset": 586
+        }
+      }
+    },
+    {
+      "type": "table",
       "align": [
         null,
         null,
@@ -1169,15 +1720,1290 @@
         null,
         null
       ],
+      "children": [
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "API",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 3,
+                      "offset": 592
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 6,
+                      "offset": 595
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 1,
+                  "offset": 590
+                },
+                "end": {
+                  "line": 27,
+                  "column": 7,
+                  "offset": 596
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Method",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 9,
+                      "offset": 598
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 15,
+                      "offset": 604
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 7,
+                  "offset": 596
+                },
+                "end": {
+                  "line": 27,
+                  "column": 16,
+                  "offset": 605
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Auth",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 18,
+                      "offset": 607
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 22,
+                      "offset": 611
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 16,
+                  "offset": 605
+                },
+                "end": {
+                  "line": 27,
+                  "column": 23,
+                  "offset": 612
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Rate Limit",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 25,
+                      "offset": 614
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 35,
+                      "offset": 624
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 23,
+                  "offset": 612
+                },
+                "end": {
+                  "line": 27,
+                  "column": 36,
+                  "offset": 625
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Cache",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 38,
+                      "offset": 627
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 43,
+                      "offset": 632
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 36,
+                  "offset": 625
+                },
+                "end": {
+                  "line": 27,
+                  "column": 44,
+                  "offset": 633
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Response",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 46,
+                      "offset": 635
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 54,
+                      "offset": 643
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 44,
+                  "offset": 633
+                },
+                "end": {
+                  "line": 27,
+                  "column": 55,
+                  "offset": 644
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Status",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 57,
+                      "offset": 646
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 63,
+                      "offset": 652
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 55,
+                  "offset": 644
+                },
+                "end": {
+                  "line": 27,
+                  "column": 65,
+                  "offset": 654
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 27,
+              "column": 1,
+              "offset": 590
+            },
+            "end": {
+              "line": 27,
+              "column": 65,
+              "offset": 654
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "/users",
+                  "position": {
+                    "start": {
+                      "line": 29,
+                      "column": 3,
+                      "offset": 703
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 9,
+                      "offset": 709
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 29,
+                  "column": 1,
+                  "offset": 701
+                },
+                "end": {
+                  "line": 29,
+                  "column": 10,
+                  "offset": 710
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "GET",
+                  "position": {
+                    "start": {
+                      "line": 29,
+                      "column": 12,
+                      "offset": 712
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 15,
+                      "offset": 715
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 29,
+                  "column": 10,
+                  "offset": 710
+                },
+                "end": {
+                  "line": 29,
+                  "column": 16,
+                  "offset": 716
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JWT",
+                  "position": {
+                    "start": {
+                      "line": 29,
+                      "column": 18,
+                      "offset": 718
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 21,
+                      "offset": 721
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 29,
+                  "column": 16,
+                  "offset": 716
+                },
+                "end": {
+                  "line": 29,
+                  "column": 22,
+                  "offset": 722
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "100/min",
+                  "position": {
+                    "start": {
+                      "line": 29,
+                      "column": 24,
+                      "offset": 724
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 31,
+                      "offset": 731
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 29,
+                  "column": 22,
+                  "offset": 722
+                },
+                "end": {
+                  "line": 29,
+                  "column": 32,
+                  "offset": 732
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "5min",
+                  "position": {
+                    "start": {
+                      "line": 29,
+                      "column": 34,
+                      "offset": 734
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 38,
+                      "offset": 738
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 29,
+                  "column": 32,
+                  "offset": 732
+                },
+                "end": {
+                  "line": 29,
+                  "column": 39,
+                  "offset": 739
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JSON",
+                  "position": {
+                    "start": {
+                      "line": 29,
+                      "column": 41,
+                      "offset": 741
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 45,
+                      "offset": 745
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 29,
+                  "column": 39,
+                  "offset": 739
+                },
+                "end": {
+                  "line": 29,
+                  "column": 46,
+                  "offset": 746
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Active",
+                  "position": {
+                    "start": {
+                      "line": 29,
+                      "column": 48,
+                      "offset": 748
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 54,
+                      "offset": 754
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 29,
+                  "column": 46,
+                  "offset": 746
+                },
+                "end": {
+                  "line": 29,
+                  "column": 56,
+                  "offset": 756
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 29,
+              "column": 1,
+              "offset": 701
+            },
+            "end": {
+              "line": 29,
+              "column": 56,
+              "offset": 756
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "/users/",
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 3,
+                      "offset": 760
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 10,
+                      "offset": 767
+                    }
+                  }
+                },
+                {
+                  "type": "textDirective",
+                  "name": "id",
+                  "attributes": {},
+                  "children": [],
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 10,
+                      "offset": 767
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 13,
+                      "offset": 770
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 30,
+                  "column": 1,
+                  "offset": 758
+                },
+                "end": {
+                  "line": 30,
+                  "column": 14,
+                  "offset": 771
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "GET",
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 16,
+                      "offset": 773
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 19,
+                      "offset": 776
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 30,
+                  "column": 14,
+                  "offset": 771
+                },
+                "end": {
+                  "line": 30,
+                  "column": 20,
+                  "offset": 777
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JWT",
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 22,
+                      "offset": 779
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 25,
+                      "offset": 782
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 30,
+                  "column": 20,
+                  "offset": 777
+                },
+                "end": {
+                  "line": 30,
+                  "column": 26,
+                  "offset": 783
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "200/min",
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 28,
+                      "offset": 785
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 35,
+                      "offset": 792
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 30,
+                  "column": 26,
+                  "offset": 783
+                },
+                "end": {
+                  "line": 30,
+                  "column": 36,
+                  "offset": 793
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "2min",
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 38,
+                      "offset": 795
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 42,
+                      "offset": 799
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 30,
+                  "column": 36,
+                  "offset": 793
+                },
+                "end": {
+                  "line": 30,
+                  "column": 43,
+                  "offset": 800
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JSON",
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 45,
+                      "offset": 802
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 49,
+                      "offset": 806
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 30,
+                  "column": 43,
+                  "offset": 800
+                },
+                "end": {
+                  "line": 30,
+                  "column": 50,
+                  "offset": 807
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Active",
+                  "position": {
+                    "start": {
+                      "line": 30,
+                      "column": 52,
+                      "offset": 809
+                    },
+                    "end": {
+                      "line": 30,
+                      "column": 58,
+                      "offset": 815
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 30,
+                  "column": 50,
+                  "offset": 807
+                },
+                "end": {
+                  "line": 30,
+                  "column": 60,
+                  "offset": 817
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 30,
+              "column": 1,
+              "offset": 758
+            },
+            "end": {
+              "line": 30,
+              "column": 60,
+              "offset": 817
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "/auth/login",
+                  "position": {
+                    "start": {
+                      "line": 31,
+                      "column": 3,
+                      "offset": 821
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 14,
+                      "offset": 832
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 31,
+                  "column": 1,
+                  "offset": 819
+                },
+                "end": {
+                  "line": 31,
+                  "column": 15,
+                  "offset": 833
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "POST",
+                  "position": {
+                    "start": {
+                      "line": 31,
+                      "column": 17,
+                      "offset": 835
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 21,
+                      "offset": 839
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 31,
+                  "column": 15,
+                  "offset": 833
+                },
+                "end": {
+                  "line": 31,
+                  "column": 22,
+                  "offset": 840
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "None",
+                  "position": {
+                    "start": {
+                      "line": 31,
+                      "column": 24,
+                      "offset": 842
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 28,
+                      "offset": 846
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 31,
+                  "column": 22,
+                  "offset": 840
+                },
+                "end": {
+                  "line": 31,
+                  "column": 29,
+                  "offset": 847
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "10/min",
+                  "position": {
+                    "start": {
+                      "line": 31,
+                      "column": 31,
+                      "offset": 849
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 37,
+                      "offset": 855
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 31,
+                  "column": 29,
+                  "offset": 847
+                },
+                "end": {
+                  "line": 31,
+                  "column": 38,
+                  "offset": 856
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "None",
+                  "position": {
+                    "start": {
+                      "line": 31,
+                      "column": 40,
+                      "offset": 858
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 44,
+                      "offset": 862
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 31,
+                  "column": 38,
+                  "offset": 856
+                },
+                "end": {
+                  "line": 31,
+                  "column": 45,
+                  "offset": 863
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JSON",
+                  "position": {
+                    "start": {
+                      "line": 31,
+                      "column": 47,
+                      "offset": 865
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 51,
+                      "offset": 869
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 31,
+                  "column": 45,
+                  "offset": 863
+                },
+                "end": {
+                  "line": 31,
+                  "column": 52,
+                  "offset": 870
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Active",
+                  "position": {
+                    "start": {
+                      "line": 31,
+                      "column": 54,
+                      "offset": 872
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 60,
+                      "offset": 878
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 31,
+                  "column": 52,
+                  "offset": 870
+                },
+                "end": {
+                  "line": 31,
+                  "column": 62,
+                  "offset": 880
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 31,
+              "column": 1,
+              "offset": 819
+            },
+            "end": {
+              "line": 31,
+              "column": 62,
+              "offset": 880
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "/auth/refresh",
+                  "position": {
+                    "start": {
+                      "line": 32,
+                      "column": 3,
+                      "offset": 884
+                    },
+                    "end": {
+                      "line": 32,
+                      "column": 16,
+                      "offset": 897
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 32,
+                  "column": 1,
+                  "offset": 882
+                },
+                "end": {
+                  "line": 32,
+                  "column": 17,
+                  "offset": 898
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "POST",
+                  "position": {
+                    "start": {
+                      "line": 32,
+                      "column": 19,
+                      "offset": 900
+                    },
+                    "end": {
+                      "line": 32,
+                      "column": 23,
+                      "offset": 904
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 32,
+                  "column": 17,
+                  "offset": 898
+                },
+                "end": {
+                  "line": 32,
+                  "column": 24,
+                  "offset": 905
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Refresh",
+                  "position": {
+                    "start": {
+                      "line": 32,
+                      "column": 26,
+                      "offset": 907
+                    },
+                    "end": {
+                      "line": 32,
+                      "column": 33,
+                      "offset": 914
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 32,
+                  "column": 24,
+                  "offset": 905
+                },
+                "end": {
+                  "line": 32,
+                  "column": 34,
+                  "offset": 915
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "20/min",
+                  "position": {
+                    "start": {
+                      "line": 32,
+                      "column": 36,
+                      "offset": 917
+                    },
+                    "end": {
+                      "line": 32,
+                      "column": 42,
+                      "offset": 923
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 32,
+                  "column": 34,
+                  "offset": 915
+                },
+                "end": {
+                  "line": 32,
+                  "column": 43,
+                  "offset": 924
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "None",
+                  "position": {
+                    "start": {
+                      "line": 32,
+                      "column": 45,
+                      "offset": 926
+                    },
+                    "end": {
+                      "line": 32,
+                      "column": 49,
+                      "offset": 930
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 32,
+                  "column": 43,
+                  "offset": 924
+                },
+                "end": {
+                  "line": 32,
+                  "column": 50,
+                  "offset": 931
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JSON",
+                  "position": {
+                    "start": {
+                      "line": 32,
+                      "column": 52,
+                      "offset": 933
+                    },
+                    "end": {
+                      "line": 32,
+                      "column": 56,
+                      "offset": 937
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 32,
+                  "column": 50,
+                  "offset": 931
+                },
+                "end": {
+                  "line": 32,
+                  "column": 57,
+                  "offset": 938
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Active",
+                  "position": {
+                    "start": {
+                      "line": 32,
+                      "column": 59,
+                      "offset": 940
+                    },
+                    "end": {
+                      "line": 32,
+                      "column": 65,
+                      "offset": 946
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 32,
+                  "column": 57,
+                  "offset": 938
+                },
+                "end": {
+                  "line": 32,
+                  "column": 67,
+                  "offset": 948
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 32,
+              "column": 1,
+              "offset": 882
+            },
+            "end": {
+              "line": 32,
+              "column": 67,
+              "offset": 948
+            }
+          }
+        }
+      ],
       "position": {
-        "startLine": 27,
-        "startColumn": 1,
-        "endLine": 32,
-        "endColumn": 67,
-        "startOffset": 564,
-        "endOffset": 917
+        "start": {
+          "line": 27,
+          "column": 1,
+          "offset": 590
+        },
+        "end": {
+          "line": 32,
+          "column": 67,
+          "offset": 948
+        }
       }
     }
   ],
-  "assets": []
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 33,
+      "column": 1,
+      "offset": 950
+    }
+  }
 }

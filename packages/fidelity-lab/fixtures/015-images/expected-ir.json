@@ -1,0 +1,254 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Image Rendering Tests",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 3,
+              "offset": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 24,
+          "offset": 23
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Here is a standard paragraph with an image:",
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 25
+            },
+            "end": {
+              "line": 3,
+              "column": 44,
+              "offset": 68
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 25
+        },
+        "end": {
+          "line": 3,
+          "column": 44,
+          "offset": 68
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "image",
+          "title": "System Architecture",
+          "url": "https://example.com/architecture.png",
+          "alt": "Diagram Architecture",
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 70
+            },
+            "end": {
+              "line": 5,
+              "column": 84,
+              "offset": 153
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 5,
+          "column": 1,
+          "offset": 70
+        },
+        "end": {
+          "line": 5,
+          "column": 84,
+          "offset": 153
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Here is an image with a data URI:",
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 1,
+              "offset": 155
+            },
+            "end": {
+              "line": 7,
+              "column": 34,
+              "offset": 188
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 7,
+          "column": 1,
+          "offset": 155
+        },
+        "end": {
+          "line": 7,
+          "column": 34,
+          "offset": 188
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "image",
+          "title": null,
+          "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+          "alt": "Tiny Pixel",
+          "position": {
+            "start": {
+              "line": 9,
+              "column": 1,
+              "offset": 190
+            },
+            "end": {
+              "line": 9,
+              "column": 130,
+              "offset": 319
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 9,
+          "column": 1,
+          "offset": 190
+        },
+        "end": {
+          "line": 9,
+          "column": 130,
+          "offset": 319
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Here is a paragraph with an inline image: icon ",
+          "position": {
+            "start": {
+              "line": 11,
+              "column": 1,
+              "offset": 321
+            },
+            "end": {
+              "line": 11,
+              "column": 48,
+              "offset": 368
+            }
+          }
+        },
+        {
+          "type": "image",
+          "title": null,
+          "url": "https://example.com/icon.png",
+          "alt": "Status Icon",
+          "position": {
+            "start": {
+              "line": 11,
+              "column": 48,
+              "offset": 368
+            },
+            "end": {
+              "line": 11,
+              "column": 92,
+              "offset": 412
+            }
+          }
+        },
+        {
+          "type": "text",
+          "value": " next to text.",
+          "position": {
+            "start": {
+              "line": 11,
+              "column": 92,
+              "offset": 412
+            },
+            "end": {
+              "line": 11,
+              "column": 106,
+              "offset": 426
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 11,
+          "column": 1,
+          "offset": 321
+        },
+        "end": {
+          "line": 11,
+          "column": 106,
+          "offset": 426
+        }
+      }
+    }
+  ],
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 12,
+      "column": 1,
+      "offset": 427
+    }
+  }
+}

@@ -1,1155 +1,1644 @@
 {
-  "version": "1.0.0",
-  "metadata": {},
-  "blocks": [
+  "type": "root",
+  "children": [
     {
-      "type": "Heading",
-      "level": 1,
-      "inlines": [
+      "type": "heading",
+      "depth": 1,
+      "children": [
         {
-          "type": "Text",
-          "value": "Authentication Architecture"
-        }
-      ],
-      "position": {
-        "startLine": 1,
-        "startColumn": 1,
-        "endLine": 1,
-        "endColumn": 30,
-        "startOffset": 0,
-        "endOffset": 29
-      }
-    },
-    {
-      "type": "Heading",
-      "level": 2,
-      "inlines": [
-        {
-          "type": "Text",
-          "value": "Overview"
-        }
-      ],
-      "position": {
-        "startLine": 3,
-        "startColumn": 1,
-        "endLine": 3,
-        "endColumn": 12,
-        "startOffset": 31,
-        "endOffset": 42
-      }
-    },
-    {
-      "type": "Paragraph",
-      "inlines": [
-        {
-          "type": "Text",
-          "value": "This document describes the authentication and authorization system for the Platform API. The system uses JWT-based authentication with refresh token rotation."
-        }
-      ],
-      "position": {
-        "startLine": 5,
-        "startColumn": 1,
-        "endLine": 5,
-        "endColumn": 160,
-        "startOffset": 44,
-        "endOffset": 203
-      }
-    },
-    {
-      "type": "Callout",
-      "calloutType": "important",
-      "blocks": [
-        {
-          "type": "Paragraph",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "All API endpoints require authentication starting with v2.0. Legacy API keys will be deprecated on January 1, 2027."
-            }
-          ],
+          "type": "text",
+          "value": "Authentication Architecture",
           "position": {
-            "startLine": 7,
-            "startColumn": 3,
-            "endLine": 8,
-            "endColumn": 118,
-            "startOffset": 207,
-            "endOffset": 337
+            "start": {
+              "line": 1,
+              "column": 3,
+              "offset": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            }
           }
         }
       ],
       "position": {
-        "startLine": 7,
-        "startColumn": 1,
-        "endLine": 8,
-        "endColumn": 118,
-        "startOffset": 205,
-        "endOffset": 337
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 30,
+          "offset": 29
+        }
       }
     },
     {
-      "type": "Heading",
-      "level": 2,
-      "inlines": [
+      "type": "heading",
+      "depth": 2,
+      "children": [
         {
-          "type": "Text",
-          "value": "System Architecture"
+          "type": "text",
+          "value": "Overview",
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 4,
+              "offset": 36
+            },
+            "end": {
+              "line": 3,
+              "column": 12,
+              "offset": 44
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 10,
-        "startColumn": 1,
-        "endLine": 10,
-        "endColumn": 23,
-        "startOffset": 339,
-        "endOffset": 361
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 33
+        },
+        "end": {
+          "line": 3,
+          "column": 12,
+          "offset": 44
+        }
       }
     },
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "paragraph",
+      "children": [
         {
-          "type": "Text",
-          "value": "The authentication flow involves three primary services:"
+          "type": "text",
+          "value": "This document describes the authentication and authorization system for the Platform API. The system uses JWT-based authentication with refresh token rotation.",
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 48
+            },
+            "end": {
+              "line": 5,
+              "column": 160,
+              "offset": 207
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 12,
-        "startColumn": 1,
-        "endLine": 12,
-        "endColumn": 57,
-        "startOffset": 363,
-        "endOffset": 419
+        "start": {
+          "line": 5,
+          "column": 1,
+          "offset": 48
+        },
+        "end": {
+          "line": 5,
+          "column": 160,
+          "offset": 207
+        }
       }
     },
     {
-      "type": "Table",
-      "headerRows": 1,
-      "rows": [
+      "type": "blockquote",
+      "children": [
         {
-          "cells": [
+          "type": "paragraph",
+          "children": [
             {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Component"
-                    }
-                  ]
+              "type": "text",
+              "value": "[!IMPORTANT]\r\nAll API endpoints require authentication starting with v2.0. Legacy API keys will be deprecated on January 1, 2027.",
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 3,
+                  "offset": 213
+                },
+                "end": {
+                  "line": 8,
+                  "column": 118,
+                  "offset": 344
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Technology"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Responsibility"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Strong",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "API Gateway"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
+          ],
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 3,
+              "offset": 213
             },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Node.js + Express"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Request routing, rate limiting"
-                    }
-                  ]
-                }
-              ]
+            "end": {
+              "line": 8,
+              "column": 118,
+              "offset": 344
             }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Strong",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "Auth Service"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Go"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Token issuance, validation, revocation"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Strong",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "User Store"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "PostgreSQL"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "User credentials, sessions, audit log"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          }
         }
       ],
+      "position": {
+        "start": {
+          "line": 7,
+          "column": 1,
+          "offset": 211
+        },
+        "end": {
+          "line": 8,
+          "column": 118,
+          "offset": 344
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "System Architecture",
+          "position": {
+            "start": {
+              "line": 10,
+              "column": 4,
+              "offset": 351
+            },
+            "end": {
+              "line": 10,
+              "column": 23,
+              "offset": 370
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 348
+        },
+        "end": {
+          "line": 10,
+          "column": 23,
+          "offset": 370
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "The authentication flow involves three primary services:",
+          "position": {
+            "start": {
+              "line": 12,
+              "column": 1,
+              "offset": 374
+            },
+            "end": {
+              "line": 12,
+              "column": 57,
+              "offset": 430
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 12,
+          "column": 1,
+          "offset": 374
+        },
+        "end": {
+          "line": 12,
+          "column": 57,
+          "offset": 430
+        }
+      }
+    },
+    {
+      "type": "table",
       "align": [
         "left",
         "left",
         "left"
       ],
-      "position": {
-        "startLine": 14,
-        "startColumn": 1,
-        "endLine": 18,
-        "endColumn": 72,
-        "startOffset": 421,
-        "endOffset": 699
-      }
-    },
-    {
-      "type": "Heading",
-      "level": 2,
-      "inlines": [
+      "children": [
         {
-          "type": "Text",
-          "value": "Authentication Flow"
-        }
-      ],
-      "position": {
-        "startLine": 20,
-        "startColumn": 1,
-        "endLine": 20,
-        "endColumn": 23,
-        "startOffset": 701,
-        "endOffset": 723
-      }
-    },
-    {
-      "type": "List",
-      "ordered": true,
-      "start": 1,
-      "items": [
-        {
-          "checked": null,
-          "blocks": [
+          "type": "tableRow",
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "User submits credentials to "
+                  "type": "text",
+                  "value": "Component",
+                  "position": {
+                    "start": {
+                      "line": 14,
+                      "column": 3,
+                      "offset": 436
+                    },
+                    "end": {
+                      "line": 14,
+                      "column": 12,
+                      "offset": 445
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 14,
+                  "column": 1,
+                  "offset": 434
                 },
-                {
-                  "type": "InlineCode",
-                  "value": "/api/auth/login"
+                "end": {
+                  "line": 14,
+                  "column": 13,
+                  "offset": 446
                 }
-              ],
-              "position": {
-                "startLine": 22,
-                "startColumn": 4,
-                "endLine": 22,
-                "endColumn": 49,
-                "startOffset": 728,
-                "endOffset": 773
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Auth Service validates credentials against User Store"
-                }
-              ],
-              "position": {
-                "startLine": 23,
-                "startColumn": 4,
-                "endLine": 23,
-                "endColumn": 57,
-                "startOffset": 777,
-                "endOffset": 830
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "On success, Auth Service issues:"
-                }
-              ],
-              "position": {
-                "startLine": 24,
-                "startColumn": 4,
-                "endLine": 24,
-                "endColumn": 36,
-                "startOffset": 834,
-                "endOffset": 866
               }
             },
             {
-              "type": "List",
-              "ordered": false,
-              "items": [
+              "type": "tableCell",
+              "children": [
                 {
-                  "checked": null,
-                  "blocks": [
-                    {
-                      "type": "Paragraph",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "Access token (JWT, 15-minute expiry)"
-                        }
-                      ],
-                      "position": {
-                        "startLine": 25,
-                        "startColumn": 6,
-                        "endLine": 25,
-                        "endColumn": 42,
-                        "startOffset": 872,
-                        "endOffset": 908
-                      }
+                  "type": "text",
+                  "value": "Technology",
+                  "position": {
+                    "start": {
+                      "line": 14,
+                      "column": 15,
+                      "offset": 448
+                    },
+                    "end": {
+                      "line": 14,
+                      "column": 25,
+                      "offset": 458
                     }
-                  ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 14,
+                  "column": 13,
+                  "offset": 446
                 },
+                "end": {
+                  "line": 14,
+                  "column": 26,
+                  "offset": 459
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
                 {
-                  "checked": null,
-                  "blocks": [
-                    {
-                      "type": "Paragraph",
-                      "inlines": [
-                        {
-                          "type": "Text",
-                          "value": "Refresh token (opaque, 7-day expiry)"
-                        }
-                      ],
-                      "position": {
-                        "startLine": 26,
-                        "startColumn": 6,
-                        "endLine": 26,
-                        "endColumn": 42,
-                        "startOffset": 914,
-                        "endOffset": 950
-                      }
+                  "type": "text",
+                  "value": "Responsibility",
+                  "position": {
+                    "start": {
+                      "line": 14,
+                      "column": 28,
+                      "offset": 461
+                    },
+                    "end": {
+                      "line": 14,
+                      "column": 42,
+                      "offset": 475
                     }
-                  ]
+                  }
                 }
               ],
               "position": {
-                "startLine": 25,
-                "startColumn": 4,
-                "endLine": 26,
-                "endColumn": 42,
-                "startOffset": 870,
-                "endOffset": 950
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Client stores tokens securely"
-                }
-              ],
-              "position": {
-                "startLine": 27,
-                "startColumn": 4,
-                "endLine": 27,
-                "endColumn": 33,
-                "startOffset": 954,
-                "endOffset": 983
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Client includes access token in "
+                "start": {
+                  "line": 14,
+                  "column": 26,
+                  "offset": 459
                 },
-                {
-                  "type": "InlineCode",
-                  "value": "Authorization"
-                },
-                {
-                  "type": "Text",
-                  "value": " header"
+                "end": {
+                  "line": 14,
+                  "column": 44,
+                  "offset": 477
                 }
-              ],
-              "position": {
-                "startLine": 28,
-                "startColumn": 4,
-                "endLine": 28,
-                "endColumn": 58,
-                "startOffset": 987,
-                "endOffset": 1041
               }
-            }
-          ]
-        }
-      ],
-      "position": {
-        "startLine": 22,
-        "startColumn": 1,
-        "endLine": 28,
-        "endColumn": 58,
-        "startOffset": 725,
-        "endOffset": 1041
-      }
-    },
-    {
-      "type": "Heading",
-      "level": 3,
-      "inlines": [
-        {
-          "type": "Text",
-          "value": "Token Refresh"
-        }
-      ],
-      "position": {
-        "startLine": 30,
-        "startColumn": 1,
-        "endLine": 30,
-        "endColumn": 18,
-        "startOffset": 1043,
-        "endOffset": 1060
-      }
-    },
-    {
-      "type": "Paragraph",
-      "inlines": [
-        {
-          "type": "Text",
-          "value": "When the access token expires:"
-        }
-      ],
-      "position": {
-        "startLine": 32,
-        "startColumn": 1,
-        "endLine": 32,
-        "endColumn": 31,
-        "startOffset": 1062,
-        "endOffset": 1092
-      }
-    },
-    {
-      "type": "List",
-      "ordered": true,
-      "start": 1,
-      "items": [
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Client sends refresh token to "
-                },
-                {
-                  "type": "InlineCode",
-                  "value": "/api/auth/refresh"
-                }
-              ],
-              "position": {
-                "startLine": 34,
-                "startColumn": 4,
-                "endLine": 34,
-                "endColumn": 53,
-                "startOffset": 1097,
-                "endOffset": 1146
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Auth Service validates the refresh token"
-                }
-              ],
-              "position": {
-                "startLine": 35,
-                "startColumn": 4,
-                "endLine": 35,
-                "endColumn": 44,
-                "startOffset": 1150,
-                "endOffset": 1190
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Old refresh token is revoked (rotation)"
-                }
-              ],
-              "position": {
-                "startLine": 36,
-                "startColumn": 4,
-                "endLine": 36,
-                "endColumn": 43,
-                "startOffset": 1194,
-                "endOffset": 1233
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "New access + refresh tokens are issued"
-                }
-              ],
-              "position": {
-                "startLine": 37,
-                "startColumn": 4,
-                "endLine": 37,
-                "endColumn": 42,
-                "startOffset": 1237,
-                "endOffset": 1275
-              }
-            }
-          ]
-        }
-      ],
-      "position": {
-        "startLine": 34,
-        "startColumn": 1,
-        "endLine": 37,
-        "endColumn": 42,
-        "startOffset": 1094,
-        "endOffset": 1275
-      }
-    },
-    {
-      "type": "Callout",
-      "calloutType": "warning",
-      "blocks": [
-        {
-          "type": "Paragraph",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "Refresh token reuse after rotation indicates a potential token theft. The system will revoke all tokens for the affected user."
             }
           ],
           "position": {
-            "startLine": 39,
-            "startColumn": 3,
-            "endLine": 40,
-            "endColumn": 129,
-            "startOffset": 1279,
-            "endOffset": 1418
+            "start": {
+              "line": 14,
+              "column": 1,
+              "offset": 434
+            },
+            "end": {
+              "line": 14,
+              "column": 44,
+              "offset": 477
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "API Gateway",
+                      "position": {
+                        "start": {
+                          "line": 16,
+                          "column": 5,
+                          "offset": 507
+                        },
+                        "end": {
+                          "line": 16,
+                          "column": 16,
+                          "offset": 518
+                        }
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 16,
+                      "column": 3,
+                      "offset": 505
+                    },
+                    "end": {
+                      "line": 16,
+                      "column": 18,
+                      "offset": 520
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 16,
+                  "column": 1,
+                  "offset": 503
+                },
+                "end": {
+                  "line": 16,
+                  "column": 19,
+                  "offset": 521
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Node.js + Express",
+                  "position": {
+                    "start": {
+                      "line": 16,
+                      "column": 21,
+                      "offset": 523
+                    },
+                    "end": {
+                      "line": 16,
+                      "column": 38,
+                      "offset": 540
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 16,
+                  "column": 19,
+                  "offset": 521
+                },
+                "end": {
+                  "line": 16,
+                  "column": 39,
+                  "offset": 541
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Request routing, rate limiting",
+                  "position": {
+                    "start": {
+                      "line": 16,
+                      "column": 41,
+                      "offset": 543
+                    },
+                    "end": {
+                      "line": 16,
+                      "column": 71,
+                      "offset": 573
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 16,
+                  "column": 39,
+                  "offset": 541
+                },
+                "end": {
+                  "line": 16,
+                  "column": 73,
+                  "offset": 575
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 16,
+              "column": 1,
+              "offset": 503
+            },
+            "end": {
+              "line": 16,
+              "column": 73,
+              "offset": 575
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Auth Service",
+                      "position": {
+                        "start": {
+                          "line": 17,
+                          "column": 5,
+                          "offset": 581
+                        },
+                        "end": {
+                          "line": 17,
+                          "column": 17,
+                          "offset": 593
+                        }
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 17,
+                      "column": 3,
+                      "offset": 579
+                    },
+                    "end": {
+                      "line": 17,
+                      "column": 19,
+                      "offset": 595
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 17,
+                  "column": 1,
+                  "offset": 577
+                },
+                "end": {
+                  "line": 17,
+                  "column": 20,
+                  "offset": 596
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Go",
+                  "position": {
+                    "start": {
+                      "line": 17,
+                      "column": 22,
+                      "offset": 598
+                    },
+                    "end": {
+                      "line": 17,
+                      "column": 24,
+                      "offset": 600
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 17,
+                  "column": 20,
+                  "offset": 596
+                },
+                "end": {
+                  "line": 17,
+                  "column": 25,
+                  "offset": 601
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Token issuance, validation, revocation",
+                  "position": {
+                    "start": {
+                      "line": 17,
+                      "column": 27,
+                      "offset": 603
+                    },
+                    "end": {
+                      "line": 17,
+                      "column": 65,
+                      "offset": 641
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 17,
+                  "column": 25,
+                  "offset": 601
+                },
+                "end": {
+                  "line": 17,
+                  "column": 67,
+                  "offset": 643
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 17,
+              "column": 1,
+              "offset": 577
+            },
+            "end": {
+              "line": 17,
+              "column": 67,
+              "offset": 643
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "strong",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "User Store",
+                      "position": {
+                        "start": {
+                          "line": 18,
+                          "column": 5,
+                          "offset": 649
+                        },
+                        "end": {
+                          "line": 18,
+                          "column": 15,
+                          "offset": 659
+                        }
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 18,
+                      "column": 3,
+                      "offset": 647
+                    },
+                    "end": {
+                      "line": 18,
+                      "column": 17,
+                      "offset": 661
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 18,
+                  "column": 1,
+                  "offset": 645
+                },
+                "end": {
+                  "line": 18,
+                  "column": 18,
+                  "offset": 662
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "PostgreSQL",
+                  "position": {
+                    "start": {
+                      "line": 18,
+                      "column": 20,
+                      "offset": 664
+                    },
+                    "end": {
+                      "line": 18,
+                      "column": 30,
+                      "offset": 674
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 18,
+                  "column": 18,
+                  "offset": 662
+                },
+                "end": {
+                  "line": 18,
+                  "column": 31,
+                  "offset": 675
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "User credentials, sessions, audit log",
+                  "position": {
+                    "start": {
+                      "line": 18,
+                      "column": 33,
+                      "offset": 677
+                    },
+                    "end": {
+                      "line": 18,
+                      "column": 70,
+                      "offset": 714
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 18,
+                  "column": 31,
+                  "offset": 675
+                },
+                "end": {
+                  "line": 18,
+                  "column": 72,
+                  "offset": 716
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 18,
+              "column": 1,
+              "offset": 645
+            },
+            "end": {
+              "line": 18,
+              "column": 72,
+              "offset": 716
+            }
           }
         }
       ],
       "position": {
-        "startLine": 39,
-        "startColumn": 1,
-        "endLine": 40,
-        "endColumn": 129,
-        "startOffset": 1277,
-        "endOffset": 1418
+        "start": {
+          "line": 14,
+          "column": 1,
+          "offset": 434
+        },
+        "end": {
+          "line": 18,
+          "column": 72,
+          "offset": 716
+        }
       }
     },
     {
-      "type": "Heading",
-      "level": 2,
-      "inlines": [
+      "type": "heading",
+      "depth": 2,
+      "children": [
         {
-          "type": "Text",
-          "value": "API Endpoints"
+          "type": "text",
+          "value": "Authentication Flow",
+          "position": {
+            "start": {
+              "line": 20,
+              "column": 4,
+              "offset": 723
+            },
+            "end": {
+              "line": 20,
+              "column": 23,
+              "offset": 742
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 42,
-        "startColumn": 1,
-        "endLine": 42,
-        "endColumn": 17,
-        "startOffset": 1420,
-        "endOffset": 1436
+        "start": {
+          "line": 20,
+          "column": 1,
+          "offset": 720
+        },
+        "end": {
+          "line": 20,
+          "column": 23,
+          "offset": 742
+        }
       }
     },
     {
-      "type": "Table",
-      "headerRows": 1,
-      "rows": [
+      "type": "list",
+      "ordered": true,
+      "start": 1,
+      "spread": false,
+      "children": [
         {
-          "cells": [
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
             {
-              "blocks": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Endpoint"
+                  "type": "text",
+                  "value": "User submits credentials to ",
+                  "position": {
+                    "start": {
+                      "line": 22,
+                      "column": 4,
+                      "offset": 749
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 32,
+                      "offset": 777
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
+                  }
+                },
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Method"
+                  "type": "inlineCode",
+                  "value": "/api/auth/login",
+                  "position": {
+                    "start": {
+                      "line": 22,
+                      "column": 32,
+                      "offset": 777
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 49,
+                      "offset": 794
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Auth"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 22,
+                  "column": 4,
+                  "offset": 749
+                },
+                "end": {
+                  "line": 22,
+                  "column": 49,
+                  "offset": 794
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Rate Limit"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Description"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 22,
+              "column": 1,
+              "offset": 746
+            },
+            "end": {
+              "line": 22,
+              "column": 49,
+              "offset": 794
+            }
+          }
         },
         {
-          "cells": [
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
             {
-              "blocks": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "InlineCode",
-                      "value": "/auth/login"
+                  "type": "text",
+                  "value": "Auth Service validates credentials against User Store",
+                  "position": {
+                    "start": {
+                      "line": 23,
+                      "column": 4,
+                      "offset": 799
+                    },
+                    "end": {
+                      "line": 23,
+                      "column": 57,
+                      "offset": 852
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "POST"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 23,
+                  "column": 4,
+                  "offset": 799
+                },
+                "end": {
+                  "line": 23,
+                  "column": 57,
+                  "offset": 852
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "None"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "10/min"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Authenticate user"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 23,
+              "column": 1,
+              "offset": 796
+            },
+            "end": {
+              "line": 23,
+              "column": 57,
+              "offset": 852
+            }
+          }
         },
         {
-          "cells": [
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
             {
-              "blocks": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "InlineCode",
-                      "value": "/auth/refresh"
+                  "type": "text",
+                  "value": "On success, Auth Service issues:",
+                  "position": {
+                    "start": {
+                      "line": 24,
+                      "column": 4,
+                      "offset": 857
+                    },
+                    "end": {
+                      "line": 24,
+                      "column": 36,
+                      "offset": 889
                     }
-                  ]
+                  }
                 }
-              ]
+              ],
+              "position": {
+                "start": {
+                  "line": 24,
+                  "column": 4,
+                  "offset": 857
+                },
+                "end": {
+                  "line": 24,
+                  "column": 36,
+                  "offset": 889
+                }
+              }
             },
             {
-              "blocks": [
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "spread": false,
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
                     {
-                      "type": "Text",
-                      "value": "POST"
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "Access token (JWT, 15-minute expiry)",
+                          "position": {
+                            "start": {
+                              "line": 25,
+                              "column": 6,
+                              "offset": 896
+                            },
+                            "end": {
+                              "line": 25,
+                              "column": 42,
+                              "offset": 932
+                            }
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 25,
+                          "column": 6,
+                          "offset": 896
+                        },
+                        "end": {
+                          "line": 25,
+                          "column": 42,
+                          "offset": 932
+                        }
+                      }
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 25,
+                      "column": 4,
+                      "offset": 894
+                    },
+                    "end": {
+                      "line": 25,
+                      "column": 42,
+                      "offset": 932
+                    }
+                  }
+                },
                 {
-                  "type": "Paragraph",
-                  "inlines": [
+                  "type": "listItem",
+                  "spread": false,
+                  "checked": null,
+                  "children": [
                     {
-                      "type": "Text",
-                      "value": "Refresh"
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "Refresh token (opaque, 7-day expiry)",
+                          "position": {
+                            "start": {
+                              "line": 26,
+                              "column": 6,
+                              "offset": 939
+                            },
+                            "end": {
+                              "line": 26,
+                              "column": 42,
+                              "offset": 975
+                            }
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 26,
+                          "column": 6,
+                          "offset": 939
+                        },
+                        "end": {
+                          "line": 26,
+                          "column": 42,
+                          "offset": 975
+                        }
+                      }
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "20/min"
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 26,
+                      "column": 4,
+                      "offset": 937
+                    },
+                    "end": {
+                      "line": 26,
+                      "column": 42,
+                      "offset": 975
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Rotate tokens"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 25,
+                  "column": 4,
+                  "offset": 894
+                },
+                "end": {
+                  "line": 26,
+                  "column": 42,
+                  "offset": 975
                 }
-              ]
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 24,
+              "column": 1,
+              "offset": 854
+            },
+            "end": {
+              "line": 26,
+              "column": 42,
+              "offset": 975
+            }
+          }
         },
         {
-          "cells": [
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
             {
-              "blocks": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "InlineCode",
-                      "value": "/auth/logout"
+                  "type": "text",
+                  "value": "Client stores tokens securely",
+                  "position": {
+                    "start": {
+                      "line": 27,
+                      "column": 4,
+                      "offset": 980
+                    },
+                    "end": {
+                      "line": 27,
+                      "column": 33,
+                      "offset": 1009
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "POST"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 27,
+                  "column": 4,
+                  "offset": 980
+                },
+                "end": {
+                  "line": 27,
+                  "column": 33,
+                  "offset": 1009
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JWT"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "100/min"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Revoke session"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 27,
+              "column": 1,
+              "offset": 977
+            },
+            "end": {
+              "line": 27,
+              "column": 33,
+              "offset": 1009
+            }
+          }
         },
         {
-          "cells": [
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
             {
-              "blocks": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "InlineCode",
-                      "value": "/auth/sessions"
+                  "type": "text",
+                  "value": "Client includes access token in ",
+                  "position": {
+                    "start": {
+                      "line": 28,
+                      "column": 4,
+                      "offset": 1014
+                    },
+                    "end": {
+                      "line": 28,
+                      "column": 36,
+                      "offset": 1046
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
+                  }
+                },
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "GET"
+                  "type": "inlineCode",
+                  "value": "Authorization",
+                  "position": {
+                    "start": {
+                      "line": 28,
+                      "column": 36,
+                      "offset": 1046
+                    },
+                    "end": {
+                      "line": 28,
+                      "column": 51,
+                      "offset": 1061
                     }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
+                  }
+                },
                 {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JWT"
+                  "type": "text",
+                  "value": " header",
+                  "position": {
+                    "start": {
+                      "line": 28,
+                      "column": 51,
+                      "offset": 1061
+                    },
+                    "end": {
+                      "line": 28,
+                      "column": 58,
+                      "offset": 1068
                     }
-                  ]
+                  }
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "50/min"
-                    }
-                  ]
+              ],
+              "position": {
+                "start": {
+                  "line": 28,
+                  "column": 4,
+                  "offset": 1014
+                },
+                "end": {
+                  "line": 28,
+                  "column": 58,
+                  "offset": 1068
                 }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "List active sessions"
-                    }
-                  ]
-                }
-              ]
+              }
             }
-          ]
-        },
-        {
-          "cells": [
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "InlineCode",
-                      "value": "/users/me"
-                    }
-                  ]
-                }
-              ]
+          ],
+          "position": {
+            "start": {
+              "line": 28,
+              "column": 1,
+              "offset": 1011
             },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "GET"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "JWT"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "200/min"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "blocks": [
-                {
-                  "type": "Paragraph",
-                  "inlines": [
-                    {
-                      "type": "Text",
-                      "value": "Current user profile"
-                    }
-                  ]
-                }
-              ]
+            "end": {
+              "line": 28,
+              "column": 58,
+              "offset": 1068
             }
-          ]
+          }
         }
       ],
+      "position": {
+        "start": {
+          "line": 22,
+          "column": 1,
+          "offset": 746
+        },
+        "end": {
+          "line": 28,
+          "column": 58,
+          "offset": 1068
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 3,
+      "children": [
+        {
+          "type": "text",
+          "value": "Token Refresh",
+          "position": {
+            "start": {
+              "line": 30,
+              "column": 5,
+              "offset": 1076
+            },
+            "end": {
+              "line": 30,
+              "column": 18,
+              "offset": 1089
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 30,
+          "column": 1,
+          "offset": 1072
+        },
+        "end": {
+          "line": 30,
+          "column": 18,
+          "offset": 1089
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "When the access token expires:",
+          "position": {
+            "start": {
+              "line": 32,
+              "column": 1,
+              "offset": 1093
+            },
+            "end": {
+              "line": 32,
+              "column": 31,
+              "offset": 1123
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 32,
+          "column": 1,
+          "offset": 1093
+        },
+        "end": {
+          "line": 32,
+          "column": 31,
+          "offset": 1123
+        }
+      }
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "start": 1,
+      "spread": false,
+      "children": [
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Client sends refresh token to ",
+                  "position": {
+                    "start": {
+                      "line": 34,
+                      "column": 4,
+                      "offset": 1130
+                    },
+                    "end": {
+                      "line": 34,
+                      "column": 34,
+                      "offset": 1160
+                    }
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "/api/auth/refresh",
+                  "position": {
+                    "start": {
+                      "line": 34,
+                      "column": 34,
+                      "offset": 1160
+                    },
+                    "end": {
+                      "line": 34,
+                      "column": 53,
+                      "offset": 1179
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 34,
+                  "column": 4,
+                  "offset": 1130
+                },
+                "end": {
+                  "line": 34,
+                  "column": 53,
+                  "offset": 1179
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 34,
+              "column": 1,
+              "offset": 1127
+            },
+            "end": {
+              "line": 34,
+              "column": 53,
+              "offset": 1179
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Auth Service validates the refresh token",
+                  "position": {
+                    "start": {
+                      "line": 35,
+                      "column": 4,
+                      "offset": 1184
+                    },
+                    "end": {
+                      "line": 35,
+                      "column": 44,
+                      "offset": 1224
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 35,
+                  "column": 4,
+                  "offset": 1184
+                },
+                "end": {
+                  "line": 35,
+                  "column": 44,
+                  "offset": 1224
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 35,
+              "column": 1,
+              "offset": 1181
+            },
+            "end": {
+              "line": 35,
+              "column": 44,
+              "offset": 1224
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Old refresh token is revoked (rotation)",
+                  "position": {
+                    "start": {
+                      "line": 36,
+                      "column": 4,
+                      "offset": 1229
+                    },
+                    "end": {
+                      "line": 36,
+                      "column": 43,
+                      "offset": 1268
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 36,
+                  "column": 4,
+                  "offset": 1229
+                },
+                "end": {
+                  "line": 36,
+                  "column": 43,
+                  "offset": 1268
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 36,
+              "column": 1,
+              "offset": 1226
+            },
+            "end": {
+              "line": 36,
+              "column": 43,
+              "offset": 1268
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "New access + refresh tokens are issued",
+                  "position": {
+                    "start": {
+                      "line": 37,
+                      "column": 4,
+                      "offset": 1273
+                    },
+                    "end": {
+                      "line": 37,
+                      "column": 42,
+                      "offset": 1311
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 37,
+                  "column": 4,
+                  "offset": 1273
+                },
+                "end": {
+                  "line": 37,
+                  "column": 42,
+                  "offset": 1311
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 37,
+              "column": 1,
+              "offset": 1270
+            },
+            "end": {
+              "line": 37,
+              "column": 42,
+              "offset": 1311
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 34,
+          "column": 1,
+          "offset": 1127
+        },
+        "end": {
+          "line": 37,
+          "column": 42,
+          "offset": 1311
+        }
+      }
+    },
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "[!WARNING]\r\nRefresh token reuse after rotation indicates a potential token theft. The system will revoke all tokens for the affected user.",
+              "position": {
+                "start": {
+                  "line": 39,
+                  "column": 3,
+                  "offset": 1317
+                },
+                "end": {
+                  "line": 40,
+                  "column": 129,
+                  "offset": 1457
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 39,
+              "column": 3,
+              "offset": 1317
+            },
+            "end": {
+              "line": 40,
+              "column": 129,
+              "offset": 1457
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 39,
+          "column": 1,
+          "offset": 1315
+        },
+        "end": {
+          "line": 40,
+          "column": 129,
+          "offset": 1457
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "API Endpoints",
+          "position": {
+            "start": {
+              "line": 42,
+              "column": 4,
+              "offset": 1464
+            },
+            "end": {
+              "line": 42,
+              "column": 17,
+              "offset": 1477
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 42,
+          "column": 1,
+          "offset": 1461
+        },
+        "end": {
+          "line": 42,
+          "column": 17,
+          "offset": 1477
+        }
+      }
+    },
+    {
+      "type": "table",
       "align": [
         "left",
         "center",
@@ -1157,539 +1646,2236 @@
         "right",
         "left"
       ],
-      "position": {
-        "startLine": 44,
-        "startColumn": 1,
-        "endLine": 50,
-        "endColumn": 61,
-        "startOffset": 1438,
-        "endOffset": 1840
-      }
-    },
-    {
-      "type": "Heading",
-      "level": 2,
-      "inlines": [
+      "children": [
         {
-          "type": "Text",
-          "value": "Implementation"
-        }
-      ],
-      "position": {
-        "startLine": 52,
-        "startColumn": 1,
-        "endLine": 52,
-        "endColumn": 18,
-        "startOffset": 1842,
-        "endOffset": 1859
-      }
-    },
-    {
-      "type": "Heading",
-      "level": 3,
-      "inlines": [
-        {
-          "type": "Text",
-          "value": "Login Handler"
-        }
-      ],
-      "position": {
-        "startLine": 54,
-        "startColumn": 1,
-        "endLine": 54,
-        "endColumn": 18,
-        "startOffset": 1861,
-        "endOffset": 1878
-      }
-    },
-    {
-      "type": "CodeBlock",
-      "language": "typescript",
-      "value": "async function handleLogin(req: LoginRequest): Promise<AuthResponse> {\n  const { email, password } = req.body;\n\n  // Validate credentials\n  const user = await userStore.findByEmail(email);\n  if (!user || !await bcrypt.compare(password, user.passwordHash)) {\n    throw new AuthenticationError('Invalid credentials');\n  }\n\n  // Check account status\n  if (user.status === 'locked') {\n    throw new AuthenticationError('Account is locked');\n  }\n\n  // Issue tokens\n  const accessToken = jwt.sign(\n    { sub: user.id, role: user.role },\n    config.jwtSecret,\n    { expiresIn: '15m' }\n  );\n\n  const refreshToken = await tokenStore.createRefreshToken(user.id);\n\n  // Audit log\n  await auditLog.record('login', { userId: user.id, ip: req.ip });\n\n  return { accessToken, refreshToken, expiresIn: 900 };\n}",
-      "position": {
-        "startLine": 56,
-        "startColumn": 1,
-        "endLine": 85,
-        "endColumn": 4,
-        "startOffset": 1880,
-        "endOffset": 2692
-      }
-    },
-    {
-      "type": "Heading",
-      "level": 3,
-      "inlines": [
-        {
-          "type": "Text",
-          "value": "Middleware"
-        }
-      ],
-      "position": {
-        "startLine": 87,
-        "startColumn": 1,
-        "endLine": 87,
-        "endColumn": 15,
-        "startOffset": 2694,
-        "endOffset": 2708
-      }
-    },
-    {
-      "type": "CodeBlock",
-      "language": "typescript",
-      "value": "function requireAuth(requiredRole?: UserRole) {\n  return async (req: Request, res: Response, next: NextFunction) => {\n    const token = extractBearerToken(req);\n    if (!token) {\n      return res.status(401).json({ error: 'Missing authentication' });\n    }\n\n    try {\n      const payload = jwt.verify(token, config.jwtSecret);\n      req.user = payload;\n\n      if (requiredRole && payload.role !== requiredRole) {\n        return res.status(403).json({ error: 'Insufficient permissions' });\n      }\n\n      next();\n    } catch (err) {\n      return res.status(401).json({ error: 'Invalid or expired token' });\n    }\n  };\n}",
-      "position": {
-        "startLine": 89,
-        "startColumn": 1,
-        "endLine": 111,
-        "endColumn": 4,
-        "startOffset": 2710,
-        "endOffset": 3346
-      }
-    },
-    {
-      "type": "Heading",
-      "level": 2,
-      "inlines": [
-        {
-          "type": "Text",
-          "value": "Security Considerations"
-        }
-      ],
-      "position": {
-        "startLine": 113,
-        "startColumn": 1,
-        "endLine": 113,
-        "endColumn": 27,
-        "startOffset": 3348,
-        "endOffset": 3374
-      }
-    },
-    {
-      "type": "Callout",
-      "calloutType": "caution",
-      "blocks": [
-        {
-          "type": "Paragraph",
-          "inlines": [
+          "type": "tableRow",
+          "children": [
             {
-              "type": "Text",
-              "value": "Never store JWTs in "
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Endpoint",
+                  "position": {
+                    "start": {
+                      "line": 44,
+                      "column": 3,
+                      "offset": 1483
+                    },
+                    "end": {
+                      "line": 44,
+                      "column": 11,
+                      "offset": 1491
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 44,
+                  "column": 1,
+                  "offset": 1481
+                },
+                "end": {
+                  "line": 44,
+                  "column": 12,
+                  "offset": 1492
+                }
+              }
             },
             {
-              "type": "InlineCode",
-              "value": "localStorage"
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Method",
+                  "position": {
+                    "start": {
+                      "line": 44,
+                      "column": 14,
+                      "offset": 1494
+                    },
+                    "end": {
+                      "line": 44,
+                      "column": 20,
+                      "offset": 1500
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 44,
+                  "column": 12,
+                  "offset": 1492
+                },
+                "end": {
+                  "line": 44,
+                  "column": 21,
+                  "offset": 1501
+                }
+              }
             },
             {
-              "type": "Text",
-              "value": ". Use "
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Auth",
+                  "position": {
+                    "start": {
+                      "line": 44,
+                      "column": 23,
+                      "offset": 1503
+                    },
+                    "end": {
+                      "line": 44,
+                      "column": 27,
+                      "offset": 1507
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 44,
+                  "column": 21,
+                  "offset": 1501
+                },
+                "end": {
+                  "line": 44,
+                  "column": 28,
+                  "offset": 1508
+                }
+              }
             },
             {
-              "type": "InlineCode",
-              "value": "httpOnly"
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Rate Limit",
+                  "position": {
+                    "start": {
+                      "line": 44,
+                      "column": 30,
+                      "offset": 1510
+                    },
+                    "end": {
+                      "line": 44,
+                      "column": 40,
+                      "offset": 1520
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 44,
+                  "column": 28,
+                  "offset": 1508
+                },
+                "end": {
+                  "line": 44,
+                  "column": 41,
+                  "offset": 1521
+                }
+              }
             },
             {
-              "type": "Text",
-              "value": " cookies or secure in-memory storage."
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Description",
+                  "position": {
+                    "start": {
+                      "line": 44,
+                      "column": 43,
+                      "offset": 1523
+                    },
+                    "end": {
+                      "line": 44,
+                      "column": 54,
+                      "offset": 1534
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 44,
+                  "column": 41,
+                  "offset": 1521
+                },
+                "end": {
+                  "line": 44,
+                  "column": 56,
+                  "offset": 1536
+                }
+              }
             }
           ],
           "position": {
-            "startLine": 115,
-            "startColumn": 3,
-            "endLine": 116,
-            "endColumn": 90,
-            "startOffset": 3378,
-            "endOffset": 3478
+            "start": {
+              "line": 44,
+              "column": 1,
+              "offset": 1481
+            },
+            "end": {
+              "line": 44,
+              "column": 56,
+              "offset": 1536
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "/auth/login",
+                  "position": {
+                    "start": {
+                      "line": 46,
+                      "column": 3,
+                      "offset": 1580
+                    },
+                    "end": {
+                      "line": 46,
+                      "column": 16,
+                      "offset": 1593
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 46,
+                  "column": 1,
+                  "offset": 1578
+                },
+                "end": {
+                  "line": 46,
+                  "column": 17,
+                  "offset": 1594
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "POST",
+                  "position": {
+                    "start": {
+                      "line": 46,
+                      "column": 19,
+                      "offset": 1596
+                    },
+                    "end": {
+                      "line": 46,
+                      "column": 23,
+                      "offset": 1600
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 46,
+                  "column": 17,
+                  "offset": 1594
+                },
+                "end": {
+                  "line": 46,
+                  "column": 24,
+                  "offset": 1601
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "None",
+                  "position": {
+                    "start": {
+                      "line": 46,
+                      "column": 26,
+                      "offset": 1603
+                    },
+                    "end": {
+                      "line": 46,
+                      "column": 30,
+                      "offset": 1607
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 46,
+                  "column": 24,
+                  "offset": 1601
+                },
+                "end": {
+                  "line": 46,
+                  "column": 31,
+                  "offset": 1608
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "10/min",
+                  "position": {
+                    "start": {
+                      "line": 46,
+                      "column": 33,
+                      "offset": 1610
+                    },
+                    "end": {
+                      "line": 46,
+                      "column": 39,
+                      "offset": 1616
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 46,
+                  "column": 31,
+                  "offset": 1608
+                },
+                "end": {
+                  "line": 46,
+                  "column": 40,
+                  "offset": 1617
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Authenticate user",
+                  "position": {
+                    "start": {
+                      "line": 46,
+                      "column": 42,
+                      "offset": 1619
+                    },
+                    "end": {
+                      "line": 46,
+                      "column": 59,
+                      "offset": 1636
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 46,
+                  "column": 40,
+                  "offset": 1617
+                },
+                "end": {
+                  "line": 46,
+                  "column": 61,
+                  "offset": 1638
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 46,
+              "column": 1,
+              "offset": 1578
+            },
+            "end": {
+              "line": 46,
+              "column": 61,
+              "offset": 1638
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "/auth/refresh",
+                  "position": {
+                    "start": {
+                      "line": 47,
+                      "column": 3,
+                      "offset": 1642
+                    },
+                    "end": {
+                      "line": 47,
+                      "column": 18,
+                      "offset": 1657
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 47,
+                  "column": 1,
+                  "offset": 1640
+                },
+                "end": {
+                  "line": 47,
+                  "column": 19,
+                  "offset": 1658
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "POST",
+                  "position": {
+                    "start": {
+                      "line": 47,
+                      "column": 21,
+                      "offset": 1660
+                    },
+                    "end": {
+                      "line": 47,
+                      "column": 25,
+                      "offset": 1664
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 47,
+                  "column": 19,
+                  "offset": 1658
+                },
+                "end": {
+                  "line": 47,
+                  "column": 26,
+                  "offset": 1665
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Refresh",
+                  "position": {
+                    "start": {
+                      "line": 47,
+                      "column": 28,
+                      "offset": 1667
+                    },
+                    "end": {
+                      "line": 47,
+                      "column": 35,
+                      "offset": 1674
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 47,
+                  "column": 26,
+                  "offset": 1665
+                },
+                "end": {
+                  "line": 47,
+                  "column": 36,
+                  "offset": 1675
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "20/min",
+                  "position": {
+                    "start": {
+                      "line": 47,
+                      "column": 38,
+                      "offset": 1677
+                    },
+                    "end": {
+                      "line": 47,
+                      "column": 44,
+                      "offset": 1683
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 47,
+                  "column": 36,
+                  "offset": 1675
+                },
+                "end": {
+                  "line": 47,
+                  "column": 45,
+                  "offset": 1684
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Rotate tokens",
+                  "position": {
+                    "start": {
+                      "line": 47,
+                      "column": 47,
+                      "offset": 1686
+                    },
+                    "end": {
+                      "line": 47,
+                      "column": 60,
+                      "offset": 1699
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 47,
+                  "column": 45,
+                  "offset": 1684
+                },
+                "end": {
+                  "line": 47,
+                  "column": 62,
+                  "offset": 1701
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 47,
+              "column": 1,
+              "offset": 1640
+            },
+            "end": {
+              "line": 47,
+              "column": 62,
+              "offset": 1701
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "/auth/logout",
+                  "position": {
+                    "start": {
+                      "line": 48,
+                      "column": 3,
+                      "offset": 1705
+                    },
+                    "end": {
+                      "line": 48,
+                      "column": 17,
+                      "offset": 1719
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 48,
+                  "column": 1,
+                  "offset": 1703
+                },
+                "end": {
+                  "line": 48,
+                  "column": 18,
+                  "offset": 1720
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "POST",
+                  "position": {
+                    "start": {
+                      "line": 48,
+                      "column": 20,
+                      "offset": 1722
+                    },
+                    "end": {
+                      "line": 48,
+                      "column": 24,
+                      "offset": 1726
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 48,
+                  "column": 18,
+                  "offset": 1720
+                },
+                "end": {
+                  "line": 48,
+                  "column": 25,
+                  "offset": 1727
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JWT",
+                  "position": {
+                    "start": {
+                      "line": 48,
+                      "column": 27,
+                      "offset": 1729
+                    },
+                    "end": {
+                      "line": 48,
+                      "column": 30,
+                      "offset": 1732
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 48,
+                  "column": 25,
+                  "offset": 1727
+                },
+                "end": {
+                  "line": 48,
+                  "column": 31,
+                  "offset": 1733
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "100/min",
+                  "position": {
+                    "start": {
+                      "line": 48,
+                      "column": 33,
+                      "offset": 1735
+                    },
+                    "end": {
+                      "line": 48,
+                      "column": 40,
+                      "offset": 1742
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 48,
+                  "column": 31,
+                  "offset": 1733
+                },
+                "end": {
+                  "line": 48,
+                  "column": 41,
+                  "offset": 1743
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Revoke session",
+                  "position": {
+                    "start": {
+                      "line": 48,
+                      "column": 43,
+                      "offset": 1745
+                    },
+                    "end": {
+                      "line": 48,
+                      "column": 57,
+                      "offset": 1759
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 48,
+                  "column": 41,
+                  "offset": 1743
+                },
+                "end": {
+                  "line": 48,
+                  "column": 59,
+                  "offset": 1761
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 48,
+              "column": 1,
+              "offset": 1703
+            },
+            "end": {
+              "line": 48,
+              "column": 59,
+              "offset": 1761
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "/auth/sessions",
+                  "position": {
+                    "start": {
+                      "line": 49,
+                      "column": 3,
+                      "offset": 1765
+                    },
+                    "end": {
+                      "line": 49,
+                      "column": 19,
+                      "offset": 1781
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 49,
+                  "column": 1,
+                  "offset": 1763
+                },
+                "end": {
+                  "line": 49,
+                  "column": 20,
+                  "offset": 1782
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "GET",
+                  "position": {
+                    "start": {
+                      "line": 49,
+                      "column": 22,
+                      "offset": 1784
+                    },
+                    "end": {
+                      "line": 49,
+                      "column": 25,
+                      "offset": 1787
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 49,
+                  "column": 20,
+                  "offset": 1782
+                },
+                "end": {
+                  "line": 49,
+                  "column": 26,
+                  "offset": 1788
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JWT",
+                  "position": {
+                    "start": {
+                      "line": 49,
+                      "column": 28,
+                      "offset": 1790
+                    },
+                    "end": {
+                      "line": 49,
+                      "column": 31,
+                      "offset": 1793
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 49,
+                  "column": 26,
+                  "offset": 1788
+                },
+                "end": {
+                  "line": 49,
+                  "column": 32,
+                  "offset": 1794
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "50/min",
+                  "position": {
+                    "start": {
+                      "line": 49,
+                      "column": 34,
+                      "offset": 1796
+                    },
+                    "end": {
+                      "line": 49,
+                      "column": 40,
+                      "offset": 1802
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 49,
+                  "column": 32,
+                  "offset": 1794
+                },
+                "end": {
+                  "line": 49,
+                  "column": 41,
+                  "offset": 1803
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "List active sessions",
+                  "position": {
+                    "start": {
+                      "line": 49,
+                      "column": 43,
+                      "offset": 1805
+                    },
+                    "end": {
+                      "line": 49,
+                      "column": 63,
+                      "offset": 1825
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 49,
+                  "column": 41,
+                  "offset": 1803
+                },
+                "end": {
+                  "line": 49,
+                  "column": 65,
+                  "offset": 1827
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 49,
+              "column": 1,
+              "offset": 1763
+            },
+            "end": {
+              "line": 49,
+              "column": 65,
+              "offset": 1827
+            }
+          }
+        },
+        {
+          "type": "tableRow",
+          "children": [
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "/users/me",
+                  "position": {
+                    "start": {
+                      "line": 50,
+                      "column": 3,
+                      "offset": 1831
+                    },
+                    "end": {
+                      "line": 50,
+                      "column": 14,
+                      "offset": 1842
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 50,
+                  "column": 1,
+                  "offset": 1829
+                },
+                "end": {
+                  "line": 50,
+                  "column": 15,
+                  "offset": 1843
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "GET",
+                  "position": {
+                    "start": {
+                      "line": 50,
+                      "column": 17,
+                      "offset": 1845
+                    },
+                    "end": {
+                      "line": 50,
+                      "column": 20,
+                      "offset": 1848
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 50,
+                  "column": 15,
+                  "offset": 1843
+                },
+                "end": {
+                  "line": 50,
+                  "column": 21,
+                  "offset": 1849
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "JWT",
+                  "position": {
+                    "start": {
+                      "line": 50,
+                      "column": 23,
+                      "offset": 1851
+                    },
+                    "end": {
+                      "line": 50,
+                      "column": 26,
+                      "offset": 1854
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 50,
+                  "column": 21,
+                  "offset": 1849
+                },
+                "end": {
+                  "line": 50,
+                  "column": 27,
+                  "offset": 1855
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "200/min",
+                  "position": {
+                    "start": {
+                      "line": 50,
+                      "column": 29,
+                      "offset": 1857
+                    },
+                    "end": {
+                      "line": 50,
+                      "column": 36,
+                      "offset": 1864
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 50,
+                  "column": 27,
+                  "offset": 1855
+                },
+                "end": {
+                  "line": 50,
+                  "column": 37,
+                  "offset": 1865
+                }
+              }
+            },
+            {
+              "type": "tableCell",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Current user profile",
+                  "position": {
+                    "start": {
+                      "line": 50,
+                      "column": 39,
+                      "offset": 1867
+                    },
+                    "end": {
+                      "line": 50,
+                      "column": 59,
+                      "offset": 1887
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 50,
+                  "column": 37,
+                  "offset": 1865
+                },
+                "end": {
+                  "line": 50,
+                  "column": 61,
+                  "offset": 1889
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 50,
+              "column": 1,
+              "offset": 1829
+            },
+            "end": {
+              "line": 50,
+              "column": 61,
+              "offset": 1889
+            }
           }
         }
       ],
       "position": {
-        "startLine": 115,
-        "startColumn": 1,
-        "endLine": 116,
-        "endColumn": 90,
-        "startOffset": 3376,
-        "endOffset": 3478
+        "start": {
+          "line": 44,
+          "column": 1,
+          "offset": 1481
+        },
+        "end": {
+          "line": 50,
+          "column": 61,
+          "offset": 1889
+        }
       }
     },
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "heading",
+      "depth": 2,
+      "children": [
         {
-          "type": "Text",
-          "value": "Key security measures:"
+          "type": "text",
+          "value": "Implementation",
+          "position": {
+            "start": {
+              "line": 52,
+              "column": 4,
+              "offset": 1896
+            },
+            "end": {
+              "line": 52,
+              "column": 18,
+              "offset": 1910
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 118,
-        "startColumn": 1,
-        "endLine": 118,
-        "endColumn": 23,
-        "startOffset": 3480,
-        "endOffset": 3502
+        "start": {
+          "line": 52,
+          "column": 1,
+          "offset": 1893
+        },
+        "end": {
+          "line": 52,
+          "column": 18,
+          "offset": 1910
+        }
       }
     },
     {
-      "type": "List",
+      "type": "heading",
+      "depth": 3,
+      "children": [
+        {
+          "type": "text",
+          "value": "Login Handler",
+          "position": {
+            "start": {
+              "line": 54,
+              "column": 5,
+              "offset": 1918
+            },
+            "end": {
+              "line": 54,
+              "column": 18,
+              "offset": 1931
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 54,
+          "column": 1,
+          "offset": 1914
+        },
+        "end": {
+          "line": 54,
+          "column": 18,
+          "offset": 1931
+        }
+      }
+    },
+    {
+      "type": "code",
+      "lang": "typescript",
+      "meta": null,
+      "value": "async function handleLogin(req: LoginRequest): Promise<AuthResponse> {\r\n  const { email, password } = req.body;\r\n\r\n  // Validate credentials\r\n  const user = await userStore.findByEmail(email);\r\n  if (!user || !await bcrypt.compare(password, user.passwordHash)) {\r\n    throw new AuthenticationError('Invalid credentials');\r\n  }\r\n\r\n  // Check account status\r\n  if (user.status === 'locked') {\r\n    throw new AuthenticationError('Account is locked');\r\n  }\r\n\r\n  // Issue tokens\r\n  const accessToken = jwt.sign(\r\n    { sub: user.id, role: user.role },\r\n    config.jwtSecret,\r\n    { expiresIn: '15m' }\r\n  );\r\n\r\n  const refreshToken = await tokenStore.createRefreshToken(user.id);\r\n\r\n  // Audit log\r\n  await auditLog.record('login', { userId: user.id, ip: req.ip });\r\n\r\n  return { accessToken, refreshToken, expiresIn: 900 };\r\n}",
+      "position": {
+        "start": {
+          "line": 56,
+          "column": 1,
+          "offset": 1935
+        },
+        "end": {
+          "line": 85,
+          "column": 4,
+          "offset": 2776
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 3,
+      "children": [
+        {
+          "type": "text",
+          "value": "Middleware",
+          "position": {
+            "start": {
+              "line": 87,
+              "column": 5,
+              "offset": 2784
+            },
+            "end": {
+              "line": 87,
+              "column": 15,
+              "offset": 2794
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 87,
+          "column": 1,
+          "offset": 2780
+        },
+        "end": {
+          "line": 87,
+          "column": 15,
+          "offset": 2794
+        }
+      }
+    },
+    {
+      "type": "code",
+      "lang": "typescript",
+      "meta": null,
+      "value": "function requireAuth(requiredRole?: UserRole) {\r\n  return async (req: Request, res: Response, next: NextFunction) => {\r\n    const token = extractBearerToken(req);\r\n    if (!token) {\r\n      return res.status(401).json({ error: 'Missing authentication' });\r\n    }\r\n\r\n    try {\r\n      const payload = jwt.verify(token, config.jwtSecret);\r\n      req.user = payload;\r\n\r\n      if (requiredRole && payload.role !== requiredRole) {\r\n        return res.status(403).json({ error: 'Insufficient permissions' });\r\n      }\r\n\r\n      next();\r\n    } catch (err) {\r\n      return res.status(401).json({ error: 'Invalid or expired token' });\r\n    }\r\n  };\r\n}",
+      "position": {
+        "start": {
+          "line": 89,
+          "column": 1,
+          "offset": 2798
+        },
+        "end": {
+          "line": 111,
+          "column": 4,
+          "offset": 3456
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Security Considerations",
+          "position": {
+            "start": {
+              "line": 113,
+              "column": 4,
+              "offset": 3463
+            },
+            "end": {
+              "line": 113,
+              "column": 27,
+              "offset": 3486
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 113,
+          "column": 1,
+          "offset": 3460
+        },
+        "end": {
+          "line": 113,
+          "column": 27,
+          "offset": 3486
+        }
+      }
+    },
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "[!CAUTION]\r\nNever store JWTs in ",
+              "position": {
+                "start": {
+                  "line": 115,
+                  "column": 3,
+                  "offset": 3492
+                },
+                "end": {
+                  "line": 116,
+                  "column": 23,
+                  "offset": 3526
+                }
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "localStorage",
+              "position": {
+                "start": {
+                  "line": 116,
+                  "column": 23,
+                  "offset": 3526
+                },
+                "end": {
+                  "line": 116,
+                  "column": 37,
+                  "offset": 3540
+                }
+              }
+            },
+            {
+              "type": "text",
+              "value": ". Use ",
+              "position": {
+                "start": {
+                  "line": 116,
+                  "column": 37,
+                  "offset": 3540
+                },
+                "end": {
+                  "line": 116,
+                  "column": 43,
+                  "offset": 3546
+                }
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "httpOnly",
+              "position": {
+                "start": {
+                  "line": 116,
+                  "column": 43,
+                  "offset": 3546
+                },
+                "end": {
+                  "line": 116,
+                  "column": 53,
+                  "offset": 3556
+                }
+              }
+            },
+            {
+              "type": "text",
+              "value": " cookies or secure in-memory storage.",
+              "position": {
+                "start": {
+                  "line": 116,
+                  "column": 53,
+                  "offset": 3556
+                },
+                "end": {
+                  "line": 116,
+                  "column": 90,
+                  "offset": 3593
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 115,
+              "column": 3,
+              "offset": 3492
+            },
+            "end": {
+              "line": 116,
+              "column": 90,
+              "offset": 3593
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 115,
+          "column": 1,
+          "offset": 3490
+        },
+        "end": {
+          "line": 116,
+          "column": 90,
+          "offset": 3593
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Key security measures:",
+          "position": {
+            "start": {
+              "line": 118,
+              "column": 1,
+              "offset": 3597
+            },
+            "end": {
+              "line": 118,
+              "column": 23,
+              "offset": 3619
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 118,
+          "column": 1,
+          "offset": 3597
+        },
+        "end": {
+          "line": 118,
+          "column": 23,
+          "offset": 3619
+        }
+      }
+    },
+    {
+      "type": "list",
       "ordered": false,
-      "items": [
+      "start": null,
+      "spread": false,
+      "children": [
         {
+          "type": "listItem",
+          "spread": false,
           "checked": true,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Password hashing with bcrypt (cost factor 12)"
+                  "type": "text",
+                  "value": "Password hashing with bcrypt (cost factor 12)",
+                  "position": {
+                    "start": {
+                      "line": 120,
+                      "column": 7,
+                      "offset": 3629
+                    },
+                    "end": {
+                      "line": 120,
+                      "column": 52,
+                      "offset": 3674
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 120,
-                "startColumn": 7,
-                "endLine": 120,
-                "endColumn": 52,
-                "startOffset": 3510,
-                "endOffset": 3555
+                "start": {
+                  "line": 120,
+                  "column": 7,
+                  "offset": 3629
+                },
+                "end": {
+                  "line": 120,
+                  "column": 52,
+                  "offset": 3674
+                }
               }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 120,
+              "column": 1,
+              "offset": 3623
+            },
+            "end": {
+              "line": 120,
+              "column": 52,
+              "offset": 3674
+            }
+          }
         },
         {
+          "type": "listItem",
+          "spread": false,
           "checked": true,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Refresh token rotation on every use"
+                  "type": "text",
+                  "value": "Refresh token rotation on every use",
+                  "position": {
+                    "start": {
+                      "line": 121,
+                      "column": 7,
+                      "offset": 3682
+                    },
+                    "end": {
+                      "line": 121,
+                      "column": 42,
+                      "offset": 3717
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 121,
-                "startColumn": 7,
-                "endLine": 121,
-                "endColumn": 42,
-                "startOffset": 3562,
-                "endOffset": 3597
+                "start": {
+                  "line": 121,
+                  "column": 7,
+                  "offset": 3682
+                },
+                "end": {
+                  "line": 121,
+                  "column": 42,
+                  "offset": 3717
+                }
               }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 121,
+              "column": 1,
+              "offset": 3676
+            },
+            "end": {
+              "line": 121,
+              "column": 42,
+              "offset": 3717
+            }
+          }
         },
         {
+          "type": "listItem",
+          "spread": false,
           "checked": true,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Rate limiting on authentication endpoints"
+                  "type": "text",
+                  "value": "Rate limiting on authentication endpoints",
+                  "position": {
+                    "start": {
+                      "line": 122,
+                      "column": 7,
+                      "offset": 3725
+                    },
+                    "end": {
+                      "line": 122,
+                      "column": 48,
+                      "offset": 3766
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 122,
-                "startColumn": 7,
-                "endLine": 122,
-                "endColumn": 48,
-                "startOffset": 3604,
-                "endOffset": 3645
+                "start": {
+                  "line": 122,
+                  "column": 7,
+                  "offset": 3725
+                },
+                "end": {
+                  "line": 122,
+                  "column": 48,
+                  "offset": 3766
+                }
               }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 122,
+              "column": 1,
+              "offset": 3719
+            },
+            "end": {
+              "line": 122,
+              "column": 48,
+              "offset": 3766
+            }
+          }
         },
         {
+          "type": "listItem",
+          "spread": false,
           "checked": true,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Account lockout after 5 failed attempts"
+                  "type": "text",
+                  "value": "Account lockout after 5 failed attempts",
+                  "position": {
+                    "start": {
+                      "line": 123,
+                      "column": 7,
+                      "offset": 3774
+                    },
+                    "end": {
+                      "line": 123,
+                      "column": 46,
+                      "offset": 3813
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 123,
-                "startColumn": 7,
-                "endLine": 123,
-                "endColumn": 46,
-                "startOffset": 3652,
-                "endOffset": 3691
+                "start": {
+                  "line": 123,
+                  "column": 7,
+                  "offset": 3774
+                },
+                "end": {
+                  "line": 123,
+                  "column": 46,
+                  "offset": 3813
+                }
               }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 123,
+              "column": 1,
+              "offset": 3768
+            },
+            "end": {
+              "line": 123,
+              "column": 46,
+              "offset": 3813
+            }
+          }
         },
         {
+          "type": "listItem",
+          "spread": false,
           "checked": false,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Implement PKCE for OAuth flows"
+                  "type": "text",
+                  "value": "Implement PKCE for OAuth flows",
+                  "position": {
+                    "start": {
+                      "line": 124,
+                      "column": 7,
+                      "offset": 3821
+                    },
+                    "end": {
+                      "line": 124,
+                      "column": 37,
+                      "offset": 3851
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 124,
-                "startColumn": 7,
-                "endLine": 124,
-                "endColumn": 37,
-                "startOffset": 3698,
-                "endOffset": 3728
+                "start": {
+                  "line": 124,
+                  "column": 7,
+                  "offset": 3821
+                },
+                "end": {
+                  "line": 124,
+                  "column": 37,
+                  "offset": 3851
+                }
               }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 124,
+              "column": 1,
+              "offset": 3815
+            },
+            "end": {
+              "line": 124,
+              "column": 37,
+              "offset": 3851
+            }
+          }
         },
         {
+          "type": "listItem",
+          "spread": false,
           "checked": false,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Add WebAuthn/passkey support"
+                  "type": "text",
+                  "value": "Add WebAuthn/passkey support",
+                  "position": {
+                    "start": {
+                      "line": 125,
+                      "column": 7,
+                      "offset": 3859
+                    },
+                    "end": {
+                      "line": 125,
+                      "column": 35,
+                      "offset": 3887
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 125,
-                "startColumn": 7,
-                "endLine": 125,
-                "endColumn": 35,
-                "startOffset": 3735,
-                "endOffset": 3763
+                "start": {
+                  "line": 125,
+                  "column": 7,
+                  "offset": 3859
+                },
+                "end": {
+                  "line": 125,
+                  "column": 35,
+                  "offset": 3887
+                }
               }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 125,
+              "column": 1,
+              "offset": 3853
+            },
+            "end": {
+              "line": 125,
+              "column": 35,
+              "offset": 3887
+            }
+          }
         },
         {
+          "type": "listItem",
+          "spread": false,
           "checked": false,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Implement certificate pinning for mobile clients"
+                  "type": "text",
+                  "value": "Implement certificate pinning for mobile clients",
+                  "position": {
+                    "start": {
+                      "line": 126,
+                      "column": 7,
+                      "offset": 3895
+                    },
+                    "end": {
+                      "line": 126,
+                      "column": 55,
+                      "offset": 3943
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 126,
-                "startColumn": 7,
-                "endLine": 126,
-                "endColumn": 55,
-                "startOffset": 3770,
-                "endOffset": 3818
+                "start": {
+                  "line": 126,
+                  "column": 7,
+                  "offset": 3895
+                },
+                "end": {
+                  "line": 126,
+                  "column": 55,
+                  "offset": 3943
+                }
               }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 126,
+              "column": 1,
+              "offset": 3889
+            },
+            "end": {
+              "line": 126,
+              "column": 55,
+              "offset": 3943
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 120,
-        "startColumn": 1,
-        "endLine": 126,
-        "endColumn": 55,
-        "startOffset": 3504,
-        "endOffset": 3818
+        "start": {
+          "line": 120,
+          "column": 1,
+          "offset": 3623
+        },
+        "end": {
+          "line": 126,
+          "column": 55,
+          "offset": 3943
+        }
       }
     },
     {
-      "type": "Heading",
-      "level": 2,
-      "inlines": [
+      "type": "heading",
+      "depth": 2,
+      "children": [
         {
-          "type": "Text",
-          "value": "Migration Guide"
+          "type": "text",
+          "value": "Migration Guide",
+          "position": {
+            "start": {
+              "line": 128,
+              "column": 4,
+              "offset": 3950
+            },
+            "end": {
+              "line": 128,
+              "column": 19,
+              "offset": 3965
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 128,
-        "startColumn": 1,
-        "endLine": 128,
-        "endColumn": 19,
-        "startOffset": 3820,
-        "endOffset": 3838
+        "start": {
+          "line": 128,
+          "column": 1,
+          "offset": 3947
+        },
+        "end": {
+          "line": 128,
+          "column": 19,
+          "offset": 3965
+        }
       }
     },
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "paragraph",
+      "children": [
         {
-          "type": "Text",
-          "value": "For teams migrating from legacy API keys:"
+          "type": "text",
+          "value": "For teams migrating from legacy API keys:",
+          "position": {
+            "start": {
+              "line": 130,
+              "column": 1,
+              "offset": 3969
+            },
+            "end": {
+              "line": 130,
+              "column": 42,
+              "offset": 4010
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 130,
-        "startColumn": 1,
-        "endLine": 130,
-        "endColumn": 42,
-        "startOffset": 3840,
-        "endOffset": 3881
+        "start": {
+          "line": 130,
+          "column": 1,
+          "offset": 3969
+        },
+        "end": {
+          "line": 130,
+          "column": 42,
+          "offset": 4010
+        }
       }
     },
     {
-      "type": "List",
+      "type": "list",
       "ordered": true,
       "start": 1,
-      "items": [
+      "spread": false,
+      "children": [
         {
+          "type": "listItem",
+          "spread": false,
           "checked": null,
-          "blocks": [
+          "children": [
             {
-              "type": "Paragraph",
-              "inlines": [
+              "type": "paragraph",
+              "children": [
                 {
-                  "type": "Text",
-                  "value": "Generate a service account in the admin console"
+                  "type": "text",
+                  "value": "Generate a service account in the admin console",
+                  "position": {
+                    "start": {
+                      "line": 132,
+                      "column": 4,
+                      "offset": 4017
+                    },
+                    "end": {
+                      "line": 132,
+                      "column": 51,
+                      "offset": 4064
+                    }
+                  }
                 }
               ],
               "position": {
-                "startLine": 132,
-                "startColumn": 4,
-                "endLine": 132,
-                "endColumn": 51,
-                "startOffset": 3886,
-                "endOffset": 3933
-              }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Exchange your API key for OAuth credentials"
+                "start": {
+                  "line": 132,
+                  "column": 4,
+                  "offset": 4017
+                },
+                "end": {
+                  "line": 132,
+                  "column": 51,
+                  "offset": 4064
                 }
-              ],
-              "position": {
-                "startLine": 133,
-                "startColumn": 4,
-                "endLine": 133,
-                "endColumn": 47,
-                "startOffset": 3937,
-                "endOffset": 3980
               }
-            }
-          ]
-        },
-        {
-          "checked": null,
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Update your client to use the new token flow:"
-                }
-              ],
-              "position": {
-                "startLine": 134,
-                "startColumn": 4,
-                "endLine": 134,
-                "endColumn": 49,
-                "startOffset": 3984,
-                "endOffset": 4029
-              }
-            }
-          ]
-        }
-      ],
-      "position": {
-        "startLine": 132,
-        "startColumn": 1,
-        "endLine": 134,
-        "endColumn": 49,
-        "startOffset": 3883,
-        "endOffset": 4029
-      }
-    },
-    {
-      "type": "CodeBlock",
-      "language": "python",
-      "value": "import httpx\n\nclass PlatformClient:\n    def __init__(self, client_id: str, client_secret: str):\n        self.client_id = client_id\n        self.client_secret = client_secret\n        self._token = None\n\n    async def authenticate(self):\n        async with httpx.AsyncClient() as client:\n            response = await client.post(\n                \"https://api.platform.com/auth/token\",\n                json={\n                    \"grant_type\": \"client_credentials\",\n                    \"client_id\": self.client_id,\n                    \"client_secret\": self.client_secret,\n                }\n            )\n            self._token = response.json()[\"access_token\"]\n\n    async def get_users(self):\n        async with httpx.AsyncClient() as client:\n            return await client.get(\n                \"https://api.platform.com/users\",\n                headers={\"Authorization\": f\"Bearer {self._token}\"}\n            )",
-      "position": {
-        "startLine": 136,
-        "startColumn": 1,
-        "endLine": 163,
-        "endColumn": 4,
-        "startOffset": 4031,
-        "endOffset": 4952
-      }
-    },
-    {
-      "type": "Callout",
-      "calloutType": "note",
-      "title": "Note",
-      "blocks": [
-        {
-          "type": "Paragraph",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": " The legacy API key system will continue to work in read-only mode until the deprecation date."
             }
           ],
           "position": {
-            "startLine": 165,
-            "startColumn": 3,
-            "endLine": 165,
-            "endColumn": 106,
-            "startOffset": 4956,
-            "endOffset": 5059
+            "start": {
+              "line": 132,
+              "column": 1,
+              "offset": 4014
+            },
+            "end": {
+              "line": 132,
+              "column": 51,
+              "offset": 4064
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Exchange your API key for OAuth credentials",
+                  "position": {
+                    "start": {
+                      "line": 133,
+                      "column": 4,
+                      "offset": 4069
+                    },
+                    "end": {
+                      "line": 133,
+                      "column": 47,
+                      "offset": 4112
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 133,
+                  "column": 4,
+                  "offset": 4069
+                },
+                "end": {
+                  "line": 133,
+                  "column": 47,
+                  "offset": 4112
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 133,
+              "column": 1,
+              "offset": 4066
+            },
+            "end": {
+              "line": 133,
+              "column": 47,
+              "offset": 4112
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Update your client to use the new token flow:",
+                  "position": {
+                    "start": {
+                      "line": 134,
+                      "column": 4,
+                      "offset": 4117
+                    },
+                    "end": {
+                      "line": 134,
+                      "column": 49,
+                      "offset": 4162
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 134,
+                  "column": 4,
+                  "offset": 4117
+                },
+                "end": {
+                  "line": 134,
+                  "column": 49,
+                  "offset": 4162
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 134,
+              "column": 1,
+              "offset": 4114
+            },
+            "end": {
+              "line": 134,
+              "column": 49,
+              "offset": 4162
+            }
           }
         }
       ],
       "position": {
-        "startLine": 165,
-        "startColumn": 1,
-        "endLine": 165,
-        "endColumn": 106,
-        "startOffset": 4954,
-        "endOffset": 5059
+        "start": {
+          "line": 132,
+          "column": 1,
+          "offset": 4014
+        },
+        "end": {
+          "line": 134,
+          "column": 49,
+          "offset": 4162
+        }
       }
     },
     {
-      "type": "ThematicBreak",
+      "type": "code",
+      "lang": "python",
+      "meta": null,
+      "value": "import httpx\r\n\r\nclass PlatformClient:\r\n    def __init__(self, client_id: str, client_secret: str):\r\n        self.client_id = client_id\r\n        self.client_secret = client_secret\r\n        self._token = None\r\n\r\n    async def authenticate(self):\r\n        async with httpx.AsyncClient() as client:\r\n            response = await client.post(\r\n                \"https://api.platform.com/auth/token\",\r\n                json={\r\n                    \"grant_type\": \"client_credentials\",\r\n                    \"client_id\": self.client_id,\r\n                    \"client_secret\": self.client_secret,\r\n                }\r\n            )\r\n            self._token = response.json()[\"access_token\"]\r\n\r\n    async def get_users(self):\r\n        async with httpx.AsyncClient() as client:\r\n            return await client.get(\r\n                \"https://api.platform.com/users\",\r\n                headers={\"Authorization\": f\"Bearer {self._token}\"}\r\n            )",
       "position": {
-        "startLine": 167,
-        "startColumn": 1,
-        "endLine": 167,
-        "endColumn": 4,
-        "startOffset": 5061,
-        "endOffset": 5064
+        "start": {
+          "line": 136,
+          "column": 1,
+          "offset": 4166
+        },
+        "end": {
+          "line": 163,
+          "column": 4,
+          "offset": 5114
+        }
       }
     },
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "blockquote",
+      "children": [
         {
-          "type": "Emphasis",
-          "inlines": [
+          "type": "paragraph",
+          "children": [
             {
-              "type": "Text",
-              "value": "Last updated: September 2026 · Author: Platform Engineering Team"
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Note:",
+                  "position": {
+                    "start": {
+                      "line": 165,
+                      "column": 5,
+                      "offset": 5122
+                    },
+                    "end": {
+                      "line": 165,
+                      "column": 10,
+                      "offset": 5127
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 165,
+                  "column": 3,
+                  "offset": 5120
+                },
+                "end": {
+                  "line": 165,
+                  "column": 12,
+                  "offset": 5129
+                }
+              }
+            },
+            {
+              "type": "text",
+              "value": " The legacy API key system will continue to work in read-only mode until the deprecation date.",
+              "position": {
+                "start": {
+                  "line": 165,
+                  "column": 12,
+                  "offset": 5129
+                },
+                "end": {
+                  "line": 165,
+                  "column": 106,
+                  "offset": 5223
+                }
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 165,
+              "column": 3,
+              "offset": 5120
+            },
+            "end": {
+              "line": 165,
+              "column": 106,
+              "offset": 5223
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 169,
-        "startColumn": 1,
-        "endLine": 169,
-        "endColumn": 67,
-        "startOffset": 5066,
-        "endOffset": 5132
+        "start": {
+          "line": 165,
+          "column": 1,
+          "offset": 5118
+        },
+        "end": {
+          "line": 165,
+          "column": 106,
+          "offset": 5223
+        }
+      }
+    },
+    {
+      "type": "thematicBreak",
+      "position": {
+        "start": {
+          "line": 167,
+          "column": 1,
+          "offset": 5227
+        },
+        "end": {
+          "line": 167,
+          "column": 4,
+          "offset": 5230
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "emphasis",
+          "children": [
+            {
+              "type": "text",
+              "value": "Last updated: September 2026 · Author: Platform Engineering Team",
+              "position": {
+                "start": {
+                  "line": 169,
+                  "column": 2,
+                  "offset": 5235
+                },
+                "end": {
+                  "line": 169,
+                  "column": 66,
+                  "offset": 5299
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 169,
+              "column": 1,
+              "offset": 5234
+            },
+            "end": {
+              "line": 169,
+              "column": 67,
+              "offset": 5300
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 169,
+          "column": 1,
+          "offset": 5234
+        },
+        "end": {
+          "line": 169,
+          "column": 67,
+          "offset": 5300
+        }
       }
     }
   ],
-  "assets": []
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 170,
+      "column": 1,
+      "offset": 5302
+    }
+  }
 }

@@ -1,0 +1,373 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Math and Equation Fidelity",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 3,
+              "offset": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 29,
+              "offset": 28
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 29,
+          "offset": 28
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Einstein's mass-energy equivalence is represented as ",
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 30
+            },
+            "end": {
+              "line": 3,
+              "column": 54,
+              "offset": 83
+            }
+          }
+        },
+        {
+          "type": "inlineMath",
+          "value": "E = mc^2",
+          "data": {
+            "hName": "code",
+            "hProperties": {
+              "className": [
+                "language-math",
+                "math-inline"
+              ]
+            },
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "E = mc^2"
+              }
+            ]
+          },
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 54,
+              "offset": 83
+            },
+            "end": {
+              "line": 3,
+              "column": 64,
+              "offset": 93
+            }
+          }
+        },
+        {
+          "type": "text",
+          "value": " within inline text.",
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 64,
+              "offset": 93
+            },
+            "end": {
+              "line": 3,
+              "column": 84,
+              "offset": 113
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 30
+        },
+        "end": {
+          "line": 3,
+          "column": 84,
+          "offset": 113
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Here is the quadratic formula displayed as a standalone equation:",
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 115
+            },
+            "end": {
+              "line": 5,
+              "column": 66,
+              "offset": 180
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 5,
+          "column": 1,
+          "offset": 115
+        },
+        "end": {
+          "line": 5,
+          "column": 66,
+          "offset": 180
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "inlineMath",
+          "value": "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}",
+          "data": {
+            "hName": "code",
+            "hProperties": {
+              "className": [
+                "language-math",
+                "math-inline"
+              ]
+            },
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"
+              }
+            ]
+          },
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 1,
+              "offset": 182
+            },
+            "end": {
+              "line": 7,
+              "column": 43,
+              "offset": 224
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 7,
+          "column": 1,
+          "offset": 182
+        },
+        "end": {
+          "line": 7,
+          "column": 43,
+          "offset": 224
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Euler's identity is ",
+          "position": {
+            "start": {
+              "line": 9,
+              "column": 1,
+              "offset": 226
+            },
+            "end": {
+              "line": 9,
+              "column": 21,
+              "offset": 246
+            }
+          }
+        },
+        {
+          "type": "inlineMath",
+          "value": "e^{i\\pi} + 1 = 0",
+          "data": {
+            "hName": "code",
+            "hProperties": {
+              "className": [
+                "language-math",
+                "math-inline"
+              ]
+            },
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "e^{i\\pi} + 1 = 0"
+              }
+            ]
+          },
+          "position": {
+            "start": {
+              "line": 9,
+              "column": 21,
+              "offset": 246
+            },
+            "end": {
+              "line": 9,
+              "column": 39,
+              "offset": 264
+            }
+          }
+        },
+        {
+          "type": "text",
+          "value": ".",
+          "position": {
+            "start": {
+              "line": 9,
+              "column": 39,
+              "offset": 264
+            },
+            "end": {
+              "line": 9,
+              "column": 40,
+              "offset": 265
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 9,
+          "column": 1,
+          "offset": 226
+        },
+        "end": {
+          "line": 9,
+          "column": 40,
+          "offset": 265
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "Here is another display equation with summation:",
+          "position": {
+            "start": {
+              "line": 11,
+              "column": 1,
+              "offset": 267
+            },
+            "end": {
+              "line": 11,
+              "column": 49,
+              "offset": 315
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 11,
+          "column": 1,
+          "offset": 267
+        },
+        "end": {
+          "line": 11,
+          "column": 49,
+          "offset": 315
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "inlineMath",
+          "value": "\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}",
+          "data": {
+            "hName": "code",
+            "hProperties": {
+              "className": [
+                "language-math",
+                "math-inline"
+              ]
+            },
+            "hChildren": [
+              {
+                "type": "text",
+                "value": "\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}"
+              }
+            ]
+          },
+          "position": {
+            "start": {
+              "line": 13,
+              "column": 1,
+              "offset": 317
+            },
+            "end": {
+              "line": 13,
+              "column": 56,
+              "offset": 372
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 13,
+          "column": 1,
+          "offset": 317
+        },
+        "end": {
+          "line": 13,
+          "column": 56,
+          "offset": 372
+        }
+      }
+    }
+  ],
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 14,
+      "column": 1,
+      "offset": 373
+    }
+  }
+}

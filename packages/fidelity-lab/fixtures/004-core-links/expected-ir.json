@@ -1,46 +1,133 @@
 {
-  "version": "1.0.0",
-  "metadata": {},
-  "blocks": [
+  "type": "root",
+  "children": [
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "paragraph",
+      "children": [
         {
-          "type": "Text",
-          "value": "Check out "
-        },
-        {
-          "type": "Link",
-          "url": "https://google.com",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "Google"
+          "type": "text",
+          "value": "Check out ",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 11,
+              "offset": 10
             }
-          ]
+          }
         },
         {
-          "type": "Text",
-          "value": ".\nThis is some "
+          "type": "link",
+          "title": null,
+          "url": "https://google.com",
+          "children": [
+            {
+              "type": "text",
+              "value": "Google",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 12,
+                  "offset": 11
+                },
+                "end": {
+                  "line": 1,
+                  "column": 18,
+                  "offset": 17
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 11,
+              "offset": 10
+            },
+            "end": {
+              "line": 1,
+              "column": 39,
+              "offset": 38
+            }
+          }
         },
         {
-          "type": "InlineCode",
-          "value": "inline code"
+          "type": "text",
+          "value": ".\r\nThis is some ",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 39,
+              "offset": 38
+            },
+            "end": {
+              "line": 2,
+              "column": 14,
+              "offset": 54
+            }
+          }
         },
         {
-          "type": "Text",
-          "value": " right here."
+          "type": "inlineCode",
+          "value": "inline code",
+          "position": {
+            "start": {
+              "line": 2,
+              "column": 14,
+              "offset": 54
+            },
+            "end": {
+              "line": 2,
+              "column": 27,
+              "offset": 67
+            }
+          }
+        },
+        {
+          "type": "text",
+          "value": " right here.",
+          "position": {
+            "start": {
+              "line": 2,
+              "column": 27,
+              "offset": 67
+            },
+            "end": {
+              "line": 2,
+              "column": 39,
+              "offset": 79
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 1,
-        "startColumn": 1,
-        "endLine": 2,
-        "endColumn": 39,
-        "startOffset": 0,
-        "endOffset": 78
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 39,
+          "offset": 79
+        }
       }
     }
   ],
-  "assets": []
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 3,
+      "column": 1,
+      "offset": 81
+    }
+  }
 }

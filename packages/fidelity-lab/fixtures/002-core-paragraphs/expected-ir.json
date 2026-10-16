@@ -1,80 +1,230 @@
 {
-  "version": "1.0.0",
-  "metadata": {},
-  "blocks": [
+  "type": "root",
+  "children": [
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "paragraph",
+      "children": [
         {
-          "type": "Text",
-          "value": "This is a standard paragraph with "
-        },
-        {
-          "type": "Strong",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "strong"
+          "type": "text",
+          "value": "This is a standard paragraph with ",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 35,
+              "offset": 34
             }
-          ]
+          }
         },
         {
-          "type": "Text",
-          "value": " text, "
-        },
-        {
-          "type": "Emphasis",
-          "inlines": [
+          "type": "strong",
+          "children": [
             {
-              "type": "Text",
-              "value": "emphasized"
+              "type": "text",
+              "value": "strong",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "end": {
+                  "line": 1,
+                  "column": 43,
+                  "offset": 42
+                }
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 35,
+              "offset": 34
+            },
+            "end": {
+              "line": 1,
+              "column": 45,
+              "offset": 44
+            }
+          }
         },
         {
-          "type": "Text",
-          "value": " text, and "
+          "type": "text",
+          "value": " text, ",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 45,
+              "offset": 44
+            },
+            "end": {
+              "line": 1,
+              "column": 52,
+              "offset": 51
+            }
+          }
         },
         {
-          "type": "Strike",
-          "inlines": [
+          "type": "emphasis",
+          "children": [
             {
-              "type": "Text",
-              "value": "strikethrough"
+              "type": "text",
+              "value": "emphasized",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "end": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                }
+              }
             }
-          ]
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 52,
+              "offset": 51
+            },
+            "end": {
+              "line": 1,
+              "column": 64,
+              "offset": 63
+            }
+          }
         },
         {
-          "type": "Text",
-          "value": " text."
+          "type": "text",
+          "value": " text, and ",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 64,
+              "offset": 63
+            },
+            "end": {
+              "line": 1,
+              "column": 75,
+              "offset": 74
+            }
+          }
+        },
+        {
+          "type": "delete",
+          "children": [
+            {
+              "type": "text",
+              "value": "strikethrough",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 77,
+                  "offset": 76
+                },
+                "end": {
+                  "line": 1,
+                  "column": 90,
+                  "offset": 89
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 75,
+              "offset": 74
+            },
+            "end": {
+              "line": 1,
+              "column": 92,
+              "offset": 91
+            }
+          }
+        },
+        {
+          "type": "text",
+          "value": " text.",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 92,
+              "offset": 91
+            },
+            "end": {
+              "line": 1,
+              "column": 98,
+              "offset": 97
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 1,
-        "startColumn": 1,
-        "endLine": 1,
-        "endColumn": 98,
-        "startOffset": 0,
-        "endOffset": 97
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 98,
+          "offset": 97
+        }
       }
     },
     {
-      "type": "Paragraph",
-      "inlines": [
+      "type": "paragraph",
+      "children": [
         {
-          "type": "Text",
-          "value": "This is a second paragraph. It should be separated by a blank line."
+          "type": "text",
+          "value": "This is a second paragraph. It should be separated by a blank line.",
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 101
+            },
+            "end": {
+              "line": 3,
+              "column": 68,
+              "offset": 168
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 3,
-        "startColumn": 1,
-        "endLine": 3,
-        "endColumn": 68,
-        "startOffset": 99,
-        "endOffset": 166
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 101
+        },
+        "end": {
+          "line": 3,
+          "column": 68,
+          "offset": 168
+        }
       }
     }
   ],
-  "assets": []
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 4,
+      "column": 1,
+      "offset": 170
+    }
+  }
 }

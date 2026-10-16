@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "tsx src/runner.ts"
+    "test": "tsx src/runner.ts",
+    "test:update": "tsx src/runner.ts --update"
   },
   "dependencies": {
     "@mdtodocs/compiler-core": "workspace:*",

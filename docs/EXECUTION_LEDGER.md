@@ -155,4 +155,49 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Clipboard HTML exports MathML `<math>` tags for Google Docs formula compatibility alongside visual KaTeX HTML.
   - [x] LaTeX syntax errors degrade safely to styled fallback blocks without breaking or crashing the application.
   - [x] Automated test suite covers math parsing, clipboard rendering, error recovery, and Word export.
-* **Next Allowed Prompt:** Prompt 6: Word / DOCX Table Calibration & Heading/List Nesting Fidelity (Ensuring repeating table headers, column width calculations, nested list indentations, and heading style hierarchies in DOCX export).
+* **Next Allowed Prompt:** Task P1: Establish Trustworthy Regression Tests for md.to.docs
+
+---
+
+## Task P1: Establish Trustworthy Regression Tests for md.to.docs
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Audit and verify all public-main fidelity test suite issues (silent generation, missing structural assertions, placeholder previews, IR-only pass/fail, and git pollution).
+  - Make normal tests strictly non-mutating: missing golden snapshots fail with clear actionable diagnostics; snapshot generation requires explicit `--update` / `-u` CLI flag.
+  - Route all temporary test artifacts exclusively to isolated OS temporary directory (`tmpdir/mdtodocs-fidelity-output`).
+  - Preserve all existing parser regression fixtures and add representative coverage for images (`015-images`) and math expressions (`016-math-expressions`).
+  - Implement deterministic assertions on actual repository renderers:
+    - Clipboard HTML: verify semantic container, headings, paragraphs, lists, links, code blocks, tables, inline formatting, callouts, images, and math formulas.
+    - DOCX: verify valid PKZIP archive structure, `[Content_Types].xml`, and `word/document.xml` containing expected text and structural XML tags.
+    - Mermaid: verify asset preservation when resolved SVG assets are attached and graceful diagnostics on syntax errors.
+  - Implement useful, deterministic failure reporting detailing fixture name, failed assertion, expected behavior, actual behavior, and artifact location.
+  - Fix context state propagation in `DocumentRenderer` and `renderToDocxBlob` for nested inline formatting (`strong`, `emphasis`, `delete`).
+* **Files Changed:**
+  - `packages/fidelity-lab/src/runner.ts` (Complete non-mutating fidelity runner with real clipboard HTML and DOCX assertions, isolated output, and detailed failure reports)
+  - `packages/fidelity-lab/fixtures/015-images/input.md` (Added dedicated image test fixture)
+  - `packages/fidelity-lab/fixtures/015-images/expected-ir.json` (Generated golden AST snapshot)
+  - `packages/fidelity-lab/fixtures/016-math-expressions/input.md` (Added dedicated math expressions fixture)
+  - `packages/fidelity-lab/fixtures/016-math-expressions/expected-ir.json` (Generated golden AST snapshot)
+  - `packages/fidelity-lab/fixtures/*/expected-ir.json` (Updated golden AST baselines to match current mdast Root format)
+  - `packages/fidelity-lab/package.json` (Added `test:update` script)
+  - `package.json` (Updated root `test` and added `test:update` script)
+  - `packages/renderers/src/core/Renderer.ts` (Fixed context state propagation across nested context clones)
+  - `packages/renderers/src/docx.ts` (Harmonized inline text formatting state in docx renderer)
+  - `packages/validation/vitest.config.ts` (Set `testTimeout: 30000` to prevent premature Vitest timeouts on Windows jsdom)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed**; 16 fixtures + 1 mermaid asset integration assertion verified with zero git pollution)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 5/5 test files, 10/10 tests passed**)
+  - `npx pnpm --filter @mdtodocs/compiler-core build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/capability-graph build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 16.38s)
+  - `git status --short` (Verified 100% non-mutating normal test execution)
+* **Acceptance Criteria:**
+  - [x] Normal tests do not silently generate or overwrite expected fixtures.
+  - [x] Existing parser coverage is preserved and expanded with missing representative cases (images, math).
+  - [x] Clipboard HTML and DOCX receive real structural assertions.
+  - [x] Test failures identify the failing fixture, assertion, expected behavior, actual behavior, and artifact path.
+  - [x] The build and test results are reported accurately.
+  - [x] Limitations recorded honestly: DOCX XML assertions verify OpenXML structural conformance rather than Word visual rendering; PDF rendering is omitted as no server-side renderer exists in the codebase.
+* **Queued Work:** Prompt 6: Word / DOCX Table Calibration & Heading/List Nesting Fidelity.

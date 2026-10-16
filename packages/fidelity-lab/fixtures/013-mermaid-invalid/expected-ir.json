@@ -1,46 +1,69 @@
 {
-  "version": "1.0.0",
-  "metadata": {},
-  "blocks": [
+  "type": "root",
+  "children": [
     {
-      "type": "Heading",
-      "level": 1,
-      "inlines": [
+      "type": "heading",
+      "depth": 1,
+      "children": [
         {
-          "type": "Text",
-          "value": "Invalid Mermaid Diagram"
+          "type": "text",
+          "value": "Invalid Mermaid Diagram",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 3,
+              "offset": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 26,
+              "offset": 25
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 1,
-        "startColumn": 1,
-        "endLine": 1,
-        "endColumn": 26,
-        "startOffset": 0,
-        "endOffset": 25
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 26,
+          "offset": 25
+        }
       }
     },
     {
-      "type": "DiagramBlock",
-      "diagramType": "mermaid",
-      "source": "this is not valid mermaid\nA --> B --> C?",
-      "assetId": "asset-1",
+      "type": "code",
+      "lang": "mermaid",
+      "meta": null,
+      "value": "this is not valid mermaid\r\nA --> B --> C?",
       "position": {
-        "startLine": 3,
-        "startColumn": 1,
-        "endLine": 6,
-        "endColumn": 4,
-        "startOffset": 27,
-        "endOffset": 82
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 29
+        },
+        "end": {
+          "line": 6,
+          "column": 4,
+          "offset": 87
+        }
       }
     }
   ],
-  "assets": [
-    {
-      "id": "asset-1",
-      "type": "diagram-source",
-      "src": "mermaid",
-      "data": "this is not valid mermaid\nA --> B --> C?"
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 7,
+      "column": 1,
+      "offset": 89
     }
-  ]
+  }
 }
