@@ -291,7 +291,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
   return (
     <div className="col-span-12 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-full">
-      <div className="w-full flex flex-wrap items-center justify-between text-secondary font-code-sm text-code-sm pb-space-sm px-space-xs border-b border-outline-variant/20 mb-space-sm shrink-0 gap-space-sm">
+      <div className="w-full flex flex-wrap items-center justify-between text-secondary font-code-sm text-code-sm pb-space-sm px-space-xs border-b border-outline-variant/20 mb-space-sm shrink-0 gap-space-sm" data-print-hide>
         <div className="flex flex-wrap items-center gap-space-sm">
           <span className="font-medium text-on-surface flex items-center gap-space-xs">
             <span className="material-symbols-outlined text-[16px] text-primary">auto_stories</span>
@@ -395,24 +395,72 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
       <div className="flex-1 flex justify-center p-space-lg overflow-y-auto">
         <div
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-          className="w-full max-w-[816px] bg-surface-container-lowest transition-all duration-300 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate max-w-none"
+          className="w-full max-w-[816px] min-w-0 bg-surface-container-lowest transition-all duration-300 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate box-border break-words [overflow-wrap:anywhere]"
         >
           {isCompiling && (
             <div className="absolute inset-0 bg-surface-container-lowest/50 flex items-center justify-center rounded z-20">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
-          <div className="relative z-10 font-serif text-on-surface [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
+          <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
               rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }]]}
               components={{
+                p({ children, ...props }: any) {
+                  return (
+                    <p className="break-words [overflow-wrap:anywhere] leading-relaxed my-3" {...props}>
+                      {children}
+                    </p>
+                  );
+                },
+                table({ children, ...props }: any) {
+                  return (
+                    <div className="w-full my-4 overflow-x-auto rounded border border-outline-variant/30 not-prose">
+                      <table className="w-full border-collapse text-left text-[13px] font-sans" {...props}>
+                        {children}
+                      </table>
+                    </div>
+                  );
+                },
+                th({ children, ...props }: any) {
+                  return (
+                    <th className="p-2.5 bg-surface-container-low font-semibold border border-outline-variant/30 break-words align-top text-on-surface" {...props}>
+                      {children}
+                    </th>
+                  );
+                },
+                td({ children, ...props }: any) {
+                  return (
+                    <td className="p-2.5 border border-outline-variant/20 break-words align-top text-on-surface" {...props}>
+                      {children}
+                    </td>
+                  );
+                },
+                pre({ children, ...props }: any) {
+                  return (
+                    <pre className="w-full max-w-full overflow-x-auto p-4 rounded bg-surface-container-low/70 border border-outline-variant/30 font-code-sm text-code-sm leading-relaxed" {...props}>
+                      {children}
+                    </pre>
+                  );
+                },
+                img({ src, alt, ...props }: any) {
+                  return (
+                    <img
+                      src={src}
+                      alt={alt || ''}
+                      className="max-w-full h-auto rounded my-4 mx-auto block shadow-xs"
+                      loading="lazy"
+                      {...props}
+                    />
+                  );
+                },
                 code({ inline, className, children, ...props }: any) {
                   const match = /language-(\w+)/.exec(className || '');
                   if (!inline && match && match[1] === 'mermaid') {
                     return <MermaidDiagram code={String(children).replace(/\n$/, '')} />;
                   }
-                  return <code className={className} {...props}>{children}</code>;
+                  return <code className={`${className || ''} break-words`} {...props}>{children}</code>;
                 },
                 ul({ node, children, ...props }: any) {
                   const isPolyfill = (node as any)?.data?.polyfill === 'table-to-list';
@@ -435,14 +483,14 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                   const isPolyfill = (node as any)?.data?.polyfill === 'image-to-link';
                   if (isPolyfill) {
                     return (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-high text-code-sm font-code-sm text-primary">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-high text-code-sm font-code-sm text-primary break-all">
                         <span className="material-symbols-outlined text-[13px]">link</span>
-                        <a {...props} className="underline hover:text-primary-focus">{children}</a>
+                        <a {...props} className="underline hover:text-primary-focus break-all">{children}</a>
                         <span className="text-secondary text-[10px]">(image fallback)</span>
                       </span>
                     );
                   }
-                  return <a {...props}>{children}</a>;
+                  return <a {...props} className="break-words underline hover:text-primary transition-colors">{children}</a>;
                 }
               }}
             >

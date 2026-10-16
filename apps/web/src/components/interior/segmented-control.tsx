@@ -50,7 +50,9 @@ export function SegmentedControl({
 
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const emit = useRef(onValueChange);
-  emit.current = onValueChange;
+  useEffect(() => {
+    emit.current = onValueChange;
+  }, [onValueChange]);
 
   const reduced = useReducedMotion();
   const pos = useMotionValue(index);

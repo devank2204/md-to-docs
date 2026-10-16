@@ -18,6 +18,18 @@ function escapeAttr(unsafe: string): string {
   return escapeHtml(unsafe);
 }
 
+function getCalloutTextIcon(type: string): string {
+  switch (type.toLowerCase()) {
+    case 'tip': return '💡';
+    case 'warning': return '⚠️';
+    case 'caution': return '🛑';
+    case 'important': return '❗';
+    case 'note':
+    default:
+      return '📝';
+  }
+}
+
 const clipboardRegistry: RendererRegistry<string> = {
   nodes: {
     heading: (block: Heading, ctx) => {
@@ -39,12 +51,28 @@ const clipboardRegistry: RendererRegistry<string> = {
       const font = ctx.theme.typography.bodyFont;
       const size = ctx.theme.typography.baseFontSizePt;
       const color = `#${ctx.theme.colors.text}`;
-      
+      const isTaskList = block.children.some((item: any) => typeof item.checked === 'boolean');
+
       const items = block.children.map((item: any) => {
-        return `<li style="margin-bottom:8px;">${ctx.renderNodes(item.children).join('')}</li>`;
+        const isTask = typeof item.checked === 'boolean';
+        const taskBox = isTask ? (item.checked ? '☑ ' : '☐ ') : '';
+        const itemContent = item.children.map((child: any, idx: number) => {
+          if (isTask && idx === 0 && child.type === 'paragraph') {
+            const p = child as Paragraph;
+            const pFont = ctx.theme.typography.bodyFont;
+            const pSize = ctx.theme.typography.baseFontSizePt;
+            const pColor = `#${ctx.theme.colors.text}`;
+            const lineHeight = ctx.theme.spacing.lineHeight;
+            return `<p style="font-family:${pFont};font-size:${pSize}pt;color:${pColor};line-height:${lineHeight};margin-bottom:16px;">${taskBox}${ctx.renderNodes(p.children).join('')}</p>`;
+          }
+          return ctx.renderNode(child);
+        }).join('');
+        const itemStyle = isTask ? 'margin-bottom:8px;list-style-type:none;' : 'margin-bottom:8px;';
+        return `<li style="${itemStyle}">${itemContent}</li>`;
       });
-      
-      return `<${tag} style="font-family:${font};font-size:${size}pt;color:${color};margin-bottom:16px;padding-left:24px;">${items.join('')}</${tag}>`;
+
+      const listPadding = isTaskList ? 'padding-left:0;list-style:none;' : 'padding-left:24px;';
+      return `<${tag} style="font-family:${font};font-size:${size}pt;color:${color};margin-bottom:16px;${listPadding}">${items.join('')}</${tag}>`;
     },
     blockquote: (block: Blockquote, ctx) => {
       const font = ctx.theme.typography.bodyFont;
@@ -54,37 +82,55 @@ const clipboardRegistry: RendererRegistry<string> = {
       return `<blockquote style="font-family:${font};font-size:${size}pt;color:${color};border-left:4px solid ${border};margin:0 0 16px 0;padding:8px 16px;background:#f9fafb;">${ctx.renderNodes(block.children).join('')}</blockquote>`;
     },
     containerDirective: (block: any /* ContainerDirective */, ctx) => {
-      const type = block.attributes?.type || 'note';
+      const type = (block.name || block.attributes?.type || 'note').toLowerCase();
       const colors = ctx.theme.colors.callouts[type as keyof typeof ctx.theme.colors.callouts] || ctx.theme.colors.callouts.note;
       const font = ctx.theme.typography.bodyFont;
       const size = ctx.theme.typography.baseFontSizePt;
       
-      return `<div style="font-family:${font};font-size:${size}pt;background-color:#${colors.bg};border-left:4px solid #${colors.border};color:#${colors.text};padding:12px 16px;margin-bottom:16px;border-radius:0 4px 4px 0;">
-        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong><br/>
+      return `<div style="font-family:${font};font-size:${size}pt;background-color:#${colors.bg};border-left:4px solid #${colors.border};color:#${colors.text};padding:12px 16px;margin-bottom:16px;border-radius:0 4px 4px 0;word-break:break-word;overflow-wrap:break-word;">
+        <strong>${getCalloutTextIcon(type)} ${type.charAt(0).toUpperCase() + type.slice(1)}</strong><br/>
         ${ctx.renderNodes(block.children).join('')}
       </div>`;
+    },
+    footnoteDefinition: (block: any, ctx) => {
+      const label = escapeHtml(block.label || block.identifier);
+      const color = `#${ctx.theme.colors.secondary}`;
+      const border = `#${ctx.theme.colors.border}`;
+      return `<div class="footnote-definition" id="fn-${block.identifier}" style="font-size:0.85em;color:${color};margin-top:12px;padding-left:12px;border-left:2px solid ${border};"><sup style="font-weight:700;">[${label}]</sup> ${ctx.renderNodes(block.children).join('')}</div>`;
     },
     table: (block: MdTable, ctx) => {
       const font = ctx.theme.typography.bodyFont;
       const size = ctx.theme.typography.baseFontSizePt - 1;
       const color = `#${ctx.theme.colors.text}`;
       const borderColor = `#${ctx.theme.colors.border}`;
-      
-      const rows = block.children.map((row: any, rowIdx: number) => {
+
+      const headerRows: string[] = [];
+      const bodyRows: string[] = [];
+
+      block.children.forEach((row: any, rowIdx: number) => {
         const isHeader = rowIdx === 0;
         const cellTag = isHeader ? 'th' : 'td';
         const bg = isHeader ? '#f3f4f6' : 'transparent';
         const fontWeight = isHeader ? '700' : '400';
-        
-        const cells = row.children.map((cell: any) => {
-          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:left;">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
+
+        const cells = row.children.map((cell: any, colIdx: number) => {
+          const colAlign = block.align?.[colIdx] || 'left';
+          return `<${cellTag} style="padding:8px 12px;border:1px solid ${borderColor};background:${bg};font-weight:${fontWeight};text-align:${colAlign};word-break:break-word;overflow-wrap:break-word;vertical-align:top;">${ctx.renderNodes(cell.children).join('')}</${cellTag}>`;
         });
-        
-        return `<tr>${cells.join('')}</tr>`;
+
+        const rowHtml = `<tr>${cells.join('')}</tr>`;
+        if (isHeader) {
+          headerRows.push(rowHtml);
+        } else {
+          bodyRows.push(rowHtml);
+        }
       });
-      
-      return `<table style="font-family:${font};font-size:${size}pt;color:${color};width:100%;border-collapse:collapse;margin-bottom:16px;">
-        <tbody>${rows.join('')}</tbody>
+
+      const theadHtml = headerRows.length > 0 ? `<thead>${headerRows.join('')}</thead>` : '';
+      const tbodyHtml = bodyRows.length > 0 ? `<tbody>${bodyRows.join('')}</tbody>` : '';
+
+      return `<table style="font-family:${font};font-size:${size}pt;color:${color};width:100%;border-collapse:collapse;margin-bottom:16px;table-layout:auto;">
+        ${theadHtml}${tbodyHtml}
       </table>`;
     },
     thematicBreak: () => '<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />',
@@ -99,13 +145,13 @@ const clipboardRegistry: RendererRegistry<string> = {
       if (isMermaid) {
         const asset = (block.data as any)?.resolvedAsset as ResolvedAsset | undefined;
         if (asset && asset.data) {
-          return `<div style="text-align:center;margin-bottom:16px;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;" /></div>`;
+          return `<div style="text-align:center;margin-bottom:16px;overflow-x:auto;"><img src="${escapeAttr(asset.data)}" alt="Diagram" style="max-width:100%;height:auto;" /></div>`;
         }
       }
       const bg = `#${ctx.theme.colors.codeBackground}`;
       const font = ctx.theme.typography.codeFont;
       const size = Math.max(8, ctx.theme.typography.baseFontSizePt - 1);
-      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;"><code>${escapeHtml(block.value)}</code></pre>`;
+      return `<pre style="font-family:${font};font-size:${size}pt;background:${bg};padding:12px;overflow-x:auto;border-radius:4px;white-space:pre-wrap;word-break:break-word;line-height:1.45;"><code>${escapeHtml(block.value)}</code></pre>`;
     },
     math: (block: any /* Math */) => {
       try {
@@ -151,6 +197,11 @@ const clipboardRegistry: RendererRegistry<string> = {
         return `<code class="math-error" style="font-family:monospace;background:#fee2e2;color:#b91c1c;padding:1px 4px;border-radius:2px;">$${escapeHtml(inline.value)}$</code>`;
       }
     },
+    footnoteReference: (inline: any, ctx) => {
+      const label = escapeHtml(inline.label || inline.identifier);
+      const color = `#${ctx.theme.colors.primary}`;
+      return `<sup><a href="#fn-${inline.identifier}" id="fnref-${inline.identifier}" style="color:${color};text-decoration:none;">[${label}]</a></sup>`;
+    },
     break: () => '<br />',
   },
   fallbackNode: () => ''
@@ -172,8 +223,10 @@ export function renderToClipboardHtml(doc: Root, theme?: DocumentTheme, signatur
 
   return `
     <div style="max-width:800px;margin:0 auto;">
-      ${childrenHtml}
-      ${signatureHtml}
+      <div style="word-break:break-word;overflow-wrap:break-word;">
+        ${childrenHtml}
+        ${signatureHtml}
+      </div>
     </div>
   `;
 }

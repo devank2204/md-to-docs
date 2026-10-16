@@ -13,7 +13,7 @@ export type UseAsyncActionOptions = {
   onError?: (error: unknown) => void;
 };
 
-export function useAsyncAction({
+function useAsyncAction({
   action,
   resetAfter = 1400,
   onError,
@@ -273,7 +273,7 @@ export function LoadingButton({
                  status === 'success' ? 'text-white' : face.tone
               }`}
             >
-              {face.icon && face.icon}
+              {face.icon}
               {face.text}
             </motion.span>
           ))}

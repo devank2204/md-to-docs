@@ -1,200 +1,398 @@
 {
-  "version": "1.0.0",
-  "metadata": {},
-  "blocks": [
+  "type": "root",
+  "children": [
     {
-      "type": "Blockquote",
-      "blocks": [
+      "type": "blockquote",
+      "children": [
         {
-          "type": "Paragraph",
-          "inlines": [
+          "type": "paragraph",
+          "children": [
             {
-              "type": "Text",
-              "value": "This is a simple blockquote."
-            }
-          ],
-          "position": {
-            "startLine": 1,
-            "startColumn": 3,
-            "endLine": 1,
-            "endColumn": 31,
-            "startOffset": 2,
-            "endOffset": 30
-          }
-        }
-      ],
-      "position": {
-        "startLine": 1,
-        "startColumn": 1,
-        "endLine": 1,
-        "endColumn": 31,
-        "startOffset": 0,
-        "endOffset": 30
-      }
-    },
-    {
-      "type": "Blockquote",
-      "blocks": [
-        {
-          "type": "Paragraph",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "This is a blockquote with "
-            },
-            {
-              "type": "Strong",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "bold"
-                }
-              ]
-            },
-            {
-              "type": "Text",
-              "value": " and "
-            },
-            {
-              "type": "Emphasis",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "italic"
-                }
-              ]
-            },
-            {
-              "type": "Text",
-              "value": " text."
-            }
-          ],
-          "position": {
-            "startLine": 3,
-            "startColumn": 3,
-            "endLine": 3,
-            "endColumn": 56,
-            "startOffset": 34,
-            "endOffset": 87
-          }
-        }
-      ],
-      "position": {
-        "startLine": 3,
-        "startColumn": 1,
-        "endLine": 3,
-        "endColumn": 56,
-        "startOffset": 32,
-        "endOffset": 87
-      }
-    },
-    {
-      "type": "Blockquote",
-      "blocks": [
-        {
-          "type": "Paragraph",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "Multiple paragraphs in a blockquote."
-            }
-          ],
-          "position": {
-            "startLine": 5,
-            "startColumn": 3,
-            "endLine": 5,
-            "endColumn": 39,
-            "startOffset": 91,
-            "endOffset": 127
-          }
-        },
-        {
-          "type": "Paragraph",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "Second paragraph here."
-            }
-          ],
-          "position": {
-            "startLine": 7,
-            "startColumn": 3,
-            "endLine": 7,
-            "endColumn": 25,
-            "startOffset": 132,
-            "endOffset": 154
-          }
-        }
-      ],
-      "position": {
-        "startLine": 5,
-        "startColumn": 1,
-        "endLine": 7,
-        "endColumn": 25,
-        "startOffset": 89,
-        "endOffset": 154
-      }
-    },
-    {
-      "type": "Blockquote",
-      "blocks": [
-        {
-          "type": "Paragraph",
-          "inlines": [
-            {
-              "type": "Text",
-              "value": "Nested blockquote level 1"
-            }
-          ],
-          "position": {
-            "startLine": 9,
-            "startColumn": 3,
-            "endLine": 9,
-            "endColumn": 28,
-            "startOffset": 158,
-            "endOffset": 183
-          }
-        },
-        {
-          "type": "Blockquote",
-          "blocks": [
-            {
-              "type": "Paragraph",
-              "inlines": [
-                {
-                  "type": "Text",
-                  "value": "Nested level 2"
-                }
-              ],
+              "type": "text",
+              "value": "This is a simple blockquote.",
               "position": {
-                "startLine": 11,
-                "startColumn": 4,
-                "endLine": 11,
-                "endColumn": 18,
-                "startOffset": 189,
-                "endOffset": 203
+                "start": {
+                  "line": 1,
+                  "column": 3,
+                  "offset": 2
+                },
+                "end": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                }
               }
             }
           ],
           "position": {
-            "startLine": 11,
-            "startColumn": 2,
-            "endLine": 11,
-            "endColumn": 18,
-            "startOffset": 187,
-            "endOffset": 203
+            "start": {
+              "line": 1,
+              "column": 3,
+              "offset": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 31,
+              "offset": 30
+            }
           }
         }
       ],
       "position": {
-        "startLine": 9,
-        "startColumn": 1,
-        "endLine": 11,
-        "endColumn": 18,
-        "startOffset": 156,
-        "endOffset": 203
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 31,
+          "offset": 30
+        }
+      }
+    },
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "This is a blockquote with ",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 3,
+                  "offset": 36
+                },
+                "end": {
+                  "line": 3,
+                  "column": 29,
+                  "offset": 62
+                }
+              }
+            },
+            {
+              "type": "strong",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "bold",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 31,
+                      "offset": 64
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 35,
+                      "offset": 68
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 29,
+                  "offset": 62
+                },
+                "end": {
+                  "line": 3,
+                  "column": 37,
+                  "offset": 70
+                }
+              }
+            },
+            {
+              "type": "text",
+              "value": " and ",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 37,
+                  "offset": 70
+                },
+                "end": {
+                  "line": 3,
+                  "column": 42,
+                  "offset": 75
+                }
+              }
+            },
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "italic",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 43,
+                      "offset": 76
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 49,
+                      "offset": 82
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 42,
+                  "offset": 75
+                },
+                "end": {
+                  "line": 3,
+                  "column": 50,
+                  "offset": 83
+                }
+              }
+            },
+            {
+              "type": "text",
+              "value": " text.",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 50,
+                  "offset": 83
+                },
+                "end": {
+                  "line": 3,
+                  "column": 56,
+                  "offset": 89
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 3,
+              "offset": 36
+            },
+            "end": {
+              "line": 3,
+              "column": 56,
+              "offset": 89
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 34
+        },
+        "end": {
+          "line": 3,
+          "column": 56,
+          "offset": 89
+        }
+      }
+    },
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Multiple paragraphs in a blockquote.",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 3,
+                  "offset": 95
+                },
+                "end": {
+                  "line": 5,
+                  "column": 39,
+                  "offset": 131
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 3,
+              "offset": 95
+            },
+            "end": {
+              "line": 5,
+              "column": 39,
+              "offset": 131
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Second paragraph here.",
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 3,
+                  "offset": 138
+                },
+                "end": {
+                  "line": 7,
+                  "column": 25,
+                  "offset": 160
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 3,
+              "offset": 138
+            },
+            "end": {
+              "line": 7,
+              "column": 25,
+              "offset": 160
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 5,
+          "column": 1,
+          "offset": 93
+        },
+        "end": {
+          "line": 7,
+          "column": 25,
+          "offset": 160
+        }
+      }
+    },
+    {
+      "type": "blockquote",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Nested blockquote level 1",
+              "position": {
+                "start": {
+                  "line": 9,
+                  "column": 3,
+                  "offset": 166
+                },
+                "end": {
+                  "line": 9,
+                  "column": 28,
+                  "offset": 191
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 9,
+              "column": 3,
+              "offset": 166
+            },
+            "end": {
+              "line": 9,
+              "column": 28,
+              "offset": 191
+            }
+          }
+        },
+        {
+          "type": "blockquote",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Nested level 2",
+                  "position": {
+                    "start": {
+                      "line": 11,
+                      "column": 4,
+                      "offset": 199
+                    },
+                    "end": {
+                      "line": 11,
+                      "column": 18,
+                      "offset": 213
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 4,
+                  "offset": 199
+                },
+                "end": {
+                  "line": 11,
+                  "column": 18,
+                  "offset": 213
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 11,
+              "column": 2,
+              "offset": 197
+            },
+            "end": {
+              "line": 11,
+              "column": 18,
+              "offset": 213
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 9,
+          "column": 1,
+          "offset": 164
+        },
+        "end": {
+          "line": 11,
+          "column": 18,
+          "offset": 213
+        }
       }
     }
   ],
-  "assets": []
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 12,
+      "column": 1,
+      "offset": 215
+    }
+  }
 }

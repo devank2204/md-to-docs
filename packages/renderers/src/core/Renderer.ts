@@ -34,21 +34,22 @@ export class DocumentRenderer<TNodeOut> {
   }
 
   private createContext(initialState: Record<string, any>, theme: DocumentTheme): RendererContext<TNodeOut> {
+    const registry = this.registry;
     const context: RendererContext<TNodeOut> = {
       theme,
       state: initialState,
-      renderNode: (node: Node) => {
-        const handler = this.registry.nodes[node.type];
+      renderNode(node: Node) {
+        const handler = registry.nodes[node.type];
         if (handler) {
-          return handler(node, context);
+          return handler(node, this);
         }
-        if (this.registry.fallbackNode) {
-          return this.registry.fallbackNode(node, context);
+        if (registry.fallbackNode) {
+          return registry.fallbackNode(node, this);
         }
         throw new Error(`No renderer registered for node type: ${node.type}`);
       },
-      renderNodes: (nodes: Node[]) => {
-        return nodes.map(context.renderNode);
+      renderNodes(nodes: Node[]) {
+        return nodes.map(n => this.renderNode(n));
       }
     };
     return context;

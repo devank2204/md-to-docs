@@ -30,40 +30,72 @@ interface DocumentStats {
   headings: number;
   paragraphs: number;
   lists: number;
+  taskLists: number;
   tables: number;
   codeBlocks: number;
   images: number;
   blockquotes: number;
   callouts: number;
-  mermaidRendered: number;
-  mermaidFailed: number;
+  math: number;
+  footnotes: number;
+  mermaid: number;
+  words: number;
+  readingTimeMinutes: number;
 }
 
-function countElements(doc: Root): DocumentStats {
+function countElements(doc: Root, rawText: string): DocumentStats {
+  const words = rawText.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));
+
   const stats: DocumentStats = {
     headings: 0,
     paragraphs: 0,
     lists: 0,
+    taskLists: 0,
     tables: 0,
     codeBlocks: 0,
     images: 0,
     blockquotes: 0,
     callouts: 0,
-    mermaidRendered: 0,
-    mermaidFailed: 0,
+    math: 0,
+    footnotes: 0,
+    mermaid: 0,
+    words,
+    readingTimeMinutes,
   };
 
   visit(doc, (node: any) => {
     switch (node.type) {
       case 'heading': stats.headings++; break;
       case 'paragraph': stats.paragraphs++; break;
-      case 'list': stats.lists++; break;
+      case 'list': {
+        const hasTask = node.children?.some((item: any) => item.checked !== null && item.checked !== undefined);
+        if (hasTask) {
+          stats.taskLists++;
+        } else {
+          stats.lists++;
+        }
+        break;
+      }
       case 'table': stats.tables++; break;
-      case 'code': stats.codeBlocks++; break;
+      case 'code':
+        if (node.lang === 'mermaid') {
+          stats.mermaid++;
+        } else {
+          stats.codeBlocks++;
+        }
+        break;
       case 'image': stats.images++; break;
       case 'blockquote': stats.blockquotes++; break;
       case 'containerDirective': stats.callouts++; break;
-      case 'math': stats.codeBlocks++; break; // or map to something else
+      case 'math':
+      case 'inlineMath':
+        stats.math++;
+        break;
+      case 'footnoteReference':
+      case 'footnoteDefinition':
+        stats.footnotes++;
+        break;
     }
   });
 
@@ -75,11 +107,11 @@ function formatStats(stats: DocumentStats): string {
   if (stats.headings > 0) parts.push(`${stats.headings} heading${stats.headings !== 1 ? 's' : ''}`);
   if (stats.tables > 0) parts.push(`${stats.tables} table${stats.tables !== 1 ? 's' : ''}`);
   if (stats.codeBlocks > 0) parts.push(`${stats.codeBlocks} code block${stats.codeBlocks !== 1 ? 's' : ''}`);
-  if (stats.images > 0) parts.push(`${stats.images} image${stats.images !== 1 ? 's' : ''}`);
-  if (stats.lists > 0) parts.push(`${stats.lists} list${stats.lists !== 1 ? 's' : ''}`);
+  if (stats.mermaid > 0) parts.push(`${stats.mermaid} diagram${stats.mermaid !== 1 ? 's' : ''}`);
+  if (stats.math > 0) parts.push(`${stats.math} equation${stats.math !== 1 ? 's' : ''}`);
   if (stats.callouts > 0) parts.push(`${stats.callouts} callout${stats.callouts !== 1 ? 's' : ''}`);
-  if (stats.mermaidRendered > 0) parts.push(`${stats.mermaidRendered} Mermaid diagram${stats.mermaidRendered !== 1 ? 's' : ''} rendered`);
-  if (stats.mermaidFailed > 0) parts.push(`${stats.mermaidFailed} Mermaid diagram${stats.mermaidFailed !== 1 ? 's' : ''} failed`);
+  if (stats.taskLists > 0) parts.push(`${stats.taskLists} task list${stats.taskLists !== 1 ? 's' : ''}`);
+  if (stats.footnotes > 0) parts.push(`${stats.footnotes} footnote${stats.footnotes !== 1 ? 's' : ''}`);
   return parts.join(' · ');
 }
 
@@ -111,7 +143,22 @@ export function Workspace({
     validationReport: any;
   }>({
     diagnostics: [],
-    stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0, mermaidRendered: 0, mermaidFailed: 0 },
+    stats: {
+      headings: 0,
+      paragraphs: 0,
+      lists: 0,
+      taskLists: 0,
+      tables: 0,
+      codeBlocks: 0,
+      images: 0,
+      blockquotes: 0,
+      callouts: 0,
+      math: 0,
+      footnotes: 0,
+      mermaid: 0,
+      words: 0,
+      readingTimeMinutes: 1,
+    },
     validationReport: null,
   });
 
@@ -135,7 +182,7 @@ export function Workspace({
         if (controller.signal.aborted) return;
 
         // Count before planner optimizations
-        const docStats = countElements(doc);
+        const docStats = countElements(doc, markdown);
 
         doc = planRepresentation(doc, destination, collector);
         if (controller.signal.aborted) return;
@@ -155,7 +202,22 @@ export function Workspace({
           console.error('Compilation error:', e);
           setCompiledState({
             diagnostics: [],
-            stats: { headings: 0, paragraphs: 0, lists: 0, tables: 0, codeBlocks: 0, images: 0, blockquotes: 0, callouts: 0, mermaidRendered: 0, mermaidFailed: 0 },
+            stats: {
+              headings: 0,
+              paragraphs: 0,
+              lists: 0,
+              taskLists: 0,
+              tables: 0,
+              codeBlocks: 0,
+              images: 0,
+              blockquotes: 0,
+              callouts: 0,
+              math: 0,
+              footnotes: 0,
+              mermaid: 0,
+              words: 0,
+              readingTimeMinutes: 1,
+            },
             validationReport: null,
           });
           setCompiledDoc(null);
@@ -179,7 +241,7 @@ export function Workspace({
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)]">
-      <div className="w-full grid grid-cols-12 h-full">
+      <div className="w-full grid grid-cols-12 h-full overflow-y-auto lg:overflow-hidden">
         <DocumentEditor
           markdown={markdown}
           onInput={onInput}
@@ -215,6 +277,8 @@ export function Workspace({
         report={validationReport}
         diagnostics={diagnostics}
         stats={stats}
+        destination={destination}
+        onDestinationChange={onDestinationChange}
       />
 
       <StatusBar

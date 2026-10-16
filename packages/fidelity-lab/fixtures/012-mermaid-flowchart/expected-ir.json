@@ -1,46 +1,69 @@
 {
-  "version": "1.0.0",
-  "metadata": {},
-  "blocks": [
+  "type": "root",
+  "children": [
     {
-      "type": "Heading",
-      "level": 1,
-      "inlines": [
+      "type": "heading",
+      "depth": 1,
+      "children": [
         {
-          "type": "Text",
-          "value": "Simple Flowchart"
+          "type": "text",
+          "value": "Simple Flowchart",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 3,
+              "offset": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 19,
+              "offset": 18
+            }
+          }
         }
       ],
       "position": {
-        "startLine": 1,
-        "startColumn": 1,
-        "endLine": 1,
-        "endColumn": 19,
-        "startOffset": 0,
-        "endOffset": 18
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 19,
+          "offset": 18
+        }
       }
     },
     {
-      "type": "DiagramBlock",
-      "diagramType": "mermaid",
-      "source": "flowchart TD\n    A[User] --> B[API]\n    B --> C[Database]",
-      "assetId": "asset-1",
+      "type": "code",
+      "lang": "mermaid",
+      "meta": null,
+      "value": "flowchart TD\r\n    A[User] --> B[API]\r\n    B --> C[Database]",
       "position": {
-        "startLine": 3,
-        "startColumn": 1,
-        "endLine": 7,
-        "endColumn": 4,
-        "startOffset": 20,
-        "endOffset": 92
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 22
+        },
+        "end": {
+          "line": 7,
+          "column": 4,
+          "offset": 98
+        }
       }
     }
   ],
-  "assets": [
-    {
-      "id": "asset-1",
-      "type": "diagram-source",
-      "src": "mermaid",
-      "data": "flowchart TD\n    A[User] --> B[API]\n    B --> C[Database]"
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 8,
+      "column": 1,
+      "offset": 100
     }
-  ]
+  }
 }
