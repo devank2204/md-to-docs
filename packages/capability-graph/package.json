@@ -5,9 +5,7 @@
   "scripts": {
     "build": "tsc"
   },
-  "dependencies": {
-    "@mdtodocs/compiler-core": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.0.0"
   }

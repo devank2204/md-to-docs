@@ -129,10 +129,6 @@ importers:
         version: 5.9.3
 
   packages/capability-graph:
-    dependencies:
-      '@mdtodocs/compiler-core':
-        specifier: workspace:*
-        version: link:../compiler-core
     devDependencies:
       typescript:
         specifier: ^5.0.0

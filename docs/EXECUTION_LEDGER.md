@@ -235,4 +235,41 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Full heading hierarchy (Heading 1 to Heading 6) is styled in DOCX with proper fonts, sizes, keepNext, and spacing.
   - [x] Task lists render ballot boxes (`☑ ` / `☐ `) in DOCX and clipboard HTML without redundant bullets.
   - [x] Regression test suite in `@mdtodocs/validation` asserts all table, heading, and list capabilities.
-* **Queued Work:** Next queued prompt or milestone.
+* **Next Allowed Prompt:** Prompt 7: Architecture Hygiene, Circular Dependency Cleanup & Standalone HTML Renderer
+
+---
+
+## Prompt 7: Architecture Hygiene, Circular Dependency Cleanup & Standalone HTML Renderer
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Remove circular unused dependency `@mdtodocs/compiler-core` from `packages/capability-graph/package.json` to ensure clean acyclic workspace dependency flow.
+  - Eliminate all 3 `oxlint` warnings in `apps/web`:
+    - Fix ref mutation during render in `segmented-control.tsx` using `useEffect`.
+    - Fix fast-refresh violation by unexporting `useAsyncAction` internal hook in `loading-button.tsx`.
+    - Remove redundant `{face.icon && face.icon}` comparison in `loading-button.tsx`.
+  - Implement standalone `html.ts` renderer in `@mdtodocs/renderers` with full document wrapping, semantic heading IDs, precise Mermaid SVG injection, table alignment, KaTeX math, task lists, and print styles.
+  - Export `renderToHtml` and `HtmlRendererOptions` from `@mdtodocs/renderers`.
+  - Add unit test suite in `@mdtodocs/validation` covering `renderToHtml` capabilities.
+* **Files Changed:**
+  - `packages/capability-graph/package.json` (Removed circular compiler-core dependency)
+  - `apps/web/src/components/interior/segmented-control.tsx` (Fixed ref update in render)
+  - `apps/web/src/components/interior/loading-button.tsx` (Internalized useAsyncAction and simplified face.icon)
+  - `packages/renderers/src/html.ts` (Implemented standalone HTML renderer)
+  - `packages/renderers/src/index.ts` (Exported renderToHtml and HtmlRendererOptions)
+  - `packages/validation/tests/html-renderer.test.ts` (Added 6 unit tests for standalone HTML renderer)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/capability-graph build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/compiler-core build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.60s)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 8/8 test files, 30/30 tests passed**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed**)
+* **Acceptance Criteria:**
+  - [x] Workspace graph has no circular dependencies between compiler-core and capability-graph.
+  - [x] `oxlint` reports 0 warnings and 0 errors across the entire web application.
+  - [x] Standalone `html.ts` renderer is implemented, exported, and tested.
+  - [x] Mermaid SVG injection injects pure SVG into HTML without rasterization.
+  - [x] All 30 validation tests and 17 fidelity lab fixtures pass.
+* **Queued Work:** Prompt 8: GFM Footnotes & Callout Styling Fidelity.
