@@ -392,10 +392,10 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 flex justify-center p-space-lg overflow-y-auto min-h-0">
+      <div className="flex-1 flex justify-center items-start p-space-lg overflow-y-auto min-h-0">
         <div
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-          className="w-full max-w-[816px] min-w-0 bg-surface-container-lowest transition-all duration-300 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col min-h-[1056px] relative border border-outline-variant/30 prose prose-slate box-border break-words [overflow-wrap:anywhere]"
+          className="w-full max-w-[816px] min-w-0 bg-surface-container-lowest transition-all duration-300 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col h-auto min-h-[1056px] relative border border-outline-variant/30 prose prose-slate box-border break-words [overflow-wrap:anywhere] mb-space-xxl"
         >
           {isCompiling && (
             <div className="absolute inset-0 bg-surface-container-lowest/50 flex items-center justify-center rounded z-20">

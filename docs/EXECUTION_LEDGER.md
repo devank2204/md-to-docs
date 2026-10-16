@@ -371,14 +371,24 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed with 0 snapshot mutations**)
   - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
   - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 16.14s)
+
+### Task P12: Paper Sheet Dynamic Expansion and Card Clipping Fix (Completed)
+* **Goal:** Resolve document content (Mermaid diagram, math formulas, and sections) spilling past the bottom of the white paper card into the workspace gray background.
+* **Root Cause:** In `DocumentPreview.tsx`, the scroll container (`div.flex-1.flex.justify-center`) defaulted to `align-items: stretch` in flexbox without `items-start`. The paper card flex child had `min-h-[1056px]` without `h-auto`, causing its layout height to be constrained rather than growing to fit inner content exceeding 1056px.
+* **Implementation Details:**
+  - Added `items-start` to preview container flexbox in `apps/web/src/components/DocumentPreview.tsx`.
+  - Added `h-auto` and `mb-space-xxl` to the paper card container to allow natural expansion and preserve comfortable bottom margin on scroll.
+* **Files Modified:**
+  - `apps/web/src/components/DocumentPreview.tsx`
+  - `docs/EXECUTION_LEDGER.md`
+* **Tests Executed and Results:**
+  - Browser Verification: **PASS** (Paper card expands to enclose entire diagram, section 3, math equations, and footer cleanly).
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 11/11 test files, 46/46 tests passed**).
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed with 0 snapshot mutations**).
+  - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**).
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, built in 3.46s).
 * **Acceptance Criteria:**
-  - [x] Both preview container and editor textarea scroll smoothly via mouse wheel, trackpad, and scrollbar dragging.
-  - [x] Sleek, visible custom scrollbars indicate position across Chrome, Edge, and Firefox.
-  - [x] Side-by-side split screen works cleanly down to 768px (including 958px/960px half-screen desktop windows) without vertical stacking or double scrollbars.
-  - [x] Mermaid diagrams render cleanly without enclosing pre container or duplicate borders.
-  - [x] Full round of browser sanity checks passes with zero console errors.
+  - [x] Paper sheet dynamically grows to contain all content regardless of document length.
+  - [x] No diagram, formula, or text nodes spill into the gray background.
   - [x] All 46 validation tests and 17 fidelity lab fixtures pass.
-  - [x] Web linter and production build succeed with zero errors.
-
-
-
+  - [x] Web lint and production build pass with zero errors.
