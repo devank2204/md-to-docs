@@ -16,6 +16,7 @@ export interface AppState {
   };
   compiledDoc: Root | null;
   isCompiling: boolean;
+  isReviewMode: boolean;
   
   setMarkdown: (markdown: string) => void;
   setDestination: (destination: DestinationType) => void;
@@ -24,6 +25,7 @@ export interface AppState {
   setDocumentSignature: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
   setCompiledDoc: (doc: Root | null) => void;
   setIsCompiling: (isCompiling: boolean) => void;
+  setIsReviewMode: (isReviewMode: boolean) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -39,6 +41,10 @@ export const useStore = create<AppState>()(
       },
       compiledDoc: null,
       isCompiling: false,
+      isReviewMode: typeof window !== 'undefined' && (
+        new URLSearchParams(window.location.search).get('mode') === 'review' ||
+        new URLSearchParams(window.location.search).get('view') === 'review'
+      ),
       
       setMarkdown: (markdown) => set({ markdown }),
       setDestination: (destination) => set({ destination }),
@@ -47,6 +53,19 @@ export const useStore = create<AppState>()(
       setDocumentSignature: (documentSignature) => set({ documentSignature }),
       setCompiledDoc: (compiledDoc) => set({ compiledDoc }),
       setIsCompiling: (isCompiling) => set({ isCompiling }),
+      setIsReviewMode: (isReviewMode) => {
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location.href);
+          if (isReviewMode) {
+            url.searchParams.set('mode', 'review');
+          } else {
+            url.searchParams.delete('mode');
+            url.searchParams.delete('view');
+          }
+          window.history.replaceState({}, '', url.toString());
+        }
+        set({ isReviewMode });
+      },
     }),
     {
       name: 'md-to-docs-storage',
@@ -60,3 +79,4 @@ export const useStore = create<AppState>()(
     }
   )
 );
+

@@ -11,6 +11,8 @@ import { DocumentInspector } from '@/components/DocumentInspector';
 import { DocumentEditor } from '@/components/DocumentEditor';
 import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
+import { ReviewActionBar } from '@/components/ReviewActionBar';
+import { SuggestEditModal } from '@/components/SuggestEditModal';
 
 interface WorkspaceProps {
   markdown: string;
@@ -132,10 +134,22 @@ export function Workspace({
 }: WorkspaceProps) {
   const [isFidelityPanelOpen, setIsFidelityPanelOpen] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(false);
+  const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
+  const [selectedPassage, setSelectedPassage] = useState('');
   
+  const isReviewMode = useStore(state => state.isReviewMode);
   const setCompiledDoc = useStore(state => state.setCompiledDoc);
   const isCompiling = useStore(state => state.isCompiling);
   const setIsCompiling = useStore(state => state.setIsCompiling);
+
+  const docTitleMatch = markdown.match(/^#\s+(.+)$/m);
+  const docTitle = docTitleMatch ? docTitleMatch[1].trim() : 'Document';
+
+  const handleOpenSuggestModal = () => {
+    const selection = typeof window !== 'undefined' ? window.getSelection()?.toString()?.trim() || '' : '';
+    setSelectedPassage(selection);
+    setIsSuggestModalOpen(true);
+  };
 
   const [compiledState, setCompiledState] = useState<{
     diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
@@ -241,28 +255,64 @@ export function Workspace({
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
-      <div className="w-full grid grid-cols-12 h-full min-h-0 overflow-y-auto md:overflow-hidden">
-        <DocumentEditor
-          markdown={markdown}
-          onInput={onInput}
-          words={words}
-          lines={lines}
-        />
+      {isReviewMode ? (
+        <div className="flex-1 w-full overflow-y-auto px-4 py-4 bg-surface-container-lowest">
+          <ReviewActionBar
+            markdown={markdown}
+            readingTimeMinutes={stats.readingTimeMinutes}
+            wordCount={words}
+            activeTheme={activeTheme}
+            documentSignature={documentSignature}
+            onOpenSuggestModal={handleOpenSuggestModal}
+          />
+          <div className="w-full flex justify-center pb-20">
+            <DocumentPreview
+              markdown={markdown}
+              destination={destination}
+              onDestinationChange={onDestinationChange}
+              themeId={themeId}
+              onThemeIdChange={onThemeIdChange}
+              baseFontSize={baseFontSize}
+              onBaseFontSizeChange={onBaseFontSizeChange}
+              isCompiling={isCompiling}
+              onOpenInspector={() => setIsInspectorOpen(true)}
+              documentSignature={documentSignature}
+              onDocumentSignatureChange={onDocumentSignatureChange}
+              isReviewMode={true}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="w-full grid grid-cols-12 h-full min-h-0 overflow-y-auto md:overflow-hidden">
+          <DocumentEditor
+            markdown={markdown}
+            onInput={onInput}
+            words={words}
+            lines={lines}
+          />
 
-        <DocumentPreview
-          markdown={markdown}
-          destination={destination}
-          onDestinationChange={onDestinationChange}
-          themeId={themeId}
-          onThemeIdChange={onThemeIdChange}
-          baseFontSize={baseFontSize}
-          onBaseFontSizeChange={onBaseFontSizeChange}
-          isCompiling={isCompiling}
-          onOpenInspector={() => setIsInspectorOpen(true)}
-          documentSignature={documentSignature}
-          onDocumentSignatureChange={onDocumentSignatureChange}
-        />
-      </div>
+          <DocumentPreview
+            markdown={markdown}
+            destination={destination}
+            onDestinationChange={onDestinationChange}
+            themeId={themeId}
+            onThemeIdChange={onThemeIdChange}
+            baseFontSize={baseFontSize}
+            onBaseFontSizeChange={onBaseFontSizeChange}
+            isCompiling={isCompiling}
+            onOpenInspector={() => setIsInspectorOpen(true)}
+            documentSignature={documentSignature}
+            onDocumentSignatureChange={onDocumentSignatureChange}
+          />
+        </div>
+      )}
+
+      <SuggestEditModal
+        isOpen={isSuggestModalOpen}
+        onClose={() => setIsSuggestModalOpen(false)}
+        initialSelection={selectedPassage}
+        documentTitle={docTitle}
+      />
 
       <FidelityCheckPanel
         isOpen={isFidelityPanelOpen}
@@ -281,14 +331,16 @@ export function Workspace({
         onDestinationChange={onDestinationChange}
       />
 
-      <StatusBar
-        isCompiling={isCompiling}
-        warningsCount={warnings.length}
-        fidelityScore={validationReport?.summary?.fidelityScore}
-        statsText={statsText}
-        destination={destination}
-        onToggleFidelityPanel={() => setIsFidelityPanelOpen(!isFidelityPanelOpen)}
-      />
+      {!isReviewMode && (
+        <StatusBar
+          isCompiling={isCompiling}
+          warningsCount={warnings.length}
+          fidelityScore={validationReport?.summary?.fidelityScore}
+          statsText={statsText}
+          destination={destination}
+          onToggleFidelityPanel={() => setIsFidelityPanelOpen(!isFidelityPanelOpen)}
+        />
+      )}
     </div>
   );
 }

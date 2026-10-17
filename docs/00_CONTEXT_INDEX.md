@@ -31,6 +31,8 @@ The north-star experience is:
 13. `13_COMMAND_PALETTE.md` — power-user interaction model.
 14. `14_DECISIONS_AND_NON_GOALS.md` — decisions, rejected directions, and scope boundaries.
 15. `15_ANTIGRAVITY_EXECUTION.md` — instructions for using this context during development.
+16. `16_CURRENT_DESIGN_REVIEW.md` — baseline design and aesthetic audit.
+17. `17_AI_WORKSPACE_STRATEGY_AND_PLAN.md` — AI workspace product strategy, GStack multi-phase review, and phased implementation roadmap.
 
 ## Canonicality
 

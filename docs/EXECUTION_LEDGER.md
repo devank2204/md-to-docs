@@ -392,3 +392,227 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] No diagram, formula, or text nodes spill into the gray background.
   - [x] All 46 validation tests and 17 fidelity lab fixtures pass.
   - [x] Web lint and production build pass with zero errors.
+
+* **Next Allowed Roadmap:** AI-Native Workspace Expansion (Tasks P13 - P17, documented in [17_AI_WORKSPACE_STRATEGY_AND_PLAN.md](file:///d:/mdtodocs/md-to-docs/docs/17_AI_WORKSPACE_STRATEGY_AND_PLAN.md))
+
+---
+
+## Task P13: Table Copy-Paste Fidelity Engine
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the Table Copy-Paste Fidelity Engine to eliminate friction when moving Markdown tables into spreadsheet tools (Excel, Google Sheets, Numbers) or documents (Word, Docs).
+  - Created `packages/renderers/src/tableClipboard.ts`:
+    - `serializeTableToTsv`: Formats table as Tab-Separated Values (`text/plain`), flattening multiline cells to spaces so columns don't shift. Pastes directly into spreadsheet cell grids.
+    - `serializeTableToCsv`: RFC 4180 compliant CSV serializer with comma and quote escaping.
+    - `serializeTableToHtml`: Self-contained styled HTML table (`text/html`) with light gray borders, shaded header rows, and cell alignment.
+    - `serializeTableToMarkdown`: Clean GFM table serializer with column padding, alignment markers (`:---`, `:---:`, `---:`), and `<br />` cell newline preservation.
+    - `copyTableToClipboard`: Multi-mime clipboard writer supporting `text/html` + `text/plain` for spreadsheet grids and rich docs.
+  - Created `apps/web/src/components/InteractiveTable.tsx`:
+    - Floating action pill above rendered tables with buttons: `[Copy for Excel/Sheets]`, `[CSV]`, `[TSV]`, and `[Markdown]`.
+    - Real-time feedback state displaying checkmark and confirmation (`Copied Excel!`, etc.).
+    - Annotated with `data-print-hide` so print and PDF export remain clean.
+  - Integrated `InteractiveTable` into `DocumentPreview.tsx`.
+* **Files Changed:**
+  - `packages/renderers/src/tableClipboard.ts` (New module: table parsers, serializations, clipboard handler)
+  - `packages/renderers/src/index.ts` (Exported table clipboard functions)
+  - `packages/validation/tests/table-clipboard.test.ts` (New test suite: 4 unit tests covering TSV, CSV, HTML, and Markdown)
+  - `apps/web/src/components/InteractiveTable.tsx` (New component: table wrapper with action pill)
+  - `apps/web/src/components/DocumentPreview.tsx` (Replaced basic table renderer with `InteractiveTable`)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 12/12 test files, 50/50 tests passed**)
+  - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 10.54s)
+  - Browser Subagent Verification: **PASS** (Verified all 4 copy buttons in live app, verified clipboard actions and visual confirmation states)
+* **Acceptance Criteria:**
+  - [x] Floating action pill appears above preview tables with Excel, CSV, TSV, and Markdown copy actions.
+  - [x] TSV, CSV, HTML, and Markdown serializations correctly format table structure and alignments.
+  - [x] Multi-mime clipboard copy writes HTML and TSV for Excel/Sheets paste.
+  - [x] Action pill is hidden on print/PDF export (`data-print-hide`).
+  - [x] All 50 validation tests pass and production build succeeds.
+
+* **Next Allowed Prompt:** Task P14: Mermaid Export Suite & Theme Selector
+
+---
+
+## Task P14: Mermaid Export Suite & Theme Selector
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Complete the Mermaid diagram export suite and syntax debugging system to solve diagram rendering failures and export friction for developers.
+  - Created `apps/web/src/components/MermaidDiagram.tsx`:
+    - **Multi-Format Export & Clipboard**:
+      - `Copy Image`: Writes PNG blob directly to system clipboard via `navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])` for instant pasting into Slack, Linear, Google Docs, or Word.
+      - `Copy SVG` & `Copy Source`: Single-click clipboard actions with checkmark feedback.
+      - `Download SVG`: Vector export with UTF-8 XML encoding.
+      - `Download PNG`: High-resolution 2x Retina canvas rasterization with transparent/white background.
+      - `Download JPEG`: Compressed rasterization on solid `#ffffff` canvas background.
+    - **Theme Selector**: Dynamic dropdown supporting `neutral`, `default`, `dark`, `forest`, and `base` with real-time re-rendering and theme-matched background containers.
+    - **Interactive Syntax Error Debugger with Line-Number Highlighting**:
+      - Parses Mermaid runtime exception messages to extract the failing line number (e.g., `Line 5`).
+      - Renders numbered code lines and highlights the exact syntax error line in red with an explicit arrow indicator (`← Syntax error here`).
+      - Offers toggleable `Debug Source` / `Hide Details` view.
+    - **Print & PDF Safety**: Tagged with `data-print-hide` so export buttons never bleed into printed documents.
+  - Modularized `DocumentPreview.tsx` by extracting inline Mermaid logic into `MermaidDiagram.tsx`.
+* **Files Changed:**
+  - `apps/web/src/components/MermaidDiagram.tsx` (New component with theme selector, JPEG/PNG/SVG export, and syntax debugger)
+  - `apps/web/src/components/DocumentPreview.tsx` (Cleaned up imports and wired `MermaidDiagram`)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.42s)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 12/12 test files, 50/50 tests passed**)
+  - Browser Subagent Verification: **PASS** (Verified Theme dropdown, 'dark' and 'forest' themes, 'Copy Image', 'JPEG' export, and verified the interactive syntax error debugger with line 5 highlight and error banner).
+* **Acceptance Criteria:**
+  - [x] JPEG export with white canvas background downloads cleanly.
+  - [x] Theme selector dynamically switches between neutral, default, dark, and forest palettes.
+  - [x] Copy Image writes image/png directly to clipboard.
+  - [x] Mermaid syntax error displays exact line number and highlights offending code line.
+  - [x] Web build, lint, and all 50 validation tests succeed.
+
+* **Next Allowed Prompt:** Task P15: JSON & Code Block Live Formatter
+
+---
+
+## Task P15: JSON & Code Block Live Formatter
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the JSON & Code Block Live Formatter to prevent broken copy-pasted code snippets, handle JSON comments, and provide rich syntax highlighting and line numbering.
+  - Created `packages/renderers/src/codeFormatter.ts`:
+    - `stripJsonComments`: Strips single-line (`//`) and multi-line (`/* */`) comments from JSON-like text.
+    - `formatJsonCode`: Validates, parses, detects comments, and auto-indents JSON strings with 2 spaces.
+    - `beautifyCode`: Normalizes tabs to spaces and trims trailing whitespace across code languages.
+  - Created `packages/validation/tests/code-formatter.test.ts`:
+    - Added 5 unit tests covering comment stripping, auto-indentation, comment detection for API requests, invalid JSON handling, and tab beautification.
+  - Created `apps/web/src/components/InteractiveCodeBlock.tsx`:
+    - Integrated with Prism.js for syntax highlighting (JavaScript, TypeScript, Python, Bash, SQL, JSON, YAML, Markdown, CSS, HTML).
+    - Header displays language tag, line count, and dynamic `valid json` / `syntax error` status.
+    - **Actions**:
+      - `Copy Clean JSON`: Appears when JSON has comments; strips comments before copying to prevent 400 Bad Request API errors.
+      - `Copy`: Copies formatted code to clipboard with real-time checkmark confirmation.
+      - `Format`: Toggles between formatted/pretty-printed and raw code.
+      - `Lines`: Toggles numbered line gutter on and off.
+    - Tagged with `data-print-hide` for clean print/PDF export.
+  - Integrated `InteractiveCodeBlock` into `DocumentPreview.tsx` for all `<pre><code>` blocks.
+* **Files Changed:**
+  - `packages/renderers/src/codeFormatter.ts` (New module: JSON comment stripping, validation, formatting, beautification)
+  - `packages/renderers/src/index.ts` (Exported code formatting utilities)
+  - `packages/validation/tests/code-formatter.test.ts` (New test suite: 5 unit tests)
+  - `apps/web/src/components/InteractiveCodeBlock.tsx` (New component with syntax highlighting, line numbers, and action bar)
+  - `apps/web/src/components/DocumentPreview.tsx` (Wired `InteractiveCodeBlock`)
+  - `apps/web/src/index.css` (Added Prism syntax highlighting color tokens)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 13/13 test files, 55/55 tests passed**)
+  - `npx pnpm --filter web lint` (**PASS: 0 warnings, 0 errors**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 27.14s)
+  - Browser Subagent Verification: **PASS** (Verified language pill, line count, `valid json` badge, `Lines` toggle on/off, `Copy Clean JSON` feedback, `Copy` feedback, and Prism syntax coloring).
+* **Acceptance Criteria:**
+  - [x] Code blocks render with language pill, line counts, and line numbers.
+  - [x] JSON blocks detect validity and presence of comments.
+  - [x] "Copy Clean JSON" strips comments for clean API usage.
+  - [x] "Lines" toggles line numbering.
+  - [x] Web build, lint, and all 55 validation tests succeed.
+
+* **Next Allowed Prompt:** Task P16: Headless Agent API
+
+---
+
+## Task P16: Headless Agent API
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the Headless Agent API (`apps/api` - `@mdtodocs/api`) designed for AI pipelines, CI/CD document validation, and programmatic rendering without requiring a browser UI.
+  - Created `apps/api/package.json` and `apps/api/tsconfig.json`:
+    - Configured `@mdtodocs/api` with module resolution and types for Node globals and workspace dependencies.
+  - Created `apps/api/src/validator.ts`:
+    - `extractMarkdownMetrics`: Computes word count, lines, headings, tables, diagrams, code blocks, math expressions, and reading time.
+    - `validateHeadlessDocument`: Validates Markdown AST, identifies ragged-row tables, catches empty or malformed Mermaid code blocks, and evaluates destination planning against `google-docs`, `word-docx`, or `clipboard`.
+  - Created `apps/api/src/server.ts`:
+    - Pure lightweight Node `http.createServer` with zero extra web framework overhead.
+    - Comprehensive CORS headers and JSON body parser.
+    - Endpoints:
+      - `GET /api/v1/health`: Server health check, uptime, and version.
+      - `POST /api/v1/validate`: Validates markdown, returning `{ valid, errors, warnings, metrics }`.
+      - `POST /api/v1/render`: Renders to `docx` (base64 DOCX binary), `html` (standalone HTML document), or `clipboard` (Google Docs paste-optimized HTML), returning file payload, mimeType, and document metrics.
+      - `POST /api/v1/repair`: Accepts `originalMarkdown` and `wordDocx` (or comments array), reconciles comment anchors and resolutions, and returns repaired markdown with patch changelog.
+  - Created `apps/api/src/index.ts`: Executable entrypoint supporting `PORT` environment variable.
+  - Created `packages/validation/tests/headless-api.test.ts`:
+    - Added 6 comprehensive integration tests against ephemeral server instances testing:
+      1. `/health` ping.
+      2. `/validate` with clean Markdown.
+      3. `/validate` flagging ragged tables and malformed Mermaid syntax.
+      4. `/render` producing base64 DOCX binary.
+      5. `/render` producing HTML markup.
+      6. `/repair` applying comment updates and patch reconciliation.
+* **Files Changed:**
+  - `apps/api/package.json` (New package config)
+  - `apps/api/tsconfig.json` (New TS config)
+  - `apps/api/src/validator.ts` (Markdown validation & metrics extraction)
+  - `apps/api/src/server.ts` (HTTP server & endpoint routes)
+  - `apps/api/src/index.ts` (Server launcher)
+  - `packages/validation/tests/headless-api.test.ts` (New test suite: 6 integration tests)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/api build` (**PASS: 0 errors**, compiled cleanly to `dist/`)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 14/14 test files, 61/61 tests passed in 27.64s**)
+* **Acceptance Criteria:**
+  - [x] Lightweight Node HTTP server supports `/api/v1/health`, `/api/v1/validate`, `/api/v1/render`, and `/api/v1/repair`.
+  - [x] Table validation detects ragged rows without throwing crashes.
+  - [x] Mermaid block validation flags malformed/empty diagrams.
+  - [x] Render endpoint supports DOCX base64, HTML, and clipboard outputs.
+  - [x] Repair endpoint reconciles comment annotations back to Markdown.
+  - [x] All 61 validation tests pass.
+
+* **Next Allowed Prompt:** Task P17: Stakeholder Review Mode
+
+---
+
+## Task P17: Stakeholder Review Mode
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the Stakeholder Review Mode for clean, distraction-free executive review and collaboration:
+    - URL query toggle (`?mode=review` / `?view=review`) and top-bar toggle in the UI.
+    - Deep-linking support: initializing directly with `?mode=review` activates presentation mode on page load.
+    - When active, hides the editor pane, raw markdown, and sidebars, centering the document sheet as the visual hero (adhering to Law 165: "Document as hero").
+    - Created `apps/web/src/components/ReviewActionBar.tsx`:
+      - Sticky glassmorphic bar positioned cleanly above the document sheet.
+      - Displays `Review Mode` pill with live pulsing indicator, reading time, word count, quick export buttons (`Google Docs`, `Word`, `PDF`), and `Exit` button.
+      - Includes `data-print-hide` so controls are never printed or exported to PDF.
+    - Created `apps/web/src/components/SuggestEditModal.tsx`:
+      - Allows non-technical stakeholders to highlight document passages and propose revisions or feedback.
+      - Includes `Open GitHub Issue` (generates pre-filled issue link with quoted passage and markdown suggestion) and `Copy Suggestion` (copies structured Markdown review note to clipboard with real-time checkmark confirmation).
+    - Updated `apps/web/src/store/index.ts` to manage `isReviewMode` state and synchronize with browser `window.history`.
+    - Updated `apps/web/src/components/Header.tsx` to include the Review Mode toggle button with icon and tooltip.
+    - Updated `apps/web/src/components/DocumentPreview.tsx` to adapt container styling in review mode.
+    - Updated `apps/web/src/components/Workspace.tsx` to switch seamlessly between two-pane authoring and distraction-free presentation.
+* **Files Changed:**
+  - `apps/web/src/store/index.ts` (Added `isReviewMode` state and URL search param synchronization)
+  - `apps/web/src/components/SuggestEditModal.tsx` (New component: stakeholder feedback modal and GitHub issue generator)
+  - `apps/web/src/components/ReviewActionBar.tsx` (New component: floating review mode toolbar and quick actions)
+  - `apps/web/src/components/Header.tsx` (Added review mode toggle button to header actions)
+  - `apps/web/src/components/DocumentPreview.tsx` (Added `isReviewMode` prop and adaptive container styling)
+  - `apps/web/src/components/Workspace.tsx` (Wired review mode presentation layout, modal, and action bar)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 9.39s)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**, 1 non-blocking warning in Mermaid)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 14/14 test files, 61/61 tests passed in 25.55s**)
+  - Browser Subagent Verification: **PASS**
+    - Verified Header `Review Mode` button toggle.
+    - Verified centered presentation layout, hidden editor pane, hidden status bar, and floating `ReviewActionBar` with reading time and word count.
+    - Verified `SuggestEditModal` opens, accepts feedback input, and executes `Copy Suggestion` with confirmation.
+    - Verified smooth return to split editor layout via `Exit`.
+    - Verified direct URL navigation (`?mode=review`) automatically activates review mode.
+* **Acceptance Criteria:**
+  - [x] Review Mode toggle works in Header and ReviewActionBar.
+  - [x] Review layout hides editor pane and centers document sheet cleanly.
+  - [x] URL synchronizes with `?mode=review` and supports direct deep-linking.
+  - [x] Suggest Edit modal allows feedback submission, GitHub issue creation, and Markdown copying.
+  - [x] All 61 validation tests and web build pass.
+
+
+
+
+
+

@@ -19,6 +19,8 @@ interface HeaderProps {
 
 export function Header({ appState, markdown, destination, onDestinationChange, activeTheme, documentSignature }: HeaderProps) {
   const compiledDoc = useStore(state => state.compiledDoc);
+  const isReviewMode = useStore(state => state.isReviewMode);
+  const setIsReviewMode = useStore(state => state.setIsReviewMode);
 
   const handleDownloadDocx = async () => {
     if (!markdown) return;
@@ -141,6 +143,23 @@ export function Header({ appState, markdown, destination, onDestinationChange, a
           >
             {primaryLabel() ?? 'Export'}
           </LoadingButton>
+
+          {/* Review Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsReviewMode(!isReviewMode)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              isReviewMode
+                ? 'bg-primary text-on-primary shadow-sm hover:bg-primary/90'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/60'
+            }`}
+            title={isReviewMode ? 'Return to split editor view' : 'Switch to distraction-free stakeholder review mode'}
+          >
+            <span className="material-symbols-outlined text-[16px]">
+              {isReviewMode ? 'edit_note' : 'visibility'}
+            </span>
+            <span className="hidden sm:inline">{isReviewMode ? 'Exit Review' : 'Review Mode'}</span>
+          </button>
         </div>
       )}
     </header>
