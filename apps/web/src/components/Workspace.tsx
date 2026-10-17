@@ -13,6 +13,8 @@ import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
 import { ReviewActionBar } from '@/components/ReviewActionBar';
 import { SuggestEditModal } from '@/components/SuggestEditModal';
+import { DocumentTabBar } from '@/components/DocumentTabBar';
+
 
 interface WorkspaceProps {
   markdown: string;
@@ -132,9 +134,12 @@ export function Workspace({
   documentSignature,
   onDocumentSignatureChange
 }: WorkspaceProps) {
-  const [isFidelityPanelOpen, setIsFidelityPanelOpen] = useState(false);
-  const [isInspectorOpen, setIsInspectorOpen] = useState(false);
-  const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
+  const isFidelityPanelOpen = useStore(state => state.isFidelityPanelOpen);
+  const setIsFidelityPanelOpen = useStore(state => state.setIsFidelityPanelOpen);
+  const isInspectorOpen = useStore(state => state.isInspectorOpen);
+  const setIsInspectorOpen = useStore(state => state.setIsInspectorOpen);
+  const isSuggestModalOpen = useStore(state => state.isSuggestModalOpen);
+  const setIsSuggestModalOpen = useStore(state => state.setIsSuggestModalOpen);
   const [selectedPassage, setSelectedPassage] = useState('');
   
   const isReviewMode = useStore(state => state.isReviewMode);
@@ -283,27 +288,30 @@ export function Workspace({
           </div>
         </div>
       ) : (
-        <div className="w-full grid grid-cols-12 h-full min-h-0 overflow-y-auto md:overflow-hidden">
-          <DocumentEditor
-            markdown={markdown}
-            onInput={onInput}
-            words={words}
-            lines={lines}
-          />
+        <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden">
+          <DocumentTabBar />
+          <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
+            <DocumentEditor
+              markdown={markdown}
+              onInput={onInput}
+              words={words}
+              lines={lines}
+            />
 
-          <DocumentPreview
-            markdown={markdown}
-            destination={destination}
-            onDestinationChange={onDestinationChange}
-            themeId={themeId}
-            onThemeIdChange={onThemeIdChange}
-            baseFontSize={baseFontSize}
-            onBaseFontSizeChange={onBaseFontSizeChange}
-            isCompiling={isCompiling}
-            onOpenInspector={() => setIsInspectorOpen(true)}
-            documentSignature={documentSignature}
-            onDocumentSignatureChange={onDocumentSignatureChange}
-          />
+            <DocumentPreview
+              markdown={markdown}
+              destination={destination}
+              onDestinationChange={onDestinationChange}
+              themeId={themeId}
+              onThemeIdChange={onThemeIdChange}
+              baseFontSize={baseFontSize}
+              onBaseFontSizeChange={onBaseFontSizeChange}
+              isCompiling={isCompiling}
+              onOpenInspector={() => setIsInspectorOpen(true)}
+              documentSignature={documentSignature}
+              onDocumentSignatureChange={onDocumentSignatureChange}
+            />
+          </div>
         </div>
       )}
 

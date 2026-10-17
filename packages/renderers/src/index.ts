@@ -19,4 +19,24 @@ export {
   beautifyCode,
   type JsonFormatResult,
 } from './codeFormatter';
+export {
+  extractDocxComments,
+  parseReviewNotesText,
+  reconcileMarkdown,
+  inferReplacementFromComment,
+  type ReviewComment,
+  type ReconciliationPatch,
+  type ReconciliationReport,
+} from './reconciliation';
+export {
+  extractDocumentTitle,
+  createDocumentItem,
+  duplicateDocumentItem,
+  createDocumentSnapshot,
+  restoreDocumentSnapshot,
+  type DocumentItem,
+  type DocumentSnapshot,
+} from './documentManager';
+
+
 

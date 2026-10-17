@@ -1,8 +1,17 @@
 import http from 'node:http';
 import { parseMarkdown, planRepresentation, DiagnosticsCollector, DEFAULT_THEME } from '@mdtodocs/compiler-core';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { renderToDocxBlob, renderToHtml, renderToClipboardHtml } from '@mdtodocs/renderers';
+import {
+  renderToDocxBlob,
+  renderToHtml,
+  renderToClipboardHtml,
+  reconcileMarkdown,
+  parseReviewNotesText,
+  extractDocxComments,
+  type ReconciliationPatch,
+} from '@mdtodocs/renderers';
 import { validateMarkdownDocument } from './validator.js';
+
 
 export function createServer(): http.Server {
   return http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
@@ -147,60 +156,68 @@ export function createServer(): http.Server {
 
       // 5. /api/v1/repair
       if (pathname === '/api/v1/repair') {
-        const { originalMarkdown, edits } = body || {};
+        const { originalMarkdown, edits, reviewNotes, docxBase64 } = body || {};
 
-        if (typeof originalMarkdown !== 'string' || !Array.isArray(edits)) {
+        if (typeof originalMarkdown !== 'string') {
           sendJson(res, 400, {
             error: 'missing_parameters',
-            message: "Request must include 'originalMarkdown' (string) and 'edits' (array of { targetText, replacementText }).",
+            message: "Request must include 'originalMarkdown' (string).",
           });
           return;
         }
 
-        let current = originalMarkdown;
-        const changelog: Array<{
-          targetText: string;
-          replacementText: string;
-          status: 'applied' | 'not_found';
-          comment?: string;
-        }> = [];
+        let patches: ReconciliationPatch[] = [];
 
-        let appliedCount = 0;
-        let unmatchedCount = 0;
-
-        for (const edit of edits) {
-          const target = edit.targetText;
-          const replacement = edit.replacementText || '';
-
-          if (typeof target === 'string' && current.includes(target)) {
-            current = current.replace(target, replacement);
-            appliedCount++;
-            changelog.push({
-              targetText: target,
-              replacementText: replacement,
-              status: 'applied',
+        try {
+          if (typeof docxBase64 === 'string' && docxBase64.trim()) {
+            const buf = Buffer.from(docxBase64, 'base64');
+            patches = await extractDocxComments(buf);
+          } else if (typeof reviewNotes === 'string' && reviewNotes.trim()) {
+            patches = parseReviewNotesText(reviewNotes);
+          } else if (Array.isArray(edits)) {
+            patches = edits.map((edit: any, idx: number) => ({
+              id: `api-edit-${idx + 1}`,
+              targetText: edit.targetText || '',
+              replacementText: edit.replacementText || '',
               comment: edit.comment,
-            });
+              status: 'matched',
+              selected: true,
+            }));
           } else {
-            unmatchedCount++;
-            changelog.push({
-              targetText: target || '',
-              replacementText: replacement,
-              status: 'not_found',
-              comment: edit.comment,
+            sendJson(res, 400, {
+              error: 'missing_parameters',
+              message: "Request must include 'edits' (array), 'reviewNotes' (string), or 'docxBase64' (base64 string).",
             });
+            return;
           }
-        }
 
-        sendJson(res, 200, {
-          success: unmatchedCount === 0,
-          updatedMarkdown: current,
-          appliedCount,
-          unmatchedCount,
-          changelog,
-        });
-        return;
+          const report = reconcileMarkdown(originalMarkdown, patches);
+
+          const changelog = report.patches.map((p) => ({
+            targetText: p.targetText,
+            replacementText: p.replacementText,
+            status: p.status === 'matched' || p.status === 'already_applied' ? ('applied' as const) : ('not_found' as const),
+            comment: p.comment,
+          }));
+
+          sendJson(res, 200, {
+            success: report.unmatchedCount === 0,
+            updatedMarkdown: report.updatedMarkdown,
+            appliedCount: report.appliedCount,
+            unmatchedCount: report.unmatchedCount,
+            changelog,
+            patches: report.patches,
+          });
+          return;
+        } catch (err: any) {
+          sendJson(res, 500, {
+            error: 'repair_failed',
+            message: err?.message || 'Failed to reconcile document comments',
+          });
+          return;
+        }
       }
+
     }
 
     // 404 handler

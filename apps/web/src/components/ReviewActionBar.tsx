@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '@/store';
-import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
-import { resolveAssets } from '@mdtodocs/asset-pipeline';
-import { renderToDocxBlob, renderToClipboardHtml } from '@mdtodocs/renderers';
+import { exportDocx, copyFormattedDoc, printPdf } from '@/utils/exportHelpers';
 
 interface ReviewActionBarProps {
   markdown: string;
@@ -11,6 +9,7 @@ interface ReviewActionBarProps {
   activeTheme: any;
   documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
   onOpenSuggestModal: () => void;
+  onOpenCommandPalette?: () => void;
 }
 
 export function ReviewActionBar({
@@ -20,6 +19,7 @@ export function ReviewActionBar({
   activeTheme,
   documentSignature,
   onOpenSuggestModal,
+  onOpenCommandPalette,
 }: ReviewActionBarProps) {
   const setIsReviewMode = useStore((state) => state.setIsReviewMode);
   const compiledDoc = useStore((state) => state.compiledDoc);
@@ -28,58 +28,21 @@ export function ReviewActionBar({
   const [copiedGDocs, setCopiedGDocs] = useState(false);
 
   const handleDownloadDocx = async () => {
-    if (!markdown) return;
     setIsExportingDocx(true);
-    try {
-      const collector = new DiagnosticsCollector();
-      let doc: any;
-      if (compiledDoc) {
-        doc = structuredClone(compiledDoc);
-        doc = planRepresentation(doc, 'word', collector);
-      } else {
-        doc = parseMarkdown(markdown);
-        doc = await resolveAssets(doc);
-        doc = planRepresentation(doc, 'word', collector);
-      }
-      const blob = await renderToDocxBlob(doc, activeTheme, documentSignature);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'document.docx';
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error('Failed to download .docx in review mode:', e);
-    } finally {
-      setIsExportingDocx(false);
-    }
+    await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
+    setIsExportingDocx(false);
   };
 
   const handleCopyGDocs = async () => {
-    if (!markdown) return;
-    try {
-      let doc = compiledDoc;
-      if (!doc) {
-        const collector = new DiagnosticsCollector();
-        doc = parseMarkdown(markdown);
-        doc = await resolveAssets(doc);
-        doc = planRepresentation(doc, 'google-docs', collector);
-      }
-      const html = renderToClipboardHtml(doc, activeTheme, documentSignature);
-      const htmlBlob = new Blob([html], { type: 'text/html' });
-      const plainBlob = new Blob([markdown], { type: 'text/plain' });
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': plainBlob }),
-      ]);
+    const success = await copyFormattedDoc(markdown, compiledDoc, 'google-docs', activeTheme, documentSignature);
+    if (success) {
       setCopiedGDocs(true);
       setTimeout(() => setCopiedGDocs(false), 2000);
-    } catch (e) {
-      console.error('Failed to copy formatted document in review mode:', e);
     }
   };
 
   const handlePrintPdf = () => {
-    window.print();
+    printPdf();
   };
 
   return (
@@ -100,6 +63,25 @@ export function ReviewActionBar({
 
       {/* Right: Quick actions */}
       <div className="flex items-center gap-2">
+        {/* Command Palette Trigger */}
+        <button
+          type="button"
+          onClick={() => {
+            if (onOpenCommandPalette) {
+              onOpenCommandPalette();
+            } else {
+              useStore.getState().setIsCommandPaletteOpen(true);
+            }
+          }}
+          className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors"
+          title="Open Command Palette (Cmd+K / Ctrl+K)"
+        >
+          <span className="material-symbols-outlined text-[16px]">search</span>
+          <kbd className="hidden md:inline px-1 py-0.2 rounded bg-surface-container text-[10px] text-outline border border-outline-variant/60 font-mono">
+            ⌘K
+          </kbd>
+        </button>
+
         {/* Suggest Edit Trigger */}
         <button
           type="button"

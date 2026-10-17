@@ -10,6 +10,7 @@
     "@mdtodocs/capability-graph": "workspace:*",
     "@mdtodocs/compiler-core": "workspace:*",
     "docx": "^8.2.0",
+    "jszip": "^3.10.2",
     "katex": "^0.18.9"
   },
   "devDependencies": {

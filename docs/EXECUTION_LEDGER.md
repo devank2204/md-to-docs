@@ -611,8 +611,252 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Suggest Edit modal allows feedback submission, GitHub issue creation, and Markdown copying.
   - [x] All 61 validation tests and web build pass.
 
+* **Next Allowed Prompt:** Task P18: Cmd+K / Ctrl+K Command Palette
 
+---
 
+## Task P18: Cmd+K / Ctrl+K Command Palette
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the keyboard-driven Command Palette (`apps/web/src/components/CommandPalette.tsx`) according to `docs/13_COMMAND_PALETTE.md`:
+    - Global keyboard shortcut: `⌘K` on macOS, `Ctrl+K` on Windows/Linux.
+    - Trigger button in Header with `⌘K` badge, and trigger button on ReviewActionBar.
+    - Search input with instant filtering across title, description, category, and keywords.
+    - Categorized actions:
+      - **Export & Share**: Copy for Google Docs (`Alt+C`), Download Word Document (`Alt+W`), Export PDF (`Alt+P`), Copy Plain Markdown.
+      - **Destination**: Switch destination between Google Docs, Microsoft Word, PDF, and Rich Clipboard with active indicator.
+      - **View & Modes**: Enter/Exit Stakeholder Review Mode, Suggest an Edit, Open Document Inspector, Open Fidelity Check Panel.
+      - **Theme & Typography**: Modern Default (Corporate), Clean Editorial (Minimalist), Technical Dark, compact/standard/large font sizes, and Document Signature toggle.
+      - **Document Headings (Dynamic Navigation)**: Parses `#`, `##`, `###` headings from active markdown; selecting jumps and scrolls the preview smoothly to that heading.
+    - Full keyboard navigation: ArrowUp/ArrowDown, Enter to run, Escape to dismiss.
+    - Print safety: `data-print-hide` so the palette never appears in exports.
+  - Centralized export helpers created in `apps/web/src/utils/exportHelpers.ts` to deduplicate logic across `Header.tsx`, `ReviewActionBar.tsx`, and `CommandPalette.tsx`.
+* **Files Changed:**
+  - `apps/web/src/utils/exportHelpers.ts` (New module: centralized export, clipboard, and print routines)
+  - `apps/web/src/components/CommandPalette.tsx` (New component: command palette modal, fuzzy search, heading extractor)
+  - `apps/web/src/store/index.ts` (Added `isCommandPaletteOpen`, `isInspectorOpen`, `isFidelityPanelOpen`, `isSuggestModalOpen`)
+  - `apps/web/src/App.tsx` (Global `Cmd+K` / `Ctrl+K` keyboard event listener, CommandPalette wiring)
+  - `apps/web/src/components/Header.tsx` (Added Command Palette accelerator button, cleaned up exports)
+  - `apps/web/src/components/ReviewActionBar.tsx` (Added Command Palette trigger button, cleaned up exports)
+  - `apps/web/src/components/Workspace.tsx` (Connected modal visibility hooks to store)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.63s)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 14/14 test files, 61/61 tests passed in 16.83s**)
+  - Browser Subagent Verification: **PASS**
+    - Verified Header `Commands ⌘K` button.
+    - Verified opening modal with auto-focused search and category organization.
+    - Verified keyword filtering ('word', 'heading', 'review').
+    - Verified dynamic document heading extraction (`1. Overview`, `2. Request Routing Architecture`).
+    - Verified running 'Enter Stakeholder Review Mode' from palette.
+    - Verified opening palette from Review Mode via `Ctrl+K` and executing 'Exit Review Mode'.
+* **Acceptance Criteria:**
+  - [x] Command Palette opens via `⌘K` / `Ctrl+K` or Header button.
+  - [x] Commands categorized by Export, Destination, View, Theme, and Headings.
+  - [x] Arrow key navigation and Enter execution work seamlessly.
+  - [x] Document headings are extracted dynamically and allow quick jumping.
+  - [x] All 61 validation tests and web build pass.
 
+* **Next Allowed Prompt:** Task P19: Executive Template Gallery
 
+---
 
+## Task P19: Executive Template Gallery
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the Executive Template Gallery featuring production-grade, highly structured starter templates across engineering, product, architecture, reliability, and project management.
+  - Created `apps/web/src/data/templates.ts`:
+    - 5 executive templates:
+      1. **Technical RFC & System Design** (Architecture): Distributed Job Queue system design with Mermaid topology, LaTeX queue throughput equation, REST endpoints, and security model.
+      2. **Architecture Decision Record ADR-042** (Decisions): Event-driven architecture selection with Mermaid state diagram, trade-off matrix table, and implementation stages.
+      3. **Executive PRD** (Product): Multi-tenant enterprise audit log product requirement document with user journey diagram, feature scope table, and OKRs.
+      4. **Incident Post-Mortem SEV-1** (Reliability): Database connection pool exhaustion post-mortem with incident chronology, Mermaid sequence diagram, root cause analysis, and remediation action items.
+      5. **Engineering Sprint Retrospective** (Process): Bi-weekly engineering retrospective with velocity chart, sprint scorecard, what went well / didn't go well, and commitments.
+  - Created `apps/web/src/components/TemplateGalleryModal.tsx`:
+    - Modal dialog displaying category filter pills (`All`, `Architecture`, `Decisions`, `Product`, `Reliability`, `Process`).
+    - Search input filtering template title, description, tags, and category.
+    - Template cards displaying category badges, word/line counts, tags, preview summary, and `Load Template` action.
+    - Safe replacement confirmation modal: if editor has unsaved content, prompts user before overwriting (`Replace & Load` vs `Cancel`).
+    - Annotated with `data-print-hide`.
+  - Enhanced `apps/web/src/components/EmptyState.tsx`:
+    - Added "Start with an Executive Template" 3-card showcase directly beneath the file upload dropzone.
+    - One-click loading of RFC, ADR, or PRD directly from empty state.
+  - Enhanced `apps/web/src/components/CommandPalette.tsx`:
+    - Added `Templates & Starters` category.
+    - Added `Browse Executive Template Gallery...` command to open the modal.
+    - Added instant direct commands for each template: `Load RFC Template`, `Load ADR Template`, `Load PRD Template`, `Load Post-Mortem Template`, `Load Retrospective Template`.
+  - Updated `apps/web/src/components/Header.tsx`:
+    - Added `Templates` button with icon `collections_bookmark` and badge.
+  - Updated `apps/web/src/store/index.ts`:
+    - Added `isTemplateGalleryOpen` state and action setter `setIsTemplateGalleryOpen`.
+* **Files Changed:**
+  - `apps/web/src/data/templates.ts` (New module: 5 executive templates and metadata)
+  - `apps/web/src/components/TemplateGalleryModal.tsx` (New component: template gallery modal with category filter, search, preview, and safe replacement confirmation)
+  - `apps/web/src/components/EmptyState.tsx` (Added executive template cards showcase)
+  - `apps/web/src/components/CommandPalette.tsx` (Added template commands and quick loading)
+  - `apps/web/src/components/Header.tsx` (Added Templates button in header navigation)
+  - `apps/web/src/store/index.ts` (Added template gallery modal visibility state)
+  - `apps/web/src/App.tsx` (Wired `TemplateGalleryModal` component)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.47s)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 14/14 test files, 61/61 tests passed in 12.58s**)
+  - Browser Subagent Verification: **PASS** (`verify_template_gallery_1792215997005.webp`)
+    - Verified Header `Templates` button opens Template Gallery modal.
+    - Verified category filter buttons (`Decisions`, `Reliability`, etc.).
+    - Verified selecting ADR-042 prompts replacement confirmation when editor is dirty.
+    - Verified `Replace & Load` cleanly replaces editor content and updates live document preview with Mermaid state diagram and decision matrix.
+    - Verified Command Palette search ('incident', 'template') shows template actions.
+* **Acceptance Criteria:**
+  - [x] Template Gallery modal provides 5 executive templates across Architecture, Decisions, Product, Reliability, and Process.
+  - [x] Filtering by category and searching by title/tag works instantaneously.
+  - [x] Replacement confirmation protects active editor content from accidental loss.
+  - [x] Empty state showcases top executive templates for instant 1-click start.
+  - [x] Command Palette integrates template browsing and direct loading.
+  - [x] All 61 validation tests and web build pass.
+
+* **Next Allowed Prompt:** Task P20: In-Browser Word / Comment Reconciliation UI
+
+---
+
+## Task P20: In-Browser Word / Comment Reconciliation UI
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the In-Browser Word / Comment Reconciliation UI & Engine to solve the primary stakeholder review roundtrip:
+    - Ingest review feedback from 3 distinct sources:
+      1. **Word (.docx) files**: Extracts reviewer comments from `word/comments.xml` and anchors from `word/document.xml`, as well as OpenXML Track Changes (`<w:del>` + `<w:ins>`).
+      2. **Pasted Review Notes**: Automatically parses JSON arrays, `SuggestEditModal` markdown notes, Key-Value pairs (`Target:` / `Replacement:` / `Comment:`), and blockquote diffs (`> target\nreplacement`).
+      3. **Manual Patches**: Fast form with target text, replacement text, reviewer name, and comment reason.
+    - Heuristically infers replacements from comment text (e.g., `Replace with: 250ms p99 SLA`, `Change to: PostgreSQL 16`, `Did you mean "TLS 1.3"?`).
+    - Evaluates match status against active editor Markdown:
+      - `Ready to Apply` with exact line number in source Markdown.
+      - `Already in Document` if the proposed replacement text is already present.
+      - `Target Not Found` with warning badge if target text was moved or modified.
+    - Visual Diff Cards:
+      - Red strikethrough for original text in document.
+      - Green highlight for proposed replacement text.
+      - Inline editable replacement input allowing author to fine-tune wording before applying.
+      - Author tag and comment reason.
+      - Single-click patch removal or selection.
+    - Full Document Diff Preview:
+      - Toggles a complete markdown preview showing the document with accepted patches applied.
+    - Batch Operations:
+      - `Accept All Matched (N)`: Updates active editor Markdown immediately in `useStore` and closes modal.
+      - `Apply Selected (N)`: Applies only checked patches.
+      - Filter pills: `All`, `Matched`, `Unmatched`, `Applied`.
+    - Integrations:
+      - `Reconcile` button in Header navigation with `sync_alt` icon.
+      - `Reconcile Word Comments & Review Edits...` command in `Cmd+K` / `Ctrl+K` Command Palette.
+      - Enhanced `/api/v1/repair` in Headless API (`apps/api/src/server.ts`) to support `docxBase64`, `reviewNotes`, and `edits`.
+    - Annotated with `data-print-hide` so review chrome is omitted from exports.
+* **Files Changed:**
+  - `packages/renderers/src/reconciliation.ts` (New module: docx comment extractor, review notes parser, replacement inferrer, and markdown reconciler)
+  - `packages/renderers/src/index.ts` (Exported reconciliation engine functions and types)
+  - `packages/validation/tests/reconciliation.test.ts` (New test suite: 10 unit tests for docx parsing, track changes, review notes, and markdown reconciliation)
+  - `apps/api/src/server.ts` (Enhanced `/api/v1/repair` route to support docxBase64, reviewNotes, and structured edits)
+  - `apps/web/src/components/ReconciliationModal.tsx` (New component: full reconciliation studio modal with Word dropzone, notes parser, visual diff cards, and diff preview)
+  - `apps/web/src/components/Header.tsx` (Added Reconcile button)
+  - `apps/web/src/components/CommandPalette.tsx` (Added Reconcile command)
+  - `apps/web/src/store/index.ts` (Added `isReconciliationModalOpen` state and setter)
+  - `apps/web/src/App.tsx` (Wired `ReconciliationModal` component)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**, compiled cleanly with JSZip)
+  - `npx pnpm --filter @mdtodocs/api build` (**PASS: 0 errors**, compiled cleanly to `dist/`)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 15/15 test files, 71/71 tests passed in 20.08s**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed with 0 snapshot mutations**)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**, 1 Mermaid warning)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.22s)
+  - Browser Subagent Verification: **PASS** (`verify_reconciliation_ui_1792216713822.webp`)
+    - Verified Header `Reconcile` button with `sync_alt` icon.
+    - Verified opening `Reconciliation & Review Patch Studio` modal.
+    - Verified 'Try Sample Edits' button parses 3 review patches and renders visual diff cards with red/green strikethrough/highlighting and reviewer author badges.
+    - Verified 'Preview Changes' button displays resulting markdown preview.
+    - Verified 'Accept All Matched' applies patches to the active editor Markdown and closes modal.
+    - Verified Command Palette search ('reconcile') shows 'Reconcile Word Comments & Review Edits...'.
+* **Acceptance Criteria:**
+  - [x] In-browser Word and comment reconciliation engine extracts Word comments and track-changes from `.docx` files.
+  - [x] Review notes parser handles JSON, SuggestEditModal markdown, key-value pairs, and blockquote diffs.
+  - [x] Visual diff cards show original strikethrough and proposed replacement with editable inputs.
+  - [x] Full document preview shows patched markdown before accepting.
+  - [x] Accept All Matched updates active document and live preview in real time.
+  - [x] Headless API `/api/v1/repair` supports docxBase64, reviewNotes, and edits payloads.
+  - [x] All 71 validation tests and 17 fidelity lab tests pass.
+
+* **Next Allowed Prompt:** Task P21: Multi-Document Local Workspace & History
+
+---
+
+## Task P21: Multi-Document Local Workspace & History
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - Build the Multi-Document Local Workspace & History system to support multi-document authoring, project switching, and version rollback entirely in-browser:
+    - Pure Document Management Engine (`packages/renderers/src/documentManager.ts`):
+      - `extractDocumentTitle`: Parses Markdown AST / regex to extract first `# Heading` or frontmatter title, falling back to first non-empty line or untitled default.
+      - `createDocumentItem`: Generates fresh document item with unique UUID, timestamp, title, and initial Markdown.
+      - `duplicateDocumentItem`: Clones existing document with `(Copy)` suffix, new ID, and current timestamp.
+      - `createDocumentSnapshot`: Captures timestamped version snapshot with custom label, word count, line count, and character metrics.
+      - `restoreDocumentSnapshot`: Safely restores document content from snapshot, automatically generating a pre-restore safety backup to eliminate accidental data loss.
+    - Zustand Store Architecture (`apps/web/src/store/index.ts`):
+      - Multi-document state: `documents: DocumentItem[]`, `activeDocumentId: string`, `snapshots: DocumentSnapshot[]`, `isHistoryModalOpen: boolean`.
+      - Actions: `createDocument`, `switchDocument`, `renameDocument`, `duplicateDocument`, `deleteDocument`, `createSnapshot`, `restoreSnapshot`, `deleteSnapshot`, `setHistoryModalOpen`.
+      - Auto-migration: Automatically migrates single-document `markdown` state into `documents[0]` on initial load without data loss.
+      - Live keystroke synchronization: Synchronizes `setMarkdown` with the active document entry in `documents` so tab titles and storage stay updated.
+    - Document Tab Bar (`apps/web/src/components/DocumentTabBar.tsx`):
+      - Sleek horizontal tab bar positioned above the split panes.
+      - Active tab styling with live title, inline rename input on double-click, and close button (`✕`) guarded against closing the sole remaining document.
+      - `+ New Doc` button for instant document creation.
+      - `📸 Snapshot` button for 1-click snapshot creation with visual feedback.
+      - `🕐 History (N)` button with dynamic snapshot count badge opening the History modal.
+      - Duplicate document action.
+      - Tagged with `data-print-hide` to ensure 100% clean Word and PDF exports.
+    - Document History Modal (`apps/web/src/components/DocumentHistoryModal.tsx`):
+      - Chronological timeline of all version snapshots for the active document.
+      - Snapshot cards displaying title, label, relative timestamp, word count, and line count.
+      - Collapsible markdown excerpt preview.
+      - `Restore Version` action with pre-restore safety snapshot.
+      - `Copy Content` action for copying snapshot text without rolling back.
+      - Snapshot deletion action.
+    - Global Integrations:
+      - `apps/web/src/components/Workspace.tsx`: Integrated `<DocumentTabBar />` above editor/preview grid.
+      - `apps/web/src/components/Header.tsx`: Displays active document title dynamically next to logo.
+      - `apps/web/src/components/CommandPalette.tsx`: Added `Documents & Workspace` category with commands (`Create New Document`, `Duplicate Current Document`, `Capture Document Snapshot`, `Browse Document History & Snapshots...`) and dynamic open tabs switcher.
+      - Pre-mutation safety snapshots: Wired automatic snapshot capture before loading templates (`TemplateGalleryModal.tsx`) and before applying reconciliation patches (`ReconciliationModal.tsx`).
+* **Files Changed:**
+  - `packages/renderers/src/documentManager.ts` (New module: document title extraction, cloning, snapshots, and pre-restore backups)
+  - `packages/renderers/src/index.ts` (Exported document manager functions and types)
+  - `packages/validation/tests/multi-document.test.ts` (New test suite: 8 unit tests for multi-document operations)
+  - `apps/web/src/store/index.ts` (Added multi-document and snapshot state, actions, and auto-migration)
+  - `apps/web/src/components/DocumentTabBar.tsx` (New component: horizontal tab strip with inline rename, snapshot trigger, and history badge)
+  - `apps/web/src/components/DocumentHistoryModal.tsx` (New component: version history timeline modal with snapshot restore and excerpt preview)
+  - `apps/web/src/components/Workspace.tsx` (Integrated DocumentTabBar above editor/preview panes)
+  - `apps/web/src/components/Header.tsx` (Synced active document title display)
+  - `apps/web/src/components/CommandPalette.tsx` (Added Documents & Workspace commands and open document tab switcher)
+  - `apps/web/src/components/TemplateGalleryModal.tsx` (Added pre-template safety snapshot)
+  - `apps/web/src/components/ReconciliationModal.tsx` (Added pre-reconciliation safety snapshot)
+  - `apps/web/src/App.tsx` (Wired DocumentHistoryModal)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter @mdtodocs/renderers build` (**PASS: 0 errors**, compiled cleanly)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 16/16 test files, 79/79 tests passed in 14.18s**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 tests passed with 0 snapshot mutations**)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**)
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 8.01s)
+  - Browser Subagent Verification: **PASS** (`verify_multidoc_workspace_1792217976525.webp`)
+    - Verified initial tab bar with active document title and `+ New Doc` button.
+    - Verified clicking `+ New Doc` opens a clean new tab, and typing `# Distributed Tracing Architecture (RFC-404)` dynamically updates the tab title and header.
+    - Verified opening Document History modal, capturing `Draft v1 Checkpoint` snapshot, and displaying timeline card with word/line counts.
+    - Verified switching back to original document tab seamlessly restores original Markdown and preview.
+    - Verified Command Palette search for 'document' lists document actions and open tabs for quick switching.
+* **Acceptance Criteria:**
+  - [x] Multi-document tab bar supports creating, switching, renaming, duplicating, and closing documents.
+  - [x] Auto-migration preserves user's existing markdown seamlessly in localStorage.
+  - [x] Version history captures timestamped snapshots with custom labels and word/line counts.
+  - [x] Restoring snapshots automatically captures a pre-restore backup to prevent accidental loss.
+  - [x] Template and reconciliation actions take automatic safety snapshots before document mutation.
+  - [x] Command Palette integrates document switching and snapshot commands.
+  - [x] All 79 validation tests, 17 fidelity lab fixtures, and web production build pass.
+
+* **Next Allowed Prompt:** Roadmap Review & Next Milestone Planning

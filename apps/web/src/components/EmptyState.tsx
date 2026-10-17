@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { DOCUMENT_TEMPLATES } from '@/data/templates';
 
 interface EmptyStateProps {
   onInput: (markdown: string) => void;
@@ -148,6 +149,55 @@ $$
             <span>Line 1, Column 1</span>
             <span>Drag-and-drop active</span>
           </div>
+        </div>
+      </div>
+
+      {/* Executive Templates Showcase */}
+      <div className="w-full mt-10">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-[20px]">collections_bookmark</span>
+            <h3 className="font-serif font-semibold text-[17px] text-on-surface tracking-tight">
+              Start with an Executive Template
+            </h3>
+          </div>
+          <span className="font-code-sm text-[11px] text-outline hidden sm:inline">
+            Math equations · Mermaid diagrams · High-fidelity tables
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {DOCUMENT_TEMPLATES.slice(0, 3).map((template) => (
+            <div
+              key={template.id}
+              onClick={() => onInput(template.content)}
+              className="bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 hover:border-primary/50 rounded-xl p-4 cursor-pointer transition-all hover:shadow-md group flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="material-symbols-outlined text-primary text-[20px]">
+                    {template.icon}
+                  </span>
+                  <span className="text-[10px] font-semibold text-primary/80 uppercase tracking-wider">
+                    {template.category}
+                  </span>
+                </div>
+                <h4 className="font-semibold text-xs text-on-surface mb-1 group-hover:text-primary transition-colors">
+                  {template.title}
+                </h4>
+                <p className="text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+                  {template.summary}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 mt-2 border-t border-outline-variant/20 text-[10px] text-outline">
+                <span>{template.tags.join(' · ')}</span>
+                <span className="text-primary font-medium flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                  Load <span className="material-symbols-outlined text-[12px]">arrow_forward</span>
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
