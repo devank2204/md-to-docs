@@ -1,0 +1,24 @@
+{
+  "name": "@mdtodocs/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mdtodocs/asset-pipeline": "workspace:*",
+    "@mdtodocs/capability-graph": "workspace:*",
+    "@mdtodocs/compiler-core": "workspace:*",
+    "@mdtodocs/renderers": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^24.13.3",
+    "typescript": "~6.0.2",
+    "vitest": "^3.1.1"
+  }
+}

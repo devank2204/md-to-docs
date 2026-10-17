@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useId, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
 import type { Root } from 'mdast';
@@ -7,7 +7,9 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
-import mermaid from 'mermaid';
+import { InteractiveTable } from './InteractiveTable';
+import { MermaidDiagram } from './MermaidDiagram';
+import { InteractiveCodeBlock } from './InteractiveCodeBlock';
 
 interface DocumentPreviewProps {
   markdown: string;
@@ -21,245 +23,9 @@ interface DocumentPreviewProps {
   onOpenInspector: () => void;
   documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
   onDocumentSignatureChange: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
+  isReviewMode?: boolean;
 }
 
-interface MermaidDiagramProps {
-  code: string;
-}
-
-const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
-  const reactId = useId();
-  const diagramId = `mermaid-${reactId.replace(/:/g, '')}`;
-
-  const [renderResult, setRenderResult] = useState<{
-    code: string;
-    svg: string;
-    error: string | null;
-  }>({
-    code: '',
-    svg: '',
-    error: null,
-  });
-
-  const isRendering = renderResult.code !== code;
-  const svg = renderResult.code === code ? renderResult.svg : '';
-  const error = renderResult.code === code ? renderResult.error : null;
-  const [copiedType, setCopiedType] = useState<'svg' | 'code' | null>(null);
-  const [showSource, setShowSource] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'neutral',
-      securityLevel: 'strict',
-    });
-
-    mermaid
-      .render(diagramId, code)
-      .then((res) => {
-        if (isMounted) {
-          setRenderResult({ code, svg: res.svg, error: null });
-        }
-      })
-      .catch((e: any) => {
-        if (isMounted) {
-          setRenderResult({
-            code,
-            svg: '',
-            error: e?.message || 'Mermaid diagram syntax error',
-          });
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [code, diagramId]);
-
-  const handleCopySvg = async () => {
-    if (!svg) return;
-    try {
-      await navigator.clipboard.writeText(svg);
-      setCopiedType('svg');
-      setTimeout(() => setCopiedType(null), 2000);
-    } catch (e) {
-      console.error('Failed to copy SVG:', e);
-    }
-  };
-
-  const handleCopyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopiedType('code');
-      setTimeout(() => setCopiedType(null), 2000);
-    } catch (e) {
-      console.error('Failed to copy code:', e);
-    }
-  };
-
-  const handleDownloadSvg = () => {
-    if (!svg) return;
-    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'diagram.svg';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDownloadPng = () => {
-    if (!svg) return;
-    try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(svg, 'image/svg+xml');
-      const svgEl = doc.querySelector('svg');
-      if (!svgEl) return;
-
-      let width = 800;
-      let height = 600;
-      const viewBox = svgEl.getAttribute('viewBox');
-      if (viewBox) {
-        const parts = viewBox.split(/\s+/).map(Number);
-        if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
-          width = parts[2];
-          height = parts[3];
-        }
-      } else {
-        const w = parseFloat(svgEl.getAttribute('width') || '');
-        const h = parseFloat(svgEl.getAttribute('height') || '');
-        if (!isNaN(w) && w > 0) width = w;
-        if (!isNaN(h) && h > 0) height = h;
-      }
-
-      const scale = 2; // High-resolution 2x canvas export
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(width * scale);
-      canvas.height = Math.round(height * scale);
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-      const img = new Image();
-      img.onload = () => {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
-
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/png');
-        a.download = 'diagram.png';
-        a.click();
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        console.error('Failed to load SVG into image for PNG export');
-      };
-      img.src = url;
-    } catch (e) {
-      console.error('Failed to export PNG:', e);
-    }
-  };
-
-  return (
-    <div className="my-6 rounded border border-outline-variant/30 bg-surface-container-lowest overflow-hidden shadow-xs">
-      {/* Diagram Action Bar */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-surface-container-low border-b border-outline-variant/20 font-code-sm text-[11px] text-secondary select-none">
-        <div className="flex items-center gap-1.5">
-          <span className="material-symbols-outlined text-[15px] text-primary">account_tree</span>
-          <span className="font-semibold uppercase tracking-wider text-on-surface">Diagram</span>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <button
-            onClick={handleCopySvg}
-            disabled={!svg}
-            title="Copy SVG XML to clipboard"
-            className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
-          >
-            <span className="material-symbols-outlined text-[13px]">
-              {copiedType === 'svg' ? 'check' : 'content_copy'}
-            </span>
-            <span>{copiedType === 'svg' ? 'Copied SVG!' : 'Copy SVG'}</span>
-          </button>
-
-          <button
-            onClick={handleCopyCode}
-            title="Copy Mermaid source code"
-            className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95"
-          >
-            <span className="material-symbols-outlined text-[13px]">
-              {copiedType === 'code' ? 'check' : 'code'}
-            </span>
-            <span>{copiedType === 'code' ? 'Copied Code!' : 'Copy Source'}</span>
-          </button>
-
-          <span className="text-outline-variant mx-0.5">·</span>
-
-          <button
-            onClick={handleDownloadSvg}
-            disabled={!svg}
-            title="Download diagram as .svg"
-            className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
-          >
-            <span className="material-symbols-outlined text-[13px]">download</span>
-            <span>SVG</span>
-          </button>
-
-          <button
-            onClick={handleDownloadPng}
-            disabled={!svg}
-            title="Download rasterized high-resolution diagram as .png"
-            className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
-          >
-            <span className="material-symbols-outlined text-[13px]">image</span>
-            <span>PNG</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Diagram Viewport */}
-      <div className="p-4 flex flex-col items-center justify-center min-h-[120px] bg-white overflow-x-auto">
-        {isRendering ? (
-          <div className="flex items-center gap-2 text-secondary font-code-sm text-code-sm py-8">
-            <span className="material-symbols-outlined text-[16px] animate-spin">refresh</span>
-            <span>Rendering diagram...</span>
-          </div>
-        ) : error ? (
-          <div className="w-full p-4 rounded bg-error-container/30 border border-error/20 text-on-surface">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-error font-medium">
-                <span className="material-symbols-outlined text-[18px]">error_outline</span>
-                <span>Mermaid Syntax Error</span>
-              </div>
-              <button
-                onClick={() => setShowSource(!showSource)}
-                className="text-secondary hover:text-on-surface font-code-sm text-[11px] underline"
-              >
-                {showSource ? 'Hide Code' : 'View Code'}
-              </button>
-            </div>
-            <p className="font-code-sm text-[12px] text-error/90 mb-2">{error}</p>
-            {showSource && (
-              <pre className="p-3 bg-surface-container-high rounded text-[11px] font-code-sm overflow-x-auto text-on-surface">
-                <code>{code}</code>
-              </pre>
-            )}
-          </div>
-        ) : (
-          <div
-            className="mermaid-preview w-full flex justify-center [&>svg]:max-w-full [&>svg]:h-auto"
-            dangerouslySetInnerHTML={{ __html: svg }}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
 
 // Remark plugin applying destination planner transformations directly to the ReactMarkdown AST
 const createDestinationPlanPlugin = (destination: DestinationType) => () => (tree: Root) => {
@@ -279,6 +45,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   onOpenInspector,
   documentSignature,
   onDocumentSignatureChange,
+  isReviewMode = false,
 }) => {
   const [zoom, setZoom] = useState(100);
 
@@ -290,7 +57,14 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   }, [destination]);
 
   return (
-    <div data-preview-pane className="col-span-12 md:col-span-7 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-auto min-h-[600px] md:h-full md:min-h-0 overflow-hidden">
+    <div
+      data-preview-pane
+      className={
+        isReviewMode
+          ? 'w-full flex flex-col items-center relative overflow-visible bg-transparent'
+          : 'col-span-12 md:col-span-7 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-auto min-h-[600px] md:h-full md:min-h-0 overflow-hidden'
+      }
+    >
       <div className="w-full flex flex-wrap items-center justify-between text-secondary font-code-sm text-code-sm pb-space-sm px-space-xs border-b border-outline-variant/20 mb-space-sm shrink-0 gap-space-sm" data-print-hide>
         <div className="flex flex-wrap items-center gap-space-sm">
           <span className="font-medium text-on-surface flex items-center gap-space-xs">
@@ -416,11 +190,9 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                 },
                 table({ children, ...props }: any) {
                   return (
-                    <div className="w-full my-4 overflow-x-auto rounded border border-outline-variant/30 not-prose">
-                      <table className="w-full border-collapse text-left text-[13px] font-sans" {...props}>
-                        {children}
-                      </table>
-                    </div>
+                    <InteractiveTable {...props}>
+                      {children}
+                    </InteractiveTable>
                   );
                 },
                 th({ children, ...props }: any) {
@@ -443,10 +215,17 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                   if (typeof className === 'string' && className.includes('language-mermaid')) {
                     return <>{children}</>;
                   }
+
+                  const rawCode = typeof child?.props?.children === 'string'
+                    ? child.props.children
+                    : Array.isArray(child?.props?.children)
+                    ? child.props.children.map((c: any) => typeof c === 'string' ? c : '').join('')
+                    : '';
+
                   return (
-                    <pre className="w-full max-w-full overflow-x-auto p-4 rounded bg-surface-container-low/70 border border-outline-variant/30 font-code-sm text-code-sm leading-relaxed my-4" {...props}>
+                    <InteractiveCodeBlock className={className} rawCode={rawCode} {...props}>
                       {children}
-                    </pre>
+                    </InteractiveCodeBlock>
                   );
                 },
                 img({ src, alt, ...props }: any) {
