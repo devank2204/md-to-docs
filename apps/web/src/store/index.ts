@@ -65,6 +65,18 @@ export interface AppState {
   restoreSnapshot: (snapshotId: string) => void;
   deleteSnapshot: (snapshotId: string) => void;
 
+  // View Routing & About Modal
+  currentView: 'landing' | 'workspace';
+  isAboutModalOpen: boolean;
+  setCurrentView: (view: 'landing' | 'workspace') => void;
+  setIsAboutModalOpen: (isOpen: boolean) => void;
+  resetWorkspaceToHome: () => void;
+
+  // Workspace Sidebar
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (isOpen: boolean) => void;
+  toggleSidebar: () => void;
+
   // Session Export Analytics & Value Milestones
   sessionExportCount: number;
   recordSuccessfulExport: () => void;
@@ -94,6 +106,26 @@ export const useStore = create<AppState>()(
       isTemplateGalleryOpen: false,
       isReconciliationModalOpen: false,
       isHistoryModalOpen: false,
+
+      // View Routing & About Modal Defaults
+      currentView: 'landing',
+      isAboutModalOpen: false,
+      setCurrentView: (currentView) => set({ currentView }),
+      setIsAboutModalOpen: (isAboutModalOpen) => set({ isAboutModalOpen }),
+      resetWorkspaceToHome: () => {
+        const resetDoc = createDocumentItem('', 'Untitled Document', get().destination);
+        set({
+          documents: [resetDoc],
+          activeDocumentId: resetDoc.id,
+          markdown: '',
+          currentView: 'landing',
+        });
+      },
+
+      // Workspace Sidebar
+      isSidebarOpen: true,
+      setIsSidebarOpen: (isSidebarOpen) => set({ isSidebarOpen }),
+      toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
 
       // Multi-Document Workspace Defaults
       documents: [
@@ -144,6 +176,7 @@ export const useStore = create<AppState>()(
             markdown,
             documents: updatedDocs,
             activeDocumentId: activeId,
+            currentView: markdown.trim().length > 0 ? 'workspace' : state.currentView,
           };
         });
       },
@@ -206,6 +239,7 @@ export const useStore = create<AppState>()(
             activeDocumentId: newDoc.id,
             markdown: initialMarkdown,
             snapshots: newSnapshots.slice(0, 50),
+            currentView: 'workspace',
           };
         });
 
@@ -230,6 +264,7 @@ export const useStore = create<AppState>()(
             documents: syncedDocs,
             activeDocumentId: id,
             markdown: targetDoc.content,
+            currentView: 'workspace',
           };
         });
       },
@@ -285,6 +320,7 @@ export const useStore = create<AppState>()(
               documents: [resetDoc],
               activeDocumentId: resetDoc.id,
               markdown: '',
+              currentView: 'workspace',
             };
           }
 
@@ -295,6 +331,7 @@ export const useStore = create<AppState>()(
               documents: filtered,
               activeDocumentId: nextDoc.id,
               markdown: nextDoc.content,
+              currentView: 'workspace',
             };
           }
 
@@ -374,13 +411,20 @@ export const useStore = create<AppState>()(
         documents: state.documents,
         activeDocumentId: state.activeDocumentId,
         snapshots: state.snapshots,
+        currentView: state.currentView,
+        isSidebarOpen: state.isSidebarOpen,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state && Array.isArray(state.documents) && state.documents.length > 5) {
-          const activeId = state.activeDocumentId;
-          const activeDoc = state.documents.find((d) => d.id === activeId) || state.documents[0];
-          const otherDocs = state.documents.filter((d) => d.id !== activeDoc.id).slice(0, 4);
-          state.documents = [activeDoc, ...otherDocs];
+        if (state) {
+          if (!state.currentView) {
+            state.currentView = state.markdown && state.markdown.trim().length > 0 ? 'workspace' : 'landing';
+          }
+          if (Array.isArray(state.documents) && state.documents.length > 5) {
+            const activeId = state.activeDocumentId;
+            const activeDoc = state.documents.find((d) => d.id === activeId) || state.documents[0];
+            const otherDocs = state.documents.filter((d) => d.id !== activeDoc.id).slice(0, 4);
+            state.documents = [activeDoc, ...otherDocs];
+          }
         }
       },
     }

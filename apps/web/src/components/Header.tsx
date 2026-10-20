@@ -1,4 +1,5 @@
 
+import { useState, useRef, useEffect } from 'react';
 import type { AppState } from '@/App';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { SegmentedControl } from '@/components/interior/segmented-control';
@@ -32,6 +33,26 @@ export function Header({
   const setIsReviewMode = useStore(state => state.setIsReviewMode);
   const activeDocumentId = useStore(state => state.activeDocumentId);
   const documents = useStore(state => state.documents);
+
+  const resetWorkspaceToHome = useStore(state => state.resetWorkspaceToHome);
+  const setIsAboutModalOpen = useStore(state => state.setIsAboutModalOpen);
+  const isSidebarOpen = useStore(state => state.isSidebarOpen);
+  const toggleSidebar = useStore(state => state.toggleSidebar);
+
+  const [isLogoMenuOpen, setIsLogoMenuOpen] = useState(false);
+  const [isEyeBlinking, setIsEyeBlinking] = useState(false);
+  const logoMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isLogoMenuOpen) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (logoMenuRef.current && !logoMenuRef.current.contains(e.target as Node)) {
+        setIsLogoMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [isLogoMenuOpen]);
 
   const activeDocTitle =
     documents.find(d => d.id === activeDocumentId)?.title || 'Untitled Document';
@@ -109,15 +130,118 @@ export function Header({
           </div>
         ) : (
           <div className="flex items-center gap-space-md">
-            <a href="/" className="flex items-center gap-space-xs group transition-transform duration-700 hover:-translate-y-[1px]">
-              <div className="flex items-center gap-space-sm">
-                <img src="/mark.png" alt="Logo" className="w-8 h-8 object-contain" />
-                <div className="flex items-baseline gap-space-xxs mt-0.5">
-                  <span className="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
-                  <span className="font-code-sm text-code-sm text-outline font-normal">.com</span>
+            <div className="relative" ref={logoMenuRef}>
+              <button
+                type="button"
+                onClick={() => setIsLogoMenuOpen(!isLogoMenuOpen)}
+                className="flex items-center gap-space-xs group rounded-lg px-1.5 py-1 hover:bg-surface-container transition-all cursor-pointer"
+                title="mdtodocs menu"
+                aria-expanded={isLogoMenuOpen}
+                aria-haspopup="true"
+              >
+                <div className="flex items-center gap-space-sm">
+                  <img src="/mark.png" alt="Logo" className="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
+                  <div className="flex items-baseline gap-space-xxs mt-0.5">
+                    <span className="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
+                    <span className="font-code-sm text-code-sm text-outline font-normal">.com</span>
+                  </div>
+                  <span
+                    className="material-symbols-outlined text-[15px] text-outline group-hover:text-on-surface transition-transform duration-200"
+                    style={{ transform: isLogoMenuOpen ? 'rotate(180deg)' : 'none' }}
+                  >
+                    expand_more
+                  </span>
                 </div>
-              </div>
-            </a>
+              </button>
+
+              {/* Glassmorphic Logo Dropdown */}
+              {isLogoMenuOpen && (
+                <div className="absolute left-0 top-full mt-2 w-64 rounded-xl bg-surface/95 dark:bg-surface-container-high/95 backdrop-blur-xl border border-outline-variant/60 shadow-xl py-1.5 text-xs text-on-surface z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-1.5 border-b border-outline-variant/30 mb-1">
+                    <div className="font-semibold text-on-surface text-[12px] flex items-center justify-between">
+                      <span>mdtodocs workspace</span>
+                      <span className="text-[10px] text-outline font-mono">v1.0</span>
+                    </div>
+                    {appState === 'WORKSPACE' && (
+                      <div className="text-[10px] text-outline truncate mt-0.5">{activeDocTitle}</div>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLogoMenuOpen(false);
+                      resetWorkspaceToHome();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-surface-container text-left transition-colors cursor-pointer group"
+                  >
+                    <span className="material-symbols-outlined text-[17px] text-secondary group-hover:text-primary">home</span>
+                    <div>
+                      <div className="font-medium">Back to Home Page</div>
+                      <div className="text-[10px] text-outline">Reset view &amp; start fresh</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLogoMenuOpen(false);
+                      setIsAboutModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-surface-container text-left transition-colors cursor-pointer group"
+                  >
+                    <span className="material-symbols-outlined text-[17px] text-secondary group-hover:text-primary">info</span>
+                    <div>
+                      <div className="font-medium">About mdtodocs</div>
+                      <div className="text-[10px] text-outline">Capabilities &amp; author info</div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLogoMenuOpen(false);
+                      onOpenCommandPalette?.();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-surface-container text-left transition-colors cursor-pointer group"
+                  >
+                    <span className="material-symbols-outlined text-[17px] text-secondary group-hover:text-primary">search</span>
+                    <div className="flex-1 flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">Command Palette</div>
+                        <div className="text-[10px] text-outline">All shortcuts &amp; tools</div>
+                      </div>
+                      <kbd className="px-1.5 py-0.5 rounded bg-surface-container-high border border-outline-variant/40 text-[10px] font-mono text-outline">
+                        {getCommandShortcut()}
+                      </kbd>
+                    </div>
+                  </button>
+
+                  <div className="my-1 border-t border-outline-variant/30" />
+
+                  <div className="px-3 py-1.5 flex items-center justify-between text-[10px] text-outline font-mono">
+                    <span>© Yours truly DC</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {appState === 'WORKSPACE' && (
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                  isSidebarOpen
+                    ? 'text-primary bg-primary/10 border border-primary/20'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container border border-outline-variant/30'
+                }`}
+                title={isSidebarOpen ? 'Collapse sidebar (Ctrl+B)' : 'Expand sidebar (Ctrl+B)'}
+              >
+                <span className="material-symbols-outlined text-[17px]">
+                  {isSidebarOpen ? 'dock_to_left' : 'view_sidebar'}
+                </span>
+              </button>
+            )}
 
             {appState === 'WORKSPACE' && (
               <div className="hidden sm:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
@@ -176,7 +300,7 @@ export function Header({
           {/* Primary Action - decoupled stable min-width to prevent layout shifts */}
           <LoadingButton
             onAction={primaryAction}
-            successLabel="✓ Copied!"
+            successLabel="Copied!"
             pendingLabel={destination === 'word' ? 'Compiling...' : 'Copying...'}
             idleIcon={<span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>}
             className="min-w-[145px]"
@@ -184,15 +308,27 @@ export function Header({
             {primaryLabel() ?? 'Export'}
           </LoadingButton>
 
-          {/* Reading View Button (shown only when in editor view) */}
+          {/* Reading View Button with Eye Blink Micro-Interaction */}
           {!isReviewMode && (
             <button
               type="button"
-              onClick={() => setIsReviewMode(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors"
+              onClick={() => {
+                setIsEyeBlinking(true);
+                setTimeout(() => {
+                  setIsReviewMode(true);
+                  setIsEyeBlinking(false);
+                }, 220);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all active:scale-95 cursor-pointer group"
               title="Switch to clean reading view"
             >
-              <span className="material-symbols-outlined text-[16px]">visibility</span>
+              <span
+                className={`material-symbols-outlined text-[16px] transition-all duration-200 ${
+                  isEyeBlinking ? 'scale-y-[0.05] text-primary -translate-y-0.5' : 'group-hover:scale-115'
+                }`}
+              >
+                visibility
+              </span>
               <span className="hidden sm:inline">Reading View</span>
             </button>
           )}

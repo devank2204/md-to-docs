@@ -56,8 +56,10 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           </>
         )}
       </div>
-      <div className="flex items-center gap-space-sm">
+      <div className="flex items-center gap-space-sm text-outline">
         <span>Target: {DEST_LABELS[destination]}</span>
+        <span className="text-outline-variant/60">·</span>
+        <span className="text-[10px] tracking-wide font-mono text-outline/80">© Yours truly DC</span>
       </div>
     </div>
   );

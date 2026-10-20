@@ -1145,5 +1145,108 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Document duplication is visually discoverable on hover in the sidebar file drawer.
   - [x] All 87 validation tests and production web build pass.
 
+* **Next Allowed Prompt:** Task P27: UX Polish, Add-New-Doc Fix, Glassmorphism, Eye Animation & Mermaid Auto-Fix
+
+---
+
+## Task P27: UX Polish, Add-New-Doc Fix, Glassmorphism, Eye Animation & Mermaid Auto-Fix
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - **1. Critical Bug Fix: "Add New Document" (`+`) Blank Sheet UX:**
+    - Root cause: `App.tsx` computed `appState = markdown.trim().length > 0 ? 'WORKSPACE' : 'EMPTY'`. Creating an empty document (`markdown = ''`) collapsed the workspace into the landing page.
+    - Decoupled view state in Zustand (`apps/web/src/store/index.ts`) with `currentView: 'landing' | 'workspace'`.
+    - Clicking `+` now creates an empty document and maintains `currentView = 'workspace'`, rendering a clean "Untitled Document" sheet ready for immediate typing.
+  - **2. Clubbed Navigation: "Back to Home Page" & "Reset Workspace":**
+    - Logo (`mdtodocs.com`) replaced with a sleek glass dropdown menu.
+    - Unified "Back to Home Page (Start Fresh)" which safely resets state while leaving open documents manageable.
+    - Added "About mdtodocs" dialog modal detailing architecture, supported destinations, and author attribution.
+  - **3. Homepage Terminal & Code Window Overhaul:**
+    - Redesigned `EmptyState.tsx` into a sleek dark macOS code terminal.
+    - Features line numbers gutter (`01`-`06`), comment line `# Start by pasting here :)` with pulsing block cursor `▋`, and instant clipboard paste button with shortcut badge (`Ctrl+V` / `⌘V`).
+    - Added `Copyright: Yours truly DC` attribution in homepage footer, workspace status bar, and about modal.
+  - **4. Reading View Eye Icon Micro-Animation:**
+    - Added a smooth tactile eye-blink/wink animation to the Reading View toggle button in `Header.tsx` (`scale-y-[0.05]` squash and transition) triggered before switching views.
+  - **5. "Copy for Google Docs" Glassmorphism & Spring Checkmark:**
+    - Replaced flat green `#22c55e` state in `loading-button.tsx` with a dark frosted glass mirror surface, specular highlight reflection line, luminous emerald ambient glow, and a spring-animated SVG checkmark (`pathLength` draw).
+  - **6. Mermaid Inspector & Auto-Fix Repair Engine:**
+    - Implemented `autoFixMermaidCode` in `MermaidDiagram.tsx` to automatically resolve syntax errors: unquoted labels containing brackets/parentheses (`[Task (v1)]` -> `["Task (v1)"]`), unclosed subgraphs, and typographic smart quotes.
+    - Added an active **"✨ Auto-Fix Diagram"** button in the diagram error banner that mutates the active document in real time.
+  - **7. Collapsible Headings in Document Preview:**
+    - Implemented `rehypeCollapsibleHeadings` wrapping H1-H6 in `<details open class="collapsible-section">` with smooth rotating chevrons.
+    - Preserved 100% expansion on `@media print` and left DOCX/Google Docs clipboard generators unpolluted.
+* **Files Changed:**
+  - `apps/web/src/store/index.ts` (View decoupled from markdown length; clubbed home reset; about modal state)
+  - `apps/web/src/App.tsx` (Bound appState to currentView; mounted AboutModal)
+  - `apps/web/src/components/AboutModal.tsx` (New glassmorphic About dialog with attribution)
+  - `apps/web/src/components/StatusBar.tsx` (Attribution in footer status bar)
+  - `apps/web/src/components/Header.tsx` (Logo glass dropdown menu; eye blink animation)
+  - `apps/web/src/components/EmptyState.tsx` (Terminal code editor landing screen; prompt line + cursor)
+  - `apps/web/src/components/interior/loading-button.tsx` (Dark glass mirror, emerald glow, spring checkmark)
+  - `apps/web/src/components/MermaidDiagram.tsx` (Auto-fix repair engine and action button)
+  - `apps/web/src/components/DocumentPreview.tsx` (Rehype collapsible headings & blank untitled sheet state)
+  - `apps/web/src/index.css` (Collapsible section styling, chevron rotation, and print rules)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.65s)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 17/17 test files, 92/92 tests passed**)
+  - `npx pnpm --filter web lint` (`oxlint`) (**PASS: 0 errors**)
+  - Browser Subagent Verification: **PASS** (`ux_touchup_verification` & `new_doc_verification`)
+    - Verified new document creation (`+`) leaves user in workspace with blank sheet and empty editor.
+    - Verified logo dropdown menu with "Back to Home Page (Start Fresh)" and "About mdtodocs".
+    - Verified terminal code window with blinking cursor and clipboard action.
+    - Verified collapsible headings folding and expanding smoothly.
+    - Verified multi-document switching without data loss.
+* **Acceptance Criteria:**
+  - [x] Adding a new document stays in workspace with clean blank sheet.
+  - [x] "Back to Home Page" and "Clear / Start Fresh" clubbed into logo dropdown.
+  - [x] Landing page overhauled into code terminal with `# Start by pasting here :)` and blinking cursor.
+  - [x] Reading view button exhibits playful eye blink animation.
+  - [x] Copy button features glass specular reflection, luminous emerald glow, and spring checkmark.
+  - [x] Mermaid diagrams include an auto-fix CTA that repairs common syntax issues.
+  - [x] Headings are collapsible in preview and Reading View, 100% expanded on print/export.
+  - [x] All 92 validation tests, typecheck, and production web build pass.
+
+* **Next Allowed Prompt:** Task P28: Workspace Sidebar Expand Icon, Border Tab, Header Toggle & Platform Shortcut
+
+---
+
+## Task P28: Workspace Sidebar Expand Icon, Border Tab, Header Toggle & Platform Shortcut
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - **1. Missing Sidebar Expand Icon Resolution:**
+    - Root cause: `WorkspaceSidebar.tsx` previously housed `isDrawerOpen` in local state. When `isDrawerOpen` was collapsed via the header `chevron_left` button (`title="Collapse sidebar"`), the entire drawer unmounted, leaving behind only the activity rail with zero expand chevron icons.
+    - Decoupled and lifted sidebar visibility to Zustand store (`isSidebarOpen`, `setIsSidebarOpen`, `toggleSidebar`) and added it to persistence (`partialize`).
+    - Added an explicit **"Expand sidebar"** button featuring `chevron_right` at the top of the activity rail whenever the sidebar is collapsed.
+    - Added a sleek floating circular tab on the vertical boundary between the sidebar and editor that renders `chevron_right` when collapsed and reveals `chevron_left` on hover when open.
+  - **2. Top Header Sidebar Toggle:**
+    - Added a platform-aligned sidebar toggle button (`dock_to_left` / `view_sidebar`) right next to the brand logo in `Header.tsx` with clear tooltip `Collapse sidebar (Ctrl+B)` / `Expand sidebar (Ctrl+B)`.
+  - **3. Global Keyboard Shortcut & Command Palette:**
+    - Handled `Ctrl+B` (and `⌘B` on macOS) globally in `App.tsx` to toggle the sidebar without conflicting with text input.
+    - Added a dedicated `"Toggle Sidebar"` action (`Ctrl+B`) under "View & Navigation" in `CommandPalette.tsx`.
+* **Files Changed:**
+  - `apps/web/src/store/index.ts` (Lifted isSidebarOpen and toggleSidebar to store and partialize)
+  - `apps/web/src/components/WorkspaceSidebar.tsx` (Added rail expand button, border floating tab, and synced state)
+  - `apps/web/src/components/Header.tsx` (Added top navbar sidebar toggle button next to logo)
+  - `apps/web/src/App.tsx` (Added global Ctrl+B / ⌘B keyboard shortcut handler)
+  - `apps/web/src/components/CommandPalette.tsx` (Added toggle sidebar command item)
+  - `docs/EXECUTION_LEDGER.md` (Updated execution ledger)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, built cleanly)
+  - `npx pnpm --filter web lint` (`oxlint`) (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 17/17 test files, 92/92 tests passed**)
+  - Browser Subagent Verification: **PASS** (`sidebar_expand_icon_verification`)
+    - Captured `sidebar_open_1792506782817.png`: verified open drawer with `chevron_left` collapse icons.
+    - Captured `sidebar_collapsed_shortcut_1792506903919.png`: verified collapsed state showing explicit `chevron_right` expand button at the top of the rail, floating circular tab on the rail boundary, and top navbar toggle button.
+    - Verified smooth expansion and collapse via button clicks and `Ctrl+B`.
+* **Acceptance Criteria:**
+  - [x] Prominent `chevron_right` expand button visible in rail when sidebar is collapsed.
+  - [x] Floating circular expand tab on rail/editor border.
+  - [x] Top header navbar toggle button next to brand logo.
+  - [x] `Ctrl+B` / `⌘B` global shortcut toggles sidebar.
+  - [x] Command Palette provides Toggle Sidebar command.
+  - [x] All 92 validation tests, lint, and production web build pass.
+
 * **Next Allowed Prompt:** Ready for next user instruction.
+
+
 

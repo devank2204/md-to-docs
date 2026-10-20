@@ -14,8 +14,10 @@ export function WorkspaceSidebar() {
   const setIsInspectorOpen = useStore((s) => s.setIsInspectorOpen);
   const themeId = useStore((s) => s.themeId);
   const setThemeId = useStore((s) => s.setThemeId);
+  const isSidebarOpen = useStore((s) => s.isSidebarOpen);
+  const setIsSidebarOpen = useStore((s) => s.setIsSidebarOpen);
+  const toggleSidebar = useStore((s) => s.toggleSidebar);
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
 
@@ -43,7 +45,7 @@ export function WorkspaceSidebar() {
 
   const handleCreateNewDoc = () => {
     createDocument('', 'Untitled Document');
-    if (!isDrawerOpen) setIsDrawerOpen(true);
+    if (!isSidebarOpen) setIsSidebarOpen(true);
   };
 
   const handleToggleTheme = () => {
@@ -53,22 +55,36 @@ export function WorkspaceSidebar() {
   return (
     <aside
       data-print-hide
-      className="flex h-full select-none shrink-0 z-20 border-r border-outline-variant/30 bg-surface-container-low transition-all duration-200"
+      className="relative flex h-full select-none shrink-0 z-20 border-r border-outline-variant/30 bg-surface-container-low transition-all duration-200"
     >
       {/* 1. VS Code-Style Activity Rail */}
       <div className="w-11 bg-surface-container-low flex flex-col items-center py-2 justify-between border-r border-outline-variant/20 shrink-0">
         {/* Top actions */}
         <div className="flex flex-col items-center gap-1.5 w-full">
+          {/* Prominent Expand Button when sidebar drawer is collapsed */}
+          {!isSidebarOpen && (
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-primary bg-primary/10 hover:bg-primary/20 transition-all cursor-pointer border border-primary/25 shadow-xs mb-0.5 group"
+              title="Expand sidebar (Ctrl+B)"
+            >
+              <span className="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform duration-150">
+                chevron_right
+              </span>
+            </button>
+          )}
+
           {/* File Explorer Toggle */}
           <button
             type="button"
-            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+            onClick={toggleSidebar}
             className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
-              isDrawerOpen
+              isSidebarOpen
                 ? 'bg-surface text-primary shadow-xs border border-outline-variant/40'
                 : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
             }`}
-            title={isDrawerOpen ? 'Collapse Files (Ctrl+B)' : 'Expand Files (Ctrl+B)'}
+            title={isSidebarOpen ? 'Collapse Files (Ctrl+B)' : 'Expand Files (Ctrl+B)'}
           >
             <span className="material-symbols-outlined text-[17px]">description</span>
             {documents.length > 1 && (
@@ -131,8 +147,22 @@ export function WorkspaceSidebar() {
         </div>
       </div>
 
+      {/* Floating Expand/Collapse Tab on Border */}
+      <button
+        type="button"
+        onClick={toggleSidebar}
+        className={`absolute -right-3 top-3.5 z-30 w-6 h-6 rounded-full bg-surface border border-outline-variant/60 shadow-xs flex items-center justify-center text-outline hover:text-primary hover:border-primary/40 hover:scale-110 transition-all cursor-pointer ${
+          isSidebarOpen ? 'opacity-0 hover:opacity-100' : 'opacity-100'
+        }`}
+        title={isSidebarOpen ? 'Collapse sidebar (Ctrl+B)' : 'Expand sidebar (Ctrl+B)'}
+      >
+        <span className="material-symbols-outlined text-[14px] transition-transform duration-150">
+          {isSidebarOpen ? 'chevron_left' : 'chevron_right'}
+        </span>
+      </button>
+
       {/* 2. Collapsible Vertical File Drawer */}
-      {isDrawerOpen && (
+      {isSidebarOpen && (
         <div className="w-52 bg-surface-container-low flex flex-col h-full overflow-hidden text-xs">
           {/* Drawer Header */}
           <div className="flex items-center justify-between px-3 py-2 border-b border-outline-variant/20 shrink-0">
@@ -152,9 +182,9 @@ export function WorkspaceSidebar() {
               </button>
               <button
                 type="button"
-                onClick={() => setIsDrawerOpen(false)}
+                onClick={() => setIsSidebarOpen(false)}
                 className="p-1 rounded hover:bg-surface-container text-outline hover:text-on-surface transition-colors cursor-pointer"
-                title="Collapse sidebar"
+                title="Collapse sidebar (Ctrl+B)"
               >
                 <span className="material-symbols-outlined text-[15px]">chevron_left</span>
               </button>

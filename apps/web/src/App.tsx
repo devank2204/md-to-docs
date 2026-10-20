@@ -7,6 +7,7 @@ import { TemplateGalleryModal } from '@/components/TemplateGalleryModal';
 import { ReconciliationModal } from '@/components/ReconciliationModal';
 import { DocumentHistoryModal } from '@/components/DocumentHistoryModal';
 import { BookmarkPrompt } from '@/components/BookmarkPrompt';
+import { AboutModal } from '@/components/AboutModal';
 import { THEMES } from '@mdtodocs/compiler-core';
 import type { DocumentTheme } from '@mdtodocs/compiler-core';
 import { useStore } from '@/store';
@@ -15,6 +16,7 @@ export type AppState = 'EMPTY' | 'WORKSPACE';
 
 function App() {
   const markdown = useStore(state => state.markdown);
+  const currentView = useStore(state => state.currentView);
   const destination = useStore(state => state.destination);
   const themeId = useStore(state => state.themeId);
   const baseFontSize = useStore(state => state.baseFontSize);
@@ -31,11 +33,12 @@ function App() {
   const setIsReconciliationModalOpen = useStore(state => state.setIsReconciliationModalOpen);
   const setIsHistoryModalOpen = useStore(state => state.setIsHistoryModalOpen);
   const createDocument = useStore(state => state.createDocument);
+  const toggleSidebar = useStore(state => state.toggleSidebar);
   const setIsInspectorOpen = useStore(state => state.setIsInspectorOpen);
   const setIsFidelityPanelOpen = useStore(state => state.setIsFidelityPanelOpen);
   const setIsSuggestModalOpen = useStore(state => state.setIsSuggestModalOpen);
 
-  const appState: AppState = markdown.trim().length > 0 ? 'WORKSPACE' : 'EMPTY';
+  const appState: AppState = currentView === 'landing' ? 'EMPTY' : 'WORKSPACE';
 
   const activeTheme: DocumentTheme = {
     ...THEMES[themeId],
@@ -50,11 +53,17 @@ function App() {
       } else if ((e.metaKey || e.ctrlKey) && e.altKey && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         createDocument('', 'Untitled Document');
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
+        const target = e.target as HTMLElement | null;
+        if (target?.tagName !== 'INPUT') {
+          e.preventDefault();
+          toggleSidebar();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCommandPaletteOpen, setIsCommandPaletteOpen, createDocument]);
+  }, [isCommandPaletteOpen, setIsCommandPaletteOpen, createDocument, toggleSidebar]);
 
 
   useEffect(() => {
@@ -138,6 +147,8 @@ function App() {
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
       />
+
+      <AboutModal />
 
       <BookmarkPrompt />
     </div>

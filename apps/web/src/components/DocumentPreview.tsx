@@ -21,6 +21,112 @@ interface DocumentPreviewProps {
 }
 
 
+// Rehype plugin to wrap headings and their section content into collapsible <details>
+function groupHeadings(children: any[]): any[] {
+  const result: any[] = [];
+  let i = 0;
+  while (i < children.length) {
+    const child = children[i];
+    if (child && child.type === 'element' && /^h[1-6]$/.test(child.tagName)) {
+      const level = parseInt(child.tagName[1], 10);
+      const sectionChildren: any[] = [];
+      let j = i + 1;
+      while (j < children.length) {
+        const next = children[j];
+        if (next && next.type === 'element' && /^h[1-6]$/.test(next.tagName)) {
+          const nextLevel = parseInt(next.tagName[1], 10);
+          if (nextLevel <= level) {
+            break;
+          }
+        }
+        sectionChildren.push(next);
+        j++;
+      }
+
+      const nestedChildren = groupHeadings(sectionChildren);
+
+      const detailsNode = {
+        type: 'element',
+        tagName: 'details',
+        properties: {
+          className: ['collapsible-section', 'group/sec', 'my-2'],
+          open: true,
+          'data-heading-level': level,
+        },
+        children: [
+          {
+            type: 'element',
+            tagName: 'summary',
+            properties: {
+              className: [
+                'collapsible-heading-summary',
+                'cursor-pointer',
+                'list-none',
+                'flex',
+                'items-center',
+                'gap-2',
+                'select-none',
+                'py-1',
+                'group-hover/sec:text-primary',
+                'transition-colors',
+              ],
+            },
+            children: [
+              {
+                type: 'element',
+                tagName: 'span',
+                properties: {
+                  className: [
+                    'material-symbols-outlined',
+                    'text-[18px]',
+                    'text-outline/60',
+                    'group-hover/sec:text-primary',
+                    'transition-transform',
+                    'duration-150',
+                    'group-open/sec:rotate-90',
+                    'shrink-0',
+                    'select-none',
+                  ],
+                  'aria-hidden': 'true',
+                },
+                children: [{ type: 'text', value: 'chevron_right' }],
+              },
+              child,
+            ],
+          },
+          {
+            type: 'element',
+            tagName: 'div',
+            properties: {
+              className: [
+                'collapsible-section-body',
+                'pl-4',
+                'border-l',
+                'border-outline-variant/30',
+                'ml-2',
+                'my-1',
+              ],
+            },
+            children: nestedChildren,
+          },
+        ],
+      };
+      result.push(detailsNode);
+      i = j;
+    } else {
+      result.push(child);
+      i++;
+    }
+  }
+  return result;
+}
+
+const rehypeCollapsibleHeadings = () => (tree: any) => {
+  if (tree && Array.isArray(tree.children)) {
+    tree.children = groupHeadings(tree.children);
+  }
+};
+
 // Remark plugin applying destination planner transformations directly to the ReactMarkdown AST
 const createDestinationPlanPlugin = (destination: DestinationType) => () => (tree: Root) => {
   const collector = new DiagnosticsCollector();
@@ -73,10 +179,19 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
               <div className="h-full bg-primary animate-pulse w-full"></div>
             </div>
           )}
-          <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
-              rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }]]}
+          {markdown.trim().length === 0 ? (
+            <div className="py-32 flex flex-col items-center justify-center text-outline select-none text-center">
+              <span className="material-symbols-outlined text-[42px] text-outline/30 mb-3">edit_document</span>
+              <h3 className="font-serif text-lg text-on-surface font-medium">Untitled Document</h3>
+              <p className="font-code-sm text-xs text-outline/70 mt-1.5 max-w-sm">
+                Start typing in the editor on the left or paste Markdown to see live preview.
+              </p>
+            </div>
+          ) : (
+            <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
+                rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], rehypeCollapsibleHeadings]}
               components={{
                 p({ children, ...props }: any) {
                   return (
@@ -177,9 +292,9 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             >
               {markdown}
             </ReactMarkdown>
-
           </div>
-        </div>
+        )}
+      </div>
       </div>
 
       {/* Floating Canvas Zoom Control (beside document page) */}
