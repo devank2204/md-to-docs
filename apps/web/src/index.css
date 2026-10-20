@@ -21,6 +21,33 @@
   }
 }
 
+/* Impeccable Browser Surfaces: Themed selection, caret, focus rings & tabular numbers */
+::selection {
+  background-color: rgba(27, 28, 29, 0.14);
+  color: #111827;
+}
+
+textarea, input[type="text"], input[type="number"], [contenteditable] {
+  caret-color: #1b1c1d;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(27, 28, 29, 0.45);
+  outline-offset: 1px;
+}
+
+.tabular-nums,
+[data-counter],
+time,
+code {
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
 /* Custom scrollbar styling: subtle, elegant, visible on scroll */
 * {
   scrollbar-width: thin;

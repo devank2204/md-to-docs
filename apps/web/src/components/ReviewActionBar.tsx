@@ -31,6 +31,7 @@ export function ReviewActionBar({
     setIsExportingDocx(true);
     await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
     setIsExportingDocx(false);
+    useStore.getState().recordSuccessfulExport();
   };
 
   const handleCopyGDocs = async () => {
@@ -38,11 +39,13 @@ export function ReviewActionBar({
     if (success) {
       setCopiedGDocs(true);
       setTimeout(() => setCopiedGDocs(false), 2000);
+      useStore.getState().recordSuccessfulExport();
     }
   };
 
   const handlePrintPdf = () => {
     printPdf();
+    useStore.getState().recordSuccessfulExport();
   };
 
   return (
@@ -54,7 +57,7 @@ export function ReviewActionBar({
       <div className="flex items-center gap-2.5">
         <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase border border-primary/20">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          Review Mode
+          Reading View
         </span>
         <span className="text-xs text-on-surface-variant hidden sm:inline">
           {readingTimeMinutes} min read · {wordCount} words

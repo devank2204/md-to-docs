@@ -11,10 +11,13 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
   const reactId = useId();
   const diagramId = `mermaid-${reactId.replace(/:/g, '')}`;
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const [theme, setTheme] = useState<MermaidTheme>('neutral');
   const [copiedType, setCopiedType] = useState<'svg' | 'code' | 'image' | null>(null);
   const [showSource, setShowSource] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [renderResult, setRenderResult] = useState<{
     code: string;
@@ -31,6 +34,40 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
   const isRendering = renderResult.code !== code || renderResult.theme !== theme;
   const svg = (renderResult.code === code && renderResult.theme === theme) ? renderResult.svg : '';
   const error = (renderResult.code === code && renderResult.theme === theme) ? renderResult.error : null;
+
+  // Close overflow menu on outside click or Escape
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(target) &&
+        menuButtonRef.current &&
+        !menuButtonRef.current.contains(target)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -226,113 +263,177 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
   return (
     <div
       ref={containerRef}
-      className="my-6 rounded border border-outline-variant/30 bg-surface-container-lowest overflow-hidden shadow-xs not-prose"
+      className="group relative my-6 rounded-lg border border-outline-variant/30 bg-surface-container-lowest shadow-xs not-prose"
     >
-      {/* Diagram Action Bar */}
-      <div
-        data-print-hide
-        className="flex flex-wrap items-center justify-between px-3 py-1.5 bg-surface-container-low border-b border-outline-variant/20 font-code-sm text-[11px] text-secondary select-none gap-2"
-      >
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[15px] text-primary">account_tree</span>
-            <span className="font-semibold uppercase tracking-wider text-on-surface">Diagram</span>
-          </div>
-
-          <span className="text-outline-variant">·</span>
-
-          {/* Theme Selector */}
-          <div className="flex items-center gap-1">
-            <span className="text-secondary text-[11px]">Theme:</span>
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value as MermaidTheme)}
-              className="bg-transparent border border-outline-variant/30 rounded px-1.5 py-0.5 text-on-surface focus:outline-none focus:border-primary text-code-sm font-medium"
-            >
-              <option value="neutral">Neutral</option>
-              <option value="default">Default</option>
-              <option value="dark">Dark</option>
-              <option value="forest">Forest</option>
-              <option value="base">Base</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1 flex-wrap">
-          {/* Copy Image Button */}
+      {/* Subtle Floating Toolbar - secondary controls revealed on hover/focus/touch */}
+      {!error && (
+        <div
+          data-print-hide
+          className={`absolute top-2.5 right-2.5 z-20 flex items-center gap-1 p-1 rounded-lg bg-surface/90 dark:bg-surface-container-high/90 backdrop-blur-xs border border-outline-variant/50 shadow-xs transition-opacity duration-150 ${
+            isMenuOpen
+              ? 'opacity-100 ring-1 ring-primary/30'
+              : 'opacity-100 [media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-within:opacity-100'
+          }`}
+        >
+          {/* Quick Action: Copy Diagram Image */}
           <button
+            type="button"
             onClick={handleCopyImage}
             disabled={!svg}
-            title="Copy high-res diagram image directly to clipboard"
-            className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
+            aria-label="Copy diagram image to clipboard"
+            title={copiedType === 'image' ? 'Copied image to clipboard!' : 'Copy diagram image'}
+            className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors active:scale-95 disabled:opacity-40"
           >
-            <span className="material-symbols-outlined text-[13px]">
+            <span className="material-symbols-outlined text-[15px]">
               {copiedType === 'image' ? 'check' : 'content_copy'}
             </span>
-            <span className="font-medium">
-              {copiedType === 'image' ? 'Copied Image!' : 'Copy Image'}
+            <span className="text-[11px] font-medium hidden sm:inline">
+              {copiedType === 'image' ? 'Copied' : 'Copy'}
             </span>
           </button>
 
-          {/* Copy SVG */}
-          <button
-            onClick={handleCopySvg}
-            disabled={!svg}
-            title="Copy SVG XML to clipboard"
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
-          >
-            <span>{copiedType === 'svg' ? 'Copied SVG!' : 'SVG'}</span>
-          </button>
+          <span className="w-px h-3.5 bg-outline-variant/50 mx-0.5" aria-hidden="true" />
 
-          {/* Copy Source */}
-          <button
-            onClick={handleCopyCode}
-            title="Copy Mermaid source code"
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95"
-          >
-            <span className="material-symbols-outlined text-[13px]">code</span>
-            <span>{copiedType === 'code' ? 'Copied Code!' : 'Source'}</span>
-          </button>
+          {/* Secondary Options Trigger (Overflow Menu) */}
+          <div className="relative">
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="More diagram options"
+              aria-haspopup="true"
+              aria-expanded={isMenuOpen}
+              title="More options (Export SVG/PNG/JPEG, code, theme)"
+              className={`p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors flex items-center justify-center ${
+                isMenuOpen ? 'bg-surface-container-highest text-on-surface' : ''
+              }`}
+            >
+              <span className="material-symbols-outlined text-[17px]">more_vert</span>
+            </button>
 
-          <span className="text-outline-variant mx-0.5">·</span>
+            {/* Overflow Dropdown */}
+            {isMenuOpen && (
+              <div
+                ref={menuRef}
+                role="menu"
+                aria-orientation="vertical"
+                className="absolute right-0 top-full mt-1.5 w-52 rounded-lg bg-surface-container-highest/98 backdrop-blur-md border border-outline-variant/70 shadow-lg py-1.5 text-xs text-on-surface z-30 animate-in fade-in zoom-in-95 duration-150"
+              >
+                {/* Theme Selector Section */}
+                <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/70">
+                  Theme
+                </div>
+                <div className="px-3 py-1 mb-1">
+                  <select
+                    value={theme}
+                    onChange={(e) => {
+                      setTheme(e.target.value as MermaidTheme);
+                    }}
+                    aria-label="Select diagram theme"
+                    className="w-full bg-surface-container border border-outline-variant/60 rounded px-2 py-1 text-xs text-on-surface focus:outline-none focus:border-primary font-sans"
+                  >
+                    <option value="neutral">Neutral (Default)</option>
+                    <option value="default">Default</option>
+                    <option value="dark">Dark</option>
+                    <option value="forest">Forest</option>
+                    <option value="base">Base</option>
+                  </select>
+                </div>
 
-          {/* Download SVG */}
-          <button
-            onClick={handleDownloadSvg}
-            disabled={!svg}
-            title="Download vector diagram as .svg"
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
-          >
-            <span className="material-symbols-outlined text-[13px]">download</span>
-            <span>SVG</span>
-          </button>
+                <div className="my-1 border-t border-outline-variant/40" />
 
-          {/* Download PNG */}
-          <button
-            onClick={handleDownloadPng}
-            disabled={!svg}
-            title="Download rasterized 2x Retina diagram as .png"
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
-          >
-            <span className="material-symbols-outlined text-[13px]">image</span>
-            <span>PNG</span>
-          </button>
+                {/* Downloads Section */}
+                <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/70">
+                  Download
+                </div>
 
-          {/* Download JPEG */}
-          <button
-            onClick={handleDownloadJpeg}
-            disabled={!svg}
-            title="Download compressed diagram as .jpg with white background"
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-surface-container hover:text-on-surface transition-all active:scale-95 disabled:opacity-40"
-          >
-            <span className="material-symbols-outlined text-[13px]">photo</span>
-            <span>JPEG</span>
-          </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    handleDownloadSvg();
+                    setIsMenuOpen(false);
+                  }}
+                  disabled={!svg}
+                  className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-surface-container text-left transition-colors disabled:opacity-40"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-primary">download</span>
+                  <span>Download SVG (Vector)</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    handleDownloadPng();
+                    setIsMenuOpen(false);
+                  }}
+                  disabled={!svg}
+                  className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-surface-container text-left transition-colors disabled:opacity-40"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-primary">image</span>
+                  <span>Download PNG (2x)</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    handleDownloadJpeg();
+                    setIsMenuOpen(false);
+                  }}
+                  disabled={!svg}
+                  className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-surface-container text-left transition-colors disabled:opacity-40"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-primary">photo</span>
+                  <span>Download JPEG</span>
+                </button>
+
+                <div className="my-1 border-t border-outline-variant/40" />
+
+                {/* Copy / Source Section */}
+                <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/70">
+                  Clipboard & Source
+                </div>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    handleCopySvg();
+                    setIsMenuOpen(false);
+                  }}
+                  disabled={!svg}
+                  className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-surface-container text-left transition-colors disabled:opacity-40"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-secondary">code</span>
+                  <span>{copiedType === 'svg' ? 'Copied SVG!' : 'Copy SVG XML'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    handleCopyCode();
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-surface-container text-left transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-secondary">terminal</span>
+                  <span>{copiedType === 'code' ? 'Copied Source!' : 'Copy Mermaid Source'}</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Diagram Viewport */}
-      <div className={`p-4 flex flex-col items-center justify-center min-h-[120px] overflow-x-auto ${theme === 'dark' ? 'bg-[#1e1e24]' : 'bg-white'}`}>
+      {/* Diagram Viewport: prominent, unencumbered by top bar */}
+      <div
+        className={`p-6 flex flex-col items-center justify-center min-h-[140px] overflow-x-auto rounded-lg transition-colors ${
+          theme === 'dark' ? 'bg-[#1e1e24]' : 'bg-white'
+        }`}
+      >
         {isRendering ? (
           <div className="flex items-center gap-2 text-secondary font-code-sm text-code-sm py-8">
             <span className="material-symbols-outlined text-[16px] animate-spin">refresh</span>
@@ -351,6 +452,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
                 )}
               </div>
               <button
+                type="button"
                 onClick={() => setShowSource(!showSource)}
                 className="text-secondary hover:text-on-surface font-code-sm text-[11px] underline"
               >

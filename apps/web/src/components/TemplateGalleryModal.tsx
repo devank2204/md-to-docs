@@ -77,9 +77,9 @@ function TemplateGalleryModalContent({
               <span className="material-symbols-outlined text-[24px]">collections_bookmark</span>
             </div>
             <div>
-              <h2 className="font-semibold text-lg tracking-tight">Executive Template Gallery</h2>
+              <h2 className="font-semibold text-lg tracking-tight">Document Templates</h2>
               <p className="text-xs text-on-surface-variant">
-                Pre-formatted, production-grade document structures for engineering, architecture, and product leadership.
+                Example document structures with tables, diagrams, and formatting.
               </p>
             </div>
           </div>

@@ -859,4 +859,291 @@ This ledger tracks the progressive implementation and verification of the `md.to
   - [x] Command Palette integrates document switching and snapshot commands.
   - [x] All 79 validation tests, 17 fidelity lab fixtures, and web production build pass.
 
-* **Next Allowed Prompt:** Roadmap Review & Next Milestone Planning
+* **Next Allowed Prompt:** Task P22: Impeccable Design Overhaul & Publication Craft
+
+---
+
+### Task P22: Impeccable Design Overhaul & Publication Craft
+* **Status:** Completed
+* **Implementation Summary:**
+  - Audited Paul Bakaus' `pbakaus/impeccable` design methodology (Operate, Craft Floor, Distill, Colorize, Depth, Typeset, Onboard, Delight, Polish).
+  - **Phase 1: Workspace Architecture & Toolbar Distillation (`/impeccable distill` & `layout`)**:
+    - Consolidated 3 stacked toolbar rows (120px+ vertical clutter) into 2 cohesive bands:
+      1. Unified Header (`Header.tsx`): Grouped `Commands ⌘K`, `Templates`, and `Reconcile` into an ergonomic tool cluster. Kept clean active doc title and high-contrast primary export button.
+      2. Studio Control Strip (`DocumentTabBar.tsx`): Open tabs on left; Appearance popover (`tune` icon), Zoom stepper (`- 100% +`), Snapshot trigger, History badge, and Details inspector on right.
+    - Purged redundant secondary `Target: PDF` dropdown and 4 raw native `<select>` tags (`Theme`, `Size`, `Signature`) from `DocumentPreview.tsx`.
+    - Implemented floating `Document Appearance` popover with theme selection (`Default`, `Clean`, `Dark`), font size stepper (`- [N] pt +`), and signature placement.
+    - Streamlined `DocumentEditor.tsx`: Clean `Markdown [GFM]` subheader with tabular-num counters; removed redundant bottom status bar.
+    - Added `zoom: number` and `setZoom` to Zustand `useStore` (`apps/web/src/store/index.ts`).
+  - **Phase 2 & 3: Palette Harmonization, Paper Elevation & Browser Surface Theming (`/impeccable colorize`, `depth`, `typeset`, `craft-floor`)**:
+    - `apps/web/src/index.css`: Injected themed browser surfaces (`::selection` with soft dark tint, `caret-color: #1b1c1d`, `:focus-visible` offset ring, `.tabular-nums` for counters/time/code, `text-underline-offset: 3px`).
+    - `DocumentPreview.tsx`: Set preview pane background to subtle architectural cool-gray canvas (`bg-[#f1f3f5]`).
+    - `DocumentPreview.tsx`: Applied multi-layered diffused paper elevation to rendered document: `shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_28px_-4px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] bg-[#ffffff]`.
+    - `DocumentPreview.tsx`: Replaced screen-flashing 50% opacity compiling spinner overlay with an elegant top hairline compiler progress indicator (`h-0.5 bg-primary animate-pulse`).
+    - `DocumentEditor.tsx`: Set editor container background to crisp `#ffffff` with `border-r border-outline-variant/30` for optical separation between editor, canvas, and stationery.
+  - **Phase 4: Authentic Onboarding (`/impeccable onboard`)**:
+    - `EmptyState.tsx`: Purged fake macOS traffic-light window chrome (`#dbdad7`).
+    - Redesigned `EmptyState.tsx` into an executive drafting studio with native drag-and-drop file upload (`.md`, `.markdown`, `.txt`), direct typing canvas, and 1-click starter templates.
+    - Added comprehensive keyboard accelerator guide (`⌘K` Command Palette, `Alt+N` New Tab, `Alt+W` Close, `Alt+C` Copy).
+  - **Phase 5: Delight, Micro-Interactions & Final Audit (`/impeccable delight` & `polish`)**:
+    - Verified cross-fade motion in `loading-button.tsx`, tactile feedback, and theme persistence.
+    - Fixed Header border boundary rule to `border-b border-outline-variant/30`.
+* **Files Changed:**
+  - `apps/web/src/index.css` (Browser surface theming: selection, caret, focus rings, tabular numbers)
+  - `apps/web/src/store/index.ts` (Added zoom state and actions to useStore)
+  - `apps/web/src/components/Header.tsx` (Grouped tools cluster, corrected bottom border)
+  - `apps/web/src/components/DocumentTabBar.tsx` (Appearance popover with theme, font size, signature, and zoom stepper)
+  - `apps/web/src/components/DocumentEditor.tsx` (Crisp white drafting background, optical border separation, GFM subheader)
+  - `apps/web/src/components/DocumentPreview.tsx` (Cool-gray canvas, multi-layered paper shadow, hairline compile indicator)
+  - `apps/web/src/components/EmptyState.tsx` (Authentic studio drafting canvas, dropzone, starter templates, keyboard cheatsheet)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.75s)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 16/16 test files, 79/79 tests passed in 12.67s**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 fixtures passed**)
+  - Browser Subagent Verification: **PASS** (`impeccable_phase2_4_verify_1792225791887.webp`)
+    - Screenshot 1 (`workspace_canvas_elevation_1792225806726.png`): Cool-gray drafting canvas with multi-layered diffused paper shadow and clean two-band toolbar layout.
+    - Screenshot 2 (`emptystate_onboarding_screen_1792225817900.png`): Authentic executive drafting studio, zero fake window chrome, drag-and-drop file dropzone, starter templates, and keyboard accelerator chips.
+    - Screenshot 3 (`document_loaded_workspace_1792225831014.png`): 1-click template loading back into workspace without screen flashing.
+* **Acceptance Criteria:**
+  - [x] Toolbar sprawl distilled into two clean bands (Header + Studio Control Strip).
+  - [x] Fake OS window chrome / traffic lights removed from EmptyState.
+  - [x] Studio canvas contrast and multi-layered paper elevation implemented.
+  - [x] Compiling indicator converted to non-intrusive hairline progress indicator.
+  - [x] Browser surfaces themed (selection, caret, focus rings, tabular numbers).
+  - [x] All 79 validation tests, 17 fidelity lab fixtures, and web production build pass.
+
+* **Next Allowed Prompt:** Task P22: UX Refinements
+
+---
+
+## Task P22: UX Refinements (Headline Group Closing, Subtle Bookmark Prompt, Secondary Mermaid Controls)
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - **1. Headline Group Closing:**
+    - Researched established interaction pattern and visual language in `json-toolkit` (`JSONWorkspace.tsx`).
+    - Created reusable accessible `apps/web/src/components/HeadlineGroup.tsx` component with uppercase tracked typography (`font-code-sm text-[11px] font-semibold text-secondary tracking-wider uppercase`), animated chevron indicator (`material-symbols-outlined` with `expand_more` rotating 90 degrees), hover state, badge tones (`default`, `error`, `warning`, `primary`), and full keyboard navigation (`aria-expanded`, Enter/Space).
+    - Integrated `HeadlineGroup` across `DocumentInspector.tsx` (collapsible sections for Active Polyfills & Protections, Compiler Diagnostics & Warnings, Document Elements, Export Recommendations) and `FidelityCheckPanel.tsx` (Document Health Summary, Transformations & Diagnostics).
+  - **2. Subtle Bookmark Prompt:**
+    - Implemented `apps/web/src/components/BookmarkPrompt.tsx` with non-blocking corner notice.
+    - Session export tracking: added `sessionExportCount` counter and `recordSuccessfulExport` action to `apps/web/src/store/index.ts` (tracked purely in memory, unpersisted).
+    - Wired `recordSuccessfulExport()` across all export trigger points in `apps/web/src/components/Header.tsx` and `apps/web/src/components/ReviewActionBar.tsx`.
+    - Gating rule: requires >= 2 successful exports in current session, >= 60 seconds of active session usage, user not currently typing (debounced idle buffer of 2.5s), no active input/textarea/Monaco focus, and compiler not running.
+    - Copy: *"Handy little tool, right? Bookmark it for next time."* with platform-aware shortcut hint (`⌘D` on macOS, `Ctrl+D` on Windows/Linux) and directional arrow pointing toward the browser bookmark control.
+    - Non-blocking layout: quiet top-right corner notice (`fixed top-14 right-4 z-40`), no modal/backdrop/audio/flashing animation, clear close button.
+    - Dismissal persistence: remembers dismissal in `localStorage` under `mdtodocs_bookmark_prompt_dismissed` so it appears at most once per browser.
+  - **3. Secondary Mermaid Controls:**
+    - Refactored `apps/web/src/components/MermaidDiagram.tsx` to remove the heavy 40px fixed top toolbar bar that pushed diagrams down and cluttered the reading view.
+    - Replaced with an unobtrusive floating action pill in the top-right corner (`absolute top-2.5 right-2.5 z-20`) with hover/focus/touch reveal (`opacity-100 [media(hover:hover)]:opacity-0 group-hover:opacity-100 focus-within:opacity-100`).
+    - Quick primary action: 1-click `Copy` image button with checkmark confirmation.
+    - Secondary actions in accessible overflow menu (`more_vert`):
+      - Diagram theme picker (Neutral, Default, Dark, Forest, Base).
+      - Downloads: SVG (vector), PNG (2x Retina), JPEG (white background).
+      - Clipboard: Copy SVG XML, Copy Mermaid Source.
+    - Keyboard navigation: Enter/Space to open menu, Escape to close, focus returned to trigger button, outside click detection.
+    - Preserved errors: syntax errors remain immediately visible and prominent in the diagram viewport with line number badges and interactive source code debugger.
+* **Files Changed:**
+  - `apps/web/src/components/HeadlineGroup.tsx` (New component: accessible collapsible section header modeled after JSON workspace)
+  - `apps/web/src/components/DocumentInspector.tsx` (Replaced static headers with interactive HeadlineGroups)
+  - `apps/web/src/components/FidelityCheckPanel.tsx` (Replaced static headers with interactive HeadlineGroups)
+  - `apps/web/src/store/index.ts` (Added `sessionExportCount` and `recordSuccessfulExport` to Zustand store)
+  - `apps/web/src/components/Header.tsx` (Wired `recordSuccessfulExport()` to export triggers)
+  - `apps/web/src/components/ReviewActionBar.tsx` (Wired `recordSuccessfulExport()` to review export triggers)
+  - `apps/web/src/components/BookmarkPrompt.tsx` (New component: subtle value-gated bookmark encouragement)
+  - `apps/web/src/App.tsx` (Mounted `BookmarkPrompt`)
+  - `apps/web/src/components/MermaidDiagram.tsx` (Refactored controls to secondary floating toolbar and overflow menu)
+  - `packages/validation/tests/ux-refinement.test.ts` (New test suite: 8 tests for prompt eligibility, persistence, and headline group contracts)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 31.26s)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 17/17 test files, 87/87 tests passed in 17.27s**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 fixtures passed in 7.0s**)
+  - Browser Subagent Verification: **PASS** (`md_to_docs_ux_refinement`)
+    - Mermaid diagram prominent, readable, uncluttered by top bar.
+    - Floating action pill visible on hover/focus/touch; `more_vert` menu opens with complete download/copy/theme options; Escape dismisses menu.
+    - Document Inspector and Fidelity Panel sections collapse and expand with chevron animation and keyboard support.
+* **Acceptance Criteria:**
+  - [x] Headline group closing replicates established JSON tool interaction and visual language.
+  - [x] Subtle bookmark prompt triggers after 2 successful exports and 60s active use, never interrupts typing/preview/export, persists dismissal in localStorage, shows at most once.
+  - [x] Mermaid diagram is prominent and readable; controls moved to secondary subtle floating toolbar and overflow menu; keyboard accessibility and errors preserved.
+  - [x] All 87 validation tests, 17 fidelity lab fixtures, and web production build pass.
+
+* **Next Allowed Prompt:** Task P23: UI De-Slop & Simplification
+
+---
+
+## Task P23: UI De-Slop & Simplification (VS Code / Raycast Minimalist Turnaround)
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - **1. Purged Corporate Jargon & Pretentious Marketing Elements:**
+    - Removed *"Drafting Studio & Document Engine"* badge and pulsing green dot.
+    - Removed *"Markdown → Publication-Grade Documents"* and *"Transform technical Markdown into formatted..."*.
+    - Removed *"Executive Starter Templates"* grid and cards from landing screen.
+    - Removed hardcoded default document title `"RFC 9110: HTTP Architecture & Semantics"` from `store/index.ts`. Initialized default document as clean `"Untitled Document"`.
+    - Removed *"Load Sample RFC"* CTA button and background RFC watermarks.
+    - Replaced the 400-line distributed systems RFC sample in `data/templates.ts` with a clean, friendly 30-line **Product Launch Plan** template featuring a simple Mermaid workflow diagram (`graph LR`), milestone table, and task checklist.
+    - Streamlined tooltips and headers in `Header.tsx`, `ReviewActionBar.tsx`, and `CommandPalette.tsx` (e.g. replaced *"Stakeholder review mode"* with *"Reading View"*, replaced *"Executive Template Gallery"* with *"Document Templates"*).
+  - **2. Rebuilt Empty State into a Sleek, Mac-Inspired Window:**
+    - Crisp, direct headline: **Markdown to Docs**
+    - Subtitle: *Paste Markdown or drop a file. Diagrams, tables, and formatting convert cleanly to Google Docs, Word, and PDF.*
+    - Mac window frame with traffic light controls (red, yellow, green window dots), `untitled.md`, and format indicators.
+    - Large, focused dropzone/canvas where user can type immediately, paste markdown, or drag & drop a file.
+    - Clean central prompt with two clean action buttons: **Browse file** and **Try an example**.
+    - Minimal footer cheatsheet: `⌘V Paste` · `⌘K Command Palette` · `Drag & drop anytime`.
+* **Files Changed:**
+  - `apps/web/src/components/EmptyState.tsx` (Rebuilt with Mac window frame, clean typography, zero slop)
+  - `apps/web/src/data/templates.ts` (Replaced default sample RFC with Product Launch Plan template)
+  - `apps/web/src/store/index.ts` (Reset default title to 'Untitled Document')
+  - `apps/web/src/components/Header.tsx` (Simplified tooltips and review mode label)
+  - `apps/web/src/components/ReviewActionBar.tsx` (Simplified 'Review Mode' to 'Reading View')
+  - `apps/web/src/components/TemplateGalleryModal.tsx` (Simplified modal title and description)
+  - `apps/web/src/components/CommandPalette.tsx` (Simplified command descriptions)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.92s)
+  - `npx pnpm --filter web lint` (**PASS: 0 errors**)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 17/17 test files, 87/87 tests passed**)
+  - `npx pnpm --filter @mdtodocs/fidelity-lab test` (**PASS: 17/17 fixtures passed**)
+  - Browser Subagent Verification: **PASS** (`clean_ui_verification`)
+    - Screenshot `clean_landing_screen_1792482537681.png`: Clean Mac-inspired editor window, zero jargon, zero green light.
+    - Screenshot `product_launch_plan_loaded_1792482670369.png`: Clean Product Launch Plan template loaded with flowchart diagram, table, and checklist.
+* **Acceptance Criteria:**
+  - [x] All pretentious corporate jargon, pulsing lights, and RFC 9110 watermarks removed.
+  - [x] Empty state redesigned into a sleek, clean, Mac-inspired developer window.
+  - [x] "Try an example" loads a clean, relatable document instead of an academic paper.
+  - [x] All 87 validation tests, 17 fidelity lab fixtures, and web build pass.
+
+* **Next Allowed Prompt:** Task P24: Navigation Streamlining & Reading View De-Cluttering
+
+---
+
+## Task P24: Navigation Streamlining & Reading View De-Cluttering
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - **1. Removed Primary Navbar Clutter:**
+    - Removed `Templates` button from the top navbar (templates are accessible via `⌘K` or empty state).
+    - Demoted `Reconcile` from the primary navbar (kept inside `⌘K` command palette where it belongs for Word comment/track-changes diffing).
+  - **2. Streamlined Reading View Navigation:**
+    - Removed duplicate floating `ReviewActionBar` from `Workspace.tsx` that previously rendered 3 competing primary CTAs below the header.
+    - Updated top `Header.tsx` in Reading View to render a clear **`← Back to Editor`** button on the left, document title, and single primary export action + format selector on the right.
+    - Clicking `← Back to Editor` cleanly returns immediately to the split editor.
+  - **3. Eliminated Layout Jitter & Spring Transforms in SegmentedControl:**
+    - Stripped `motion/react` spring physics from `segmented-control.tsx`. Replaced with instant CSS pill selector.
+    - Set stable `min-w-[145px]` on the adjacent primary CTA button so changing format labels ("Export PDF" vs "Copy for Google Docs") never shifts or glitches neighboring elements.
+  - **4. Typography Integrity:**
+    - Maintained project typography system: **Newsreader** (`font-serif`) for headings and editorial copy, **JetBrains Mono** (`font-code-*`) for code, tokens, and metadata.
+* **Files Changed:**
+  - `apps/web/src/components/interior/segmented-control.tsx` (Removed `motion/react`, instant CSS pill toggle)
+  - `apps/web/src/components/Header.tsx` (Removed Templates/Reconcile from top bar, added Back to Editor mode, decoupled button width)
+  - `apps/web/src/components/Workspace.tsx` (Removed duplicate `ReviewActionBar`, clean single DocumentPreview layout)
+  - `apps/web/src/components/EmptyState.tsx` (Restored Newsreader and JetBrains Mono typography tokens)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 25.26s)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 17/17 test files, 87/87 tests passed**)
+  - Browser Subagent Verification: **PASS** (`ux_polish_verification`)
+    - Screenshot `editor_view_initial_1792497297114.png`: Uncluttered header with only Commands ⌘K, format toggle, and Reading View. Zero templates/reconcile noise.
+    - Screenshot `reading_view_1792497320775.png`: Clean single header with `← Back to Editor` and single export CTA; zero floating duplicate toolbar.
+    - Screenshot `returned_to_editor_1792497333270.png`: Instant return to editor mode on back click.
+* **Acceptance Criteria:**
+  - [x] Navbar stripped of secondary distractions (Templates & Reconcile moved to ⌘K).
+  - [x] Reading View displays a single clear `← Back to Editor` button and 1 primary export CTA.
+  - [x] Zero layout jitter or spring jumps on format change.
+  - [x] Newsreader serif and JetBrains Mono typography tokens preserved.
+  - [x] All 87 validation tests and production web build pass.
+
+* **Next Allowed Prompt:** Task P25: VS Code Left Sidebar, Single Logo Fix, Canvas Zoom, and Bloat Elimination
+
+---
+
+## Task P25: VS Code Left Sidebar, Single Logo Fix, Canvas Zoom, and Bloat Elimination
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - **1. Fixed Double Logo Bug:**
+    - In `Header.tsx`, removed the redundant unconditional logo render. The header now renders strictly a single `mdtodocs.com` brand logo in editor mode.
+  - **2. Replaced Second Horizontal Navbar with VS Code-Style Collapsible Left Sidebar:**
+    - Deleted horizontal tab bar (`DocumentTabBar.tsx`) that caused scrolling and visual clutter.
+    - Built `WorkspaceSidebar.tsx`:
+      - 44px Activity Rail with Document Explorer (`description`), New Document (`add`), History (`history`), Inspector (`info`), and Theme toggle (`dark_mode`/`light_mode`).
+      - Collapsible 208px File Explorer drawer with clean vertical document list, active indicator, double-click rename, and close button.
+      - Removed the confusing duplicate/copy button that previously spawned 20+ bloated tabs.
+  - **3. Moved Zoom Control to Preview Canvas:**
+    - Relocated Zoom stepper (`[-] 100% [+]`) directly onto the preview canvas (`bottom-5 right-5` floating glassmorphism pill) beside the document sheet.
+  - **4. Deleted Attribution Signature & Implemented Theme Reactivity:**
+    - Permanently removed the childish attribution signature footer ("made with mdtodocs.com") and its UI controls from `DocumentPreview.tsx` and `CommandPalette.tsx`.
+    - Wired theme reactivity into `DocumentPreview.tsx` (`#111827` dark background and light text in Dark mode, dynamic font sizing), ensuring theme changes take immediate visual effect.
+  - **5. Frontend Deflation & Tab Safeguards:**
+    - Added workspace cap (max 6 documents) in `store/index.ts` to prevent tab proliferation.
+    - Implemented automatic rehydration pruning to deflate bloated tab lists down to active + recent documents.
+* **Files Changed:**
+  - `apps/web/src/components/Header.tsx` (Fixed duplicate logo rendering bug)
+  - `apps/web/src/components/WorkspaceSidebar.tsx` (New component: VS Code activity rail + collapsible file explorer)
+  - `apps/web/src/components/Workspace.tsx` (Integrated `WorkspaceSidebar`, eliminated horizontal tab bar)
+  - `apps/web/src/components/DocumentTabBar.tsx` (Deleted obsolete horizontal tab bar)
+  - `apps/web/src/components/DocumentPreview.tsx` (Floating canvas zoom, dynamic theme styling, deleted signature footer)
+  - `apps/web/src/components/CommandPalette.tsx` (Removed signature toggle command)
+  - `apps/web/src/store/index.ts` (Document cap at 6, rehydration deflation)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.93s)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 17/17 test files, 87/87 tests passed in 12.96s**)
+  - Browser Subagent Verification: **PASS** (`vscode_sidebar_verification`)
+    - Screenshot `layout_verification_1792498174827.png`: Single header logo, clean VS Code sidebar, no horizontal tab bar, clean document sheet.
+    - Screenshot `sidebar_collapsed_1792498185929.png`: Collapses cleanly to 44px slim activity rail giving full width to editor.
+    - Screenshot `dark_mode_verification_1792498227084.png`: Theme toggle switches preview sheet to dark mode.
+* **Acceptance Criteria:**
+  - [x] Only one brand logo in the top navbar.
+  - [x] Horizontal tab bar and duplicate copy icon completely removed.
+  - [x] VS Code-style collapsible vertical sidebar on the left.
+  - [x] Zoom control relocated to floating pill on preview canvas.
+  - [x] Attribution signature deleted from UI and preview.
+  - [x] Themes visually react and re-render document sheet.
+  - [x] All 87 validation tests and production web build pass.
+
+* **Next Allowed Prompt:** Task P26: Command Palette Overhaul, Platform Shortcuts & Discoverable Sidebar Duplicate
+
+---
+
+## Task P26: Command Palette Overhaul, Platform Shortcuts & Discoverable Sidebar Duplicate
+* **Status:** Complete
+* **Scope and Intended Behavior:**
+  - **1. Platform-Aware Keyboard Shortcuts:**
+    - Created `apps/web/src/utils/platform.ts` with `isMac()`, `getModifierKey()`, and `getCommandShortcut()`.
+    - Automatically displays `Ctrl+K` on Windows and Linux, and `⌘K` on macOS in the top header and footer cheatsheets.
+    - Updated keyboard shortcuts across the app to display platform-native keys (`Ctrl+...` vs `⌘...`).
+  - **2. Command Palette Decluttering & Human Copy:**
+    - Purged all 10 pre-baked template rows from `CommandPalette.tsx`.
+    - Removed redundant `Target: ...` format switchers (which duplicated the segmented control).
+    - Removed redundant `Copy Plain Markdown`.
+    - Replaced pompous *"Enter Stakeholder Review Mode"* with clean **"Toggle Reading View"** (`Ctrl+R`).
+    - Unified the overlapping `Document Inspector` and `Fidelity Check Panel` into a single **"Document Details & Fidelity Report"** action.
+    - Simplified theme commands into a single, clean **"Switch to Dark / Light Theme"** toggle.
+    - Improved Reconcile copy to human-readable **"Sync Word Comments & Track Changes (.docx)"** with a `NEW` badge.
+  - **3. Discoverable Visual Duplication in Sidebar:**
+    - Added a clean `content_copy` duplicate button on hover for each document in `WorkspaceSidebar.tsx` with clear tooltip *"Duplicate this document"*.
+    - Allows users to duplicate any document visually with 1 click in the sidebar where files are managed, without needing Command Palette or risking navbar button misclicks.
+* **Files Changed:**
+  - `apps/web/src/utils/platform.ts` (New platform utility: detects OS and formats shortcuts)
+  - `apps/web/src/components/Header.tsx` (Dynamic platform shortcut display)
+  - `apps/web/src/components/EmptyState.tsx` (Dynamic platform shortcut display)
+  - `apps/web/src/components/CommandPalette.tsx` (Overhauled commands, human copy, template purge)
+  - `apps/web/src/components/WorkspaceSidebar.tsx` (Visual duplicate button on document hover)
+  - `docs/EXECUTION_LEDGER.md` (Updated tracker)
+* **Tests Executed and Results:**
+  - `npx pnpm --filter web build` (**PASS: 0 errors**, bundled cleanly in 3.58s)
+  - `npx pnpm --filter @mdtodocs/validation test` (**PASS: 17/17 test files, 87/87 tests passed in 17.05s**)
+  - Browser Subagent Verification: **PASS** (`command_palette_overhaul`)
+    - Header verified showing `Ctrl+K` for Windows environment.
+    - Command Palette verified with zero template rows, zero target switchers, clean Word Sync with `NEW` badge, and unified reports.
+    - Sidebar hover duplicate button verified: cloned document cleanly into vertical list without freeze or bloat.
+* **Acceptance Criteria:**
+  - [x] Header dynamically renders `Ctrl+K` on Windows/Linux and `⌘K` on Mac.
+  - [x] Command Palette stripped of template bloat, mode duplication, and jargon.
+  - [x] Word feedback sync copy improved with `NEW` badge.
+  - [x] Document duplication is visually discoverable on hover in the sidebar file drawer.
+  - [x] All 87 validation tests and production web build pass.
+
+* **Next Allowed Prompt:** Ready for next user instruction.
+

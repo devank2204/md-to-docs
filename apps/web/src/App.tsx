@@ -6,6 +6,7 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { TemplateGalleryModal } from '@/components/TemplateGalleryModal';
 import { ReconciliationModal } from '@/components/ReconciliationModal';
 import { DocumentHistoryModal } from '@/components/DocumentHistoryModal';
+import { BookmarkPrompt } from '@/components/BookmarkPrompt';
 import { THEMES } from '@mdtodocs/compiler-core';
 import type { DocumentTheme } from '@mdtodocs/compiler-core';
 import { useStore } from '@/store';
@@ -25,9 +26,6 @@ function App() {
   
   const setMarkdown = useStore(state => state.setMarkdown);
   const setDestination = useStore(state => state.setDestination);
-  const setThemeId = useStore(state => state.setThemeId);
-  const setBaseFontSize = useStore(state => state.setBaseFontSize);
-  const setDocumentSignature = useStore(state => state.setDocumentSignature);
   const setIsCommandPaletteOpen = useStore(state => state.setIsCommandPaletteOpen);
   const setIsTemplateGalleryOpen = useStore(state => state.setIsTemplateGalleryOpen);
   const setIsReconciliationModalOpen = useStore(state => state.setIsReconciliationModalOpen);
@@ -109,13 +107,8 @@ function App() {
             onInput={handleInput}
             destination={destination}
             onDestinationChange={setDestination}
-            themeId={themeId}
-            onThemeIdChange={setThemeId}
-            baseFontSize={baseFontSize}
-            onBaseFontSizeChange={setBaseFontSize}
             activeTheme={activeTheme}
             documentSignature={documentSignature}
-            onDocumentSignatureChange={setDocumentSignature}
           />
         )}
       </main>
@@ -145,6 +138,8 @@ function App() {
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
       />
+
+      <BookmarkPrompt />
     </div>
   );
 }

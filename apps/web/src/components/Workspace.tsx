@@ -11,9 +11,8 @@ import { DocumentInspector } from '@/components/DocumentInspector';
 import { DocumentEditor } from '@/components/DocumentEditor';
 import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
-import { ReviewActionBar } from '@/components/ReviewActionBar';
 import { SuggestEditModal } from '@/components/SuggestEditModal';
-import { DocumentTabBar } from '@/components/DocumentTabBar';
+import { WorkspaceSidebar } from '@/components/WorkspaceSidebar';
 
 
 interface WorkspaceProps {
@@ -21,13 +20,8 @@ interface WorkspaceProps {
   onInput: (markdown: string) => void;
   destination: DestinationType;
   onDestinationChange: (dest: DestinationType) => void;
-  themeId: string;
-  onThemeIdChange: (themeId: any) => void;
-  baseFontSize: number;
-  onBaseFontSizeChange: (size: number) => void;
   activeTheme: any;
   documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
-  onDocumentSignatureChange: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
 }
 
 interface DocumentStats {
@@ -126,13 +120,8 @@ export function Workspace({
   onInput,
   destination,
   onDestinationChange,
-  themeId,
-  onThemeIdChange,
-  baseFontSize,
-  onBaseFontSizeChange,
   activeTheme,
   documentSignature,
-  onDocumentSignatureChange
 }: WorkspaceProps) {
   const isFidelityPanelOpen = useStore(state => state.isFidelityPanelOpen);
   const setIsFidelityPanelOpen = useStore(state => state.setIsFidelityPanelOpen);
@@ -140,7 +129,6 @@ export function Workspace({
   const setIsInspectorOpen = useStore(state => state.setIsInspectorOpen);
   const isSuggestModalOpen = useStore(state => state.isSuggestModalOpen);
   const setIsSuggestModalOpen = useStore(state => state.setIsSuggestModalOpen);
-  const [selectedPassage, setSelectedPassage] = useState('');
   
   const isReviewMode = useStore(state => state.isReviewMode);
   const setCompiledDoc = useStore(state => state.setCompiledDoc);
@@ -149,12 +137,6 @@ export function Workspace({
 
   const docTitleMatch = markdown.match(/^#\s+(.+)$/m);
   const docTitle = docTitleMatch ? docTitleMatch[1].trim() : 'Document';
-
-  const handleOpenSuggestModal = () => {
-    const selection = typeof window !== 'undefined' ? window.getSelection()?.toString()?.trim() || '' : '';
-    setSelectedPassage(selection);
-    setIsSuggestModalOpen(true);
-  };
 
   const [compiledState, setCompiledState] = useState<{
     diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
@@ -261,35 +243,20 @@ export function Workspace({
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
       {isReviewMode ? (
-        <div className="flex-1 w-full overflow-y-auto px-4 py-4 bg-surface-container-lowest">
-          <ReviewActionBar
-            markdown={markdown}
-            readingTimeMinutes={stats.readingTimeMinutes}
-            wordCount={words}
-            activeTheme={activeTheme}
-            documentSignature={documentSignature}
-            onOpenSuggestModal={handleOpenSuggestModal}
-          />
+        <div className="flex-1 w-full overflow-y-auto px-4 py-8 bg-surface-container-lowest">
           <div className="w-full flex justify-center pb-20">
             <DocumentPreview
               markdown={markdown}
               destination={destination}
-              onDestinationChange={onDestinationChange}
-              themeId={themeId}
-              onThemeIdChange={onThemeIdChange}
-              baseFontSize={baseFontSize}
-              onBaseFontSizeChange={onBaseFontSizeChange}
               isCompiling={isCompiling}
-              onOpenInspector={() => setIsInspectorOpen(true)}
               documentSignature={documentSignature}
-              onDocumentSignatureChange={onDocumentSignatureChange}
               isReviewMode={true}
             />
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden">
-          <DocumentTabBar />
+        <div className="flex-1 flex flex-row h-full min-h-0 overflow-hidden">
+          <WorkspaceSidebar />
           <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
             <DocumentEditor
               markdown={markdown}
@@ -301,15 +268,8 @@ export function Workspace({
             <DocumentPreview
               markdown={markdown}
               destination={destination}
-              onDestinationChange={onDestinationChange}
-              themeId={themeId}
-              onThemeIdChange={onThemeIdChange}
-              baseFontSize={baseFontSize}
-              onBaseFontSizeChange={onBaseFontSizeChange}
               isCompiling={isCompiling}
-              onOpenInspector={() => setIsInspectorOpen(true)}
               documentSignature={documentSignature}
-              onDocumentSignatureChange={onDocumentSignatureChange}
             />
           </div>
         </div>
@@ -318,7 +278,7 @@ export function Workspace({
       <SuggestEditModal
         isOpen={isSuggestModalOpen}
         onClose={() => setIsSuggestModalOpen(false)}
-        initialSelection={selectedPassage}
+        initialSelection={typeof window !== 'undefined' ? window.getSelection()?.toString()?.trim() || '' : ''}
         documentTitle={docTitle}
       />
 

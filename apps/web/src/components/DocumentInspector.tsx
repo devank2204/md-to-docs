@@ -3,6 +3,7 @@ import type { ValidationReport } from '@mdtodocs/validation';
 import type { DiagnosticsCollector } from '@mdtodocs/compiler-core';
 import type { DestinationType, SupportLevel } from '@mdtodocs/capability-graph';
 import { DESTINATIONS, FEATURE_CAPABILITIES } from '@mdtodocs/capability-graph';
+import { HeadlineGroup } from './HeadlineGroup';
 
 interface DocumentInspectorProps {
   report: ValidationReport | null;
@@ -252,17 +253,12 @@ export function DocumentInspector({
               </div>
 
               {/* Active Polyfills & Transformations */}
-              <section className="flex flex-col gap-space-sm">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-code-sm text-code-sm font-semibold text-secondary uppercase tracking-wider flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px]">speed</span>
-                    Active Polyfills & Protections
-                  </h3>
-                  <span className="text-secondary font-code-sm text-[11px]">
-                    {activePolyfills.length} active
-                  </span>
-                </div>
-
+              <HeadlineGroup
+                title="Active Polyfills & Protections"
+                icon="speed"
+                badge={`${activePolyfills.length} active`}
+                badgeTone={activePolyfills.length > 0 ? 'warning' : 'success'}
+              >
                 {activePolyfills.length === 0 ? (
                   <div className="p-space-sm bg-surface-container-lowest rounded border border-outline-variant/30 text-secondary font-body-sm text-body-sm flex items-center gap-space-xs">
                     <span className="material-symbols-outlined text-success text-[16px]">check_circle</span>
@@ -301,15 +297,15 @@ export function DocumentInspector({
                     ))}
                   </div>
                 )}
-              </section>
+              </HeadlineGroup>
 
               {/* Compiler Diagnostics */}
-              <section className="flex flex-col gap-space-sm">
-                <h3 className="font-code-sm text-code-sm font-semibold text-secondary uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[16px]">warning</span>
-                  Diagnostics & Warnings
-                </h3>
-
+              <HeadlineGroup
+                title="Diagnostics & Warnings"
+                icon="warning"
+                badge={`${diagnostics.length} ${diagnostics.length === 1 ? 'item' : 'items'}`}
+                badgeTone={diagnostics.length > 0 ? (diagnostics.some((d) => d.severity === 'error') ? 'error' : 'warning') : 'success'}
+              >
                 {diagnostics.length === 0 ? (
                   <div className="text-secondary font-body-sm text-body-sm p-space-sm bg-surface-container-lowest rounded border border-outline-variant/30 flex items-center gap-space-xs">
                     <span className="material-symbols-outlined text-success text-[16px]">check_circle</span>
@@ -347,7 +343,7 @@ export function DocumentInspector({
                     ))}
                   </ul>
                 )}
-              </section>
+              </HeadlineGroup>
             </div>
           )}
 
@@ -455,10 +451,11 @@ export function DocumentInspector({
               </div>
 
               {/* Elements Breakdown Grid */}
-              <section className="flex flex-col gap-space-sm">
-                <h3 className="font-code-sm text-code-sm font-semibold text-secondary uppercase tracking-wider">
-                  Document Elements
-                </h3>
+              <HeadlineGroup
+                title="Document Elements"
+                icon="format_list_bulleted"
+                badge={`${report?.summary?.total || 0} total`}
+              >
                 <div className="grid grid-cols-2 gap-space-sm">
                   {[
                     { label: 'Headings (H1-H6)', value: stats?.headings || 0, icon: 'title' },
@@ -490,20 +487,23 @@ export function DocumentInspector({
                     </div>
                   ))}
                 </div>
-              </section>
+              </HeadlineGroup>
 
               {/* Export Recommendations */}
-              <section className="p-space-sm bg-surface-container-low rounded border border-outline-variant/20 flex flex-col gap-1 text-[12px] font-body-sm text-secondary">
-                <div className="flex items-center gap-1.5 font-medium text-on-surface">
-                  <span className="material-symbols-outlined text-[16px] text-primary">auto_stories</span>
-                  Export Recommendation
+              <HeadlineGroup
+                title="Export Recommendation"
+                icon="auto_stories"
+                badge={DESTINATIONS[activeDest]?.name}
+                badgeTone="primary"
+              >
+                <div className="p-space-sm bg-surface-container-low rounded border border-outline-variant/20 flex flex-col gap-1 text-[12px] font-body-sm text-secondary">
+                  <p>
+                    Targeting <strong>{DESTINATIONS[activeDest]?.name}</strong> preserves{' '}
+                    <strong>{report?.summary?.preserved || 0}</strong> native elements and applies{' '}
+                    <strong>{activePolyfills.length}</strong> fidelity protections for layout stability.
+                  </p>
                 </div>
-                <p>
-                  Targeting <strong>{DESTINATIONS[activeDest]?.name}</strong> preserves{' '}
-                  <strong>{report?.summary?.preserved || 0}</strong> native elements and applies{' '}
-                  <strong>{activePolyfills.length}</strong> fidelity protections for layout stability.
-                </p>
-              </section>
+              </HeadlineGroup>
             </div>
           )}
         </div>

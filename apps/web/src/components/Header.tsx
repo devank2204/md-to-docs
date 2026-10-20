@@ -6,6 +6,7 @@ import { LoadingButton } from '@/components/interior/loading-button';
 import { useStore } from '@/store';
 
 import { exportDocx, copyFormattedDoc, printPdf } from '@/utils/exportHelpers';
+import { getCommandShortcut } from '@/utils/platform';
 
 interface HeaderProps {
   appState: AppState;
@@ -34,18 +35,23 @@ export function Header({
 
   const activeDocTitle =
     documents.find(d => d.id === activeDocumentId)?.title || 'Untitled Document';
-
+  const recordSuccessfulExport = useStore(state => state.recordSuccessfulExport);
 
   const handleDownloadDocx = async () => {
-    await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
+    const success = await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
+    if (success) recordSuccessfulExport();
+    return success;
   };
 
   const handleCopyFormatted = async () => {
-    await copyFormattedDoc(markdown, compiledDoc, destination, activeTheme, documentSignature);
+    const success = await copyFormattedDoc(markdown, compiledDoc, destination, activeTheme, documentSignature);
+    if (success) recordSuccessfulExport();
+    return success;
   };
 
   const handlePrintPdf = () => {
     printPdf();
+    recordSuccessfulExport();
   };
 
   const primaryAction = async () => {
@@ -81,67 +87,78 @@ export function Header({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-12 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-space-md gap-space-md border-t border-outline-variant/30">
+    <header className="fixed top-0 left-0 right-0 h-12 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-space-md gap-space-md border-b border-outline-variant/30">
       <div className="flex items-center gap-space-md">
-        <a href="/" className="flex items-center gap-space-xs group transition-transform duration-700 hover:-translate-y-[1px]">
-          <div className="flex items-center gap-space-sm">
-            <img src="/mark.png" alt="Logo" className="w-8 h-8 object-contain" />
-            <div className="flex items-baseline gap-space-xxs mt-0.5">
-              <span className="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
-              <span className="font-code-sm text-code-sm text-outline font-normal">.com</span>
+        {/* Left: Brand or Back to Editor navigation */}
+        {appState === 'WORKSPACE' && isReviewMode ? (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsReviewMode(false)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/60 hover:bg-surface-container-high text-xs font-medium text-on-surface transition-colors shadow-2xs cursor-pointer"
+              title="Return to editor"
+            >
+              <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+              <span>Back to Editor</span>
+            </button>
+            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant">
+              <span className="font-semibold text-on-surface truncate max-w-[200px]" title={activeDocTitle}>
+                {activeDocTitle}
+              </span>
             </div>
           </div>
-        </a>
+        ) : (
+          <div className="flex items-center gap-space-md">
+            <a href="/" className="flex items-center gap-space-xs group transition-transform duration-700 hover:-translate-y-[1px]">
+              <div className="flex items-center gap-space-sm">
+                <img src="/mark.png" alt="Logo" className="w-8 h-8 object-contain" />
+                <div className="flex items-baseline gap-space-xxs mt-0.5">
+                  <span className="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
+                  <span className="font-code-sm text-code-sm text-outline font-normal">.com</span>
+                </div>
+              </div>
+            </a>
 
-        {appState === 'WORKSPACE' && (
-          <div className="hidden sm:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
-            <span className="material-symbols-outlined text-[15px] text-outline">description</span>
-            <span className="truncate max-w-[180px] text-on-surface font-sans" title={activeDocTitle}>
-              {activeDocTitle}
-            </span>
+            {appState === 'WORKSPACE' && (
+              <div className="hidden sm:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
+                <span className="material-symbols-outlined text-[15px] text-outline">description</span>
+                <span className="truncate max-w-[180px] text-on-surface font-sans" title={activeDocTitle}>
+                  {activeDocTitle}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-
       {appState === 'WORKSPACE' && (
-        <div className="flex items-center gap-space-md">
-          {/* Command Palette Accelerator Trigger */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Commands Trigger (No Templates, No Reconcile clutter) */}
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-code-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/50 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-code-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border border-outline-variant/30"
             title="Open Command Palette (Cmd+K / Ctrl+K)"
           >
             <span className="material-symbols-outlined text-[15px]">search</span>
             <span className="hidden md:inline">Commands</span>
-            <kbd className="px-1 py-0.2 rounded bg-surface-container text-[10px] text-outline border border-outline-variant/60 font-mono">
-              ⌘K
+            <kbd className="px-1 py-0.2 rounded bg-surface-container-high text-[10px] text-outline font-mono">
+              {getCommandShortcut()}
             </kbd>
           </button>
 
-          {/* Templates Gallery Trigger */}
-          <button
-            type="button"
-            onClick={() => useStore.getState().setIsTemplateGalleryOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-code-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/50 transition-colors"
-            title="Browse Executive Document Templates Gallery"
-          >
-            <span className="material-symbols-outlined text-[15px]">collections_bookmark</span>
-            <span className="hidden lg:inline">Templates</span>
-          </button>
-
-          {/* Reconcile Word Comments & Edits Trigger */}
-          <button
-            type="button"
-            onClick={() => useStore.getState().setIsReconciliationModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-code-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/50 transition-colors"
-            title="Reconcile Word comments, track changes, and review notes"
-          >
-            <span className="material-symbols-outlined text-[15px]">sync_alt</span>
-            <span className="hidden lg:inline">Reconcile</span>
-          </button>
-
+          {/* Suggest Edit Trigger (shown in Reading View) */}
+          {isReviewMode && (
+            <button
+              type="button"
+              onClick={() => useStore.getState().setIsSuggestModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border border-outline-variant/30"
+              title="Suggest an edit or feedback"
+            >
+              <span className="material-symbols-outlined text-[15px]">rate_review</span>
+              <span className="hidden sm:inline">Suggest Edit</span>
+            </button>
+          )}
 
           {/* Destination Selector */}
           <SegmentedControl
@@ -156,32 +173,29 @@ export function Header({
             onValueChange={(val) => onDestinationChange(val as DestinationType)}
           />
 
-          {/* Primary Action */}
+          {/* Primary Action - decoupled stable min-width to prevent layout shifts */}
           <LoadingButton
             onAction={primaryAction}
             successLabel="✓ Copied!"
             pendingLabel={destination === 'word' ? 'Compiling...' : 'Copying...'}
             idleIcon={<span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>}
+            className="min-w-[145px]"
           >
             {primaryLabel() ?? 'Export'}
           </LoadingButton>
 
-          {/* Review Mode Toggle */}
-          <button
-            type="button"
-            onClick={() => setIsReviewMode(!isReviewMode)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              isReviewMode
-                ? 'bg-primary text-on-primary shadow-sm hover:bg-primary/90'
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/60'
-            }`}
-            title={isReviewMode ? 'Return to split editor view' : 'Switch to distraction-free stakeholder review mode'}
-          >
-            <span className="material-symbols-outlined text-[16px]">
-              {isReviewMode ? 'edit_note' : 'visibility'}
-            </span>
-            <span className="hidden sm:inline">{isReviewMode ? 'Exit Review' : 'Review Mode'}</span>
-          </button>
+          {/* Reading View Button (shown only when in editor view) */}
+          {!isReviewMode && (
+            <button
+              type="button"
+              onClick={() => setIsReviewMode(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors"
+              title="Switch to clean reading view"
+            >
+              <span className="material-symbols-outlined text-[16px]">visibility</span>
+              <span className="hidden sm:inline">Reading View</span>
+            </button>
+          )}
         </div>
       )}
     </header>

@@ -1,5 +1,6 @@
 import type { ValidationReport } from '@mdtodocs/validation';
 import type { DiagnosticsCollector } from '@mdtodocs/compiler-core';
+import { HeadlineGroup } from './HeadlineGroup';
 
 interface FidelityCheckPanelProps {
   report: ValidationReport | null;
@@ -41,48 +42,57 @@ export function FidelityCheckPanel({ report, diagnostics, isOpen, onClose }: Fid
 
       <div className="p-space-md flex flex-col gap-space-md flex-1 overflow-y-auto">
         {/* Results summary */}
-        <div className="bg-surface-container p-space-sm rounded font-code-sm text-code-sm text-on-surface flex flex-col gap-space-xs">
-          <div className="flex items-center justify-between text-secondary pb-space-xs border-b border-outline-variant/20">
-            <span>Element</span>
-            <span>Result</span>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <span>Elements ({report.summary.total})</span>
-            <span className="flex items-center gap-space-xxs text-primary">
-              <span className="material-symbols-outlined text-[14px]">check_circle</span>
-              {report.summary.preserved} Preserved
-            </span>
-          </div>
+        <HeadlineGroup
+          title="Document Health Summary"
+          icon="verified"
+          badge={`${report.summary.fidelityScore}% preserved`}
+          badgeTone={report.summary.fidelityScore >= 95 ? 'success' : report.summary.fidelityScore >= 80 ? 'primary' : 'warning'}
+        >
+          <div className="bg-surface-container p-space-sm rounded font-code-sm text-code-sm text-on-surface flex flex-col gap-space-xs">
+            <div className="flex items-center justify-between text-secondary pb-space-xs border-b border-outline-variant/20">
+              <span>Element</span>
+              <span>Result</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span>Elements ({report.summary.total})</span>
+              <span className="flex items-center gap-space-xxs text-primary">
+                <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                {report.summary.preserved} Preserved
+              </span>
+            </div>
 
-          {report.summary.transformed > 0 && (
-            <div className="flex items-center justify-between">
-              <span>Transformed</span>
-              <span className="text-secondary">{report.summary.transformed}</span>
-            </div>
-          )}
+            {report.summary.transformed > 0 && (
+              <div className="flex items-center justify-between">
+                <span>Transformed</span>
+                <span className="text-secondary">{report.summary.transformed}</span>
+              </div>
+            )}
 
-          {report.summary.degraded > 0 && (
-            <div className="flex items-center justify-between">
-              <span>Degraded</span>
-              <span className="text-error">{report.summary.degraded}</span>
-            </div>
-          )}
-          
-          {report.summary.unsupported > 0 && (
-            <div className="flex items-center justify-between">
-              <span>Unsupported</span>
-              <span className="text-error">{report.summary.unsupported}</span>
-            </div>
-          )}
-        </div>
+            {report.summary.degraded > 0 && (
+              <div className="flex items-center justify-between">
+                <span>Degraded</span>
+                <span className="text-error">{report.summary.degraded}</span>
+              </div>
+            )}
+            
+            {report.summary.unsupported > 0 && (
+              <div className="flex items-center justify-between">
+                <span>Unsupported</span>
+                <span className="text-error">{report.summary.unsupported}</span>
+              </div>
+            )}
+          </div>
+        </HeadlineGroup>
 
         {/* Actionable Diagnostics */}
         {(warnings.length > 0 || infos.length > 0) && (
-          <div className="flex flex-col gap-space-sm">
-            <h4 className="font-code-sm text-code-sm font-medium text-on-surface border-b border-outline-variant/20 pb-space-xxs">
-              Transformations & Diagnostics
-            </h4>
+          <HeadlineGroup
+            title="Transformations & Diagnostics"
+            icon="warning"
+            badge={`${warnings.length + infos.length} issues`}
+            badgeTone={warnings.length > 0 ? 'warning' : 'primary'}
+          >
             <ul className="space-y-space-sm">
               {warnings.map(diag => (
                 <li key={diag.id} className="font-body-sm text-body-sm text-on-surface bg-error-container/20 p-space-sm rounded border border-error-container/50 flex flex-col gap-1">
@@ -100,7 +110,7 @@ export function FidelityCheckPanel({ report, diagnostics, isOpen, onClose }: Fid
                 </li>
               ))}
             </ul>
-          </div>
+          </HeadlineGroup>
         )}
       </div>
       </div>

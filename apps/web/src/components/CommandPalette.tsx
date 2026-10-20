@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useStore } from '@/store';
-import { exportDocx, copyFormattedDoc, printPdf, copyPlainMarkdown } from '@/utils/exportHelpers';
-import { DOCUMENT_TEMPLATES } from '@/data/templates';
-import type { DestinationType } from '@mdtodocs/capability-graph';
-import type { THEMES } from '@mdtodocs/compiler-core';
+import { exportDocx, copyFormattedDoc, printPdf } from '@/utils/exportHelpers';
+import { getModifierKey } from '@/utils/platform';
 
 export interface CommandPaletteProps {
   isOpen: boolean;
@@ -18,17 +16,17 @@ interface CommandItem {
   id: string;
   category:
     | 'Export & Share'
-    | 'Destination'
-    | 'View & Modes'
-    | 'Theme & Typography'
+    | 'View & Navigation'
+    | 'Tools & Workflows'
+    | 'Theme & Appearance'
     | 'Document Headings'
-    | 'Templates & Starters'
     | 'Documents & Workspace'
     | 'Open Documents';
   title: string;
   description?: string;
   icon: string;
   shortcut?: string;
+  badge?: string;
   isActive?: boolean;
   keywords?: string[];
   action: () => void;
@@ -54,20 +52,14 @@ function CommandPaletteModal({
   const listRef = useRef<HTMLDivElement>(null);
 
   const markdown = useStore((state) => state.markdown);
-  const destination = useStore((state) => state.destination);
   const themeId = useStore((state) => state.themeId);
-  const baseFontSize = useStore((state) => state.baseFontSize);
   const documentSignature = useStore((state) => state.documentSignature);
   const isReviewMode = useStore((state) => state.isReviewMode);
   const compiledDoc = useStore((state) => state.compiledDoc);
   const documents = useStore((state) => state.documents);
   const activeDocumentId = useStore((state) => state.activeDocumentId);
 
-  const setMarkdown = useStore((state) => state.setMarkdown);
-  const setDestination = useStore((state) => state.setDestination);
   const setThemeId = useStore((state) => state.setThemeId);
-  const setBaseFontSize = useStore((state) => state.setBaseFontSize);
-  const setDocumentSignature = useStore((state) => state.setDocumentSignature);
   const setIsReviewMode = useStore((state) => state.setIsReviewMode);
   const createDocument = useStore((state) => state.createDocument);
   const switchDocument = useStore((state) => state.switchDocument);
@@ -123,17 +115,19 @@ function CommandPaletteModal({
     return items;
   }, [markdown]);
 
+  const mod = getModifierKey();
+
   // Build standard commands
   const baseCommands = useMemo<CommandItem[]>(() => {
     return [
-      // Export & Share
+      // 1. Export & Share
       {
         id: 'export-gdocs',
         category: 'Export & Share',
         title: 'Copy for Google Docs',
         description: 'Formatted HTML clipboard for native Google Docs paste',
         icon: 'content_copy',
-        shortcut: 'Alt+C',
+        shortcut: `${mod}+C`,
         action: async () => {
           await copyFormattedDoc(markdown, compiledDoc, 'google-docs', activeTheme, documentSignature);
         },
@@ -142,9 +136,9 @@ function CommandPaletteModal({
         id: 'export-word',
         category: 'Export & Share',
         title: 'Download Word Document (.docx)',
-        description: 'Generate publication-grade OOXML Word document',
+        description: 'Export as Microsoft Word (.docx) document',
         icon: 'download',
-        shortcut: 'Alt+W',
+        shortcut: `${mod}+Shift+E`,
         action: async () => {
           await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
         },
@@ -155,214 +149,86 @@ function CommandPaletteModal({
         title: 'Export PDF (Print)',
         description: 'Open browser print dialog formatted with print stylesheets',
         icon: 'picture_as_pdf',
-        shortcut: 'Alt+P',
+        shortcut: `${mod}+P`,
         action: () => {
           printPdf();
         },
       },
-      {
-        id: 'copy-markdown',
-        category: 'Export & Share',
-        title: 'Copy Plain Markdown',
-        description: 'Copy raw Markdown source code to clipboard',
-        icon: 'file_copy',
-        action: async () => {
-          await copyPlainMarkdown(markdown);
-        },
-      },
 
-      // Destinations
-      {
-        id: 'dest-gdocs',
-        category: 'Destination',
-        title: 'Target: Google Docs',
-        description: 'Optimize representations for Google Docs compatibility',
-        icon: 'description',
-        isActive: destination === 'google-docs',
-        action: () => setDestination('google-docs' as DestinationType),
-      },
-      {
-        id: 'dest-word',
-        category: 'Destination',
-        title: 'Target: Microsoft Word',
-        description: 'Optimize representations for Word OOXML',
-        icon: 'article',
-        isActive: destination === 'word',
-        action: () => setDestination('word' as DestinationType),
-      },
-      {
-        id: 'dest-pdf',
-        category: 'Destination',
-        title: 'Target: PDF Print',
-        description: 'Optimize representations for paginated print media',
-        icon: 'picture_as_pdf',
-        isActive: destination === 'pdf',
-        action: () => setDestination('pdf' as DestinationType),
-      },
-      {
-        id: 'dest-clipboard',
-        category: 'Destination',
-        title: 'Target: Rich Clipboard',
-        description: 'Multi-MIME clipboard format for universal paste',
-        icon: 'assignment',
-        isActive: destination === 'clipboard',
-        action: () => setDestination('clipboard' as DestinationType),
-      },
-
-      // View & Modes
+      // 2. View & Navigation
       {
         id: 'mode-review',
-        category: 'View & Modes',
-        title: isReviewMode ? 'Exit Review Mode (Return to Editor)' : 'Enter Stakeholder Review Mode',
+        category: 'View & Navigation',
+        title: isReviewMode ? 'Exit Reading View (Return to Editor)' : 'Toggle Reading View',
         description: isReviewMode
-          ? 'Switch to two-pane split markdown authoring'
-          : 'Distraction-free centered document sheet with review controls',
+          ? 'Switch back to split editor and live preview'
+          : 'Clean distraction-free document reading view',
         icon: isReviewMode ? 'edit_note' : 'visibility',
+        shortcut: `${mod}+R`,
         isActive: isReviewMode,
         action: () => setIsReviewMode(!isReviewMode),
       },
       {
         id: 'action-suggest',
-        category: 'View & Modes',
-        title: 'Suggest an Edit / Propose Change',
+        category: 'View & Navigation',
+        title: 'Propose Document Edit / Feedback',
         description: 'Open feedback modal to create GitHub issues or copy suggestions',
         icon: 'rate_review',
         action: () => onOpenSuggestModal?.(),
       },
+
+      // 3. Tools & Workflows
       {
         id: 'action-reconcile',
-        category: 'View & Modes',
-        title: 'Reconcile Word Comments & Review Edits...',
-        description: 'Import Word (.docx) comments, track changes, or paste review notes to patch markdown',
+        category: 'Tools & Workflows',
+        title: 'Sync Word Comments & Track Changes (.docx)',
+        badge: 'NEW',
+        description: 'Import tracked changes and comments from Word to update your Markdown draft',
         icon: 'sync_alt',
         keywords: ['word', 'comment', 'review', 'patch', 'reconcile', 'track changes', 'diff', 'merge'],
         action: () => useStore.getState().setIsReconciliationModalOpen(true),
       },
-
       {
         id: 'view-inspector',
-        category: 'View & Modes',
-        title: 'Open Document Inspector',
-        description: 'Inspect structure, element statistics, and fidelity score',
+        category: 'Tools & Workflows',
+        title: 'Document Details & Fidelity Report',
+        description: 'Inspect structure, element statistics, word counts, and formatting compatibility',
         icon: 'info',
-        action: () => onOpenInspector?.(),
-      },
-      {
-        id: 'view-fidelity',
-        category: 'View & Modes',
-        title: 'Open Fidelity Check Panel',
-        description: 'View capability diagnostics and destination transformation notices',
-        icon: 'verified',
-        action: () => onOpenFidelityPanel?.(),
-      },
-
-      // Theme & Typography
-      {
-        id: 'theme-default',
-        category: 'Theme & Typography',
-        title: 'Theme: Modern Default (Corporate)',
-        description: 'Professional serif typography with indigo accents',
-        icon: 'palette',
-        isActive: themeId === 'default',
-        action: () => setThemeId('default' as keyof typeof THEMES),
-      },
-      {
-        id: 'theme-clean',
-        category: 'Theme & Typography',
-        title: 'Theme: Clean Editorial (Minimalist)',
-        description: 'Crisp sans-serif typography with generous spacing',
-        icon: 'palette',
-        isActive: themeId === 'clean',
-        action: () => setThemeId('clean' as keyof typeof THEMES),
-      },
-      {
-        id: 'theme-dark',
-        category: 'Theme & Typography',
-        title: 'Theme: Technical Dark',
-        description: 'High-contrast dark palette tailored for engineering docs',
-        icon: 'palette',
-        isActive: themeId === 'dark',
-        action: () => setThemeId('dark' as keyof typeof THEMES),
-      },
-      {
-        id: 'font-small',
-        category: 'Theme & Typography',
-        title: 'Font Size: Compact (10.5 pt)',
-        description: 'High information density layout',
-        icon: 'text_fields',
-        isActive: baseFontSize === 10.5,
-        action: () => setBaseFontSize(10.5),
-      },
-      {
-        id: 'font-normal',
-        category: 'Theme & Typography',
-        title: 'Font Size: Standard (11.5 pt)',
-        description: 'Balanced reading layout',
-        icon: 'text_fields',
-        isActive: baseFontSize === 11.5,
-        action: () => setBaseFontSize(11.5),
-      },
-      {
-        id: 'font-large',
-        category: 'Theme & Typography',
-        title: 'Font Size: Large (12.5 pt)',
-        description: 'Spacious presentation layout',
-        icon: 'text_fields',
-        isActive: baseFontSize === 12.5,
-        action: () => setBaseFontSize(12.5),
-      },
-      {
-        id: 'toggle-signature',
-        category: 'Theme & Typography',
-        title: documentSignature.enabled
-          ? 'Document Signature: Enabled'
-          : 'Document Signature: Disabled',
-        description: 'Toggle generated timestamp and metadata footer',
-        icon: 'draw',
-        isActive: documentSignature.enabled,
-        action: () =>
-          setDocumentSignature({
-            ...documentSignature,
-            enabled: !documentSignature.enabled,
-          }),
-      },
-
-      // Templates & Starters
-      {
-        id: 'open-template-gallery',
-        category: 'Templates & Starters' as const,
-        title: 'Browse Executive Template Gallery...',
-        description: 'Explore full gallery of architectural, product, and leadership document templates',
-        icon: 'collections_bookmark',
         action: () => {
-          useStore.getState().setIsTemplateGalleryOpen(true);
+          if (onOpenInspector) {
+            onOpenInspector();
+          } else if (onOpenFidelityPanel) {
+            onOpenFidelityPanel();
+          } else {
+            useStore.getState().setIsInspectorOpen(true);
+          }
         },
       },
-      ...DOCUMENT_TEMPLATES.map((tmpl) => ({
-        id: `template-${tmpl.id}`,
-        category: 'Templates & Starters' as const,
-        title: `Template: ${tmpl.title}`,
-        description: `${tmpl.summary} (${tmpl.tags.join(', ')})`,
-        icon: tmpl.icon,
-        action: () => {
-          setMarkdown(tmpl.content);
-        },
-      })),
 
-      // Documents & Workspace
+      // 4. Theme & Appearance
+      {
+        id: 'toggle-theme',
+        category: 'Theme & Appearance',
+        title: themeId === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme',
+        description: `Currently active: ${themeId === 'dark' ? 'Dark' : 'Light'} theme`,
+        icon: themeId === 'dark' ? 'light_mode' : 'dark_mode',
+        action: () => setThemeId(themeId === 'dark' ? 'default' : 'dark'),
+      },
+
+      // 5. Documents & Workspace
       {
         id: 'doc-new',
         category: 'Documents & Workspace' as const,
         title: 'Create New Document',
-        description: 'Open a blank markdown draft in a new tab',
+        description: 'Open a blank markdown draft in your workspace',
         icon: 'add_circle',
-        shortcut: 'Ctrl+Alt+N',
+        shortcut: `${mod}+Alt+N`,
         action: () => createDocument('', 'Untitled Document'),
       },
       {
         id: 'doc-duplicate',
         category: 'Documents & Workspace' as const,
-        title: 'Duplicate Current Document',
+        title: 'Duplicate this document',
         description: 'Create an exact cloned copy of the active document',
         icon: 'content_copy',
         action: () => duplicateDocument(activeDocumentId),
@@ -370,24 +236,26 @@ function CommandPaletteModal({
       {
         id: 'doc-snapshot',
         category: 'Documents & Workspace' as const,
-        title: 'Capture Document Snapshot',
-        description: 'Save a point-in-time version checkpoint into history',
+        title: 'Save Document Checkpoint',
+        description: 'Save a version checkpoint you can restore from History',
         icon: 'bookmark_add',
         action: () => createSnapshot('Manual Checkpoint'),
       },
       {
         id: 'doc-history',
         category: 'Documents & Workspace' as const,
-        title: 'Browse Document History & Snapshots...',
-        description: 'View point-in-time version timeline, compare, or roll back',
+        title: 'Browse Document History & Snapshots',
+        description: 'View version timeline, compare revisions, or roll back',
         icon: 'history',
         action: () => setIsHistoryModalOpen(true),
       },
+
+      // 6. Open Documents
       ...documents.map((doc) => ({
         id: `switch-doc-${doc.id}`,
         category: 'Open Documents' as const,
         title: `Switch to: ${doc.title || 'Untitled Document'}`,
-        description: `Open document tab (${doc.content.split(/\s+/).filter(Boolean).length} words)`,
+        description: `Open document (${doc.content.split(/\s+/).filter(Boolean).length} words)`,
         icon: doc.id === activeDocumentId ? 'check_circle' : 'description',
         isActive: doc.id === activeDocumentId,
         keywords: ['switch', 'tab', 'document', doc.title.toLowerCase()],
@@ -397,19 +265,13 @@ function CommandPaletteModal({
   }, [
     markdown,
     compiledDoc,
-    destination,
     themeId,
-    baseFontSize,
     documentSignature,
     isReviewMode,
     activeTheme,
     documents,
     activeDocumentId,
-    setMarkdown,
-    setDestination,
     setThemeId,
-    setBaseFontSize,
-    setDocumentSignature,
     setIsReviewMode,
     createDocument,
     switchDocument,
@@ -419,6 +281,7 @@ function CommandPaletteModal({
     onOpenInspector,
     onOpenFidelityPanel,
     onOpenSuggestModal,
+    mod,
   ]);
 
 
@@ -540,6 +403,11 @@ function CommandPaletteModal({
                         {command.isActive && (
                           <span className="px-1.5 py-0.2 rounded text-[10px] bg-primary/20 text-primary border border-primary/30 uppercase tracking-wider font-semibold">
                             Active
+                          </span>
+                        )}
+                        {command.badge && (
+                          <span className="px-1.5 py-0.2 rounded text-[10px] bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider font-semibold font-mono">
+                            {command.badge}
                           </span>
                         )}
                       </div>

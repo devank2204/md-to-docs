@@ -32,6 +32,7 @@ export interface AppState {
   isTemplateGalleryOpen: boolean;
   isReconciliationModalOpen: boolean;
   isHistoryModalOpen: boolean;
+  zoom: number;
 
   // Multi-Document Workspace & History
   documents: DocumentItem[];
@@ -53,6 +54,7 @@ export interface AppState {
   setIsTemplateGalleryOpen: (isTemplateGalleryOpen: boolean) => void;
   setIsReconciliationModalOpen: (isReconciliationModalOpen: boolean) => void;
   setIsHistoryModalOpen: (isHistoryModalOpen: boolean) => void;
+  setZoom: (zoom: number | ((prev: number) => number)) => void;
 
   createDocument: (initialMarkdown?: string, customTitle?: string) => string;
   switchDocument: (id: string) => void;
@@ -62,6 +64,10 @@ export interface AppState {
   createSnapshot: (label?: string) => void;
   restoreSnapshot: (snapshotId: string) => void;
   deleteSnapshot: (snapshotId: string) => void;
+
+  // Session Export Analytics & Value Milestones
+  sessionExportCount: number;
+  recordSuccessfulExport: () => void;
 }
 
 export const useStore = create<AppState>()(
@@ -93,7 +99,7 @@ export const useStore = create<AppState>()(
       documents: [
         {
           id: 'doc-default',
-          title: 'RFC 9110: HTTP Architecture & Semantics',
+          title: 'Untitled Document',
           content: '',
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -101,6 +107,9 @@ export const useStore = create<AppState>()(
       ],
       activeDocumentId: 'doc-default',
       snapshots: [],
+      sessionExportCount: 0,
+      recordSuccessfulExport: () =>
+        set((state) => ({ sessionExportCount: state.sessionExportCount + 1 })),
 
       setMarkdown: (markdown) => {
         set((state) => {
@@ -139,6 +148,8 @@ export const useStore = create<AppState>()(
         });
       },
 
+      zoom: 100,
+
       setDestination: (destination) => set({ destination }),
       setThemeId: (themeId) => set({ themeId }),
       setBaseFontSize: (baseFontSize) => set({ baseFontSize }),
@@ -153,6 +164,7 @@ export const useStore = create<AppState>()(
       setIsReconciliationModalOpen: (isReconciliationModalOpen) =>
         set({ isReconciliationModalOpen }),
       setIsHistoryModalOpen: (isHistoryModalOpen) => set({ isHistoryModalOpen }),
+      setZoom: (zoom) => set((state) => ({ zoom: typeof zoom === 'function' ? zoom(state.zoom) : zoom })),
 
       setIsReviewMode: (isReviewMode) => {
         if (typeof window !== 'undefined') {
@@ -174,11 +186,16 @@ export const useStore = create<AppState>()(
 
         set((state) => {
           // Sync current active doc first
-          const syncedDocs = state.documents.map((d) =>
+          let syncedDocs = state.documents.map((d) =>
             d.id === state.activeDocumentId
               ? { ...d, content: state.markdown, updatedAt: Date.now() }
               : d
           );
+
+          // Guard against frontend bloat: cap workspace at 6 documents max
+          if (syncedDocs.length >= 6) {
+            syncedDocs = syncedDocs.slice(-5);
+          }
 
           const newSnapshots = initialMarkdown.trim()
             ? [createDocumentSnapshot(newDoc, 'Initial Draft'), ...state.snapshots]
@@ -237,11 +254,15 @@ export const useStore = create<AppState>()(
           });
           createdId = clone.id;
 
-          const syncedDocs = state.documents.map((d) =>
+          let syncedDocs = state.documents.map((d) =>
             d.id === state.activeDocumentId
               ? { ...d, content: state.markdown, updatedAt: Date.now() }
               : d
           );
+
+          if (syncedDocs.length >= 6) {
+            syncedDocs = syncedDocs.slice(-5);
+          }
 
           const snap = createDocumentSnapshot(clone, 'Document Cloned');
 
@@ -354,6 +375,14 @@ export const useStore = create<AppState>()(
         activeDocumentId: state.activeDocumentId,
         snapshots: state.snapshots,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state && Array.isArray(state.documents) && state.documents.length > 5) {
+          const activeId = state.activeDocumentId;
+          const activeDoc = state.documents.find((d) => d.id === activeId) || state.documents[0];
+          const otherDocs = state.documents.filter((d) => d.id !== activeDoc.id).slice(0, 4);
+          state.documents = [activeDoc, ...otherDocs];
+        }
+      },
     }
   )
 );

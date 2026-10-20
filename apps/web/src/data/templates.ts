@@ -10,73 +10,41 @@ export interface DocumentTemplate {
 
 export const DOCUMENT_TEMPLATES: DocumentTemplate[] = [
   {
-    id: 'technical-rfc',
-    title: 'Technical RFC & Architecture Spec',
-    category: 'Architecture',
-    summary: 'Distributed systems specification with Mermaid topology, SLA budget tables, and throughput models.',
-    icon: 'architecture',
-    tags: ['RFC', 'Mermaid', 'Math', 'SLAs'],
-    content: `# RFC 9110: High-Throughput Event Streaming Architecture
+    id: 'product-overview',
+    title: 'Product Overview & Launch Plan',
+    category: 'Product',
+    summary: 'A clean overview with workflow diagrams, milestone tables, and task checklists.',
+    icon: 'rocket_launch',
+    tags: ['Overview', 'Mermaid', 'Tables', 'Tasks'],
+    content: `# Product Launch Plan
 
-> **Author:** Distributed Systems Core Team  
-> **Status:** Proposed  
-> **Target Release:** Q1 2027  
-> **Review Period:** October 2026 – November 2026  
+A fast, clean overview of what we're building and shipping this quarter.
 
----
-
-## 1. Executive Summary
-
-This Request for Comments (RFC) specifies the next-generation event ingestion pipeline for high-scale document telemetry. The primary objective is achieving sub-25ms end-to-end event propagation with zero message loss during regional failovers.
-
-### 1.1 Non-Negotiable SLOs
-
-| Tier | Metric | Target | Failover Threshold |
-| :--- | :--- | :--- | :--- |
-| **Tier 1 (Ingress)** | P99 Ingestion Latency | $\\le 18\\text{ ms}$ | $35\\text{ ms}$ |
-| **Tier 1 (Ingress)** | Availability | $99.995\\%$ | $99.900\\%$ |
-| **Tier 2 (Processing)** | Max Backlog Duration | $< 60\\text{ s}$ | $300\\text{ s}$ |
-| **Tier 3 (Export)** | DOCX / PDF Render Time | $< 800\\text{ ms}$ | $2000\\text{ ms}$ |
-
----
-
-## 2. Ingress & Routing Topology
-
-The architecture decouples stateless edge terminators from durable log partitions:
+## Workflow Pipeline
 
 \`\`\`mermaid
-flowchart TD
-    Client[Edge Telemetry Client] -->|mTLS 1.3| Gateway[Envoy Ingress Gateway]
-    Gateway -->|gRPC Stream| ShardRouter[Consistent Hash Shard Router]
-    ShardRouter -->|Partition 0-15| KafkaCluster[(Durable Storage Cluster)]
-    ShardRouter -->|Failover Replica| S3Backup[(Cold Storage Sink)]
-    KafkaCluster -->|Consumer Group| WorkerFleet[Renderer Worker Fleet]
-    WorkerFleet -->|Artifact| CDN[Global Edge Cache]
+graph LR
+    A[Write Markdown] --> B[md.to.docs]
+    B --> C[Google Docs]
+    B --> D[Word .docx]
+    B --> E[PDF Export]
 \`\`\`
 
----
+## Milestones & Deliverables
 
-## 3. Mathematical Performance Model
+| Milestone | Deliverable | Owner | Status |
+| :--- | :--- | :--- | :--- |
+| **Alpha** | Parser & Renderer Core | Engineering | Done |
+| **Beta** | Mermaid Diagrams & Tables | Design & Eng | In Progress |
+| **v1.0** | Public Web Release | Product | Scheduled |
 
-The streaming buffer capacity $C$ required to withstand a maximum consumer outage duration $\\Delta t_{\\max}$ without packet drop is derived as:
+### Key Requirements
+- [x] Instant live preview with zero lag
+- [x] High-fidelity Word and Google Docs formatting
+- [x] One-click diagram copying and export
+- [x] Math equation and table styling
 
-$$
-C = \\int_{t_0}^{t_0 + \\Delta t_{\\max}} \\lambda(t) \\cdot \\bar{S} \\, dt + \\alpha \\cdot \\sigma_{\\lambda}
-$$
-
-Where:
-- $\\lambda(t)$ is the incoming request arrival rate (events/second).
-- $\\bar{S}$ is the average payload size in bytes ($4.2\\text{ KB}$).
-- $\\alpha = 3.0$ provides a $99.7\\%$ confidence interval against burst traffic variance $\\sigma_{\\lambda}$.
-
----
-
-## 4. Rollback and Disaster Recovery
-
-In the event that the primary partition broker enters an unrecoverable state:
-1. Edge ingress drains in-flight connections within **5,000ms**.
-2. DNS routing fails over to secondary availability zone via route health checks.
-3. Cold storage replay reconciles missing offsets using idempotent message hashes.
+> **Tip:** You can edit this text directly in the editor, drop any \`.md\` file from your computer, or paste your Markdown from your clipboard.
 `,
   },
 

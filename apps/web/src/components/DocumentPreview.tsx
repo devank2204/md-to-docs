@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
 import type { Root } from 'mdast';
@@ -10,19 +10,13 @@ import 'katex/dist/katex.min.css';
 import { InteractiveTable } from './InteractiveTable';
 import { MermaidDiagram } from './MermaidDiagram';
 import { InteractiveCodeBlock } from './InteractiveCodeBlock';
+import { useStore } from '@/store';
 
 interface DocumentPreviewProps {
   markdown: string;
   destination: DestinationType;
-  onDestinationChange?: (dest: DestinationType) => void;
-  themeId: string;
-  onThemeIdChange: (themeId: string) => void;
-  baseFontSize: number;
-  onBaseFontSizeChange: (size: number) => void;
   isCompiling: boolean;
-  onOpenInspector: () => void;
-  documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
-  onDocumentSignatureChange: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
+  documentSignature?: { enabled: boolean; placement: 'every-page' | 'last-page' };
   isReviewMode?: boolean;
 }
 
@@ -36,21 +30,15 @@ const createDestinationPlanPlugin = (destination: DestinationType) => () => (tre
 export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   markdown,
   destination,
-  onDestinationChange,
-  themeId,
-  onThemeIdChange,
-  baseFontSize,
-  onBaseFontSizeChange,
   isCompiling,
-  onOpenInspector,
-  documentSignature,
-  onDocumentSignatureChange,
   isReviewMode = false,
 }) => {
-  const [zoom, setZoom] = useState(100);
+  const zoom = useStore((state) => state.zoom);
+  const setZoom = useStore((state) => state.setZoom);
+  const themeId = useStore((state) => state.themeId);
+  const baseFontSize = useStore((state) => state.baseFontSize);
 
-  const handleZoomIn = () => setZoom((prev) => Math.min(prev + 10, 150));
-  const handleZoomOut = () => setZoom((prev) => Math.max(prev - 10, 50));
+  const isDark = themeId === 'dark';
 
   const destinationPlanPlugin = useMemo(() => {
     return [createDestinationPlanPlugin(destination)];
@@ -62,118 +50,27 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
       className={
         isReviewMode
           ? 'w-full flex flex-col items-center relative overflow-visible bg-transparent'
-          : 'col-span-12 md:col-span-7 lg:col-span-8 bg-surface-container-high/60 flex flex-col p-space-md relative h-auto min-h-[600px] md:h-full md:min-h-0 overflow-hidden'
+          : `col-span-12 md:col-span-7 lg:col-span-8 ${isDark ? 'bg-[#0f172a]' : 'bg-[#f1f3f5]'} flex flex-col p-space-md relative h-auto min-h-[600px] md:h-full md:min-h-0 overflow-hidden`
       }
     >
-      <div className="w-full flex flex-wrap items-center justify-between text-secondary font-code-sm text-code-sm pb-space-sm px-space-xs border-b border-outline-variant/20 mb-space-sm shrink-0 gap-space-sm" data-print-hide>
-        <div className="flex flex-wrap items-center gap-space-sm">
-          <span className="font-medium text-on-surface flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-[16px] text-primary">auto_stories</span>
-            <span>Preview</span>
-          </span>
-          <span className="text-outline-variant">·</span>
-
-          <div className="flex items-center gap-space-xs">
-            <span className="text-secondary text-[11px]">Target:</span>
-            <select
-              className="bg-transparent border border-outline-variant/30 rounded px-2 py-0.5 text-on-surface focus:outline-none focus:border-primary text-code-sm font-semibold text-[11px]"
-              value={destination}
-              onChange={(e) => onDestinationChange?.(e.target.value as DestinationType)}
-            >
-              <option value="google-docs">Docs</option>
-              <option value="word">Word</option>
-              <option value="pdf">PDF</option>
-              <option value="clipboard">Copy</option>
-            </select>
-          </div>
-
-          <span className="text-outline-variant">·</span>
-
-          <div className="flex items-center gap-space-xs">
-            <span className="text-secondary text-[11px]">Theme:</span>
-            <select
-              className="bg-transparent border border-outline-variant/30 rounded px-2 py-0.5 text-on-surface focus:outline-none focus:border-primary text-code-sm"
-              value={themeId}
-              onChange={(e) => onThemeIdChange(e.target.value)}
-            >
-              <option value="default">Default</option>
-              <option value="clean">Clean</option>
-              <option value="dark">Dark</option>
-            </select>
-          </div>
-
-          <span className="text-outline-variant">·</span>
-
-          <div className="flex items-center gap-space-xs">
-            <span className="text-secondary text-[11px]">Size:</span>
-            <input
-              type="number"
-              min="8"
-              max="24"
-              className="w-12 bg-transparent border border-outline-variant/30 rounded px-1.5 py-0.5 text-on-surface focus:outline-none focus:border-primary tabular-nums text-code-sm"
-              value={baseFontSize}
-              onChange={(e) => onBaseFontSizeChange(parseInt(e.target.value) || 12)}
-            />
-          </div>
-
-          <span className="text-outline-variant">·</span>
-
-          <div className="flex items-center gap-space-xs" title="Add an mdtodocs attribution line to exported documents.">
-            <span className="text-secondary text-[11px]">Signature:</span>
-            <select
-              className="bg-transparent border border-outline-variant/30 rounded px-2 py-0.5 text-on-surface focus:outline-none focus:border-primary text-code-sm"
-              value={documentSignature.enabled ? documentSignature.placement : 'off'}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === 'off') {
-                  onDocumentSignatureChange({ ...documentSignature, enabled: false });
-                } else {
-                  onDocumentSignatureChange({ enabled: true, placement: val as 'every-page' | 'last-page' });
-                }
-              }}
-            >
-              <option value="off">Off</option>
-              <option value="every-page">Every page</option>
-              <option value="last-page">Last page</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex items-center gap-space-sm ml-auto">
-          <button
-            onClick={onOpenInspector}
-            className="flex items-center gap-space-xxs text-secondary hover:text-on-surface transition-colors font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface border border-outline-variant/30 shadow-xs"
-          >
-            <span className="material-symbols-outlined text-[15px]">info</span>
-            Details
-          </button>
-          <div className="flex items-center gap-space-xs bg-surface rounded p-space-xxs shadow-xs border border-outline-variant/20">
-            <button
-              onClick={handleZoomOut}
-              title="Zoom out"
-              className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container hover:text-on-surface transition-all active:scale-95"
-            >
-              <span className="material-symbols-outlined text-[16px]">remove</span>
-            </button>
-            <span className="tabular-nums font-medium text-on-surface px-space-xs">{zoom}%</span>
-            <button
-              onClick={handleZoomIn}
-              title="Zoom in"
-              className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container hover:text-on-surface transition-all active:scale-95"
-            >
-              <span className="material-symbols-outlined text-[16px]">add</span>
-            </button>
-          </div>
-        </div>
-      </div>
 
       <div className="flex-1 flex justify-center items-start p-space-lg overflow-y-auto min-h-0">
         <div
-          style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-          className="w-full max-w-[816px] min-w-0 bg-surface-container-lowest transition-all duration-300 p-space-xxl shadow-[0_12px_36px_rgba(0,0,0,0.09),0_2px_6px_rgba(0,0,0,0.04)] rounded flex flex-col h-auto min-h-[1056px] relative border border-outline-variant/30 prose prose-slate box-border break-words [overflow-wrap:anywhere] mb-space-xxl"
+          style={{
+            transform: `scale(${zoom / 100})`,
+            transformOrigin: 'top center',
+            backgroundColor: isDark ? '#111827' : '#ffffff',
+            color: isDark ? '#e5e7eb' : '#1a1a1a',
+            borderColor: isDark ? '#374151' : '#e5e7eb',
+            fontSize: `${baseFontSize}pt`,
+          }}
+          className={`w-full max-w-[816px] min-w-0 transition-all duration-300 p-space-xxl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_28px_-4px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] rounded-sm flex flex-col h-auto min-h-[1056px] relative border box-border break-words [overflow-wrap:anywhere] mb-space-xxl ${
+            isDark ? 'prose prose-invert' : 'prose prose-slate'
+          }`}
         >
           {isCompiling && (
-            <div className="absolute inset-0 bg-surface-container-lowest/50 flex items-center justify-center rounded z-20">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-primary/20 overflow-hidden z-20 rounded-t-sm">
+              <div className="h-full bg-primary animate-pulse w-full"></div>
             </div>
           )}
           <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
@@ -281,13 +178,39 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
               {markdown}
             </ReactMarkdown>
 
-            {documentSignature.enabled && (
-              <div className="mt-12 text-right text-secondary/60 font-['Caveat',cursive] text-2xl select-none" style={{ pageBreakInside: 'avoid' }}>
-                made with mdtodocs.com
-              </div>
-            )}
           </div>
         </div>
+      </div>
+
+      {/* Floating Canvas Zoom Control (beside document page) */}
+      <div
+        data-print-hide
+        className="absolute bottom-5 right-5 z-30 flex items-center bg-surface/90 backdrop-blur-md border border-outline-variant/60 rounded-full shadow-md px-1.5 py-1 text-xs select-none"
+      >
+        <button
+          type="button"
+          onClick={() => setZoom((z) => Math.max(z - 10, 50))}
+          className="w-6 h-6 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+          title="Zoom out"
+        >
+          <span className="material-symbols-outlined text-[14px]">remove</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setZoom(100)}
+          className="px-2 font-mono text-on-surface font-semibold text-[11px] tabular-nums hover:text-primary transition-colors cursor-pointer"
+          title="Click to reset to 100%"
+        >
+          {zoom}%
+        </button>
+        <button
+          type="button"
+          onClick={() => setZoom((z) => Math.min(z + 10, 150))}
+          className="w-6 h-6 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+          title="Zoom in"
+        >
+          <span className="material-symbols-outlined text-[14px]">add</span>
+        </button>
       </div>
     </div>
   );
