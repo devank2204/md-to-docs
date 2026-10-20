@@ -1,4 +1,6 @@
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
+import { DOCUMENT_TEMPLATES } from '@/data/templates';
+import { getCommandShortcut, getModifierKey } from '@/utils/platform';
 
 interface EmptyStateProps {
   onInput: (markdown: string) => void;
@@ -6,149 +8,161 @@ interface EmptyStateProps {
 
 export function EmptyState({ onInput }: EmptyStateProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          onInput(event.target.result as string);
-        }
-      };
-      reader.readAsText(file);
+      readFile(file);
+    }
+  };
+
+  const readFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (typeof event.target?.result === 'string') {
+        onInput(event.target.result);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      readFile(file);
     }
   };
 
   const loadSample = () => {
-    onInput(`# RFC 9110: HTTP Architecture & Semantics
-
-> Working Group: HTTP
-> Target: Standards Track
-> Date: October 2024
-
-## 1. Overview
-
-The Hypertext Transfer Protocol (HTTP) is a stateless application-level protocol for distributed, collaborative, hypertext information systems.
-
-### 1.1 Method Properties
-
-| Method | Safe | Idempotent | Latency Budget |
-| :--- | :--- | :--- | :--- |
-| \`GET\` | Yes | Yes | < 15ms |
-| \`PUT\` | No | Yes | < 40ms |
-| \`POST\` | No | No | < 100ms |
-| \`DELETE\` | No | Yes | < 30ms |
-
-## 2. Request Routing Architecture
-
-\`\`\`mermaid
-flowchart TD
-    Client -->|TLS 1.3| EdgeGateway
-    EdgeGateway -->|Route| AuthWorker
-    AuthWorker -->|Validate| OriginService
-\`\`\`
-
-## 3. Performance Model
-
-$$
-\\text{Throughput} = \\frac{N \\times \\text{Payload Size}}{\\Delta t}
-$$
-`);
+    const sample = DOCUMENT_TEMPLATES[0];
+    onInput(sample.content);
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-8 py-12 flex flex-col items-center">
-
-      {/* Header */}
-      <div className="w-full max-w-3xl text-center mb-10">
-        <h1 className="font-serif text-[42px] leading-tight text-[#1b1c1a] mb-4 tracking-tight">
-          Markdown → Document
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-12 flex flex-col items-center">
+      {/* Editorial Header with established Newsreader font-serif */}
+      <div className="text-center mb-8 max-w-xl">
+        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight text-on-surface mb-3 tracking-tight font-medium">
+          Markdown to Docs
         </h1>
-        <p className="font-serif text-[17px] text-[#53606c] max-w-[600px] mx-auto leading-relaxed">
-          Convert Markdown into formatted Word, Google Docs, or PDF files with tables, math equations, and vector diagrams intact.
+        <p className="font-serif text-base sm:text-lg text-secondary max-w-[560px] mx-auto leading-relaxed">
+          Paste Markdown or drop a file. Diagrams, tables, and formatting convert cleanly to Google Docs, Word, and PDF.
         </p>
       </div>
 
-      {/* Editor Empty State */}
-      <div className="w-full bg-[#ffffff] rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[#e3e2df] flex flex-col overflow-hidden relative">
-        {/* Editor Header */}
-        <div className="bg-[#faf9f6] px-4 py-2.5 border-b border-[#e3e2df] flex items-center justify-between font-code-sm text-[11px] text-[#75777a]">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#dbdad7]"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[#dbdad7]"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[#dbdad7]"></span>
-            </div>
-            <span className="opacity-80">source.md</span>
+      {/* Mac-Style Window Frame */}
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`w-full bg-surface rounded-xl border transition-all duration-150 flex flex-col overflow-hidden shadow-sm ${
+          isDragging
+            ? 'border-primary ring-4 ring-primary/10 bg-primary/[0.02]'
+            : 'border-outline-variant/40 hover:border-outline-variant/70'
+        }`}
+      >
+        {/* Mac Window Titlebar */}
+        <div className="h-10 px-4 bg-surface-container-low border-b border-outline-variant/30 flex items-center justify-between select-none">
+          {/* Window dots */}
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]/40 inline-block" />
+            <span className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]/40 inline-block" />
+            <span className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]/40 inline-block" />
           </div>
-          <div className="opacity-80">0 characters | UTF-8</div>
+
+          {/* Window Title */}
+          <div className="flex items-center gap-1.5 font-code-sm text-xs text-outline">
+            <span className="material-symbols-outlined text-[14px]">edit_note</span>
+            <span>untitled.md</span>
+          </div>
+
+          {/* Format Hint */}
+          <div className="font-code-sm text-[11px] text-outline-variant hidden sm:block">
+            CommonMark · GFM
+          </div>
         </div>
 
-        {/* Editor Body */}
-        <div className="relative min-h-[440px] flex flex-col p-8">
+        {/* Editor / Dropzone Area */}
+        <div className="relative min-h-[340px] flex flex-col p-6">
           <textarea
-            className="absolute inset-0 w-full h-full p-8 font-code-md text-[13px] text-[#1b1c1a] bg-transparent resize-none focus:outline-none z-10 placeholder-transparent leading-relaxed prose prose-slate prose-invert max-w-none"
+            className="absolute inset-0 w-full h-full p-6 font-code-md text-sm text-on-surface bg-transparent resize-none focus:outline-none z-10 placeholder-transparent leading-relaxed"
             onChange={(e) => onInput(e.target.value)}
-            placeholder=""
             spellCheck="false"
+            autoFocus
+            aria-label="Markdown input"
           />
 
-          {/* Placeholder Background */}
-          <div className="absolute inset-0 p-8 pointer-events-none z-0">
-            <div className="font-code-md text-[13px] text-[#dbdad7] select-none space-y-1">
-              <div># Document Title</div>
-              <div className="opacity-70">## Overview &amp; Architecture</div>
-              <div className="opacity-50">Paste CommonMark or GitHub-flavored Markdown here...</div>
-              <div className="opacity-40 pt-2">| Method | Description | Target |</div>
-              <div className="opacity-40">|--------|-------------|--------|</div>
-              <div className="opacity-40">| GET    | Read query  | Docs   |</div>
+          {/* Central Action Prompt */}
+          <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-12 h-12 rounded-xl bg-surface-container border border-outline-variant/40 flex items-center justify-center mb-3 text-secondary shadow-2xs">
+              <span className="material-symbols-outlined text-[24px]">
+                {isDragging ? 'file_download' : 'description'}
+              </span>
             </div>
-          </div>
 
-          {/* Upload UI Overlay */}
-          <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center justify-center pt-24">
-            <div className="w-10 h-10 bg-[#f4f3f0] border border-[#e3e2df] rounded flex items-center justify-center mb-4 text-[#1b1c1a]">
-              <span className="material-symbols-outlined text-[20px]">upload</span>
-            </div>
-            <h2 className="font-serif text-[17px] font-semibold text-[#1b1c1a] mb-2 tracking-tight">
-              Paste Markdown here
-            </h2>
-            <p className="font-code-sm text-[11px] text-[#75777a] mb-6">
-              or drop any <span className="font-medium text-[#1b1c1a]">.md</span>, <span className="font-medium text-[#1b1c1a]">.markdown</span>, or <span className="font-medium text-[#1b1c1a]">.txt</span> file directly
+            <p className="font-serif text-base sm:text-lg font-medium text-on-surface mb-1">
+              {isDragging ? 'Drop your file to open' : 'Drop a Markdown file, paste, or start typing'}
+            </p>
+            <p className="font-code-sm text-xs text-outline mb-5">
+              Supports .md, .markdown, or .txt
             </p>
 
-            <div className="flex items-center gap-3 pointer-events-auto shadow-sm">
-              <input 
-                type="file" 
-                accept=".md,.markdown,.txt" 
-                className="hidden" 
+            <div className="flex items-center gap-2.5 pointer-events-auto">
+              <input
+                type="file"
+                accept=".md,.markdown,.txt"
+                className="hidden"
                 ref={fileInputRef}
                 onChange={handleFileChange}
               />
-              <button 
-                className="px-4 py-2 bg-[#ffffff] border border-[#c5c6c9] text-[#1b1c1a] rounded font-code-sm text-[11px] hover:bg-[#faf9f6] transition-colors flex items-center gap-2"
+              <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
+                className="px-3.5 py-1.5 bg-surface hover:bg-surface-container border border-outline-variant/60 text-on-surface rounded-lg font-code-sm text-xs font-medium transition-colors flex items-center gap-1.5 shadow-2xs active:scale-95"
               >
-                <span className="material-symbols-outlined text-[15px]">snippet_folder</span>
-                Browse file...
+                <span className="material-symbols-outlined text-[15px] text-secondary">folder_open</span>
+                Browse file
               </button>
-              <button 
-                className="px-4 py-2 bg-[#000000] text-[#ffffff] rounded font-code-sm text-[11px] hover:bg-[#1b1c1a] transition-colors flex items-center gap-2"
+              <button
+                type="button"
                 onClick={loadSample}
+                className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-on-primary rounded-lg font-code-sm text-xs font-medium transition-colors flex items-center gap-1.5 shadow-2xs active:scale-95"
               >
-                <span className="material-symbols-outlined text-[15px]">import_contacts</span>
-                Load sample document
+                <span className="material-symbols-outlined text-[15px]">auto_stories</span>
+                Try an example
               </button>
             </div>
           </div>
-
-          {/* Editor Footer */}
-          <div className="absolute bottom-5 left-8 right-8 flex items-center justify-between pointer-events-none z-20 font-code-sm text-[10px] text-[#c5c6c9] uppercase tracking-wider">
-            <span>Line 1, Column 1</span>
-            <span>Drag-and-drop active</span>
-          </div>
         </div>
+      </div>
+
+      {/* Minimal Cheatsheet Footer with JetBrains Mono */}
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-4 font-code-sm text-xs text-outline">
+        <span className="flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 font-code-sm text-[10px]">{getModifierKey()}+V</kbd> Paste
+        </span>
+        <span>·</span>
+        <span className="flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/40 font-code-sm text-[10px]">{getCommandShortcut()}</kbd> Command Palette
+        </span>
+        <span>·</span>
+        <span>Drag &amp; drop anytime</span>
       </div>
     </div>
   );

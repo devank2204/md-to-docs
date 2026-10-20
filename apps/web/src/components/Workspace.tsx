@@ -11,19 +11,17 @@ import { DocumentInspector } from '@/components/DocumentInspector';
 import { DocumentEditor } from '@/components/DocumentEditor';
 import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
+import { SuggestEditModal } from '@/components/SuggestEditModal';
+import { WorkspaceSidebar } from '@/components/WorkspaceSidebar';
+
 
 interface WorkspaceProps {
   markdown: string;
   onInput: (markdown: string) => void;
   destination: DestinationType;
   onDestinationChange: (dest: DestinationType) => void;
-  themeId: string;
-  onThemeIdChange: (themeId: any) => void;
-  baseFontSize: number;
-  onBaseFontSizeChange: (size: number) => void;
   activeTheme: any;
   documentSignature: { enabled: boolean; placement: 'every-page' | 'last-page' };
-  onDocumentSignatureChange: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
 }
 
 interface DocumentStats {
@@ -122,20 +120,23 @@ export function Workspace({
   onInput,
   destination,
   onDestinationChange,
-  themeId,
-  onThemeIdChange,
-  baseFontSize,
-  onBaseFontSizeChange,
   activeTheme,
   documentSignature,
-  onDocumentSignatureChange
 }: WorkspaceProps) {
-  const [isFidelityPanelOpen, setIsFidelityPanelOpen] = useState(false);
-  const [isInspectorOpen, setIsInspectorOpen] = useState(false);
+  const isFidelityPanelOpen = useStore(state => state.isFidelityPanelOpen);
+  const setIsFidelityPanelOpen = useStore(state => state.setIsFidelityPanelOpen);
+  const isInspectorOpen = useStore(state => state.isInspectorOpen);
+  const setIsInspectorOpen = useStore(state => state.setIsInspectorOpen);
+  const isSuggestModalOpen = useStore(state => state.isSuggestModalOpen);
+  const setIsSuggestModalOpen = useStore(state => state.setIsSuggestModalOpen);
   
+  const isReviewMode = useStore(state => state.isReviewMode);
   const setCompiledDoc = useStore(state => state.setCompiledDoc);
   const isCompiling = useStore(state => state.isCompiling);
   const setIsCompiling = useStore(state => state.setIsCompiling);
+
+  const docTitleMatch = markdown.match(/^#\s+(.+)$/m);
+  const docTitle = docTitleMatch ? docTitleMatch[1].trim() : 'Document';
 
   const [compiledState, setCompiledState] = useState<{
     diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
@@ -241,28 +242,45 @@ export function Workspace({
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
-      <div className="w-full grid grid-cols-12 h-full min-h-0 overflow-y-auto md:overflow-hidden">
-        <DocumentEditor
-          markdown={markdown}
-          onInput={onInput}
-          words={words}
-          lines={lines}
-        />
+      {isReviewMode ? (
+        <div className="flex-1 w-full overflow-y-auto px-4 py-8 bg-surface-container-lowest">
+          <div className="w-full flex justify-center pb-20">
+            <DocumentPreview
+              markdown={markdown}
+              destination={destination}
+              isCompiling={isCompiling}
+              documentSignature={documentSignature}
+              isReviewMode={true}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-row h-full min-h-0 overflow-hidden">
+          <WorkspaceSidebar />
+          <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
+            <DocumentEditor
+              markdown={markdown}
+              onInput={onInput}
+              words={words}
+              lines={lines}
+            />
 
-        <DocumentPreview
-          markdown={markdown}
-          destination={destination}
-          onDestinationChange={onDestinationChange}
-          themeId={themeId}
-          onThemeIdChange={onThemeIdChange}
-          baseFontSize={baseFontSize}
-          onBaseFontSizeChange={onBaseFontSizeChange}
-          isCompiling={isCompiling}
-          onOpenInspector={() => setIsInspectorOpen(true)}
-          documentSignature={documentSignature}
-          onDocumentSignatureChange={onDocumentSignatureChange}
-        />
-      </div>
+            <DocumentPreview
+              markdown={markdown}
+              destination={destination}
+              isCompiling={isCompiling}
+              documentSignature={documentSignature}
+            />
+          </div>
+        </div>
+      )}
+
+      <SuggestEditModal
+        isOpen={isSuggestModalOpen}
+        onClose={() => setIsSuggestModalOpen(false)}
+        initialSelection={typeof window !== 'undefined' ? window.getSelection()?.toString()?.trim() || '' : ''}
+        documentTitle={docTitle}
+      />
 
       <FidelityCheckPanel
         isOpen={isFidelityPanelOpen}
@@ -281,14 +299,16 @@ export function Workspace({
         onDestinationChange={onDestinationChange}
       />
 
-      <StatusBar
-        isCompiling={isCompiling}
-        warningsCount={warnings.length}
-        fidelityScore={validationReport?.summary?.fidelityScore}
-        statsText={statsText}
-        destination={destination}
-        onToggleFidelityPanel={() => setIsFidelityPanelOpen(!isFidelityPanelOpen)}
-      />
+      {!isReviewMode && (
+        <StatusBar
+          isCompiling={isCompiling}
+          warningsCount={warnings.length}
+          fidelityScore={validationReport?.summary?.fidelityScore}
+          statsText={statsText}
+          destination={destination}
+          onToggleFidelityPanel={() => setIsFidelityPanelOpen(!isFidelityPanelOpen)}
+        />
+      )}
     </div>
   );
 }

@@ -1,16 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  animate,
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useTransform,
-} from "motion/react";
-
-const CELL = { type: "spring", stiffness: 520, damping: 34, mass: 0.45 } as const;
-
-const SEG =
-  "px-space-sm py-space-xxs text-center font-code-sm text-code-sm tracking-tight whitespace-nowrap transition-colors";
+import { useCallback, useRef } from "react";
 
 export type SegmentedOption = {
   value: string;
@@ -35,82 +23,41 @@ export function SegmentedControl({
   onValueChange,
   className = "",
 }: SegmentedControlProps) {
-  const count = Math.max(1, options.length);
-  const template = `repeat(${count}, minmax(0, 1fr))`;
-
-  const [internal, setInternal] = useState(
-    () => defaultValue ?? options[0]?.value ?? "",
-  );
-  const [hovered, setHovered] = useState(-1);
-
-  const controlled = value !== undefined;
-  const current = controlled ? value : internal;
-  const found = options.findIndex((o) => o.value === current);
-  const index = found < 0 ? 0 : found;
+  const current = value ?? defaultValue ?? options[0]?.value ?? "";
+  const index = options.findIndex((o) => o.value === current);
+  const activeIndex = index < 0 ? 0 : index;
+  const count = options.length;
 
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-  const emit = useRef(onValueChange);
-  useEffect(() => {
-    emit.current = onValueChange;
-  }, [onValueChange]);
-
-  const reduced = useReducedMotion();
-  const pos = useMotionValue(index);
-  const thumbX = useTransform(pos, (v) => `${v * 100}%`);
-  const maskX = useTransform(pos, (v) => `${v * -100}%`);
-
-  useEffect(() => {
-    if (reduced) {
-      pos.set(index);
-      return;
-    }
-    const controls = animate(pos, index, CELL);
-    return () => controls.stop();
-  }, [index, reduced, pos]);
 
   const select = useCallback(
     (next: string) => {
-      if (!controlled) setInternal(next);
-      if (next !== current) emit.current?.(next);
-    },
-    [controlled, current],
-  );
-
-  const seek = useCallback(
-    (from: number, dir: number) => {
-      let i = from;
-      for (let k = 0; k < count; k++) {
-        i = (i + dir + count) % count;
-        if (!options[i]?.disabled) return i;
+      if (next !== current) {
+        onValueChange?.(next);
       }
-      return from;
     },
-    [count, options],
-  );
-
-  const go = useCallback(
-    (i: number) => {
-      const option = options[i];
-      if (!option || option.disabled) return;
-      buttons.current[i]?.focus();
-      select(option.value);
-    },
-    [options, select],
+    [current, onValueChange],
   );
 
   const onKeyDown = (e: React.KeyboardEvent, i: number) => {
+    let nextIndex = i;
     if (e.key === "ArrowRight" || e.key === "ArrowDown") {
       e.preventDefault();
-      go(seek(i, 1));
+      nextIndex = (i + 1) % count;
     } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
       e.preventDefault();
-      go(seek(i, -1));
+      nextIndex = (i - 1 + count) % count;
     } else if (e.key === "Home") {
       e.preventDefault();
-      go(seek(count - 1, 1));
+      nextIndex = 0;
     } else if (e.key === "End") {
       e.preventDefault();
-      go(seek(0, -1));
+      nextIndex = count - 1;
+    }
+
+    if (nextIndex !== i && !options[nextIndex]?.disabled) {
+      buttons.current[nextIndex]?.focus();
+      select(options[nextIndex]!.value);
     }
   };
 
@@ -118,80 +65,35 @@ export function SegmentedControl({
     <div
       role="radiogroup"
       aria-label={label}
-      className={`relative inline-block select-none rounded-[6px] border border-outline-variant/30 bg-surface-container p-[3px] shadow-sm ${className}`}
+      className={`inline-flex items-center select-none rounded-[6px] border border-outline-variant/30 bg-surface-container p-[2px] ${className}`}
     >
-      <div
-        className="relative grid"
-        style={{ gridTemplateColumns: template, touchAction: "manipulation" }}
-      >
-        {options.map((option, i) => (
-          <span
+      {options.map((option, i) => {
+        const isActive = i === activeIndex;
+
+        return (
+          <button
             key={option.value}
-            aria-hidden
-            className={`${SEG} pointer-events-none ${
-              option.disabled
-                ? "text-outline-variant"
-                : hovered === i && i !== index
-                  ? "text-on-surface"
-                  : "text-secondary"
-            }`}
+            ref={(node) => {
+              buttons.current[i] = node;
+            }}
+            type="button"
+            role="radio"
+            aria-checked={isActive}
+            aria-disabled={option.disabled || undefined}
+            tabIndex={isActive ? 0 : -1}
+            onClick={() => !option.disabled && select(option.value)}
+            onKeyDown={(e) => onKeyDown(e, i)}
+            disabled={option.disabled}
+            className={`px-2.5 py-1 text-center font-code-sm text-xs tracking-tight whitespace-nowrap rounded-[4px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              isActive
+                ? "bg-surface text-on-surface font-medium shadow-xs border border-outline-variant/20"
+                : "text-secondary hover:text-on-surface hover:bg-surface-container-high/50"
+            } ${option.disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
           >
             {option.label}
-          </span>
-        ))}
-
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden rounded-[4px] bg-surface shadow-sm border border-outline-variant/10"
-          style={{ width: `${100 / count}%`, x: thumbX }}
-          initial={false}
-        >
-          <motion.div
-            className="absolute inset-0"
-            style={{ x: maskX }}
-            initial={false}
-          >
-            <div
-              className="absolute inset-y-0 left-0 grid"
-              style={{ width: `${count * 100}%`, gridTemplateColumns: template }}
-            >
-              {options.map((option) => (
-                <span
-                  key={option.value}
-                  className={`${SEG} text-on-surface font-medium`}
-                >
-                  {option.label}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
-        <div
-          className="absolute inset-0 grid"
-          style={{ gridTemplateColumns: template }}
-          onPointerLeave={() => setHovered(-1)}
-        >
-          {options.map((option, i) => (
-            <button
-              key={option.value}
-              ref={(node) => {
-                buttons.current[i] = node;
-              }}
-              type="button"
-              role="radio"
-              aria-checked={i === index}
-              aria-disabled={option.disabled || undefined}
-              tabIndex={i === index ? 0 : -1}
-              onClick={() => !option.disabled && select(option.value)}
-              onKeyDown={(e) => onKeyDown(e, i)}
-              onPointerEnter={() => !option.disabled && setHovered(i)}
-              className="cursor-default rounded-[4px] outline-none focus-visible:bg-primary/[0.06] focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary"
-            >
-              <span className="sr-only">{option.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+          </button>
+        );
+      })}
     </div>
   );
 }
