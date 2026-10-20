@@ -110,9 +110,9 @@ export function AboutModal() {
         <div className="pt-4 border-t border-outline-variant/30 flex items-center justify-between text-xs font-code-sm">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
-            <span className="text-secondary font-medium tracking-wide">
+            {/* <span className="text-secondary font-medium tracking-wide">
               © Yours truly DC
-            </span>
+            </span> */}
           </div>
 
           <button
