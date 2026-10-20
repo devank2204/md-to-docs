@@ -249,9 +249,9 @@ export function EmptyState({ onInput }: EmptyStateProps) {
       </div>
 
       {/* Author & Copyright Footer */}
-      <div className="mt-5 font-code-sm text-xs text-outline/80 tracking-wide">
+      {/* <div className="mt-5 font-code-sm text-xs text-outline/80 tracking-wide">
         © Yours truly DC
-      </div>
+      </div> */}
     </div>
   );
 }

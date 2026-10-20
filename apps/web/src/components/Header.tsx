@@ -219,9 +219,9 @@ export function Header({
 
                   <div className="my-1 border-t border-outline-variant/30" />
 
-                  <div className="px-3 py-1.5 flex items-center justify-between text-[10px] text-outline font-mono">
+                  {/* <div className="px-3 py-1.5 flex items-center justify-between text-[10px] text-outline font-mono">
                     <span>© Yours truly DC</span>
-                  </div>
+                  </div> */}
                 </div>
               )}
             </div>
