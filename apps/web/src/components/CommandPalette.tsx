@@ -66,6 +66,8 @@ function CommandPaletteModal({
   const duplicateDocument = useStore((state) => state.duplicateDocument);
   const createSnapshot = useStore((state) => state.createSnapshot);
   const setIsHistoryModalOpen = useStore((state) => state.setIsHistoryModalOpen);
+  const isSidebarOpen = useStore((state) => state.isSidebarOpen);
+  const toggleSidebar = useStore((state) => state.toggleSidebar);
 
 
   if (query !== prevQuery) {
@@ -167,6 +169,16 @@ function CommandPaletteModal({
         shortcut: `${mod}+R`,
         isActive: isReviewMode,
         action: () => setIsReviewMode(!isReviewMode),
+      },
+      {
+        id: 'toggle-sidebar',
+        category: 'View & Navigation',
+        title: isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar',
+        description: isSidebarOpen ? 'Hide document file list and snapshots' : 'Show document file list and snapshots',
+        icon: isSidebarOpen ? 'dock_to_left' : 'view_sidebar',
+        shortcut: `${mod}+B`,
+        isActive: isSidebarOpen,
+        action: () => toggleSidebar(),
       },
       {
         id: 'action-suggest',
@@ -281,6 +293,8 @@ function CommandPaletteModal({
     onOpenInspector,
     onOpenFidelityPanel,
     onOpenSuggestModal,
+    isSidebarOpen,
+    toggleSidebar,
     mod,
   ]);
 

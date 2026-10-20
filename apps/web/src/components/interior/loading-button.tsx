@@ -128,22 +128,28 @@ function Spinner({ still }: { still: boolean }) {
 
 function CheckMark() {
   return (
-    <svg
+    <motion.svg
       width="14"
       height="14"
       viewBox="0 0 12 12"
       fill="none"
       aria-hidden="true"
-      className="shrink-0"
+      className="shrink-0 drop-shadow-[0_0_6px_rgba(52,211,153,0.6)]"
+      initial={{ scale: 0.6, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 450, damping: 25 }}
     >
-      <path
+      <motion.path
         d="M2.6 6.3 4.9 8.6 9.4 3.6"
         stroke="currentColor"
-        strokeWidth="1.7"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
+        initial={{ pathLength: 0.2 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.25 }}
       />
-    </svg>
+    </motion.svg>
   );
 }
 
@@ -211,32 +217,37 @@ export function LoadingButton({
     {
       key: "idle",
       text: children,
-      tone: "text-on-primary",
+      tone: "text-[#f4f3f0]",
       icon: idleIcon,
     },
     {
       key: "pending",
       text: pendingLabel,
-      tone: "text-on-primary/80",
+      tone: "text-white/80",
       icon: <Spinner still={reduced === true || status !== "pending"} />,
     },
     {
       key: "success",
       text: successLabel,
-      tone: "text-white", // specific success overrides
+      tone: "text-emerald-300 font-semibold",
       icon: <CheckMark />,
     },
     {
       key: "error",
       text: errorLabel,
-      tone: "text-error",
+      tone: "text-rose-300 font-semibold",
       icon: <AlertMark />,
     },
   ];
 
-  const bgColor = status === 'success' 
-    ? 'bg-success text-white hover:bg-success' 
-    : 'bg-primary text-on-primary hover:bg-secondary-fixed-dim hover:text-on-secondary-fixed';
+  const glassStyle =
+    status === 'success'
+      ? 'bg-gradient-to-b from-[#062c1e] to-[#031b12] text-emerald-300 border-emerald-400/50 shadow-[0_0_20px_rgba(16,185,129,0.25),inset_0_1px_0_rgba(52,211,153,0.35)]'
+      : status === 'error'
+      ? 'bg-gradient-to-b from-[#2e0e0e] to-[#1c0808] text-rose-300 border-rose-400/50 shadow-[0_0_20px_rgba(244,63,94,0.25)]'
+      : status === 'pending'
+      ? 'bg-[#18191d] text-white/90 border-white/20 shadow-sm'
+      : 'bg-gradient-to-b from-[#1c1d21] to-[#101114] text-[#f4f3f0] border-white/15 hover:border-white/35 hover:from-[#25262c] hover:to-[#16171b] shadow-[0_1px_4px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.18)] hover:shadow-[0_3px_12px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]';
 
   return (
     <>
@@ -255,9 +266,12 @@ export function LoadingButton({
           }
           run();
         }}
-        className={`relative inline-flex h-8 select-none items-center justify-center rounded px-space-md font-code-sm text-code-sm font-medium shadow-sm outline-none transition-[background-color,color] duration-300 disabled:opacity-50 ${bgColor} ${className}`}
+        className={`relative inline-flex h-8 select-none items-center justify-center rounded-lg px-space-md font-code-sm text-code-sm font-medium border outline-none transition-all duration-200 overflow-hidden cursor-pointer disabled:opacity-50 ${glassStyle} ${className}`}
         style={{ touchAction: "manipulation" }}
       >
+        {/* Specular Mirror Top Sheen */}
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+
         <span aria-hidden className="relative grid place-items-center">
           {faces.map((face) => (
             <motion.span
@@ -269,9 +283,7 @@ export function LoadingButton({
                   : { opacity: 0, y: 3, filter: "blur(3px)" }
               }
               transition={fade}
-              className={`col-start-1 row-start-1 flex items-center justify-center gap-space-xs whitespace-nowrap ${
-                 status === 'success' ? 'text-white' : face.tone
-              }`}
+              className={`col-start-1 row-start-1 flex items-center justify-center gap-space-xs whitespace-nowrap ${face.tone}`}
             >
               {face.icon}
               {face.text}

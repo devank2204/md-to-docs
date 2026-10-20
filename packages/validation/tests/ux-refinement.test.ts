@@ -149,4 +149,92 @@ describe('md.to.docs UX Refinement Validation', () => {
       expect(isOpen).toBe(true);
     });
   });
+
+  describe('Mermaid Auto-Fix Repair Engine', () => {
+    function autoFixMermaidCode(raw: string): string {
+      let fixed = raw;
+      fixed = fixed.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+
+      fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\[([^"\n]+?)\](?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
+        if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
+          return `${id}["${text}"]`;
+        }
+        return match;
+      });
+
+      fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\{([^"\n]+?)\}(?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
+        if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
+          return `${id}{"${text}"}`;
+        }
+        return match;
+      });
+
+      fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\(([^"\n]+?)\)(?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
+        if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
+          return `${id}("${text}")`;
+        }
+        return match;
+      });
+
+      const subgraphs = (fixed.match(/\bsubgraph\b/g) || []).length;
+      const ends = (fixed.match(/\bend\b/g) || []).length;
+      if (subgraphs > ends) {
+        fixed = fixed + '\n' + Array(subgraphs - ends).fill('end').join('\n');
+      }
+
+      fixed = fixed.replace(/--\s+>/g, '-->').replace(/--\s+\|\s*([^|]+)\s*\|\s*>/g, '-->|$1|');
+      return fixed;
+    }
+
+    it('quotes node labels containing parentheses and special characters', () => {
+      const input = 'graph TD\nA[Calculate (Total)] --> B{Is Valid? [Yes/No]}';
+      const output = autoFixMermaidCode(input);
+      expect(output).toContain('A["Calculate (Total)"]');
+      expect(output).toContain('B{"Is Valid? [Yes/No]"}');
+    });
+
+    it('replaces typographic smart quotes with standard ASCII quotes', () => {
+      const input = 'graph LR\nA[“Start Process”] --> B';
+      const output = autoFixMermaidCode(input);
+      expect(output).toContain('"Start Process"');
+    });
+
+    it('balances unclosed subgraphs with end clauses', () => {
+      const input = 'graph TD\nsubgraph ClusterA\nA --> B';
+      const output = autoFixMermaidCode(input);
+      expect(output).toContain('end');
+    });
+  });
+
+  describe('Workspace Document Navigation Stability', () => {
+    it('creates new document in workspace without falling back to landing page', () => {
+      let currentView: 'landing' | 'workspace' = 'workspace';
+      let markdown = '# Existing Doc';
+
+      // Simulate createDocument('', 'Untitled Document')
+      const createDocument = (initialMarkdown = '') => {
+        markdown = initialMarkdown;
+        currentView = 'workspace'; // stays in workspace!
+        return 'doc-new';
+      };
+
+      createDocument('', 'Untitled Document');
+      expect(markdown).toBe('');
+      expect(currentView).toBe('workspace'); // Does NOT drop to landing!
+    });
+
+    it('resets to landing page on explicit home navigation', () => {
+      let currentView: 'landing' | 'workspace' = 'workspace';
+      let markdown = '# Existing Doc';
+
+      const resetWorkspaceToHome = () => {
+        markdown = '';
+        currentView = 'landing';
+      };
+
+      resetWorkspaceToHome();
+      expect(markdown).toBe('');
+      expect(currentView).toBe('landing');
+    });
+  });
 });

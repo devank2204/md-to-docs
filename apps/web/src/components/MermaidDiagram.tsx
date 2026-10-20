@@ -1,7 +1,51 @@
 import React, { useEffect, useState, useId, useRef } from 'react';
 import mermaid from 'mermaid';
+import { useStore } from '@/store';
 
 export type MermaidTheme = 'neutral' | 'default' | 'dark' | 'forest' | 'base';
+
+export function autoFixMermaidCode(raw: string): string {
+  let fixed = raw;
+
+  // 1. Replace typographic / curly quotes with standard quotes
+  fixed = fixed.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+
+  // 2. Fix square bracket node labels: A[Calculate (Total)] -> A["Calculate (Total)"]
+  fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\[([^"\n]+?)\](?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
+    if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
+      return `${id}["${text}"]`;
+    }
+    return match;
+  });
+
+  // 3. Fix curly brace node labels: B{Is Valid? [Yes/No]} -> B{"Is Valid? [Yes/No]"}
+  fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\{([^"\n]+?)\}(?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
+    if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
+      return `${id}{"${text}"}`;
+    }
+    return match;
+  });
+
+  // 4. Fix round bracket node labels: C(Start (v1)) -> C("Start (v1)")
+  fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\(([^"\n]+?)\)(?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
+    if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
+      return `${id}("${text}")`;
+    }
+    return match;
+  });
+
+  // 5. Ensure missing 'end' statements for subgraphs
+  const subgraphs = (fixed.match(/\bsubgraph\b/g) || []).length;
+  const ends = (fixed.match(/\bend\b/g) || []).length;
+  if (subgraphs > ends) {
+    fixed = fixed + '\n' + Array(subgraphs - ends).fill('end').join('\n');
+  }
+
+  // 6. Fix malformed arrow tokens (e.g., -- > or --->)
+  fixed = fixed.replace(/--\s+>/g, '-->').replace(/--\s+\|\s*([^|]+)\s*\|\s*>/g, '-->|$1|');
+
+  return fixed;
+}
 
 interface MermaidDiagramProps {
   code: string;
@@ -260,6 +304,22 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
 
   const codeLines = code.split(/\r?\n/);
 
+  const [fixStatus, setFixStatus] = useState<'idle' | 'fixed' | 'failed'>('idle');
+
+  const handleAutoFix = () => {
+    const fixed = autoFixMermaidCode(code);
+    const currentMarkdown = useStore.getState().markdown;
+    if (currentMarkdown.includes(code)) {
+      const updated = currentMarkdown.replace(code, fixed);
+      useStore.getState().setMarkdown(updated);
+      setFixStatus('fixed');
+      setTimeout(() => setFixStatus('idle'), 2500);
+    } else {
+      setFixStatus('failed');
+      setTimeout(() => setFixStatus('idle'), 2500);
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -441,7 +501,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
           </div>
         ) : error ? (
           <div className="w-full p-4 rounded bg-error-container/20 border border-error/30 text-on-surface">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2 text-error font-medium">
                 <span className="material-symbols-outlined text-[18px]">error_outline</span>
                 <span>Mermaid Syntax Error</span>
@@ -451,13 +511,26 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code }) => {
                   </span>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => setShowSource(!showSource)}
-                className="text-secondary hover:text-on-surface font-code-sm text-[11px] underline"
-              >
-                {showSource ? 'Hide Details' : 'Debug Source'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleAutoFix}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary text-on-primary hover:bg-primary/90 text-xs font-medium shadow-xs transition-transform active:scale-95 cursor-pointer"
+                  title="Auto-fix common Mermaid syntax issues (unquoted labels, special characters, unclosed subgraphs)"
+                >
+                  <span className="material-symbols-outlined text-[14px]">
+                    {fixStatus === 'fixed' ? 'check' : 'auto_fix_high'}
+                  </span>
+                  <span>{fixStatus === 'fixed' ? 'Repaired!' : 'Auto-Fix Diagram'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSource(!showSource)}
+                  className="text-secondary hover:text-on-surface font-code-sm text-[11px] underline cursor-pointer"
+                >
+                  {showSource ? 'Hide Details' : 'Debug Source'}
+                </button>
+              </div>
             </div>
 
             <p className="font-code-sm text-[12px] text-error mb-3 font-mono leading-relaxed">

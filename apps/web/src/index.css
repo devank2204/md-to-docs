@@ -237,4 +237,47 @@ a {
   color: #ea580c;
 }
 
+/* Interactive Collapsible Headings */
+details.collapsible-section {
+  position: relative;
+}
+
+details.collapsible-section > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+details.collapsible-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.collapsible-section > summary > h1,
+details.collapsible-section > summary > h2,
+details.collapsible-section > summary > h3,
+details.collapsible-section > summary > h4,
+details.collapsible-section > summary > h5,
+details.collapsible-section > summary > h6 {
+  margin: 0 !important;
+  display: inline-block;
+}
+
+/* Print calibration for collapsible sections: always expanded, no left rail */
+@media print {
+  details.collapsible-section {
+    display: block !important;
+  }
+  details.collapsible-section > summary span.material-symbols-outlined {
+    display: none !important;
+  }
+  .collapsible-section-body {
+    display: block !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+}
+
 
