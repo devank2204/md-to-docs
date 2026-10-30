@@ -1,0 +1,29 @@
+# Netlify Deployment Configuration for mdtodocs
+# Single-page application with build-time technical SEO prerendering
+
+[build]
+  base = "."
+  publish = "apps/web/dist"
+  command = "pnpm --filter web build && pnpm prerender"
+
+# Immutable caching for hashed static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Security and privacy headers across all HTML routes
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    X-XSS-Protection = "1; mode=block"
+
+# Fallback rewrite for client-side single page navigation
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

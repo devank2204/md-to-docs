@@ -61,19 +61,6 @@ export function WorkspaceSidebar() {
       <div className="w-11 bg-surface-container-low flex flex-col items-center py-2 justify-between border-r border-outline-variant/20 shrink-0">
         {/* Top actions */}
         <div className="flex flex-col items-center gap-1.5 w-full">
-          {/* Prominent Expand Button when sidebar drawer is collapsed */}
-          {!isSidebarOpen && (
-            <button
-              type="button"
-              onClick={() => setIsSidebarOpen(true)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-primary bg-primary/10 hover:bg-primary/20 transition-all cursor-pointer border border-primary/25 shadow-xs mb-0.5 group"
-              title="Expand sidebar (Ctrl+B)"
-            >
-              <span className="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform duration-150">
-                chevron_right
-              </span>
-            </button>
-          )}
 
           {/* File Explorer Toggle */}
           <button
@@ -161,9 +148,17 @@ export function WorkspaceSidebar() {
         </span>
       </button>
 
-      {/* 2. Collapsible Vertical File Drawer */}
+      {/* Mobile Backdrop when drawer is open */}
       {isSidebarOpen && (
-        <div className="w-52 bg-surface-container-low flex flex-col h-full overflow-hidden text-xs">
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden backdrop-blur-2xs"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* 2. Collapsible Vertical File Drawer (overlay on mobile, inline on desktop) */}
+      {isSidebarOpen && (
+        <div className="absolute left-11 top-0 bottom-0 z-40 w-60 bg-surface-container-low border-r border-outline-variant/40 shadow-2xl md:static md:w-52 md:shadow-none flex flex-col h-full overflow-hidden text-xs">
           {/* Drawer Header */}
           <div className="flex items-center justify-between px-3 py-2 border-b border-outline-variant/20 shrink-0">
             <span className="font-code-sm text-[10px] uppercase font-semibold text-outline tracking-wider flex items-center gap-1">

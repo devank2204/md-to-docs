@@ -61,6 +61,80 @@ export const DESTINATIONS: Record<DestinationType, DestinationProfile> = {
   },
 };
 
+// Formal Capability Rules & Diagnostics Contract
+
+export interface CapabilityRule {
+  id: string;
+  name: string;
+  severity: 'info' | 'warning' | 'error';
+  description: string;
+  fallbackMechanism: string;
+}
+
+export const CAPABILITY_RULES: Record<string, CapabilityRule> = {
+  'wide-table-overflow': {
+    id: 'wide-table-overflow',
+    name: 'Wide Table Column Limit',
+    severity: 'warning',
+    description: 'Table exceeds maximum supported column count for destination.',
+    fallbackMechanism: 'Linearize table rows into hierarchical bullet list to prevent horizontal truncation.',
+  },
+  'unsupported-html-element': {
+    id: 'unsupported-html-element',
+    name: 'Raw HTML Element',
+    severity: 'warning',
+    description: 'Raw HTML tags (<video>, <canvas>, etc.) cannot be natively rendered in destination format.',
+    fallbackMechanism: 'Preserve raw markup as code block so text is never silently dropped.',
+  },
+  'missing-image-source': {
+    id: 'missing-image-source',
+    name: 'Missing Image Source',
+    severity: 'warning',
+    description: 'Image node is missing a valid URL or file path.',
+    fallbackMechanism: 'Convert to fallback placeholder text link.',
+  },
+  'mermaid-asset-conversion': {
+    id: 'mermaid-asset-conversion',
+    name: 'Mermaid Vector Compilation',
+    severity: 'info',
+    description: 'Mermaid diagrams compiled to SVG vector assets for Word/Docs.',
+    fallbackMechanism: 'Compile to standalone SVG asset or show source code on failure.',
+  },
+  'math-equation-typesetting': {
+    id: 'math-equation-typesetting',
+    name: 'Math Equation Typesetting',
+    severity: 'info',
+    description: 'TeX math converted to destination-compatible format (MathML/Cambria Math/KaTeX).',
+    fallbackMechanism: 'Dual MathML and KaTeX HTML markup.',
+  },
+  'unsupported-syntax-element': {
+    id: 'unsupported-syntax-element',
+    name: 'Unsupported Syntax Element',
+    severity: 'warning',
+    description: 'Construct not supported natively by the destination document format.',
+    fallbackMechanism: 'Preserve textual content as fallback block so information is never lost.',
+  },
+};
+
+export interface DiagnosticFixAction {
+  label: string;
+  description: string;
+  autoFixable: boolean;
+  apply?: (tree: any) => void;
+}
+
+export interface DocumentDiagnostic {
+  id: string;
+  ruleId: string;
+  severity: 'info' | 'warning' | 'error';
+  destination: DestinationType;
+  message: string;
+  nodeType?: string;
+  position?: { line: number; column: number };
+  suggestedAction?: string;
+  fixAction?: DiagnosticFixAction;
+}
+
 // Capability Matrix
 
 export interface Capability {
@@ -170,6 +244,14 @@ export const FEATURE_CAPABILITIES: FeatureCapability[] = [
     support: { 'google-docs': 'styled', word: 'styled', pdf: 'styled', clipboard: 'styled' },
     description: 'Indented quotes with left border styling and italic typography.',
   },
+  {
+    id: 'html',
+    name: 'Raw HTML & Unsupported Tags',
+    category: 'advanced',
+    support: { 'google-docs': 'unsupported', word: 'unsupported', pdf: 'styled', clipboard: 'styled' },
+    description: 'Raw HTML elements preserved as formatted code blocks so content is never silently dropped.',
+    polyfill: 'Raw HTML transformed into visible code blocks.',
+  },
 ];
 
 type CapabilityKey =
@@ -196,7 +278,8 @@ type CapabilityKey =
   | 'link'
   | 'break'
   | 'inlineMath'
-  | 'footnoteReference';
+  | 'footnoteReference'
+  | 'html';
 
 const CAPABILITY_MATRIX: Record<CapabilityKey, Record<DestinationType, SupportLevel>> = {
   root:                { 'google-docs': 'native',      word: 'native',  pdf: 'native',  clipboard: 'native' },
@@ -223,6 +306,7 @@ const CAPABILITY_MATRIX: Record<CapabilityKey, Record<DestinationType, SupportLe
   break:               { 'google-docs': 'native',      word: 'native',  pdf: 'native',  clipboard: 'native' },
   inlineMath:          { 'google-docs': 'transformed', word: 'styled',  pdf: 'native',  clipboard: 'transformed' },
   footnoteReference:   { 'google-docs': 'transformed', word: 'native',  pdf: 'native',  clipboard: 'transformed' },
+  html:                { 'google-docs': 'unsupported', word: 'unsupported', pdf: 'styled', clipboard: 'styled' },
 };
 
 export function evaluateCapability(
@@ -278,6 +362,23 @@ export function evaluateCapability(
     }
   }
 
+  // Special case: Raw HTML nodes
+  if (blockType === 'html') {
+    if (destination === 'pdf') {
+      return {
+        support: 'styled',
+        requiresPolyfill: false,
+        reason: 'Raw HTML preserved in PDF renderer',
+      };
+    }
+    return {
+      support: 'unsupported',
+      requiresPolyfill: true,
+      reason: `Raw HTML element is not natively supported in ${profile.name}`,
+      transformTo: 'code',
+    };
+  }
+
   // Check the capability matrix
   const matrixEntry = CAPABILITY_MATRIX[blockType as CapabilityKey];
   if (matrixEntry) {
@@ -309,10 +410,27 @@ export function evaluateCapability(
     };
   }
 
-  // Unknown block type
+  // Unknown block type - fallback to text preserving content
   return {
     support: 'unsupported',
-    requiresPolyfill: false,
-    reason: `Block type "${blockType}" is not in the capability matrix`,
+    requiresPolyfill: true,
+    reason: `Block type "${blockType}" is not supported natively in ${profile.name}`,
+    transformTo: 'text',
   };
 }
+
+export function getDestinationProfile(destination: DestinationType): DestinationProfile {
+  return DESTINATIONS[destination] || DESTINATIONS['word'];
+}
+
+export function isFeatureSupported(featureId: string, destination: DestinationType): boolean {
+  const feat = FEATURE_CAPABILITIES.find(f => f.id === featureId);
+  if (!feat) return false;
+  const level = feat.support[destination];
+  return level !== 'unsupported';
+}
+
+export function getSupportedFeatures(destination: DestinationType): FeatureCapability[] {
+  return FEATURE_CAPABILITIES.filter(f => f.support[destination] !== 'unsupported');
+}
+

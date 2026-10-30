@@ -2,6 +2,21 @@ import { visit } from 'unist-util-visit';
 import type { Root } from 'mdast';
 import { renderMermaid } from './mermaid';
 
+export {
+  renderMermaid,
+  inlineOndineColors,
+  autoFixMermaidCode,
+  sanitizeMermaidSvg,
+  extractMermaidAccessibleText,
+  ONDINE_PALETTES,
+} from './mermaid';
+export type {
+  RenderMermaidOptions,
+  RenderMermaidResult,
+  OndinePalette,
+  InlineOndineOptions,
+} from './mermaid';
+
 const imageCache = new Map<string, Promise<ResolvedAsset>>();
 
 export function clearAssetCache(): void {

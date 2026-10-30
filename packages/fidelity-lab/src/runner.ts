@@ -417,6 +417,42 @@ function assertClipboardHtmlStructure(
       });
     }
   }
+
+  if (dir.includes('unicode-and-symbols')) {
+    if (!html.includes('東京都千代田区霞が関') || !html.includes('“Smart double quotes”')) {
+      failures.push({
+        fixture: dir,
+        assertion: 'Unicode and Smart Quotes Preservation',
+        expected: 'HTML contains CJK characters and typographic smart quotes',
+        actual: 'Missing Unicode characters in clipboard HTML',
+        artifactPath
+      });
+    }
+  }
+
+  if (dir.includes('long-lines-and-overflow')) {
+    if (!html.includes('auth-svc') || !html.includes('TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')) {
+      failures.push({
+        fixture: dir,
+        assertion: 'Long Lines and Multi-Column Table Content Preservation',
+        expected: 'HTML contains continuous code string and wide table content',
+        actual: 'Missing long line tokens or table rows',
+        artifactPath
+      });
+    }
+  }
+
+  if (dir.includes('unsupported-constructs')) {
+    if (!html.includes('Deep leaf item that tests list indentation overflow')) {
+      failures.push({
+        fixture: dir,
+        assertion: 'Deeply Nested List Content Preservation',
+        expected: 'HTML contains deeply nested list item content',
+        actual: 'Deep leaf item missing in HTML output',
+        artifactPath
+      });
+    }
+  }
 }
 
 async function assertDocxStructure(
@@ -545,6 +581,42 @@ async function assertDocxStructure(
           assertion: 'DOCX Math Typography Font',
           expected: 'word/document.xml contains Cambria Math font run',
           actual: 'Cambria Math font missing in document.xml',
+          artifactPath
+        });
+      }
+    }
+
+    if (dir.includes('unicode-and-symbols')) {
+      if (!docXml.includes('東京都千代田区霞が関') && !docXml.includes('千代田区')) {
+        failures.push({
+          fixture: dir,
+          assertion: 'DOCX Unicode and Multilingual Character Preservation',
+          expected: 'word/document.xml contains CJK characters or UTF-8 runs',
+          actual: 'Unicode character run missing in document.xml',
+          artifactPath
+        });
+      }
+    }
+
+    if (dir.includes('long-lines-and-overflow')) {
+      if (!docXml.includes('auth-svc') || !docXml.includes('TOKEN=')) {
+        failures.push({
+          fixture: dir,
+          assertion: 'DOCX Long Lines and Table Content Preservation',
+          expected: 'word/document.xml contains wide table rows and long code tokens',
+          actual: 'Missing table or long token runs in document.xml',
+          artifactPath
+        });
+      }
+    }
+
+    if (dir.includes('unsupported-constructs')) {
+      if (!docXml.includes('Deep leaf item')) {
+        failures.push({
+          fixture: dir,
+          assertion: 'DOCX Deeply Nested List Text Preservation',
+          expected: 'word/document.xml contains nested list text runs',
+          actual: 'Nested list text missing in document.xml',
           artifactPath
         });
       }

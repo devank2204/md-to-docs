@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "pnpm --filter web dev",
     "start": "pnpm --filter web dev",
-    "build": "pnpm -r build",
+    "build": "pnpm -r build && pnpm prerender",
+    "prerender": "tsx scripts/prerender.ts",
     "test": "pnpm --filter @mdtodocs/fidelity-lab test",
     "test:update": "pnpm --filter @mdtodocs/fidelity-lab test:update"
   },
@@ -25,6 +26,7 @@
   "dependencies": {
     "@tailwindcss/typography": "^0.5.20",
     "mermaid": "^12.0.0",
+    "ondine": "^0.0.3",
     "unist-util-visit": "^5.1.0"
   }
 }

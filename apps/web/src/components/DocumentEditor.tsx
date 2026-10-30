@@ -11,7 +11,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
   return (
     <div
       data-editor-pane
-      className="col-span-12 md:col-span-5 lg:col-span-4 bg-[#ffffff] flex flex-col border-r border-outline-variant/30 h-auto min-h-[350px] md:h-full md:min-h-0 overflow-hidden"
+      className="w-full h-full bg-[#ffffff] flex flex-col border-r border-outline-variant/30 min-h-0 overflow-hidden"
     >
       {/* Editor Sub-Header */}
       <div className="px-3 py-1.5 bg-[#fafaf9] flex items-center justify-between font-code-sm text-code-sm text-secondary border-b border-outline-variant/30 shrink-0 select-none">

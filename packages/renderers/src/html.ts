@@ -238,8 +238,26 @@ const htmlRegistry: RendererRegistry<string> = {
       return `<sup><a href="#fn-${inline.identifier}" id="fnref-${inline.identifier}" style="color:${color};text-decoration:none;">[${label}]</a></sup>`;
     },
     break: () => '<br />',
+    html: (block: any) => {
+      const val = block.value || '';
+      const isPageBreak = block.data?.isPageBreak ||
+        /<!--\s*page-?break\s*-->/i.test(val) ||
+        /<div\s+class=["'](?:page-?break)["']\s*>\s*<\/div>/i.test(val);
+      if (isPageBreak) {
+        return '<div class="page-break" data-pagebreak="true"></div>';
+      }
+      return val;
+    },
   },
-  fallbackNode: () => ''
+  fallbackNode: (node: any, ctx) => {
+    if (node.value && typeof node.value === 'string') {
+      return `<p>${escapeHtml(node.value)}</p>`;
+    }
+    if (Array.isArray(node.children)) {
+      return ctx.renderNodes(node.children).join('');
+    }
+    return '';
+  }
 };
 
 const htmlRenderer = new DocumentRenderer<string>(htmlRegistry);
@@ -289,12 +307,57 @@ export function renderToHtml(doc: Root, options?: HtmlRendererOptions): string {
     th { background: #f3f4f6; font-weight: 700; }
     pre { overflow-x: auto; white-space: pre-wrap; word-break: break-word; max-width: 100%; }
     img, svg { max-width: 100%; height: auto; }
+    .page-break, .pagebreak, [data-pagebreak="true"] {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 24px 0;
+      border-top: 1px dashed #d1d5db;
+      position: relative;
+    }
+    .page-break::after, .pagebreak::after, [data-pagebreak="true"]::after {
+      content: 'PAGE BREAK';
+      position: absolute;
+      top: -9px;
+      background: #ffffff;
+      padding: 0 8px;
+      font-size: 10px;
+      font-family: monospace;
+      color: #9ca3af;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+    }
     @media print {
       body { max-width: 100%; margin: 0; padding: 0; }
-      @page { margin: 0.75in; size: letter portrait; }
+      @page {
+        margin: 20mm 15mm 20mm 15mm;
+        size: letter portrait;
+        @bottom-right {
+          content: "Page " counter(page) " of " counter(pages);
+          font-family: system-ui, -apple-system, sans-serif;
+          font-size: 8pt;
+          color: #6b7280;
+        }
+      }
       h1, h2, h3, h4, h5, h6 { page-break-after: avoid; break-after: avoid; }
-      table, pre, blockquote, figure, .callout, .diagram-mermaid { page-break-inside: avoid; break-inside: avoid; }
+      table, pre, blockquote, figure, .callout, .diagram-mermaid, .mermaid-preview { page-break-inside: avoid; break-inside: avoid; }
+      table { border-collapse: collapse; width: 100%; }
+      thead { display: table-header-group !important; }
+      tfoot { display: table-footer-group !important; }
       tr { page-break-inside: avoid; break-inside: avoid; }
+      .page-break, .pagebreak, [data-pagebreak="true"] {
+        display: block !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+      .page-break::after, .pagebreak::after, [data-pagebreak="true"]::after {
+        display: none !important;
+      }
+      img, svg { max-width: 100% !important; height: auto !important; }
     }
   </style>
 </head>

@@ -203,8 +203,28 @@ const clipboardRegistry: RendererRegistry<string> = {
       return `<sup><a href="#fn-${inline.identifier}" id="fnref-${inline.identifier}" style="color:${color};text-decoration:none;">[${label}]</a></sup>`;
     },
     break: () => '<br />',
+    html: (block: any) => {
+      const text = block.value || '';
+      if (!text.trim()) return '';
+      const isPageBreak = block.data?.isPageBreak ||
+        /<!--\s*page-?break\s*-->/i.test(text) ||
+        /<div\s+class=["'](?:page-?break)["']\s*>\s*<\/div>/i.test(text) ||
+        text === '\\pagebreak';
+      if (isPageBreak) {
+        return '<div class="page-break" style="page-break-after:always;break-after:page;height:0;margin:0;padding:0;"></div>';
+      }
+      return `<pre style="background:#f4f4f5;padding:8px;border-radius:4px;font-family:monospace;font-size:12px;margin:8px 0;white-space:pre-wrap;"><code>${escapeHtml(text)}</code></pre>`;
+    },
   },
-  fallbackNode: () => ''
+  fallbackNode: (node: any, ctx) => {
+    if (node.value && typeof node.value === 'string') {
+      return `<p>${escapeHtml(node.value)}</p>`;
+    }
+    if (Array.isArray(node.children)) {
+      return ctx.renderNodes(node.children).join('');
+    }
+    return '';
+  }
 };
 
 const clipboardRenderer = new DocumentRenderer<string>(clipboardRegistry);

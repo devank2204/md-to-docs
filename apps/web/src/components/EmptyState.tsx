@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { DOCUMENT_TEMPLATES } from '@/data/templates';
 import { getCommandShortcut, getModifierKey } from '@/utils/platform';
+import { analytics, getDocLengthBucket } from '@/utils/analytics';
 
 interface EmptyStateProps {
   onInput: (markdown: string) => void;
@@ -12,16 +13,17 @@ export function EmptyState({ onInput }: EmptyStateProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      readFile(file);
-    }
-  };
+    if (!file) return;
 
-  const readFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       if (typeof event.target?.result === 'string') {
-        onInput(event.target.result);
+        const text = event.target.result;
+        analytics.track('editor_action', {
+          action: 'drop',
+          docLengthBucket: getDocLengthBucket(text.length),
+        });
+        onInput(text);
       }
     };
     reader.readAsText(file);
@@ -29,28 +31,40 @@ export function EmptyState({ onInput }: EmptyStateProps) {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      readFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (typeof event.target?.result === 'string') {
+          const text = event.target.result;
+          analytics.track('editor_action', {
+            action: 'drop',
+            docLengthBucket: getDocLengthBucket(text.length),
+          });
+          onInput(text);
+        }
+      };
+      reader.readAsText(file);
     }
   };
 
   const loadSample = () => {
     const sample = DOCUMENT_TEMPLATES[0];
+    analytics.track('editor_action', {
+      action: 'sample',
+      docLengthBucket: getDocLengthBucket(sample.content.length),
+    });
     onInput(sample.content);
   };
 
@@ -58,6 +72,10 @@ export function EmptyState({ onInput }: EmptyStateProps) {
     try {
       const text = await navigator.clipboard.readText();
       if (text && text.trim().length > 0) {
+        analytics.track('editor_action', {
+          action: 'paste',
+          docLengthBucket: getDocLengthBucket(text.length),
+        });
         onInput(text);
       }
     } catch (e) {
@@ -67,7 +85,7 @@ export function EmptyState({ onInput }: EmptyStateProps) {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 flex flex-col items-center select-none">
-      {/* Editorial Header with established Newsreader font-serif */}
+      {/* Editorial Header */}
       <div className="text-center mb-8 max-w-xl">
         <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight text-on-surface mb-3 tracking-tight font-medium">
           Markdown to Docs
@@ -247,11 +265,6 @@ export function EmptyState({ onInput }: EmptyStateProps) {
         <span>·</span>
         <span>Drag &amp; drop anytime</span>
       </div>
-
-      {/* Author & Copyright Footer */}
-      {/* <div className="mt-5 font-code-sm text-xs text-outline/80 tracking-wide">
-        © Yours truly DC
-      </div> */}
     </div>
   );
 }

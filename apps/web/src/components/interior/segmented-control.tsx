@@ -3,6 +3,7 @@ import { useCallback, useRef } from "react";
 export type SegmentedOption = {
   value: string;
   label: string;
+  shortLabel?: string;
   disabled?: boolean;
 };
 
@@ -84,13 +85,14 @@ export function SegmentedControl({
             onClick={() => !option.disabled && select(option.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
             disabled={option.disabled}
-            className={`px-2.5 py-1 text-center font-code-sm text-xs tracking-tight whitespace-nowrap rounded-[4px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+            className={`px-2 sm:px-2.5 py-1 text-center font-code-sm text-xs tracking-tight whitespace-nowrap rounded-[4px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
               isActive
                 ? "bg-surface text-on-surface font-medium shadow-xs border border-outline-variant/20"
                 : "text-secondary hover:text-on-surface hover:bg-surface-container-high/50"
             } ${option.disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
           >
-            {option.label}
+            <span className="hidden sm:inline">{option.label}</span>
+            <span className="inline sm:hidden">{option.shortLabel || option.label}</span>
           </button>
         );
       })}

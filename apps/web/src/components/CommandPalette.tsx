@@ -191,6 +191,15 @@ function CommandPaletteModal({
 
       // 3. Tools & Workflows
       {
+        id: 'action-rescue',
+        category: 'Tools & Workflows',
+        title: 'Open Document Rescue & Preflight Panel',
+        description: 'Deterministic pre-export layout checks and 1-click safe repairs',
+        icon: 'healing',
+        keywords: ['rescue', 'preflight', 'repair', 'fix', 'table', 'mermaid', 'diagnostics', 'errors', 'warnings'],
+        action: () => useStore.getState().setIsRescuePanelOpen(true),
+      },
+      {
         id: 'action-reconcile',
         category: 'Tools & Workflows',
         title: 'Sync Word Comments & Track Changes (.docx)',

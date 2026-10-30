@@ -1,0 +1,690 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "Unicode and Multilingual Typography Fidelity",
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 3,
+              "offset": 2
+            },
+            "end": {
+              "line": 1,
+              "column": 47,
+              "offset": 46
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 47,
+          "offset": 46
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "This fixture verifies Unicode character preservation, CJK scripts, emojis, and typographic entities across Word (.docx) and HTML clipboard export.",
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 48
+            },
+            "end": {
+              "line": 3,
+              "column": 147,
+              "offset": 194
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 3,
+          "column": 1,
+          "offset": 48
+        },
+        "end": {
+          "line": 3,
+          "column": 147,
+          "offset": 194
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Typographic Quotes and Dashes",
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 4,
+              "offset": 199
+            },
+            "end": {
+              "line": 5,
+              "column": 33,
+              "offset": 228
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 5,
+          "column": 1,
+          "offset": 196
+        },
+        "end": {
+          "line": 5,
+          "column": 33,
+          "offset": 228
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "“Smart double quotes” and ‘smart single quotes’ — separated by an em—dash and an en–dash.\nEllipses should be preserved properly… not flattened.",
+          "position": {
+            "start": {
+              "line": 6,
+              "column": 1,
+              "offset": 229
+            },
+            "end": {
+              "line": 7,
+              "column": 54,
+              "offset": 372
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 6,
+          "column": 1,
+          "offset": 229
+        },
+        "end": {
+          "line": 7,
+          "column": 54,
+          "offset": 372
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Multilingual Characters & Diacritics",
+          "position": {
+            "start": {
+              "line": 9,
+              "column": 4,
+              "offset": 377
+            },
+            "end": {
+              "line": 9,
+              "column": 40,
+              "offset": 413
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 9,
+          "column": 1,
+          "offset": 374
+        },
+        "end": {
+          "line": 9,
+          "column": 40,
+          "offset": 413
+        }
+      }
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "start": null,
+      "spread": false,
+      "children": [
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Japanese (Kanji/Kana): 東京都千代田区霞が関 (Tokyo, Chiyoda-ku, Kasumigaseki)",
+                  "position": {
+                    "start": {
+                      "line": 10,
+                      "column": 3,
+                      "offset": 416
+                    },
+                    "end": {
+                      "line": 10,
+                      "column": 70,
+                      "offset": 483
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 3,
+                  "offset": 416
+                },
+                "end": {
+                  "line": 10,
+                  "column": 70,
+                  "offset": 483
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 10,
+              "column": 1,
+              "offset": 414
+            },
+            "end": {
+              "line": 10,
+              "column": 70,
+              "offset": 483
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Traditional Chinese: 繁體中文國際化測試 (Internationalization test)",
+                  "position": {
+                    "start": {
+                      "line": 11,
+                      "column": 3,
+                      "offset": 486
+                    },
+                    "end": {
+                      "line": 11,
+                      "column": 61,
+                      "offset": 544
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 3,
+                  "offset": 486
+                },
+                "end": {
+                  "line": 11,
+                  "column": 61,
+                  "offset": 544
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 11,
+              "column": 1,
+              "offset": 484
+            },
+            "end": {
+              "line": 11,
+              "column": 61,
+              "offset": 544
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Arabic (RTL text segment): اللغة العربية لغة سامية",
+                  "position": {
+                    "start": {
+                      "line": 12,
+                      "column": 3,
+                      "offset": 547
+                    },
+                    "end": {
+                      "line": 12,
+                      "column": 53,
+                      "offset": 597
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 12,
+                  "column": 3,
+                  "offset": 547
+                },
+                "end": {
+                  "line": 12,
+                  "column": 53,
+                  "offset": 597
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 12,
+              "column": 1,
+              "offset": 545
+            },
+            "end": {
+              "line": 12,
+              "column": 53,
+              "offset": 597
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Accented Latin: Français: déjà vu, résumé, naïve façade; Español: niño, año, ¿cómo estás?",
+                  "position": {
+                    "start": {
+                      "line": 13,
+                      "column": 3,
+                      "offset": 600
+                    },
+                    "end": {
+                      "line": 13,
+                      "column": 92,
+                      "offset": 689
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 13,
+                  "column": 3,
+                  "offset": 600
+                },
+                "end": {
+                  "line": 13,
+                  "column": 92,
+                  "offset": 689
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 13,
+              "column": 1,
+              "offset": 598
+            },
+            "end": {
+              "line": 13,
+              "column": 92,
+              "offset": 689
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "German: Grüßen, Straße, Übergrößen.",
+                  "position": {
+                    "start": {
+                      "line": 14,
+                      "column": 3,
+                      "offset": 692
+                    },
+                    "end": {
+                      "line": 14,
+                      "column": 38,
+                      "offset": 727
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 14,
+                  "column": 3,
+                  "offset": 692
+                },
+                "end": {
+                  "line": 14,
+                  "column": 38,
+                  "offset": 727
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 14,
+              "column": 1,
+              "offset": 690
+            },
+            "end": {
+              "line": 14,
+              "column": 38,
+              "offset": 727
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 414
+        },
+        "end": {
+          "line": 14,
+          "column": 38,
+          "offset": 727
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Technical Symbols & Arrows",
+          "position": {
+            "start": {
+              "line": 16,
+              "column": 4,
+              "offset": 732
+            },
+            "end": {
+              "line": 16,
+              "column": 30,
+              "offset": 758
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 729
+        },
+        "end": {
+          "line": 16,
+          "column": 30,
+          "offset": 758
+        }
+      }
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "start": null,
+      "spread": false,
+      "children": [
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Mathematical symbols: ∀x ∈ ℝ, ∃y > 0 such that x² ≥ 0, ±∞, ≈, ≠, ≤, ≥, ∑, ∏, ∫.",
+                  "position": {
+                    "start": {
+                      "line": 17,
+                      "column": 3,
+                      "offset": 761
+                    },
+                    "end": {
+                      "line": 17,
+                      "column": 82,
+                      "offset": 840
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 17,
+                  "column": 3,
+                  "offset": 761
+                },
+                "end": {
+                  "line": 17,
+                  "column": 82,
+                  "offset": 840
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 17,
+              "column": 1,
+              "offset": 759
+            },
+            "end": {
+              "line": 17,
+              "column": 82,
+              "offset": 840
+            }
+          }
+        },
+        {
+          "type": "listItem",
+          "spread": false,
+          "checked": null,
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Directional arrows: ← ↑ → ↓ ↔ ⇄ ⇒ ⇔.",
+                  "position": {
+                    "start": {
+                      "line": 18,
+                      "column": 3,
+                      "offset": 843
+                    },
+                    "end": {
+                      "line": 18,
+                      "column": 39,
+                      "offset": 879
+                    }
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 18,
+                  "column": 3,
+                  "offset": 843
+                },
+                "end": {
+                  "line": 18,
+                  "column": 39,
+                  "offset": 879
+                }
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 18,
+              "column": 1,
+              "offset": 841
+            },
+            "end": {
+              "line": 18,
+              "column": 39,
+              "offset": 879
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 759
+        },
+        "end": {
+          "line": 18,
+          "column": 39,
+          "offset": 879
+        }
+      }
+    },
+    {
+      "type": "heading",
+      "depth": 2,
+      "children": [
+        {
+          "type": "text",
+          "value": "Emoji Runs",
+          "position": {
+            "start": {
+              "line": 20,
+              "column": 4,
+              "offset": 884
+            },
+            "end": {
+              "line": 20,
+              "column": 14,
+              "offset": 894
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 20,
+          "column": 1,
+          "offset": 881
+        },
+        "end": {
+          "line": 20,
+          "column": 14,
+          "offset": 894
+        }
+      }
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "🚀 Rocket ship, ⚡ High voltage, 🛡️ Shield security, 📝 Document memo, 💻 Developer workstation.",
+          "position": {
+            "start": {
+              "line": 21,
+              "column": 1,
+              "offset": 895
+            },
+            "end": {
+              "line": 21,
+              "column": 97,
+              "offset": 991
+            }
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 21,
+          "column": 1,
+          "offset": 895
+        },
+        "end": {
+          "line": 21,
+          "column": 97,
+          "offset": 991
+        }
+      }
+    }
+  ],
+  "position": {
+    "start": {
+      "line": 1,
+      "column": 1,
+      "offset": 0
+    },
+    "end": {
+      "line": 22,
+      "column": 1,
+      "offset": 992
+    }
+  }
+}

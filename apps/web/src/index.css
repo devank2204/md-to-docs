@@ -104,6 +104,35 @@ a {
   font-size: 0.85em;
 }
 
+/* Screen styling for explicit pagebreak dividers in preview */
+.page-break, .pagebreak, [data-pagebreak="true"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 2rem 0;
+  border-top: 1px dashed rgba(156, 163, 175, 0.5);
+}
+.page-break::after, .pagebreak::after, [data-pagebreak="true"]::after {
+  content: 'PAGE BREAK';
+  position: absolute;
+  top: -9px;
+  background: #ffffff;
+  padding: 0 10px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #9ca3af;
+  border-radius: 4px;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+.dark .page-break::after, .dark .pagebreak::after, .dark [data-pagebreak="true"]::after {
+  background: #111827;
+  color: #9ca3af;
+  border-color: rgba(156, 163, 175, 0.2);
+}
+
 /* Print calibration: Hide web UI chrome, expand preview, avoid page split bugs */
 @media print {
   /* Hide application UI chromes */
@@ -167,9 +196,24 @@ a {
     break-after: avoid !important;
   }
 
-  table, pre, blockquote, .mermaid-preview, figure, .callout {
+  table, pre, blockquote, .mermaid-preview, figure, .callout, [data-code-block] {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+
+  /* Multi-page table splitting: repeating table header row on each page */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
   }
 
   tr {
@@ -177,9 +221,42 @@ a {
     break-inside: avoid !important;
   }
 
+  /* Explicit pagination controls */
+  .page-break, .pagebreak, [data-pagebreak="true"] {
+    display: block !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  .page-break::after, .pagebreak::after, [data-pagebreak="true"]::after {
+    display: none !important;
+  }
+
+  /* Diagram & asset vector scaling to prevent horizontal clipping */
+  svg, img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .mermaid-preview svg {
+    max-width: 100% !important;
+    height: auto !important;
+    break-inside: avoid !important;
+  }
+
   @page {
     size: letter portrait;
-    margin: 0.75in;
+    margin: 20mm 15mm 20mm 15mm;
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 8pt;
+      color: #6b7280;
+    }
   }
 }
 
