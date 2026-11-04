@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { EmptyState } from '@/components/EmptyState';
 import { Workspace } from '@/components/Workspace';
 import { Header } from '@/components/Header';
@@ -11,6 +11,10 @@ import { AboutModal } from '@/components/AboutModal';
 import { THEMES } from '@mdtodocs/compiler-core';
 import type { DocumentTheme } from '@mdtodocs/compiler-core';
 import { useStore } from '@/store';
+import { getRouteSpec } from '@/routes/landingData';
+import type { LandingRoutePath } from '@/routes/landingData';
+import { MermaidUtilityView } from '@/components/MermaidUtilityView';
+import { analytics, getDocLengthBucket } from '@/utils/analytics';
 
 export type AppState = 'EMPTY' | 'WORKSPACE';
 
@@ -38,12 +42,49 @@ function App() {
   const setIsFidelityPanelOpen = useStore(state => state.setIsFidelityPanelOpen);
   const setIsSuggestModalOpen = useStore(state => state.setIsSuggestModalOpen);
 
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+    }
+    return '/';
+  });
+
   const appState: AppState = currentView === 'landing' ? 'EMPTY' : 'WORKSPACE';
 
   const activeTheme: DocumentTheme = {
     ...THEMES[themeId],
     typography: { ...THEMES[themeId].typography, baseFontSizePt: baseFontSize },
   };
+
+  const handleNavigateRoute = (path: LandingRoutePath) => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', path);
+      setCurrentPath(path);
+      const spec = getRouteSpec(path);
+      if (spec) {
+        setDestination(spec.destination);
+        if (!markdown.trim()) {
+          document.title = spec.title;
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = (window.location.pathname.toLowerCase().replace(/\/$/, '') || '/') as LandingRoutePath;
+      setCurrentPath(path);
+      const spec = getRouteSpec(path);
+      if (spec) {
+        setDestination(spec.destination);
+        if (!markdown.trim()) {
+          document.title = spec.title;
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [markdown, setDestination]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -65,7 +106,6 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isCommandPaletteOpen, setIsCommandPaletteOpen, createDocument, toggleSidebar]);
 
-
   useEffect(() => {
     const handleGlobalPaste = (e: ClipboardEvent) => {
       if (appState === 'EMPTY') {
@@ -80,8 +120,26 @@ function App() {
   }, [appState, setMarkdown]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const pathname = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
+    const spec = getRouteSpec(pathname);
+    if (spec) {
+      setDestination(spec.destination);
+      if (!markdown.trim()) {
+        document.title = spec.title;
+      }
+    }
+  }, [setDestination, markdown]);
+
+  useEffect(() => {
     if (!markdown.trim()) {
-      document.title = 'mdtodocs: Markdown to Documents';
+      const pathname = typeof window !== 'undefined' ? (window.location.pathname.toLowerCase().replace(/\/$/, '') || '/') : '/';
+      const spec = getRouteSpec(pathname);
+      if (spec) {
+        document.title = spec.title;
+      } else {
+        document.title = 'mdtodocs: Markdown to Documents';
+      }
       return;
     }
     const match = markdown.match(/^#\s+(.+)$/m);
@@ -92,7 +150,18 @@ function App() {
     }
   }, [markdown]);
 
+  useEffect(() => {
+    analytics.track('page_view', {
+      path: currentPath,
+      referrer: typeof document !== 'undefined' ? document.referrer : '',
+    });
+  }, [currentPath]);
+
   const handleInput = (newMarkdown: string) => {
+    analytics.track('editor_action', {
+      action: newMarkdown.trim() ? 'type' : 'clear',
+      docLengthBucket: getDocLengthBucket(newMarkdown.length),
+    });
     setMarkdown(newMarkdown);
   };
 
@@ -108,7 +177,16 @@ function App() {
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
       <main className="flex-1 flex flex-col mt-12 relative">
-        {appState === 'EMPTY' ? (
+        {currentPath === '/mermaid-to-svg' || currentPath === '/mermaid-to-png' ? (
+          <MermaidUtilityView
+            currentPath={currentPath}
+            onNavigateRoute={handleNavigateRoute}
+            onOpenInStudio={(importedMarkdown) => {
+              setMarkdown(importedMarkdown);
+              handleNavigateRoute('/');
+            }}
+          />
+        ) : appState === 'EMPTY' ? (
           <EmptyState onInput={handleInput} />
         ) : (
           <Workspace

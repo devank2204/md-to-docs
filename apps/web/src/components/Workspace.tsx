@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
-import { parseMarkdown, planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
+import {
+  parseMarkdown,
+  planRepresentation,
+  DiagnosticsCollector,
+  analyzeDocumentForRescue,
+  applyRescueFix,
+  applyAllRescueFixes,
+  type RescueDiagnostic,
+} from '@mdtodocs/compiler-core';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { visit } from 'unist-util-visit';
 import type { Root } from 'mdast';
@@ -8,6 +16,7 @@ import { validateDocument } from '@mdtodocs/validation';
 import { useStore } from '@/store';
 import { FidelityCheckPanel } from '@/components/FidelityCheckPanel';
 import { DocumentInspector } from '@/components/DocumentInspector';
+import { DocumentRescuePanel } from '@/components/DocumentRescuePanel';
 import { DocumentEditor } from '@/components/DocumentEditor';
 import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
@@ -127,16 +136,21 @@ export function Workspace({
   const setIsFidelityPanelOpen = useStore(state => state.setIsFidelityPanelOpen);
   const isInspectorOpen = useStore(state => state.isInspectorOpen);
   const setIsInspectorOpen = useStore(state => state.setIsInspectorOpen);
+  const isRescuePanelOpen = useStore(state => state.isRescuePanelOpen);
+  const setIsRescuePanelOpen = useStore(state => state.setIsRescuePanelOpen);
   const isSuggestModalOpen = useStore(state => state.isSuggestModalOpen);
   const setIsSuggestModalOpen = useStore(state => state.setIsSuggestModalOpen);
   
   const isReviewMode = useStore(state => state.isReviewMode);
   const setCompiledDoc = useStore(state => state.setCompiledDoc);
+  const setDiagnostics = useStore(state => state.setDiagnostics);
   const isCompiling = useStore(state => state.isCompiling);
   const setIsCompiling = useStore(state => state.setIsCompiling);
 
   const docTitleMatch = markdown.match(/^#\s+(.+)$/m);
   const docTitle = docTitleMatch ? docTitleMatch[1].trim() : 'Document';
+
+  const [activeMobileTab, setActiveMobileTab] = useState<'editor' | 'preview'>('editor');
 
   const [compiledState, setCompiledState] = useState<{
     diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
@@ -191,12 +205,23 @@ export function Workspace({
         const validationReport = validateDocument(doc, destination);
 
         if (!controller.signal.aborted) {
+          const rescueDiags = analyzeDocumentForRescue(markdown, destination, doc);
+          const plannerDiags = collector.getAll();
+          const combinedDiagnostics: any[] = [...rescueDiags];
+
+          for (const pd of plannerDiags) {
+            if (!combinedDiagnostics.some(rd => rd.ruleId === pd.ruleId)) {
+              combinedDiagnostics.push(pd);
+            }
+          }
+
           setCompiledState({
-            diagnostics: collector.getAll(),
+            diagnostics: combinedDiagnostics,
             stats: docStats,
             validationReport,
           });
           setCompiledDoc(doc);
+          setDiagnostics(combinedDiagnostics);
         }
       } catch (e: any) {
         if (!controller.signal.aborted) {
@@ -222,6 +247,7 @@ export function Workspace({
             validationReport: null,
           });
           setCompiledDoc(null);
+          setDiagnostics([]);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -234,7 +260,7 @@ export function Workspace({
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [markdown, destination, activeTheme, setCompiledDoc, setIsCompiling]);
+  }, [markdown, destination, activeTheme, setCompiledDoc, setDiagnostics, setIsCompiling]);
 
   const { diagnostics, stats, validationReport } = compiledState;
   const warnings = diagnostics.filter(d => d.severity === 'warning' || d.severity === 'error');
@@ -255,22 +281,61 @@ export function Workspace({
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-row h-full min-h-0 overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row h-full min-h-0 overflow-hidden">
           <WorkspaceSidebar />
-          <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
-            <DocumentEditor
-              markdown={markdown}
-              onInput={onInput}
-              words={words}
-              lines={lines}
-            />
 
-            <DocumentPreview
-              markdown={markdown}
-              destination={destination}
-              isCompiling={isCompiling}
-              documentSignature={documentSignature}
-            />
+          {/* Mobile Tab Switcher (Visible only on mobile < md: screens) */}
+          <div className="flex md:hidden items-center justify-center p-1.5 bg-surface-container-low border-b border-outline-variant/30 shrink-0 select-none">
+            <div className="inline-flex rounded-lg p-0.5 bg-surface-container border border-outline-variant/30 text-xs">
+              <button
+                type="button"
+                onClick={() => setActiveMobileTab('editor')}
+                className={`px-3 py-1 rounded-md font-medium transition-all ${
+                  activeMobileTab === 'editor'
+                    ? 'bg-surface text-on-surface shadow-xs font-semibold'
+                    : 'text-secondary hover:text-on-surface'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[15px]">edit_note</span>
+                  <span>Editor</span>
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveMobileTab('preview')}
+                className={`px-3 py-1 rounded-md font-medium transition-all ${
+                  activeMobileTab === 'preview'
+                    ? 'bg-surface text-on-surface shadow-xs font-semibold'
+                    : 'text-secondary hover:text-on-surface'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[15px]">visibility</span>
+                  <span>Preview</span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
+            <div className={`${activeMobileTab === 'editor' ? 'col-span-12 flex flex-col' : 'hidden md:flex md:flex-col'} md:col-span-5 lg:col-span-4 h-full min-h-0`}>
+              <DocumentEditor
+                markdown={markdown}
+                onInput={onInput}
+                words={words}
+                lines={lines}
+              />
+            </div>
+
+            <div className={`${activeMobileTab === 'preview' ? 'col-span-12 flex flex-col' : 'hidden md:flex md:flex-col'} md:col-span-7 lg:col-span-8 h-full min-h-0`}>
+              <DocumentPreview
+                markdown={markdown}
+                destination={destination}
+                isCompiling={isCompiling}
+                documentSignature={documentSignature}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -297,6 +362,21 @@ export function Workspace({
         stats={stats}
         destination={destination}
         onDestinationChange={onDestinationChange}
+      />
+
+      <DocumentRescuePanel
+        isOpen={isRescuePanelOpen}
+        onClose={() => setIsRescuePanelOpen(false)}
+        destination={destination}
+        diagnostics={diagnostics as RescueDiagnostic[]}
+        onApplyFix={(ruleId) => {
+          const updated = applyRescueFix(markdown, ruleId, destination);
+          onInput(updated);
+        }}
+        onApplyAllFixes={() => {
+          const updated = applyAllRescueFixes(markdown, destination);
+          onInput(updated);
+        }}
       />
 
       {!isReviewMode && (

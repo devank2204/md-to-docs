@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { THEMES } from '@mdtodocs/compiler-core';
+import { THEMES, type DocumentDiagnostic, type DocumentPresetId } from '@mdtodocs/compiler-core';
 import type { Root } from 'mdast';
 import {
   extractDocumentTitle,
@@ -17,6 +17,7 @@ export interface AppState {
   markdown: string;
   destination: DestinationType;
   themeId: keyof typeof THEMES;
+  activePresetId: DocumentPresetId;
   baseFontSize: number;
   documentSignature: {
     enabled: boolean;
@@ -24,9 +25,12 @@ export interface AppState {
   };
   compiledDoc: Root | null;
   isCompiling: boolean;
+  diagnostics: DocumentDiagnostic[];
+  setDiagnostics: (diagnostics: DocumentDiagnostic[]) => void;
   isReviewMode: boolean;
   isCommandPaletteOpen: boolean;
   isInspectorOpen: boolean;
+  isRescuePanelOpen: boolean;
   isFidelityPanelOpen: boolean;
   isSuggestModalOpen: boolean;
   isTemplateGalleryOpen: boolean;
@@ -42,6 +46,7 @@ export interface AppState {
   setMarkdown: (markdown: string) => void;
   setDestination: (destination: DestinationType) => void;
   setThemeId: (themeId: keyof typeof THEMES) => void;
+  setActivePreset: (presetId: DocumentPresetId) => void;
   setBaseFontSize: (size: number) => void;
   setDocumentSignature: (signature: { enabled: boolean; placement: 'every-page' | 'last-page' }) => void;
   setCompiledDoc: (doc: Root | null) => void;
@@ -49,6 +54,7 @@ export interface AppState {
   setIsReviewMode: (isReviewMode: boolean) => void;
   setIsCommandPaletteOpen: (isCommandPaletteOpen: boolean) => void;
   setIsInspectorOpen: (isInspectorOpen: boolean) => void;
+  setIsRescuePanelOpen: (isRescuePanelOpen: boolean) => void;
   setIsFidelityPanelOpen: (isFidelityPanelOpen: boolean) => void;
   setIsSuggestModalOpen: (isSuggestModalOpen: boolean) => void;
   setIsTemplateGalleryOpen: (isTemplateGalleryOpen: boolean) => void;
@@ -88,6 +94,7 @@ export const useStore = create<AppState>()(
       markdown: '',
       destination: 'google-docs',
       themeId: 'default',
+      activePresetId: 'default',
       baseFontSize: THEMES['default'].typography.baseFontSizePt,
       documentSignature: {
         enabled: false,
@@ -95,12 +102,16 @@ export const useStore = create<AppState>()(
       },
       compiledDoc: null,
       isCompiling: false,
+      diagnostics: [],
+      setDiagnostics: (diagnostics) => set({ diagnostics }),
       isReviewMode:
         typeof window !== 'undefined' &&
         (new URLSearchParams(window.location.search).get('mode') === 'review' ||
           new URLSearchParams(window.location.search).get('view') === 'review'),
       isCommandPaletteOpen: false,
       isInspectorOpen: false,
+      isRescuePanelOpen: false,
+      setIsRescuePanelOpen: (isRescuePanelOpen) => set({ isRescuePanelOpen }),
       isFidelityPanelOpen: false,
       isSuggestModalOpen: false,
       isTemplateGalleryOpen: false,
@@ -185,6 +196,7 @@ export const useStore = create<AppState>()(
 
       setDestination: (destination) => set({ destination }),
       setThemeId: (themeId) => set({ themeId }),
+      setActivePreset: (activePresetId) => set({ activePresetId }),
       setBaseFontSize: (baseFontSize) => set({ baseFontSize }),
       setDocumentSignature: (documentSignature) => set({ documentSignature }),
       setCompiledDoc: (compiledDoc) => set({ compiledDoc }),
@@ -406,6 +418,7 @@ export const useStore = create<AppState>()(
         markdown: state.markdown,
         destination: state.destination,
         themeId: state.themeId,
+        activePresetId: state.activePresetId,
         baseFontSize: state.baseFontSize,
         documentSignature: state.documentSignature,
         documents: state.documents,
@@ -416,6 +429,9 @@ export const useStore = create<AppState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
+          if (!state.activePresetId) {
+            state.activePresetId = 'default';
+          }
           if (!state.currentView) {
             state.currentView = state.markdown && state.markdown.trim().length > 0 ? 'workspace' : 'landing';
           }

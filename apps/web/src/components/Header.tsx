@@ -1,13 +1,12 @@
-
 import { useState, useRef, useEffect } from 'react';
 import type { AppState } from '@/App';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { SegmentedControl } from '@/components/interior/segmented-control';
 import { LoadingButton } from '@/components/interior/loading-button';
 import { useStore } from '@/store';
-
-import { exportDocx, copyFormattedDoc, printPdf } from '@/utils/exportHelpers';
+import { exportDocx, copyFormattedDoc, printPdf, downloadHtml } from '@/utils/exportHelpers';
 import { getCommandShortcut } from '@/utils/platform';
+import { analytics } from '@/utils/analytics';
 
 interface HeaderProps {
   appState: AppState;
@@ -38,6 +37,7 @@ export function Header({
   const setIsAboutModalOpen = useStore(state => state.setIsAboutModalOpen);
   const isSidebarOpen = useStore(state => state.isSidebarOpen);
   const toggleSidebar = useStore(state => state.toggleSidebar);
+  const diagnostics = useStore(state => state.diagnostics);
 
   const [isLogoMenuOpen, setIsLogoMenuOpen] = useState(false);
   const [isEyeBlinking, setIsEyeBlinking] = useState(false);
@@ -59,23 +59,76 @@ export function Header({
   const recordSuccessfulExport = useStore(state => state.recordSuccessfulExport);
 
   const handleDownloadDocx = async () => {
-    const success = await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
-    if (success) recordSuccessfulExport();
-    return success;
+    const startTime = Date.now();
+    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
+    analytics.track('export_attempt', { destination: 'word', format: 'docx', hasWarnings });
+    try {
+      const success = await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
+      if (success) {
+        recordSuccessfulExport();
+        analytics.trackExportCompleted('word', 'docx', Date.now() - startTime);
+      } else {
+        analytics.track('export_failure', { destination: 'word', format: 'docx', errorType: 'export_failed' });
+      }
+      return success;
+    } catch (err: any) {
+      analytics.track('export_failure', { destination: 'word', format: 'docx', errorType: err?.message || 'unknown' });
+      return false;
+    }
   };
 
   const handleCopyFormatted = async () => {
-    const success = await copyFormattedDoc(markdown, compiledDoc, destination, activeTheme, documentSignature);
-    if (success) recordSuccessfulExport();
-    return success;
+    const startTime = Date.now();
+    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
+    analytics.track('export_attempt', { destination, format: 'clipboard_html', hasWarnings });
+    try {
+      const success = await copyFormattedDoc(markdown, compiledDoc, destination, activeTheme, documentSignature);
+      if (success) {
+        recordSuccessfulExport();
+        analytics.trackExportCompleted(destination, 'clipboard_html', Date.now() - startTime);
+      } else {
+        analytics.track('export_failure', { destination, format: 'clipboard_html', errorType: 'copy_failed' });
+      }
+      return success;
+    } catch (err: any) {
+      analytics.track('export_failure', { destination, format: 'clipboard_html', errorType: err?.message || 'unknown' });
+      return false;
+    }
+  };
+
+  const handleDownloadHtml = async () => {
+    const startTime = Date.now();
+    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
+    analytics.track('export_attempt', { destination: 'html', format: 'html', hasWarnings });
+    try {
+      const success = await downloadHtml(markdown, compiledDoc, activeTheme, activeDocTitle);
+      if (success) {
+        recordSuccessfulExport();
+        analytics.trackExportCompleted('html', 'html', Date.now() - startTime);
+      } else {
+        analytics.track('export_failure', { destination: 'html', format: 'html', errorType: 'html_failed' });
+      }
+      return success;
+    } catch (err: any) {
+      analytics.track('export_failure', { destination: 'html', format: 'html', errorType: err?.message || 'unknown' });
+      return false;
+    }
   };
 
   const handlePrintPdf = () => {
+    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
+    analytics.track('export_attempt', { destination: 'pdf', format: 'pdf', hasWarnings });
     printPdf();
     recordSuccessfulExport();
+    analytics.trackExportCompleted('pdf', 'pdf', 0);
   };
 
+  const isHtmlRoute = typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('markdown-to-html');
+
   const primaryAction = async () => {
+    if (isHtmlRoute && destination === 'clipboard') {
+      return await handleDownloadHtml();
+    }
     switch (destination) {
       case 'google-docs':
       case 'clipboard':
@@ -89,6 +142,9 @@ export function Header({
   };
 
   const primaryLabel = () => {
+    if (isHtmlRoute && destination === 'clipboard') {
+      return 'Download .html';
+    }
     switch (destination) {
       case 'google-docs': return 'Copy for Google Docs';
       case 'clipboard': return 'Copy formatted';
@@ -98,6 +154,9 @@ export function Header({
   };
 
   const primaryIcon = () => {
+    if (isHtmlRoute && destination === 'clipboard') {
+      return 'code';
+    }
     switch (destination) {
       case 'google-docs':
       case 'clipboard':
@@ -156,14 +215,15 @@ export function Header({
 
               {/* Glassmorphic Logo Dropdown */}
               {isLogoMenuOpen && (
-                <div className="absolute left-0 top-full mt-2 w-64 rounded-xl bg-surface/95 dark:bg-surface-container-high/95 backdrop-blur-xl border border-outline-variant/60 shadow-xl py-1.5 text-xs text-on-surface z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-1.5 border-b border-outline-variant/30 mb-1">
-                    <div className="font-semibold text-on-surface text-[12px] flex items-center justify-between">
-                      <span>mdtodocs workspace</span>
-                      <span className="text-[10px] text-outline font-mono">v1.0</span>
-                    </div>
+                <div className="absolute left-0 top-full mt-2 w-64 rounded-xl bg-surface/95 dark:bg-surface-container-high/95 backdrop-blur-xl border border-outline-variant/60 shadow-xl p-1.5 z-50 text-xs text-on-surface animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-2 border-b border-outline-variant/30 mb-1">
+                    <div className="font-semibold text-on-surface text-[13px]">mdtodocs</div>
+                    <div className="text-[11px] text-outline mt-0.5">Markdown to Google Docs, Word &amp; PDF</div>
                     {appState === 'WORKSPACE' && (
-                      <div className="text-[10px] text-outline truncate mt-0.5">{activeDocTitle}</div>
+                      <div className="text-[10px] text-primary font-mono mt-1 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                        <span>Active Document Session</span>
+                      </div>
                     )}
                   </div>
 
@@ -218,10 +278,6 @@ export function Header({
                   </button>
 
                   <div className="my-1 border-t border-outline-variant/30" />
-
-                  {/* <div className="px-3 py-1.5 flex items-center justify-between text-[10px] text-outline font-mono">
-                    <span>© Yours truly DC</span>
-                  </div> */}
                 </div>
               )}
             </div>
@@ -257,11 +313,11 @@ export function Header({
 
       {appState === 'WORKSPACE' && (
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Commands Trigger (No Templates, No Reconcile clutter) */}
+          {/* Commands Trigger */}
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-code-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border border-outline-variant/30"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-code-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border border-outline-variant/30 cursor-pointer"
             title="Open Command Palette (Cmd+K / Ctrl+K)"
           >
             <span className="material-symbols-outlined text-[15px]">search</span>
@@ -276,7 +332,7 @@ export function Header({
             <button
               type="button"
               onClick={() => useStore.getState().setIsSuggestModalOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border border-outline-variant/30"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border border-outline-variant/30 cursor-pointer"
               title="Suggest an edit or feedback"
             >
               <span className="material-symbols-outlined text-[15px]">rate_review</span>
@@ -287,25 +343,32 @@ export function Header({
           {/* Destination Selector */}
           <SegmentedControl
             options={[
-              { value: 'google-docs', label: 'Google Docs' },
-              { value: 'word', label: 'Word' },
-              { value: 'pdf', label: 'PDF' },
-              { value: 'clipboard', label: 'Copy' },
+              { value: 'google-docs', label: 'Google Docs', shortLabel: 'Docs' },
+              { value: 'word', label: 'Word', shortLabel: 'Word' },
+              { value: 'pdf', label: 'PDF', shortLabel: 'PDF' },
+              { value: 'clipboard', label: 'Copy', shortLabel: 'Copy' },
             ]}
             label="Destination"
             value={destination}
-            onValueChange={(val) => onDestinationChange(val as DestinationType)}
+            onValueChange={(val) => {
+              analytics.track('destination_change', { from: destination, to: val });
+              onDestinationChange(val as DestinationType);
+            }}
           />
 
-          {/* Primary Action - decoupled stable min-width to prevent layout shifts */}
+          {/* Primary Action Button */}
           <LoadingButton
             onAction={primaryAction}
-            successLabel="Copied!"
-            pendingLabel={destination === 'word' ? 'Compiling...' : 'Copying...'}
+            destination={destination}
+            successLabel={destination === 'word' ? 'Downloaded!' : destination === 'pdf' ? 'Printed!' : 'Copied!'}
+            pendingLabel={destination === 'word' ? 'Compiling...' : destination === 'pdf' ? 'Preparing...' : 'Copying...'}
             idleIcon={<span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>}
-            className="min-w-[145px]"
+            className="min-w-fit px-2.5 sm:px-3 sm:min-w-[145px]"
           >
-            {primaryLabel() ?? 'Export'}
+            <span className="hidden sm:inline">{primaryLabel() ?? 'Export'}</span>
+            <span className="inline sm:hidden">
+              {destination === 'google-docs' ? 'Copy Docs' : destination === 'word' ? 'Export' : destination === 'pdf' ? 'Print' : 'Copy'}
+            </span>
           </LoadingButton>
 
           {/* Reading View Button with Eye Blink Micro-Interaction */}

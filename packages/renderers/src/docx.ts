@@ -21,6 +21,7 @@ import {
   LevelFormat,
   ImageRun,
   Footer,
+  PageBreak,
 } from 'docx';
 
 function parseDataUri(dataUri: string): { type: 'png' | 'jpg' | 'gif' | 'bmp' | 'svg', data: Uint8Array } {
@@ -530,8 +531,37 @@ const docxRegistry: RendererRegistry<DocxNode[]> = {
       })
     ],
     break: () => [new TextRun({ break: 1 })],
+    html: (block: any, ctx) => {
+      const text = block.value || '';
+      if (!text.trim()) return [];
+      const isPageBreak = block.data?.isPageBreak ||
+        /<!--\s*page-?break\s*-->/i.test(text) ||
+        /<div\s+class=["'](?:page-?break)["']\s*>\s*<\/div>/i.test(text) ||
+        text === '\\pagebreak';
+      if (isPageBreak) {
+        return [new DocxParagraph({ children: [new PageBreak()] })];
+      }
+      const codeFont = extractFirstFont(ctx.theme.typography.codeFont);
+      const sizeHalfPts = (ctx.theme.typography.baseFontSizePt - 1) * 2;
+      return [
+        new DocxParagraph({
+          children: [new TextRun({ text, font: codeFont, size: sizeHalfPts })],
+          style: 'CodeBlock',
+          shading: { type: ShadingType.CLEAR, color: 'auto', fill: ctx.theme.colors.codeBackground },
+          spacing: { before: 60, after: 60 },
+        })
+      ];
+    },
   },
-  fallbackNode: () => []
+  fallbackNode: (node: any, ctx) => {
+    if (node.value && typeof node.value === 'string') {
+      return [new DocxParagraph({ children: [new TextRun({ text: node.value })] })];
+    }
+    if (Array.isArray(node.children)) {
+      return ctx.renderNodes(node.children).flat();
+    }
+    return [];
+  }
 };
 
 const docxRenderer = new DocumentRenderer<DocxNode[]>(docxRegistry);

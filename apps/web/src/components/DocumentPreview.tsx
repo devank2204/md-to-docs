@@ -20,7 +20,6 @@ interface DocumentPreviewProps {
   isReviewMode?: boolean;
 }
 
-
 // Rehype plugin to wrap headings and their section content into collapsible <details>
 function groupHeadings(children: any[]): any[] {
   const result: any[] = [];
@@ -59,16 +58,15 @@ function groupHeadings(children: any[]): any[] {
             tagName: 'summary',
             properties: {
               className: [
-                'collapsible-heading-summary',
                 'cursor-pointer',
-                'list-none',
+                'select-none',
                 'flex',
                 'items-center',
-                'gap-2',
-                'select-none',
-                'py-1',
-                'group-hover/sec:text-primary',
-                'transition-colors',
+                'gap-1.5',
+                'list-none',
+                '[&::-webkit-details-marker]:hidden',
+                'hover:opacity-80',
+                'transition-opacity',
               ],
             },
             children: [
@@ -156,11 +154,10 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
       className={
         isReviewMode
           ? 'w-full flex flex-col items-center relative overflow-visible bg-transparent'
-          : `col-span-12 md:col-span-7 lg:col-span-8 ${isDark ? 'bg-[#0f172a]' : 'bg-[#f1f3f5]'} flex flex-col p-space-md relative h-auto min-h-[600px] md:h-full md:min-h-0 overflow-hidden`
+          : `w-full ${isDark ? 'bg-[#0f172a]' : 'bg-[#f1f3f5]'} flex flex-col p-1.5 sm:p-space-md relative h-full min-h-0 overflow-hidden`
       }
     >
-
-      <div className="flex-1 flex justify-center items-start p-space-lg overflow-y-auto min-h-0">
+      <div className="flex-1 flex justify-center items-start p-1.5 sm:p-space-md md:p-space-lg overflow-y-auto overflow-x-hidden min-h-0 w-full">
         <div
           style={{
             transform: `scale(${zoom / 100})`,
@@ -170,7 +167,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             borderColor: isDark ? '#374151' : '#e5e7eb',
             fontSize: `${baseFontSize}pt`,
           }}
-          className={`w-full max-w-[816px] min-w-0 transition-all duration-300 p-space-xxl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_28px_-4px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] rounded-sm flex flex-col h-auto min-h-[1056px] relative border box-border break-words [overflow-wrap:anywhere] mb-space-xxl ${
+          className={`w-full max-w-[816px] min-w-0 transition-all duration-300 p-4 sm:p-space-md md:p-space-xxl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_28px_-4px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] rounded-sm flex flex-col h-auto min-h-[1056px] relative border box-border break-words [overflow-wrap:anywhere] mb-space-xxl ${
             isDark ? 'prose prose-invert' : 'prose prose-slate'
           }`}
         >
@@ -192,109 +189,109 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
                 rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], rehypeCollapsibleHeadings]}
-              components={{
-                p({ children, ...props }: any) {
-                  return (
-                    <p className="break-words [overflow-wrap:anywhere] leading-relaxed my-3" {...props}>
-                      {children}
-                    </p>
-                  );
-                },
-                table({ children, ...props }: any) {
-                  return (
-                    <InteractiveTable {...props}>
-                      {children}
-                    </InteractiveTable>
-                  );
-                },
-                th({ children, ...props }: any) {
-                  return (
-                    <th className="p-2.5 bg-surface-container-low font-semibold border border-outline-variant/30 break-words align-top text-on-surface" {...props}>
-                      {children}
-                    </th>
-                  );
-                },
-                td({ children, ...props }: any) {
-                  return (
-                    <td className="p-2.5 border border-outline-variant/20 break-words align-top text-on-surface" {...props}>
-                      {children}
-                    </td>
-                  );
-                },
-                pre({ children, ...props }: any) {
-                  const child = Array.isArray(children) ? children[0] : children;
-                  const className = child?.props?.className || '';
-                  if (typeof className === 'string' && className.includes('language-mermaid')) {
-                    return <>{children}</>;
-                  }
-
-                  const rawCode = typeof child?.props?.children === 'string'
-                    ? child.props.children
-                    : Array.isArray(child?.props?.children)
-                    ? child.props.children.map((c: any) => typeof c === 'string' ? c : '').join('')
-                    : '';
-
-                  return (
-                    <InteractiveCodeBlock className={className} rawCode={rawCode} {...props}>
-                      {children}
-                    </InteractiveCodeBlock>
-                  );
-                },
-                img({ src, alt, ...props }: any) {
-                  return (
-                    <img
-                      src={src}
-                      alt={alt || ''}
-                      className="max-w-full h-auto rounded my-4 mx-auto block shadow-xs"
-                      loading="lazy"
-                      {...props}
-                    />
-                  );
-                },
-                code({ inline, className, children, ...props }: any) {
-                  const match = /language-(\w+)/.exec(className || '');
-                  if (!inline && match && match[1] === 'mermaid') {
-                    return <MermaidDiagram code={String(children).replace(/\n$/, '')} />;
-                  }
-                  return <code className={`${className || ''} break-words`} {...props}>{children}</code>;
-                },
-                ul({ node, children, ...props }: any) {
-                  const isPolyfill = (node as any)?.data?.polyfill === 'table-to-list';
-                  if (isPolyfill) {
+                components={{
+                  p({ children, ...props }: any) {
                     return (
-                      <div className="my-4 border border-outline-variant/40 rounded bg-surface-container-low/40 p-3 not-prose">
-                        <div className="flex items-center gap-1.5 font-code-sm text-[11px] text-secondary mb-2 select-none border-b border-outline-variant/20 pb-1.5">
-                          <span className="material-symbols-outlined text-[14px] text-primary">swap_horiz</span>
-                          <span className="font-semibold uppercase tracking-wider text-on-surface">Linearized Table</span>
-                          <span className="text-outline">·</span>
-                          <span>Adapted for {destination === 'word' ? 'Word' : 'Google Docs'} layout limits</span>
+                      <p className="break-words [overflow-wrap:anywhere] leading-relaxed my-3" {...props}>
+                        {children}
+                      </p>
+                    );
+                  },
+                  table({ children, ...props }: any) {
+                    return (
+                      <InteractiveTable {...props}>
+                        {children}
+                      </InteractiveTable>
+                    );
+                  },
+                  th({ children, ...props }: any) {
+                    return (
+                      <th className="p-2.5 bg-surface-container-low font-semibold border border-outline-variant/30 break-words align-top text-on-surface" {...props}>
+                        {children}
+                      </th>
+                    );
+                  },
+                  td({ children, ...props }: any) {
+                    return (
+                      <td className="p-2.5 border border-outline-variant/20 break-words align-top text-on-surface" {...props}>
+                        {children}
+                      </td>
+                    );
+                  },
+                  pre({ children, ...props }: any) {
+                    const child = Array.isArray(children) ? children[0] : children;
+                    const className = child?.props?.className || '';
+                    if (typeof className === 'string' && className.includes('language-mermaid')) {
+                      return <>{children}</>;
+                    }
+
+                    const rawCode = typeof child?.props?.children === 'string'
+                      ? child.props.children
+                      : Array.isArray(child?.props?.children)
+                      ? child.props.children.map((c: any) => typeof c === 'string' ? c : '').join('')
+                      : '';
+
+                    return (
+                      <InteractiveCodeBlock className={className} rawCode={rawCode} {...props}>
+                        {children}
+                      </InteractiveCodeBlock>
+                    );
+                  },
+                  img({ src, alt, ...props }: any) {
+                    return (
+                      <img
+                        src={src}
+                        alt={alt || ''}
+                        className="max-w-full h-auto rounded my-4 mx-auto block shadow-xs"
+                        loading="lazy"
+                        {...props}
+                      />
+                    );
+                  },
+                  code({ inline, className, children, ...props }: any) {
+                    const match = /language-(\w+)/.exec(className || '');
+                    if (!inline && match && match[1] === 'mermaid') {
+                      return <MermaidDiagram code={String(children).replace(/\n$/, '')} />;
+                    }
+                    return <code className={`${className || ''} break-words`} {...props}>{children}</code>;
+                  },
+                  ul({ node, children, ...props }: any) {
+                    const isPolyfill = (node as any)?.data?.polyfill === 'table-to-list';
+                    if (isPolyfill) {
+                      return (
+                        <div className="my-4 border border-outline-variant/40 rounded bg-surface-container-low/40 p-3 not-prose">
+                          <div className="flex items-center gap-1.5 font-code-sm text-[11px] text-secondary mb-2 select-none border-b border-outline-variant/20 pb-1.5">
+                            <span className="material-symbols-outlined text-[14px] text-primary">swap_horiz</span>
+                            <span className="font-semibold uppercase tracking-wider text-on-surface">Linearized Table</span>
+                            <span className="text-outline">·</span>
+                            <span>Adapted for {destination === 'word' ? 'Word' : 'Google Docs'} layout limits</span>
+                          </div>
+                          <ul {...props} className="pl-6 list-disc space-y-1 font-serif text-[15px]">{children}</ul>
                         </div>
-                        <ul {...props} className="pl-6 list-disc space-y-1 font-serif text-[15px]">{children}</ul>
-                      </div>
-                    );
+                      );
+                    }
+                    return <ul {...props}>{children}</ul>;
+                  },
+                  a({ node, children, ...props }: any) {
+                    const isPolyfill = (node as any)?.data?.polyfill === 'image-to-link';
+                    if (isPolyfill) {
+                      return (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-high text-code-sm font-code-sm text-primary break-all">
+                          <span className="material-symbols-outlined text-[13px]">link</span>
+                          <a {...props} className="underline hover:text-primary-focus break-all">{children}</a>
+                          <span className="text-secondary text-[10px]">(image fallback)</span>
+                        </span>
+                      );
+                    }
+                    return <a {...props} className="break-words underline hover:text-primary transition-colors">{children}</a>;
                   }
-                  return <ul {...props}>{children}</ul>;
-                },
-                a({ node, children, ...props }: any) {
-                  const isPolyfill = (node as any)?.data?.polyfill === 'image-to-link';
-                  if (isPolyfill) {
-                    return (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-high text-code-sm font-code-sm text-primary break-all">
-                        <span className="material-symbols-outlined text-[13px]">link</span>
-                        <a {...props} className="underline hover:text-primary-focus break-all">{children}</a>
-                        <span className="text-secondary text-[10px]">(image fallback)</span>
-                      </span>
-                    );
-                  }
-                  return <a {...props} className="break-words underline hover:text-primary transition-colors">{children}</a>;
-                }
-              }}
-            >
-              {markdown}
-            </ReactMarkdown>
-          </div>
-        )}
-      </div>
+                }}
+              >
+                {markdown}
+              </ReactMarkdown>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Floating Canvas Zoom Control (beside document page) */}
