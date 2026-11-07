@@ -7,6 +7,7 @@ import { useStore } from '@/store';
 import { exportDocx, copyFormattedDoc, printPdf, downloadHtml } from '@/utils/exportHelpers';
 import { getCommandShortcut } from '@/utils/platform';
 import { analytics } from '@/utils/analytics';
+import { BrandWordmark } from './BrandWordmark';
 
 interface HeaderProps {
   appState: AppState;
@@ -199,11 +200,7 @@ export function Header({
                 aria-haspopup="true"
               >
                 <div className="flex items-center gap-space-sm">
-                  <img src="/mark.png" alt="Logo" className="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
-                  <div className="flex items-baseline gap-space-xxs mt-0.5">
-                    <span className="font-code-lg text-code-lg font-semibold tracking-tighter text-on-surface">mdtodocs</span>
-                    <span className="font-code-sm text-code-sm text-outline font-normal">.com</span>
-                  </div>
+                  <BrandWordmark />
                   <span
                     className="material-symbols-outlined text-[15px] text-outline group-hover:text-on-surface transition-transform duration-200"
                     style={{ transform: isLogoMenuOpen ? 'rotate(180deg)' : 'none' }}

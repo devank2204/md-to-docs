@@ -379,9 +379,7 @@ details.collapsible-section > summary > h6 {
 .mobile-workspace button, .workspace-sheet button, .workspace-sheet a { min-height: 44px; cursor: pointer; touch-action: manipulation; }
 .mobile-workspace button:disabled { cursor: default; opacity: .45; }
 .mobile-header { min-height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 12px; border-bottom: 1px solid var(--mobile-line); flex-shrink: 0; }
-.mobile-brand { display: flex; align-items: center; gap: 9px; font-size: 19px; font-weight: 650; letter-spacing: -.7px; text-decoration: none; min-height: 44px; }
-.mobile-brand img { width: 28px; height: 28px; }
-.brand-dot { color: #7c8066; }
+.mobile-brand { display: flex; align-items: center; text-decoration: none; min-height: 44px; }
 .mobile-menu { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 550; }
 .mobile-menu .material-symbols-outlined { font-size: 21px; }
 .mobile-document-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 16px; min-height: 44px; flex-shrink: 0; font-size: 12px; color: var(--mobile-muted); }
@@ -392,11 +390,8 @@ details.collapsible-section > summary > h6 {
 .tab-dot { width: 5px; height: 5px; border-radius: 50%; background: #87916f; }
 .mobile-edit-panel { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 16px; overflow-y: auto; }
 .mobile-edit-panel[hidden], .mobile-preview-panel[hidden] { display: none; }
-.mobile-intro { padding: 24px 0 18px; flex-shrink: 0; }
-.mobile-eyebrow { font-size: 9px; letter-spacing: 1.5px; font-weight: 600; color: #666b61; margin-bottom: 12px; }
-.mobile-intro h1 { font-family: Newsreader, Georgia, serif; font-weight: 450; font-size: clamp(34px, 8vw, 48px); letter-spacing: -1.3px; line-height: 1.04; margin: 0 0 12px; }
-.mobile-intro h1 em { color: #6d7657; font-weight: 400; }
-.mobile-intro > p:last-child { font-size: 13px; line-height: 1.6; color: var(--mobile-muted); max-width: 33em; }
+.mobile-intro { padding: 24px 0 0; flex-shrink: 0; }
+.mobile-intro > div { margin-bottom: 8px; }
 .mobile-input-actions { display: flex; gap: 8px; padding: 12px 0; flex-shrink: 0; }
 .mobile-input-actions button { display: flex; align-items: center; justify-content: center; gap: 7px; flex: 1; border: 1px solid var(--mobile-line); border-radius: 8px; background: #fff; font-size: 12px; font-weight: 550; }
 .mobile-input-actions button:first-child { background: #eeefe7; border-color: #d9dccd; }
@@ -453,7 +448,7 @@ details.collapsible-section > summary > h6 {
 .sheet-options label { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
 .sheet-options input, .sheet-options select { width: 100%; min-height: 44px; border: 1px solid #d3d6cb; border-radius: 6px; padding: 8px 12px; font-size: 16px; background: white; color: #242622; }
 .sheet-notes p { padding: 10px 0; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
-@media (max-height: 700px) { .mobile-intro { padding-top: 14px; padding-bottom: 6px; } .mobile-intro h1 { font-size: 32px; } .mobile-intro > p:last-child { font-size: 12px; } }
+@media (max-height: 700px) { .mobile-intro { padding-top: 14px; } }
 @media (prefers-reduced-motion: reduce) { .mobile-workspace *, .workspace-sheet * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 @media print {
   .mobile-app, .mobile-main, .mobile-workspace, .mobile-preview-panel, .mobile-preview-panel > div, .mobile-preview-panel [data-preview-pane] > div { height: auto !important; min-height: 0 !important; overflow: visible !important; display: block !important; padding: 0 !important; }

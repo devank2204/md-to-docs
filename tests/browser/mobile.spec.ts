@@ -28,7 +28,7 @@ test('first character keeps input mounted and focused; no automatic library over
 }) => {
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: /Markdown in/ }),
+    page.getByRole('heading', { name: 'Markdown to Docs', exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   const editor = page.getByRole('textbox', { name: 'Markdown text' });

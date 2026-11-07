@@ -8,6 +8,8 @@ import type { DestinationType } from '@mdtodocs/capability-graph';
 import { useStore } from '@/store';
 import { DocumentPreview } from './DocumentPreview';
 import { MobileExportBar } from './MobileExportBar';
+import { HomeIntroduction } from './HomeIntroduction';
+import { BrandWordmark } from './BrandWordmark';
 import { MobileWorkspaceSheets } from './MobileWorkspaceSheets';
 import type { MobileSheet } from '@/utils/mobileDestinations';
 import { useDocumentExport } from '@/hooks/useDocumentExport';
@@ -225,10 +227,7 @@ export function MobileWorkspace(props: Props) {
     <div className={`mobile-workspace ${keyboardOpen ? 'keyboard-open' : ''}`}>
       <header className="mobile-header" data-print-hide>
         <a href="/" aria-label="mdtodocs home" className="mobile-brand">
-          <img src="/mark.png" alt="" />
-          <span>
-            mdtodocs<span className="brand-dot">.</span>
-          </span>
+          <BrandWordmark />
         </a>
         <button
           type="button"
@@ -306,18 +305,7 @@ export function MobileWorkspace(props: Props) {
       >
         {!hasContent && (
           <div className="mobile-intro">
-            <p className="mobile-eyebrow">
-              FROM TEXT TO SOMETHING YOU CAN SEND
-            </p>
-            <h1>
-              Markdown in.
-              <br />
-              <em>Document out.</em>
-            </h1>
-            <p>
-              Bring text from your AI chat, notes, or a Markdown file. We’ll
-              take care of the formatting.
-            </p>
+            <HomeIntroduction />
           </div>
         )}
         <div className="mobile-input-actions">
