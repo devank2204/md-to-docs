@@ -135,7 +135,8 @@ async function executeFixture(dir: string, fixturePath: string): Promise<Fixture
 
   let markdown = '';
   try {
-    markdown = await fs.readFile(inputPath, 'utf-8');
+    // Canonicalize fixture input so AST offsets and code values match on every OS.
+    markdown = (await fs.readFile(inputPath, 'utf-8')).replace(/\r\n?/g, '\n');
   } catch (err: any) {
     failures.push({
       fixture: dir,

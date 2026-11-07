@@ -57,7 +57,7 @@
         },
         {
           "type": "text",
-          "value": ".\r\nThis is some ",
+          "value": ".\nThis is some ",
           "position": {
             "start": {
               "line": 1,
@@ -67,7 +67,7 @@
             "end": {
               "line": 2,
               "column": 14,
-              "offset": 54
+              "offset": 53
             }
           }
         },
@@ -78,12 +78,12 @@
             "start": {
               "line": 2,
               "column": 14,
-              "offset": 54
+              "offset": 53
             },
             "end": {
               "line": 2,
               "column": 27,
-              "offset": 67
+              "offset": 66
             }
           }
         },
@@ -94,12 +94,12 @@
             "start": {
               "line": 2,
               "column": 27,
-              "offset": 67
+              "offset": 66
             },
             "end": {
               "line": 2,
               "column": 39,
-              "offset": 79
+              "offset": 78
             }
           }
         }
@@ -113,7 +113,7 @@
         "end": {
           "line": 2,
           "column": 39,
-          "offset": 79
+          "offset": 78
         }
       }
     }
@@ -127,7 +127,7 @@
     "end": {
       "line": 3,
       "column": 1,
-      "offset": 81
+      "offset": 79
     }
   }
 }

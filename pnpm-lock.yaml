@@ -20,6 +20,10 @@ importers:
       unist-util-visit:
         specifier: ^5.1.0
         version: 5.1.0
+    devDependencies:
+      tsx:
+        specifier: 4.23.15
+        version: 4.23.15
 
   apps/api:
     dependencies:

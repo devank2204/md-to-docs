@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, v1]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, v1]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,7 +18,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        node-version: [20.x]
 
     steps:
       - name: Checkout Repository
@@ -26,20 +25,18 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v3
-        with:
-          version: 9
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Typecheck & Build Monorepo
-        run: pnpm -r build
+      - name: Typecheck, Build & Prerender Monorepo
+        run: pnpm build
 
       - name: Run Validation Unit Tests (Vitest)
         run: pnpm --filter @mdtodocs/validation test

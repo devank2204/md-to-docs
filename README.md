@@ -31,12 +31,28 @@ The repository is built as a strict monorepo containing individual, decoupled pa
 
 ## Local Development
 
-```bash
-# Install dependencies
-pnpm install
+Requires Node.js 24.15.0 or newer within the 24.x release line and pnpm 9.15.9.
+The locked Vitest and jsdom versions do not support Node.js 20.
 
-# Run the test suite
+```bash
+# Select Node.js 24 and activate the pinned pnpm version
+nvm install
+nvm use
+corepack enable
+corepack prepare pnpm@9.15.9 --activate
+
+# Install dependencies
+pnpm install --frozen-lockfile
+
+# Build all packages and prerender pages required by validation tests
+pnpm build
+
+# Run validation and fidelity regression tests
+pnpm --filter @mdtodocs/validation test
 pnpm test
+
+# Lint the web application
+pnpm --filter web lint
 
 # Start the local development web server
 pnpm dev

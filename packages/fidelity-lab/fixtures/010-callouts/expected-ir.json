@@ -9,7 +9,7 @@
           "children": [
             {
               "type": "text",
-              "value": "[!NOTE]\r\nThis is important background information that the reader should be aware of.",
+              "value": "[!NOTE]\nThis is important background information that the reader should be aware of.",
               "position": {
                 "start": {
                   "line": 1,
@@ -19,7 +19,7 @@
                 "end": {
                   "line": 2,
                   "column": 79,
-                  "offset": 89
+                  "offset": 88
                 }
               }
             }
@@ -33,7 +33,7 @@
             "end": {
               "line": 2,
               "column": 79,
-              "offset": 89
+              "offset": 88
             }
           }
         }
@@ -47,7 +47,7 @@
         "end": {
           "line": 2,
           "column": 79,
-          "offset": 89
+          "offset": 88
         }
       }
     },
@@ -59,17 +59,17 @@
           "children": [
             {
               "type": "text",
-              "value": "[!WARNING]\r\nNever commit API keys or secrets to version control.",
+              "value": "[!WARNING]\nNever commit API keys or secrets to version control.",
               "position": {
                 "start": {
                   "line": 4,
                   "column": 3,
-                  "offset": 95
+                  "offset": 92
                 },
                 "end": {
                   "line": 5,
                   "column": 55,
-                  "offset": 161
+                  "offset": 157
                 }
               }
             }
@@ -78,12 +78,12 @@
             "start": {
               "line": 4,
               "column": 3,
-              "offset": 95
+              "offset": 92
             },
             "end": {
               "line": 5,
               "column": 55,
-              "offset": 161
+              "offset": 157
             }
           }
         }
@@ -92,12 +92,12 @@
         "start": {
           "line": 4,
           "column": 1,
-          "offset": 93
+          "offset": 90
         },
         "end": {
           "line": 5,
           "column": 55,
-          "offset": 161
+          "offset": 157
         }
       }
     },
@@ -109,17 +109,17 @@
           "children": [
             {
               "type": "text",
-              "value": "[!TIP]\r\nUse environment variables for configuration that changes between deployments.",
+              "value": "[!TIP]\nUse environment variables for configuration that changes between deployments.",
               "position": {
                 "start": {
                   "line": 7,
                   "column": 3,
-                  "offset": 167
+                  "offset": 161
                 },
                 "end": {
                   "line": 8,
                   "column": 80,
-                  "offset": 254
+                  "offset": 247
                 }
               }
             }
@@ -128,12 +128,12 @@
             "start": {
               "line": 7,
               "column": 3,
-              "offset": 167
+              "offset": 161
             },
             "end": {
               "line": 8,
               "column": 80,
-              "offset": 254
+              "offset": 247
             }
           }
         }
@@ -142,12 +142,12 @@
         "start": {
           "line": 7,
           "column": 1,
-          "offset": 165
+          "offset": 159
         },
         "end": {
           "line": 8,
           "column": 80,
-          "offset": 254
+          "offset": 247
         }
       }
     },
@@ -159,17 +159,17 @@
           "children": [
             {
               "type": "text",
-              "value": "[!CAUTION]\r\nThis operation will permanently delete all user data. There is no undo.",
+              "value": "[!CAUTION]\nThis operation will permanently delete all user data. There is no undo.",
               "position": {
                 "start": {
                   "line": 10,
                   "column": 3,
-                  "offset": 260
+                  "offset": 251
                 },
                 "end": {
                   "line": 11,
                   "column": 74,
-                  "offset": 345
+                  "offset": 335
                 }
               }
             }
@@ -178,12 +178,12 @@
             "start": {
               "line": 10,
               "column": 3,
-              "offset": 260
+              "offset": 251
             },
             "end": {
               "line": 11,
               "column": 74,
-              "offset": 345
+              "offset": 335
             }
           }
         }
@@ -192,12 +192,12 @@
         "start": {
           "line": 10,
           "column": 1,
-          "offset": 258
+          "offset": 249
         },
         "end": {
           "line": 11,
           "column": 74,
-          "offset": 345
+          "offset": 335
         }
       }
     },
@@ -209,17 +209,17 @@
           "children": [
             {
               "type": "text",
-              "value": "[!IMPORTANT]\r\nAll API endpoints require authentication after v2.0.",
+              "value": "[!IMPORTANT]\nAll API endpoints require authentication after v2.0.",
               "position": {
                 "start": {
                   "line": 13,
                   "column": 3,
-                  "offset": 351
+                  "offset": 339
                 },
                 "end": {
                   "line": 14,
                   "column": 55,
-                  "offset": 419
+                  "offset": 406
                 }
               }
             }
@@ -228,12 +228,12 @@
             "start": {
               "line": 13,
               "column": 3,
-              "offset": 351
+              "offset": 339
             },
             "end": {
               "line": 14,
               "column": 55,
-              "offset": 419
+              "offset": 406
             }
           }
         }
@@ -242,12 +242,12 @@
         "start": {
           "line": 13,
           "column": 1,
-          "offset": 349
+          "offset": 337
         },
         "end": {
           "line": 14,
           "column": 55,
-          "offset": 419
+          "offset": 406
         }
       }
     },
@@ -267,12 +267,12 @@
                     "start": {
                       "line": 16,
                       "column": 5,
-                      "offset": 427
+                      "offset": 412
                     },
                     "end": {
                       "line": 16,
                       "column": 13,
-                      "offset": 435
+                      "offset": 420
                     }
                   }
                 }
@@ -281,12 +281,12 @@
                 "start": {
                   "line": 16,
                   "column": 3,
-                  "offset": 425
+                  "offset": 410
                 },
                 "end": {
                   "line": 16,
                   "column": 15,
-                  "offset": 437
+                  "offset": 422
                 }
               }
             },
@@ -297,12 +297,12 @@
                 "start": {
                   "line": 16,
                   "column": 15,
-                  "offset": 437
+                  "offset": 422
                 },
                 "end": {
                   "line": 16,
                   "column": 80,
-                  "offset": 502
+                  "offset": 487
                 }
               }
             }
@@ -311,12 +311,12 @@
             "start": {
               "line": 16,
               "column": 3,
-              "offset": 425
+              "offset": 410
             },
             "end": {
               "line": 16,
               "column": 80,
-              "offset": 502
+              "offset": 487
             }
           }
         }
@@ -325,12 +325,12 @@
         "start": {
           "line": 16,
           "column": 1,
-          "offset": 423
+          "offset": 408
         },
         "end": {
           "line": 16,
           "column": 80,
-          "offset": 502
+          "offset": 487
         }
       }
     },
@@ -350,12 +350,12 @@
                     "start": {
                       "line": 18,
                       "column": 5,
-                      "offset": 510
+                      "offset": 493
                     },
                     "end": {
                       "line": 18,
                       "column": 10,
-                      "offset": 515
+                      "offset": 498
                     }
                   }
                 }
@@ -364,12 +364,12 @@
                 "start": {
                   "line": 18,
                   "column": 3,
-                  "offset": 508
+                  "offset": 491
                 },
                 "end": {
                   "line": 18,
                   "column": 12,
-                  "offset": 517
+                  "offset": 500
                 }
               }
             },
@@ -380,12 +380,12 @@
                 "start": {
                   "line": 18,
                   "column": 12,
-                  "offset": 517
+                  "offset": 500
                 },
                 "end": {
                   "line": 18,
                   "column": 67,
-                  "offset": 572
+                  "offset": 555
                 }
               }
             }
@@ -394,12 +394,12 @@
             "start": {
               "line": 18,
               "column": 3,
-              "offset": 508
+              "offset": 491
             },
             "end": {
               "line": 18,
               "column": 67,
-              "offset": 572
+              "offset": 555
             }
           }
         }
@@ -408,12 +408,12 @@
         "start": {
           "line": 18,
           "column": 1,
-          "offset": 506
+          "offset": 489
         },
         "end": {
           "line": 18,
           "column": 67,
-          "offset": 572
+          "offset": 555
         }
       }
     }
@@ -427,7 +427,7 @@
     "end": {
       "line": 19,
       "column": 1,
-      "offset": 574
+      "offset": 556
     }
   }
 }
