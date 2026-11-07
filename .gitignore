@@ -2,3 +2,7 @@ node_modules/
 dist/
 build/
 .DS_Store
+
+# gstack machine state and generated host adapters (rebuild with scripts/setup-gstack.sh)
+.gstack/
+.agents/skills/gstack-*

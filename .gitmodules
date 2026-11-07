@@ -1,0 +1,3 @@
+[submodule ".agents/skills/gstack"]
+	path = .agents/skills/gstack
+	url = https://github.com/garrytan/gstack.git
