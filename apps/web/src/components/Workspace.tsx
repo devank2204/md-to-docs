@@ -22,9 +22,11 @@ import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
 import { SuggestEditModal } from '@/components/SuggestEditModal';
 import { WorkspaceSidebar } from '@/components/WorkspaceSidebar';
+import { MobileWorkspace } from './MobileWorkspace';
 
 
 interface WorkspaceProps {
+  isMobile?: boolean;
   markdown: string;
   onInput: (markdown: string) => void;
   destination: DestinationType;
@@ -125,6 +127,7 @@ function formatStats(stats: DocumentStats): string {
 
 
 export function Workspace({
+  isMobile = false,
   markdown,
   onInput,
   destination,
@@ -144,19 +147,23 @@ export function Workspace({
   const isReviewMode = useStore(state => state.isReviewMode);
   const setCompiledDoc = useStore(state => state.setCompiledDoc);
   const setDiagnostics = useStore(state => state.setDiagnostics);
-  const isCompiling = useStore(state => state.isCompiling);
+  const compilationPending = useStore(state => state.isCompiling);
+  const activeDocumentId = useStore(state => state.activeDocumentId);
+  const compileKey = JSON.stringify([activeDocumentId, markdown, destination, activeTheme]);
   const setIsCompiling = useStore(state => state.setIsCompiling);
 
   const docTitleMatch = markdown.match(/^#\s+(.+)$/m);
   const docTitle = docTitleMatch ? docTitleMatch[1].trim() : 'Document';
 
-  const [activeMobileTab, setActiveMobileTab] = useState<'editor' | 'preview'>('editor');
+  const [compilationError, setCompilationError] = useState(false);
 
   const [compiledState, setCompiledState] = useState<{
+    inputKey: string;
     diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
     stats: any;
     validationReport: any;
   }>({
+    inputKey: '',
     diagnostics: [],
     stats: {
       headings: 0,
@@ -177,15 +184,16 @@ export function Workspace({
     validationReport: null,
   });
 
+  const isCompiling = compilationPending || compiledState.inputKey !== compileKey;
   const words = markdown.trim().split(/\s+/).filter(w => w.length > 0).length;
   const lines = markdown.split('\n').length;
 
   useEffect(() => {
     const controller = new AbortController();
-
     const timeoutId = setTimeout(async () => {
       if (controller.signal.aborted) return;
       setIsCompiling(true);
+      setCompilationError(false);
 
       try {
         const collector = new DiagnosticsCollector();
@@ -216,6 +224,7 @@ export function Workspace({
           }
 
           setCompiledState({
+            inputKey: compileKey,
             diagnostics: combinedDiagnostics,
             stats: docStats,
             validationReport,
@@ -226,7 +235,9 @@ export function Workspace({
       } catch (e: any) {
         if (!controller.signal.aborted) {
           console.error('Compilation error:', e);
+          setCompilationError(true);
           setCompiledState({
+            inputKey: compileKey,
             diagnostics: [],
             stats: {
               headings: 0,
@@ -260,11 +271,13 @@ export function Workspace({
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [markdown, destination, activeTheme, setCompiledDoc, setDiagnostics, setIsCompiling]);
+  }, [markdown, destination, activeTheme, activeDocumentId, compileKey, setCompiledDoc, setDiagnostics, setIsCompiling]);
 
   const { diagnostics, stats, validationReport } = compiledState;
   const warnings = diagnostics.filter(d => d.severity === 'warning' || d.severity === 'error');
   const statsText = formatStats(stats);
+
+  if (isMobile) return <MobileWorkspace markdown={markdown} onInput={onInput} destination={destination} onDestinationChange={onDestinationChange} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={isCompiling} diagnostics={diagnostics} compilationError={compilationError && compiledState.inputKey === compileKey}/>;
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
@@ -284,42 +297,8 @@ export function Workspace({
         <div className="flex-1 flex flex-col md:flex-row h-full min-h-0 overflow-hidden">
           <WorkspaceSidebar />
 
-          {/* Mobile Tab Switcher (Visible only on mobile < md: screens) */}
-          <div className="flex md:hidden items-center justify-center p-1.5 bg-surface-container-low border-b border-outline-variant/30 shrink-0 select-none">
-            <div className="inline-flex rounded-lg p-0.5 bg-surface-container border border-outline-variant/30 text-xs">
-              <button
-                type="button"
-                onClick={() => setActiveMobileTab('editor')}
-                className={`px-3 py-1 rounded-md font-medium transition-all ${
-                  activeMobileTab === 'editor'
-                    ? 'bg-surface text-on-surface shadow-xs font-semibold'
-                    : 'text-secondary hover:text-on-surface'
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[15px]">edit_note</span>
-                  <span>Editor</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveMobileTab('preview')}
-                className={`px-3 py-1 rounded-md font-medium transition-all ${
-                  activeMobileTab === 'preview'
-                    ? 'bg-surface text-on-surface shadow-xs font-semibold'
-                    : 'text-secondary hover:text-on-surface'
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[15px]">visibility</span>
-                  <span>Preview</span>
-                </span>
-              </button>
-            </div>
-          </div>
-
           <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
-            <div className={`${activeMobileTab === 'editor' ? 'col-span-12 flex flex-col' : 'hidden md:flex md:flex-col'} md:col-span-5 lg:col-span-4 h-full min-h-0`}>
+            <div className="flex flex-col col-span-5 lg:col-span-4 h-full min-h-0">
               <DocumentEditor
                 markdown={markdown}
                 onInput={onInput}
@@ -328,7 +307,7 @@ export function Workspace({
               />
             </div>
 
-            <div className={`${activeMobileTab === 'preview' ? 'col-span-12 flex flex-col' : 'hidden md:flex md:flex-col'} md:col-span-7 lg:col-span-8 h-full min-h-0`}>
+            <div className="flex flex-col col-span-7 lg:col-span-8 h-full min-h-0">
               <DocumentPreview
                 markdown={markdown}
                 destination={destination}

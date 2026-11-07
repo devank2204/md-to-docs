@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master, v1]
+    branches: [main, master, v1, v3]
   pull_request:
-    branches: [main, master, v1]
+    branches: [main, master, v1, v3]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -46,3 +46,16 @@ jobs:
 
       - name: Lint Web Application
         run: pnpm --filter web lint
+
+      - name: Install browser for interaction tests
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Mobile and desktop browser regressions
+        run: pnpm test:browser
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-evidence-${{ matrix.os }}
+          path: test-results/

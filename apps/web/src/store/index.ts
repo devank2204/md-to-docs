@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { deviceStorage } from '../utils/deviceStorage';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { THEMES, type DocumentDiagnostic, type DocumentPresetId } from '@mdtodocs/compiler-core';
 import type { Root } from 'mdast';
@@ -16,6 +17,8 @@ import {
 export interface AppState {
   markdown: string;
   destination: DestinationType;
+  htmlOutput: boolean;
+  setHtmlOutput: (value: boolean) => void;
   themeId: keyof typeof THEMES;
   activePresetId: DocumentPresetId;
   baseFontSize: number;
@@ -93,6 +96,8 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       markdown: '',
       destination: 'google-docs',
+      htmlOutput: false,
+      setHtmlOutput: (htmlOutput) => set({ htmlOutput }),
       themeId: 'default',
       activePresetId: 'default',
       baseFontSize: THEMES['default'].typography.baseFontSizePt,
@@ -414,9 +419,11 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'md-to-docs-storage',
+      storage: createJSONStorage(() => deviceStorage),
       partialize: (state) => ({
         markdown: state.markdown,
         destination: state.destination,
+        htmlOutput: state.htmlOutput,
         themeId: state.themeId,
         activePresetId: state.activePresetId,
         baseFontSize: state.baseFontSize,
@@ -435,10 +442,10 @@ export const useStore = create<AppState>()(
           if (!state.currentView) {
             state.currentView = state.markdown && state.markdown.trim().length > 0 ? 'workspace' : 'landing';
           }
-          if (Array.isArray(state.documents) && state.documents.length > 5) {
+          if (Array.isArray(state.documents) && state.documents.length > 6) {
             const activeId = state.activeDocumentId;
             const activeDoc = state.documents.find((d) => d.id === activeId) || state.documents[0];
-            const otherDocs = state.documents.filter((d) => d.id !== activeDoc.id).slice(0, 4);
+            const otherDocs = state.documents.filter((d) => d.id !== activeDoc.id).slice(-5);
             state.documents = [activeDoc, ...otherDocs];
           }
         }

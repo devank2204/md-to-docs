@@ -71,8 +71,8 @@ export function Header({
         analytics.track('export_failure', { destination: 'word', format: 'docx', errorType: 'export_failed' });
       }
       return success;
-    } catch (err: any) {
-      analytics.track('export_failure', { destination: 'word', format: 'docx', errorType: err?.message || 'unknown' });
+    } catch {
+      analytics.track('export_failure', { destination: 'word', format: 'docx', errorType: 'export_failed' });
       return false;
     }
   };
@@ -90,8 +90,8 @@ export function Header({
         analytics.track('export_failure', { destination, format: 'clipboard_html', errorType: 'copy_failed' });
       }
       return success;
-    } catch (err: any) {
-      analytics.track('export_failure', { destination, format: 'clipboard_html', errorType: err?.message || 'unknown' });
+    } catch {
+      analytics.track('export_failure', { destination, format: 'clipboard_html', errorType: 'export_failed' });
       return false;
     }
   };
@@ -109,8 +109,8 @@ export function Header({
         analytics.track('export_failure', { destination: 'html', format: 'html', errorType: 'html_failed' });
       }
       return success;
-    } catch (err: any) {
-      analytics.track('export_failure', { destination: 'html', format: 'html', errorType: err?.message || 'unknown' });
+    } catch {
+      analytics.track('export_failure', { destination: 'html', format: 'html', errorType: 'export_failed' });
       return false;
     }
   };
@@ -119,11 +119,11 @@ export function Header({
     const hasWarnings = diagnostics.some(d => d.severity === 'warning');
     analytics.track('export_attempt', { destination: 'pdf', format: 'pdf', hasWarnings });
     printPdf();
-    recordSuccessfulExport();
-    analytics.trackExportCompleted('pdf', 'pdf', 0);
+    // Browser print does not tell us whether a PDF was saved.
+    analytics.track('document_delivery', { destination: 'pdf', result: 'print_opened' });
   };
 
-  const isHtmlRoute = typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('markdown-to-html');
+  const isHtmlRoute = useStore(state => state.htmlOutput);
 
   const primaryAction = async () => {
     if (isHtmlRoute && destination === 'clipboard') {
@@ -149,7 +149,7 @@ export function Header({
       case 'google-docs': return 'Copy for Google Docs';
       case 'clipboard': return 'Copy formatted';
       case 'word': return 'Download .docx';
-      case 'pdf': return 'Export PDF';
+      case 'pdf': return 'Print / Save as PDF';
     }
   };
 
@@ -300,7 +300,7 @@ export function Header({
             )}
 
             {appState === 'WORKSPACE' && (
-              <div className="hidden sm:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
+              <div className="hidden xl:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
                 <span className="material-symbols-outlined text-[15px] text-outline">description</span>
                 <span className="truncate max-w-[180px] text-on-surface font-sans" title={activeDocTitle}>
                   {activeDocTitle}
@@ -321,7 +321,7 @@ export function Header({
             title="Open Command Palette (Cmd+K / Ctrl+K)"
           >
             <span className="material-symbols-outlined text-[15px]">search</span>
-            <span className="hidden md:inline">Commands</span>
+            <span className="hidden xl:inline">Commands</span>
             <kbd className="px-1 py-0.2 rounded bg-surface-container-high text-[10px] text-outline font-mono">
               {getCommandShortcut()}
             </kbd>
@@ -352,6 +352,7 @@ export function Header({
             value={destination}
             onValueChange={(val) => {
               analytics.track('destination_change', { from: destination, to: val });
+              useStore.getState().setHtmlOutput(false);
               onDestinationChange(val as DestinationType);
             }}
           />
@@ -360,7 +361,7 @@ export function Header({
           <LoadingButton
             onAction={primaryAction}
             destination={destination}
-            successLabel={destination === 'word' ? 'Downloaded!' : destination === 'pdf' ? 'Printed!' : 'Copied!'}
+            successLabel={destination === 'word' || (isHtmlRoute && destination === 'clipboard') ? 'Download started' : destination === 'pdf' ? 'Print opened' : 'Copied!'}
             pendingLabel={destination === 'word' ? 'Compiling...' : destination === 'pdf' ? 'Preparing...' : 'Copying...'}
             idleIcon={<span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>}
             className="min-w-fit px-2.5 sm:px-3 sm:min-w-[145px]"
@@ -392,7 +393,7 @@ export function Header({
               >
                 visibility
               </span>
-              <span className="hidden sm:inline">Reading View</span>
+              <span className="hidden xl:inline">Reading View</span>
             </button>
           )}
         </div>

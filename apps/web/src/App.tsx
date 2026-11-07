@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useMobileLayout } from '@/hooks/useMobileLayout';
 import { EmptyState } from '@/components/EmptyState';
 import { Workspace } from '@/components/Workspace';
 import { Header } from '@/components/Header';
@@ -19,6 +20,7 @@ import { analytics, getDocLengthBucket } from '@/utils/analytics';
 export type AppState = 'EMPTY' | 'WORKSPACE';
 
 function App() {
+  const isMobile = useMobileLayout();
   const markdown = useStore(state => state.markdown);
   const currentView = useStore(state => state.currentView);
   const destination = useStore(state => state.destination);
@@ -61,8 +63,9 @@ function App() {
       window.history.pushState({}, '', path);
       setCurrentPath(path);
       const spec = getRouteSpec(path);
-      if (spec) {
+      if (spec && path !== '/') {
         setDestination(spec.destination);
+        useStore.getState().setHtmlOutput(spec.path === '/markdown-to-html');
         if (!markdown.trim()) {
           document.title = spec.title;
         }
@@ -75,8 +78,9 @@ function App() {
       const path = (window.location.pathname.toLowerCase().replace(/\/$/, '') || '/') as LandingRoutePath;
       setCurrentPath(path);
       const spec = getRouteSpec(path);
-      if (spec) {
+      if (spec && path !== '/') {
         setDestination(spec.destination);
+        useStore.getState().setHtmlOutput(spec.path === '/markdown-to-html');
         if (!markdown.trim()) {
           document.title = spec.title;
         }
@@ -108,7 +112,8 @@ function App() {
 
   useEffect(() => {
     const handleGlobalPaste = (e: ClipboardEvent) => {
-      if (appState === 'EMPTY') {
+      const editing = e.target instanceof Element && e.target.closest('input, textarea, [contenteditable]');
+      if (!isMobile && !e.defaultPrevented && !editing && appState === 'EMPTY') {
         const text = e.clipboardData?.getData('text');
         if (text) {
           setMarkdown(text);
@@ -117,19 +122,20 @@ function App() {
     };
     window.addEventListener('paste', handleGlobalPaste);
     return () => window.removeEventListener('paste', handleGlobalPaste);
-  }, [appState, setMarkdown]);
+  }, [appState, setMarkdown, isMobile]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const pathname = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
     const spec = getRouteSpec(pathname);
-    if (spec) {
+    if (spec && pathname !== '/') {
       setDestination(spec.destination);
-      if (!markdown.trim()) {
+      useStore.getState().setHtmlOutput(spec.path === '/markdown-to-html');
+      if (!useStore.getState().markdown.trim()) {
         document.title = spec.title;
       }
     }
-  }, [setDestination, markdown]);
+  }, [setDestination]);
 
   useEffect(() => {
     if (!markdown.trim()) {
@@ -166,8 +172,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface text-on-surface">
-      <Header
+    <div className={`${isMobile ? 'mobile-app' : 'min-h-screen'} flex flex-col bg-surface text-on-surface`}>
+      {(!isMobile || currentPath.startsWith('/mermaid-')) && <Header
         appState={appState}
         markdown={markdown}
         destination={destination}
@@ -175,8 +181,8 @@ function App() {
         activeTheme={activeTheme}
         documentSignature={documentSignature}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-      />
-      <main className="flex-1 flex flex-col mt-12 relative">
+      />}
+      <main className={`flex-1 flex flex-col relative ${isMobile && !currentPath.startsWith('/mermaid-') ? 'mobile-main' : 'mt-12'}`}>
         {currentPath === '/mermaid-to-svg' || currentPath === '/mermaid-to-png' ? (
           <MermaidUtilityView
             currentPath={currentPath}
@@ -186,10 +192,11 @@ function App() {
               handleNavigateRoute('/');
             }}
           />
-        ) : appState === 'EMPTY' ? (
+        ) : !isMobile && appState === 'EMPTY' ? (
           <EmptyState onInput={handleInput} />
         ) : (
           <Workspace
+            isMobile={isMobile}
             markdown={markdown}
             onInput={handleInput}
             destination={destination}
@@ -228,7 +235,7 @@ function App() {
 
       <AboutModal />
 
-      <BookmarkPrompt />
+      {!isMobile && <BookmarkPrompt />}
     </div>
   );
 }

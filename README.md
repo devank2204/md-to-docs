@@ -61,3 +61,15 @@ pnpm dev
 ## Aesthetic Philosophy
 
 md.to.docs avoids raw browser defaults. It implements a strict design system inspired by high-end typography, leveraging optimized Tailwind spacing, Söhne/Inter fallbacks, precise border radiuses, and tactile micro-animations to create a world-class documentation experience.
+
+## Mobile workspace
+
+On phones and tablets below 1024px, paste or import Markdown, switch between
+full-width Edit and Preview, then choose a destination at the bottom. Word and
+HTML are prepared before download/share; Google Docs uses formatted copy with a
+Word-file fallback. PDF uses your browser's Print / Save as PDF flow.
+
+Text and recent documents stay in this browser on this device. Export important
+work before clearing browser storage. File imports and pastes are limited to
+1 MB and are never truncated. See [mobile verification](docs/MOBILE_QA.md) for
+browser-test commands and the real-device release checklist.
