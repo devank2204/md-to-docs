@@ -1,6 +1,7 @@
 # Mobile conversion workspace: implementation plan
 
-Status: proposed implementation contract; product code has not been changed.
+Status: implemented locally; see `MOBILE_QA.md` for coverage and release checks.
+Physical-device handoff and production rollout remain pending.
 Baseline: v3, after the CI/runtime fixes. Prepared 2026-11-07.
 Method: gstack digest, design principles, product/engineering challenge, and
 repository source inspection. Formal autoplan, outside review, live browser

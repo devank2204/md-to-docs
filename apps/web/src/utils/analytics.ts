@@ -16,6 +16,8 @@ export function getExportCountBucket(count: number): ExportCountBucket {
 }
 
 export type AnalyticsEvent =
+  | { name: 'mobile_preview'; properties: { destination: string } }
+  | { name: 'document_delivery'; properties: { destination: string; result: 'prepared' | 'copied' | 'download_started' | 'share_opened' | 'print_opened' | 'canceled' | 'failed' } }
   | { name: 'page_view'; properties: { path: string; referrer: string } }
   | {
       name: 'editor_action';

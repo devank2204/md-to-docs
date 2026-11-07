@@ -18,6 +18,7 @@ interface DocumentPreviewProps {
   isCompiling: boolean;
   documentSignature?: { enabled: boolean; placement: 'every-page' | 'last-page' };
   isReviewMode?: boolean;
+  readingLayout?: boolean;
 }
 
 // Rehype plugin to wrap headings and their section content into collapsible <details>
@@ -136,6 +137,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   destination,
   isCompiling,
   isReviewMode = false,
+  readingLayout = false,
 }) => {
   const zoom = useStore((state) => state.zoom);
   const setZoom = useStore((state) => state.setZoom);
@@ -150,6 +152,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
   return (
     <div
+      data-reading-layout={readingLayout || undefined}
       data-preview-pane
       className={
         isReviewMode
@@ -160,7 +163,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
       <div className="flex-1 flex justify-center items-start p-1.5 sm:p-space-md md:p-space-lg overflow-y-auto overflow-x-hidden min-h-0 w-full">
         <div
           style={{
-            transform: `scale(${zoom / 100})`,
+            transform: readingLayout ? undefined : `scale(${zoom / 100})`,
             transformOrigin: 'top center',
             backgroundColor: isDark ? '#111827' : '#ffffff',
             color: isDark ? '#e5e7eb' : '#1a1a1a',
@@ -181,7 +184,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
               <span className="material-symbols-outlined text-[42px] text-outline/30 mb-3">edit_document</span>
               <h3 className="font-serif text-lg text-on-surface font-medium">Untitled Document</h3>
               <p className="font-code-sm text-xs text-outline/70 mt-1.5 max-w-sm">
-                Start typing in the editor on the left or paste Markdown to see live preview.
+                Paste or type Markdown in the editor to see your document here.
               </p>
             </div>
           ) : (

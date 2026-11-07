@@ -25,6 +25,7 @@ export const InteractiveTable: React.FC<InteractiveTableProps> = ({ children, ..
       {/* Floating Action Pill */}
       <div
         data-print-hide
+        data-table-toolbar
         className="flex items-center justify-between px-3 py-1.5 bg-surface-container-low border-b border-outline-variant/20 font-code-sm text-[11px] text-secondary select-none"
       >
         <div className="flex items-center gap-1.5">

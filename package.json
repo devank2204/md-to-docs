@@ -9,7 +9,8 @@
     "build": "pnpm -r build && pnpm prerender",
     "prerender": "tsx scripts/prerender.ts",
     "test": "pnpm --filter @mdtodocs/fidelity-lab test",
-    "test:update": "pnpm --filter @mdtodocs/fidelity-lab test:update"
+    "test:update": "pnpm --filter @mdtodocs/fidelity-lab test:update",
+    "test:browser": "playwright test"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,8 @@
   },
   "packageManager": "pnpm@9.15.9",
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "jszip": "3.10.1",
     "tsx": "4.23.15"
   }
 }
