@@ -1,0 +1,2 @@
+# Keep golden fixture text stable across Windows and Unix checkouts.
+packages/fidelity-lab/fixtures/** text eol=lf

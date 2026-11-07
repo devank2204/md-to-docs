@@ -191,12 +191,12 @@
             "start": {
               "line": 3,
               "column": 1,
-              "offset": 101
+              "offset": 99
             },
             "end": {
               "line": 3,
               "column": 68,
-              "offset": 168
+              "offset": 166
             }
           }
         }
@@ -205,12 +205,12 @@
         "start": {
           "line": 3,
           "column": 1,
-          "offset": 101
+          "offset": 99
         },
         "end": {
           "line": 3,
           "column": 68,
-          "offset": 168
+          "offset": 166
         }
       }
     }
@@ -224,7 +224,7 @@
     "end": {
       "line": 4,
       "column": 1,
-      "offset": 170
+      "offset": 167
     }
   }
 }
