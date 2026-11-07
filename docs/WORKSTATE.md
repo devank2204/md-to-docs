@@ -49,7 +49,20 @@ prove a PDF was saved. No production or usability-study outcome is claimed.
 
 ## Git / continuity
 
-809a445 is the last known pushed v3 revision. Subsequent planning, identity
-restoration and decision-workflow commits remain intact locally, followed by this
-implementation. The current request did not ask for a push, and repository policy
-requires an explicit push request in the current prompt. No deployment occurred.
+50478c0 is the last verified pushed v3 revision (implementation and prior planning/
+identity commits included). The current domain investigation has not been pushed.
+
+## Active incident: office access to the custom domain
+
+2026-11-07: investigated mdtodocs.com versus mdtodocs.netlify.app. Public DNS,
+Netlify domain association, HTTP redirects and independent origin TLS passed;
+SSL Labs rated apex A+ with trusted normal SNI certificate paths. Domain/category
+filtering, office DNS and TLS inspection remain hypotheses pending the affected
+browser's exact error. No production records, certificates or application config
+were changed. No company IT or vendor message was sent.
+
+See [investigation and repair decision](operations/domain-access-investigation.md)
+and [public evidence snapshot](operations/domain-access-evidence.json). The incident
+is not resolved until an affected company user can load and use the site. The next
+necessary input is the office browser error/block category; local read-only DNS/
+HTTP comparison commands and an unsent IT draft are in the investigation document.
