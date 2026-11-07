@@ -1,3 +1,4 @@
+import { preparePrintSnapshot, type PrintSnapshot } from './printSnapshot';
 import {
   parseMarkdown,
   planRepresentation,
@@ -25,6 +26,7 @@ export interface ExportInput {
   title: string;
 }
 export type PreparedExport =
+  | { kind: 'print'; snapshot: PrintSnapshot }
   | { kind: 'file'; file: File }
   | { kind: 'clipboard'; html: string; plain: string };
 
@@ -44,10 +46,12 @@ export function documentFilename(title: string, extension: string) {
 // different destination. Each export compiles one immutable source snapshot.
 export async function prepareDocumentExport(
   input: ExportInput,
+  signal?: AbortSignal,
 ): Promise<PreparedExport> {
   if (!input.markdown.trim()) throw new Error('empty_document');
   const target = input.destination === 'html' ? 'clipboard' : input.destination;
-  const source = await resolveAssets(parseMarkdown(input.markdown));
+  const source = await resolveAssets(parseMarkdown(input.markdown), signal);
+  signal?.throwIfAborted();
   const doc = planRepresentation(source, target, new DiagnosticsCollector());
   if (input.destination === 'word') {
     const blob = await renderToDocxBlob(doc, input.theme, input.signature);
@@ -57,6 +61,13 @@ export async function prepareDocumentExport(
         type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       }),
     };
+  }
+  if (input.destination === 'pdf') {
+    let html = renderToHtml(doc, { theme: input.theme, title: input.title, fullDocument: true });
+    // Clipboard renderer already implements the chosen signature and theme.
+    const body = renderToClipboardHtml(doc, input.theme, input.signature);
+    html = html.replace(/<body>[\s\S]*<\/body>/, () => `<body>${body}</body>`);
+    return { kind: 'print', snapshot: await preparePrintSnapshot(html, signal) };
   }
   if (input.destination === 'html') {
     const html = renderToHtml(doc, {
@@ -164,7 +175,7 @@ export async function copyFormattedDoc(
 }
 
 export function printPdf(): void {
-  window.print();
+  window.dispatchEvent(new CustomEvent('mdtodocs:prepare-print'));
 }
 export async function copyPlainMarkdown(markdown: string): Promise<boolean> {
   if (!markdown.trim()) return false;

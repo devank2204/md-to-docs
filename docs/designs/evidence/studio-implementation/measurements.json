@@ -1,0 +1,264 @@
+{
+  "browser": "156.0.8078.79",
+  "capturedAt": "2026-11-07T13:48:26.713Z",
+  "measurements": [
+    {
+      "width": 390,
+      "appearance": "cream",
+      "overflow": false,
+      "paper": "rgb(255, 255, 255)",
+      "controls": [
+        {
+          "name": "Open documents",
+          "left": 277.703125,
+          "right": 374
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "appearance": "dark",
+      "overflow": false,
+      "paper": "rgb(255, 255, 255)",
+      "controls": [
+        {
+          "name": "Open documents",
+          "left": 277.703125,
+          "right": 374
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "appearance": "cream",
+      "overflow": false,
+      "paper": "rgb(255, 255, 255)",
+      "controls": [
+        {
+          "name": "mdtodocs.comexpand_more",
+          "left": 12,
+          "right": 177.015625
+        },
+        {
+          "name": "dock_to_left",
+          "left": 189.015625,
+          "right": 217.015625
+        },
+        {
+          "name": "searchCommandsCtrl+K",
+          "left": 383.15625,
+          "right": 470.171875
+        },
+        {
+          "name": "Google DocsDocs",
+          "left": 485.171875,
+          "right": 583.078125
+        },
+        {
+          "name": "WordWord",
+          "left": 583.078125,
+          "right": 630.6875
+        },
+        {
+          "name": "PDFPDF",
+          "left": 630.6875,
+          "right": 671.390625
+        },
+        {
+          "name": "CopyCopy",
+          "left": 671.390625,
+          "right": 719
+        },
+        {
+          "name": "Change app appearance",
+          "left": 734,
+          "right": 766
+        },
+        {
+          "name": "Copy for Google Docs",
+          "left": 778,
+          "right": 958
+        },
+        {
+          "name": "visibilityReading View",
+          "left": 970,
+          "right": 1012
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "appearance": "dark",
+      "overflow": false,
+      "paper": "rgb(255, 255, 255)",
+      "controls": [
+        {
+          "name": "mdtodocs.comexpand_more",
+          "left": 12,
+          "right": 177.015625
+        },
+        {
+          "name": "dock_to_left",
+          "left": 189.015625,
+          "right": 217.015625
+        },
+        {
+          "name": "searchCommandsCtrl+K",
+          "left": 383.15625,
+          "right": 470.171875
+        },
+        {
+          "name": "Google DocsDocs",
+          "left": 485.171875,
+          "right": 583.078125
+        },
+        {
+          "name": "WordWord",
+          "left": 583.078125,
+          "right": 630.6875
+        },
+        {
+          "name": "PDFPDF",
+          "left": 630.6875,
+          "right": 671.390625
+        },
+        {
+          "name": "CopyCopy",
+          "left": 671.390625,
+          "right": 719
+        },
+        {
+          "name": "Change app appearance",
+          "left": 734,
+          "right": 766
+        },
+        {
+          "name": "Copy for Google Docs",
+          "left": 778,
+          "right": 958
+        },
+        {
+          "name": "visibilityReading View",
+          "left": 970,
+          "right": 1012
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "appearance": "cream",
+      "overflow": false,
+      "paper": "rgb(255, 255, 255)",
+      "controls": [
+        {
+          "name": "mdtodocs.comexpand_more",
+          "left": 12,
+          "right": 177.015625
+        },
+        {
+          "name": "dock_to_left",
+          "left": 189.015625,
+          "right": 217.015625
+        },
+        {
+          "name": "searchCommandsCtrl+K",
+          "left": 653.921875,
+          "right": 804.546875
+        },
+        {
+          "name": "Google DocsDocs",
+          "left": 819.546875,
+          "right": 917.453125
+        },
+        {
+          "name": "WordWord",
+          "left": 917.453125,
+          "right": 965.0625
+        },
+        {
+          "name": "PDFPDF",
+          "left": 965.0625,
+          "right": 1005.765625
+        },
+        {
+          "name": "CopyCopy",
+          "left": 1005.765625,
+          "right": 1053.375
+        },
+        {
+          "name": "Change app appearance",
+          "left": 1068.375,
+          "right": 1100.375
+        },
+        {
+          "name": "Copy for Google Docs",
+          "left": 1112.375,
+          "right": 1292.375
+        },
+        {
+          "name": "visibilityReading View",
+          "left": 1304.375,
+          "right": 1428
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "appearance": "dark",
+      "overflow": false,
+      "paper": "rgb(255, 255, 255)",
+      "controls": [
+        {
+          "name": "mdtodocs.comexpand_more",
+          "left": 12,
+          "right": 177.015625
+        },
+        {
+          "name": "dock_to_left",
+          "left": 189.015625,
+          "right": 217.015625
+        },
+        {
+          "name": "searchCommandsCtrl+K",
+          "left": 653.921875,
+          "right": 804.546875
+        },
+        {
+          "name": "Google DocsDocs",
+          "left": 819.546875,
+          "right": 917.453125
+        },
+        {
+          "name": "WordWord",
+          "left": 917.453125,
+          "right": 965.0625
+        },
+        {
+          "name": "PDFPDF",
+          "left": 965.0625,
+          "right": 1005.765625
+        },
+        {
+          "name": "CopyCopy",
+          "left": 1005.765625,
+          "right": 1053.375
+        },
+        {
+          "name": "Change app appearance",
+          "left": 1068.375,
+          "right": 1100.375
+        },
+        {
+          "name": "Copy for Google Docs",
+          "left": 1112.375,
+          "right": 1292.375
+        },
+        {
+          "name": "visibilityReading View",
+          "left": 1304.375,
+          "right": 1428
+        }
+      ]
+    }
+  ]
+}

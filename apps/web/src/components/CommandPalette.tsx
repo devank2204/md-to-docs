@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useStore } from '@/store';
-import { exportDocx, copyFormattedDoc, printPdf } from '@/utils/exportHelpers';
 import { getModifierKey } from '@/utils/platform';
 
 export interface CommandPaletteProps {
@@ -43,7 +42,6 @@ function CommandPaletteModal({
   onOpenInspector,
   onOpenFidelityPanel,
   onOpenSuggestModal,
-  activeTheme,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [prevQuery, setPrevQuery] = useState('');
@@ -53,9 +51,7 @@ function CommandPaletteModal({
 
   const markdown = useStore((state) => state.markdown);
   const themeId = useStore((state) => state.themeId);
-  const documentSignature = useStore((state) => state.documentSignature);
   const isReviewMode = useStore((state) => state.isReviewMode);
-  const compiledDoc = useStore((state) => state.compiledDoc);
   const documents = useStore((state) => state.documents);
   const activeDocumentId = useStore((state) => state.activeDocumentId);
 
@@ -131,7 +127,7 @@ function CommandPaletteModal({
         icon: 'content_copy',
         shortcut: `${mod}+C`,
         action: async () => {
-          await copyFormattedDoc(markdown, compiledDoc, 'google-docs', activeTheme, documentSignature);
+          window.dispatchEvent(new CustomEvent('mdtodocs:deliver', { detail: 'google-docs' }));
         },
       },
       {
@@ -142,7 +138,7 @@ function CommandPaletteModal({
         icon: 'download',
         shortcut: `${mod}+Shift+E`,
         action: async () => {
-          await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
+          window.dispatchEvent(new CustomEvent('mdtodocs:deliver', { detail: 'word' }));
         },
       },
       {
@@ -153,7 +149,7 @@ function CommandPaletteModal({
         icon: 'picture_as_pdf',
         shortcut: `${mod}+P`,
         action: () => {
-          printPdf();
+          window.dispatchEvent(new CustomEvent('mdtodocs:deliver', { detail: 'pdf' }));
         },
       },
 
@@ -230,11 +226,20 @@ function CommandPaletteModal({
       {
         id: 'toggle-theme',
         category: 'Theme & Appearance',
-        title: themeId === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme',
-        description: `Currently active: ${themeId === 'dark' ? 'Dark' : 'Light'} theme`,
+        title: themeId === 'dark' ? 'Document style: Default' : 'Document style: Dark',
+        description: `Changes document and export styling. Current document style: ${themeId}`,
         icon: themeId === 'dark' ? 'light_mode' : 'dark_mode',
         action: () => setThemeId(themeId === 'dark' ? 'default' : 'dark'),
       },
+
+      ...(['cream', 'dark', 'system'] as const).map(appearance => ({
+        id: `app-appearance-${appearance}`,
+        category: 'Theme & Appearance' as const,
+        title: `App appearance: ${appearance[0].toUpperCase() + appearance.slice(1)}`,
+        description: 'Changes only the app. Document styling stays the same.',
+        icon: 'contrast',
+        action: () => useStore.getState().setAppAppearance(appearance),
+      })),
 
       // 5. Documents & Workspace
       {
@@ -284,13 +289,11 @@ function CommandPaletteModal({
       })),
     ];
   }, [
-    markdown,
-    compiledDoc,
+
     themeId,
-    documentSignature,
+
     isReviewMode,
-    activeTheme,
-    documents,
+      documents,
     activeDocumentId,
     setThemeId,
     setIsReviewMode,

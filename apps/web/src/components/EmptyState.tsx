@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { HomeIntroduction } from './HomeIntroduction';
 import { DOCUMENT_TEMPLATES } from '@/data/templates';
 import { getCommandShortcut, getModifierKey } from '@/utils/platform';
 import { analytics, getDocLengthBucket } from '@/utils/analytics';
@@ -86,14 +87,7 @@ export function EmptyState({ onInput }: EmptyStateProps) {
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 flex flex-col items-center select-none">
       {/* Editorial Header */}
-      <div className="text-center mb-8 max-w-xl">
-        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl leading-tight text-on-surface mb-3 tracking-tight font-medium">
-          Markdown to Docs
-        </h1>
-        <p className="font-serif text-base sm:text-lg text-secondary max-w-[560px] mx-auto leading-relaxed">
-          Paste Markdown or drop a file. Diagrams, tables, and formatting convert cleanly to Google Docs, Word, and PDF.
-        </p>
-      </div>
+      <HomeIntroduction />
 
       {/* Mac-Style Code Terminal Frame */}
       <div

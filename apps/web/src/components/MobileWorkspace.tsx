@@ -8,6 +8,8 @@ import type { DestinationType } from '@mdtodocs/capability-graph';
 import { useStore } from '@/store';
 import { DocumentPreview } from './DocumentPreview';
 import { MobileExportBar } from './MobileExportBar';
+import { HomeIntroduction } from './HomeIntroduction';
+import { BrandWordmark } from './BrandWordmark';
 import { MobileWorkspaceSheets } from './MobileWorkspaceSheets';
 import type { MobileSheet } from '@/utils/mobileDestinations';
 import { useDocumentExport } from '@/hooks/useDocumentExport';
@@ -202,33 +204,36 @@ export function MobileWorkspace(props: Props) {
       );
     }
   };
+  useEffect(() => {
+    const open = (event: Event) => {
+      const value = ((event as CustomEvent).detail || 'pdf') as ExportTarget;
+      useStore.getState().setHtmlOutput(value === 'html');
+      useStore.getState().setDestination(value === 'html' ? 'clipboard' : value);
+      setSheet(null);
+    };
+    window.addEventListener('mdtodocs:deliver', open);
+    window.addEventListener('mdtodocs:prepare-print', open);
+    return () => {
+      window.removeEventListener('mdtodocs:deliver', open);
+      window.removeEventListener('mdtodocs:prepare-print', open);
+    };
+  }, []);
+  useEffect(() => {
+    const review = () => setSheet('notes');
+    window.addEventListener('mdtodocs:review', review);
+    return () => window.removeEventListener('mdtodocs:review', review);
+  }, []);
   const chooseTarget = (value: ExportTarget) => {
     setHtmlOutput(value === 'html');
     analytics.track('destination_change', { from: target, to: value });
     onDestinationChange(value === 'html' ? 'clipboard' : value);
     setSheet(null);
   };
-  const print = () => {
-    // The preview is always mounted, even when the editor tab is selected.
-    switchTab('preview');
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        window.print();
-      }),
-    );
-    analytics.track('document_delivery', {
-      destination: 'pdf',
-      result: 'print_opened',
-    });
-  };
   return (
     <div className={`mobile-workspace ${keyboardOpen ? 'keyboard-open' : ''}`}>
       <header className="mobile-header" data-print-hide>
         <a href="/" aria-label="mdtodocs home" className="mobile-brand">
-          <img src="/mark.png" alt="" />
-          <span>
-            mdtodocs<span className="brand-dot">.</span>
-          </span>
+          <BrandWordmark />
         </a>
         <button
           type="button"
@@ -306,18 +311,7 @@ export function MobileWorkspace(props: Props) {
       >
         {!hasContent && (
           <div className="mobile-intro">
-            <p className="mobile-eyebrow">
-              FROM TEXT TO SOMETHING YOU CAN SEND
-            </p>
-            <h1>
-              Markdown in.
-              <br />
-              <em>Document out.</em>
-            </h1>
-            <p>
-              Bring text from your AI chat, notes, or a Markdown file. We’ll
-              take care of the formatting.
-            </p>
+            <HomeIntroduction />
           </div>
         )}
         <div className="mobile-input-actions">
@@ -355,6 +349,7 @@ export function MobileWorkspace(props: Props) {
         </label>
         <textarea
           ref={editor}
+          data-source-editor
           id="mobile-markdown"
           value={markdown}
           onChange={(e) => onInput(e.target.value)}
@@ -419,6 +414,7 @@ export function MobileWorkspace(props: Props) {
           </button>
         </div>
         <DocumentPreview
+            reviewNotes={isCompiling ? [] : diagnostics}
           markdown={markdown}
           destination={destination}
           isCompiling={isCompiling}
@@ -440,7 +436,6 @@ export function MobileWorkspace(props: Props) {
         warningsCount={warnings.length}
         output={output}
         setSheet={setSheet}
-        print={print}
         chooseTarget={chooseTarget}
       />
       {sheet && (

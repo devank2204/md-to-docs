@@ -28,7 +28,7 @@ test('first character keeps input mounted and focused; no automatic library over
 }) => {
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: /Markdown in/ }),
+    page.getByRole('heading', { name: 'Markdown to Docs', exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   const editor = page.getByRole('textbox', { name: 'Markdown text' });
@@ -315,28 +315,18 @@ test('hardware focus keeps actions visible, simulated soft keyboard makes room, 
   await expect(page.locator('.mobile-export')).toBeVisible();
 });
 
-test('PDF uses the preview and does not report a completed file save', async ({
-  page,
-}) => {
-  await page.addInitScript(() => {
-    window.print = () => {
-      (window as any).printOpened = true;
-    };
-  });
+test('PDF prepares isolated content and reports only the print dialog outcome', async ({ page }) => {
   await enter(page, '# Print this document');
   await target(page, 'PDF');
-  await page
-    .getByRole('button', { name: 'Print / Save as PDF', exact: true })
-    .click();
-  await expect
-    .poll(() => page.evaluate(() => (window as any).printOpened))
-    .toBe(true);
-  await page.emulateMedia({ media: 'print' });
-  await expect(page.locator('[data-preview-pane]')).toBeVisible();
-  await expect(page.locator('[data-preview-pane]')).toContainText(
-    'Print this document',
-  );
-  await expect(page.locator('.mobile-export')).toBeHidden();
+  await page.getByRole('button', { name: 'Print / Save as PDF', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Open Print / Save as PDF' })).toBeVisible();
+  await expect(page.frameLocator('[data-print-snapshot]').locator('body')).toContainText('Print this document');
+  await page.locator('[data-print-snapshot]').evaluate((frame: HTMLIFrameElement) => {
+    frame.contentWindow!.print = () => { (window as any).printOpened = true; };
+  });
+  await page.getByRole('button', { name: 'Open Print / Save as PDF' }).click();
+  await expect.poll(() => page.evaluate(() => (window as any).printOpened)).toBe(true);
+  await expect(page.getByRole('status')).toContainText('Print opened');
 });
 
 test('HTML preference survives reload at the root route', async ({ page }) => {

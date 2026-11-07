@@ -14,7 +14,17 @@ The north-star experience is:
 
 > **Turn Markdown into documents you don't have to fix.**
 
-## Reading order for Antigravity
+## Current entry point
+
+Read root AGENTS.md, PRODUCT.md, DESIGN.md, docs/decisions/README.md and
+WORKSTATE.md first. The numbered reading order below is the historical reference
+library, not a requirement to load every document for every task. Latest explicit
+user constraints and accepted decisions override proposed or outdated directions.
+The mobile typography experiment in 809a445 is superseded by the explicit request
+to restore web-home identity. Do not preserve that experiment merely because it
+appears in old screenshots or the earlier source-hash baseline.
+
+## Historical reading order for Antigravity
 
 1. `01_PRD.md` — canonical product requirements and current scope.
 2. `02_PRODUCT_THESIS.md` — why the product exists and the product/market insight.

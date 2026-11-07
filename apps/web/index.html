@@ -2,6 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      try {
+        const preference = JSON.parse(localStorage.getItem('md-to-docs-storage') || '{}').state?.appAppearance;
+        document.documentElement.dataset.appearance = preference === 'dark' || (preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'cream';
+      } catch { /* Cream remains the default when storage is unavailable. */ }
+    </script>
     <link rel="icon" type="image/png" href="/mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>mdtodocs: Markdown to Documents</title>

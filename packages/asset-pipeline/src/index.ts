@@ -89,7 +89,8 @@ async function processImage(src: string, signal?: AbortSignal): Promise<Resolved
     };
   }
 
-  // Check cache for existing or in-flight promise
+  // Completed assets and uncancelable requests may be shared. A preview's
+  // abortable request must never own an export's network lifetime.
   if (imageCache.has(src)) {
     return imageCache.get(src)!;
   }
@@ -111,13 +112,16 @@ async function processImage(src: string, signal?: AbortSignal): Promise<Resolved
       dimensions,
     };
   })().catch((err) => {
-    // Evict on failure so retries can occur
-    imageCache.delete(src);
+    // Do not evict a newer successful request for the same URL.
+    if (imageCache.get(src) === fetchPromise) imageCache.delete(src);
     throw err;
   });
 
-  imageCache.set(src, fetchPromise);
-  return fetchPromise;
+  if (!signal) imageCache.set(src, fetchPromise);
+  return fetchPromise.then((asset) => {
+    imageCache.set(src, Promise.resolve(asset));
+    return asset;
+  });
 }
 
 function blobToDataUri(blob: Blob): Promise<string> {
