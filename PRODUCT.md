@@ -32,7 +32,7 @@ formatted clipboard or a Word-file handoff; it does not create a cloud Doc.
   user explicitly asks to change typography. A general UX request does not do so.
 - Web and mobile home share the incumbent web introduction and wordmark.
 - Preserve the working mobile flow and unchanged document preview.
-- Dark app appearance is requested in the roadmap, but has not been implemented.
+- Dark app appearance is implemented as an optional Cream/Dark/System preference.
   It must stay separate from document styling and export options.
 - Show useful context at the user's next decision; avoid technical machinery in
   the normal conversion flow.

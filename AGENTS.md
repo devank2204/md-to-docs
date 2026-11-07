@@ -21,8 +21,8 @@ ambitious”, and an agent/tool recommendation do not authorize it. Do not updat
 identity test expectations to normalize an unauthorized change.
 
 HomeIntroduction and BrandWordmark are shared web/mobile authorities. Preserve
-the working mobile flow and document preview. App dark appearance is a separately
-proposed preference, never an implicit document/export style change.
+the working mobile flow and document preview. App dark appearance is a separate
+app preference, never an implicit document/export style change.
 
 ## Implement with evidence
 

@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { useStore } from '@/store';
-import { exportDocx, copyFormattedDoc, printPdf } from '@/utils/exportHelpers';
 
 interface ReviewActionBarProps {
   markdown: string;
@@ -13,40 +11,18 @@ interface ReviewActionBarProps {
 }
 
 export function ReviewActionBar({
-  markdown,
   readingTimeMinutes,
   wordCount,
-  activeTheme,
-  documentSignature,
   onOpenSuggestModal,
   onOpenCommandPalette,
 }: ReviewActionBarProps) {
   const setIsReviewMode = useStore((state) => state.setIsReviewMode);
-  const compiledDoc = useStore((state) => state.compiledDoc);
-
-  const [isExportingDocx, setIsExportingDocx] = useState(false);
-  const [copiedGDocs, setCopiedGDocs] = useState(false);
-
-  const handleDownloadDocx = async () => {
-    setIsExportingDocx(true);
-    await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
-    setIsExportingDocx(false);
-    useStore.getState().recordSuccessfulExport();
-  };
-
-  const handleCopyGDocs = async () => {
-    const success = await copyFormattedDoc(markdown, compiledDoc, 'google-docs', activeTheme, documentSignature);
-    if (success) {
-      setCopiedGDocs(true);
-      setTimeout(() => setCopiedGDocs(false), 2000);
-      useStore.getState().recordSuccessfulExport();
-    }
-  };
-
-  const handlePrintPdf = () => {
-    printPdf();
-    useStore.getState().recordSuccessfulExport();
-  };
+  const isExportingDocx = false;
+  const copiedGDocs = false;
+  const openDelivery = (target: string) => window.dispatchEvent(new CustomEvent('mdtodocs:deliver', { detail: target }));
+  const handleDownloadDocx = () => openDelivery('word');
+  const handleCopyGDocs = () => openDelivery('google-docs');
+  const handlePrintPdf = () => openDelivery('pdf');
 
   return (
     <div

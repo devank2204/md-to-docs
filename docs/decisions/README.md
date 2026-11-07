@@ -8,16 +8,23 @@ Do not read every historical plan to infer today's intent.
 | --- | --- | --- | --- |
 | D001 | Accepted / user | Cream identity and typography are locked until the user explicitly requests typography changes. General polish or ambitious-UX scope does not lift the lock. | User corrections; DESIGN.md; all UI and output roles |
 | D002 | Accepted restoration / user request | Restore mobile home to the incumbent web home treatment; share introduction and wordmark rather than maintain a second identity. Keep the working mobile flow and preview. | HomeIntroduction.tsx, BrandWordmark.tsx, browser identity tests |
-| D003 | Accepted boundary / user | Plan dark app appearance separately from document styling. No export or source change when app appearance changes. Exact dark palette and implementation remain proposed. | User's dark-mode request; PRODUCT.md; current themeId is document styling |
+| D003 | Accepted boundary / user | Plan dark app appearance separately from document styling. No export or source change when app appearance changes. Implementation now provides Cream/Dark/System under the latest implementation request. | User's dark-mode request; PRODUCT.md; current themeId is document styling |
 | D004 | Accepted / existing task scope | Local-first conversion remains available without a required account. Never imply clipboard creates a Google Doc or browser print proves a PDF was saved. | Current helpers and browser behavior |
 | D005 | Workflow / this task | Borrow documented techniques from reference repos; add a dependency only for a demonstrated gap within authorized scope. No mass installation or hook activation. | docs/research/reference-repositories.md |
 | D006 | Workflow / this task | Evaluate bounded changes against a fixed baseline, guardrails and evidence; retain useful changes, revert only the experiment's own changes when worse. | program.md, adapted from autoresearch's documented loop |
 
-## Proposed, not approved
+## Implementation scope update · 2026-11-07
 
-The studio roadmap, handoff kits, exact dark colors, linked source/preview review,
-and broader persistence migration in docs/designs/ambitious-web-mobile-experience.md
-remain proposals. Independent review is evidence about the plan, not user consent.
+The latest user request authorizes starting the proposed implementation. Shared
+preparation/delivery, position-based review with guarded patch/undo, and optional
+app appearance are implemented in this work. See the [implementation record](../designs/studio-implementation.md)
+for evidence and remaining limits. D001/D002 continue to bind all work. This does
+not turn unimplemented roadmap items or research goals into completed features.
+
+## Remaining proposals
+
+The remaining studio roadmap, conditional handoff kits, continuous source/preview
+synchronization and broader persistence migration remain proposals. Independent review is evidence about the plan, not user consent.
 Older docs that discourage dark mode are superseded only by the explicit request
 for optional app appearance. Older mobile visual experiments are superseded by D002.
 

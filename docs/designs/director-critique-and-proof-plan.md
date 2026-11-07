@@ -97,9 +97,10 @@ These are normal use conditions, not bonus polish.
 | 5. Measured refinement | Faster, clearer, calmer work in short and long documents | Actual task measurements and performance traces; controlled before/after; reduced motion and accessibility checks |
 | 6. Handoff kits, if justified | One source can serve multiple audiences | Evidence of repeated multi-format work; isolated target results, partial failure recovery, explicit source inclusion |
 
-Do not implement all slices under a vague “make it cooler” instruction. Select one
-journey, define success, and complete its failure paths. The current request
-authorizes Slice 0 and the critique/workflow documents; later slices remain plans.
+Historical authorization at planning time covered Slice 0 and critique/workflow
+documents. The subsequent implementation request authorizes the core delivery,
+linked-review and appearance work. See [implementation and evidence](studio-implementation.md)
+for current completion and limits; the roadmap is not a blanket completion claim.
 
 ## The craft review should ask
 

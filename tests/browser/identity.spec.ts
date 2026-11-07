@@ -84,3 +84,21 @@ for (const width of [390, 1440]) {
     });
   });
 }
+
+test('desktop delivery keeps the incumbent control typography in cream and dark', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.locator('textarea').first().fill('# Protected controls');
+  const trigger = page.locator('header').getByRole('button', { name: 'Copy for Google Docs', exact: true });
+  for (const appearance of ['cream', 'dark']) {
+    await page.getByRole('button', { name: 'Change app appearance' }).click();
+    await page.getByRole('combobox', { name: 'App appearance', exact: true }).selectOption(appearance);
+    await page.getByRole('button', { name: 'Close App appearance', exact: true }).click();
+    const actual = await trigger.evaluate(node => {
+      const style = getComputedStyle(node);
+      return { family: style.fontFamily, size: style.fontSize, weight: style.fontWeight, lineHeight: style.lineHeight, tracking: style.letterSpacing };
+    });
+    expect(actual.family).toContain('JetBrains Mono');
+    expect(actual).toMatchObject({ size: '11px', weight: '500', lineHeight: '16px', tracking: 'normal' });
+  }
+});

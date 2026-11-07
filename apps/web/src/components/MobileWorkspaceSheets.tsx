@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { THEMES } from '@mdtodocs/compiler-core';
 import type { DocumentDiagnostic } from '@mdtodocs/compiler-core';
 import { useStore } from '@/store';
+import { LinkedReview } from './LinkedReview';
+import { AppAppearance } from './AppAppearance';
 import { WorkspaceSheet } from './WorkspaceSheet';
 import { mobileDestinations } from '@/utils/mobileDestinations';
 import type { MobileSheet } from '@/utils/mobileDestinations';
@@ -118,6 +120,7 @@ export function MobileWorkspaceSheets({
       )}
       {sheet === 'options' && (
         <div className="sheet-options">
+          <AppAppearance />
           <label>
             Document name
             <input
@@ -137,7 +140,7 @@ export function MobileWorkspaceSheets({
             Save name
           </button>
           <label>
-            Style
+            Document style
             <select
               value={store.themeId}
               onChange={(e) =>
@@ -214,24 +217,7 @@ export function MobileWorkspaceSheets({
         </div>
       )}
       {sheet === 'notes' && (
-        <div className="sheet-notes">
-          <p>
-            {compilationError
-              ? 'We could not finish checking this document. Edit the Markdown and try again.'
-              : isCompiling
-                ? 'Checking your latest text…'
-                : !warnings.length
-                  ? 'No structural formatting issues found.'
-                  : 'These elements may look different in your chosen app.'}
-          </p>
-          {warnings.map((note, i) => (
-            <p key={`${note.ruleId}-${i}`}>{note.message}</p>
-          ))}
-          <p className="sheet-description">
-            Formatting can vary when you paste into another app. Review
-            important documents after saving.
-          </p>
-        </div>
+        <LinkedReview notes={warnings} pending={isCompiling || compilationError} onNavigate={(view) => { setTab(view); setSheet(null); }} />
       )}
       {sheet === 'import' && (
         <div className="sheet-options">

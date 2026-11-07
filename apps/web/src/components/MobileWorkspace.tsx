@@ -204,24 +204,30 @@ export function MobileWorkspace(props: Props) {
       );
     }
   };
+  useEffect(() => {
+    const open = (event: Event) => {
+      const value = ((event as CustomEvent).detail || 'pdf') as ExportTarget;
+      useStore.getState().setHtmlOutput(value === 'html');
+      useStore.getState().setDestination(value === 'html' ? 'clipboard' : value);
+      setSheet(null);
+    };
+    window.addEventListener('mdtodocs:deliver', open);
+    window.addEventListener('mdtodocs:prepare-print', open);
+    return () => {
+      window.removeEventListener('mdtodocs:deliver', open);
+      window.removeEventListener('mdtodocs:prepare-print', open);
+    };
+  }, []);
+  useEffect(() => {
+    const review = () => setSheet('notes');
+    window.addEventListener('mdtodocs:review', review);
+    return () => window.removeEventListener('mdtodocs:review', review);
+  }, []);
   const chooseTarget = (value: ExportTarget) => {
     setHtmlOutput(value === 'html');
     analytics.track('destination_change', { from: target, to: value });
     onDestinationChange(value === 'html' ? 'clipboard' : value);
     setSheet(null);
-  };
-  const print = () => {
-    // The preview is always mounted, even when the editor tab is selected.
-    switchTab('preview');
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        window.print();
-      }),
-    );
-    analytics.track('document_delivery', {
-      destination: 'pdf',
-      result: 'print_opened',
-    });
   };
   return (
     <div className={`mobile-workspace ${keyboardOpen ? 'keyboard-open' : ''}`}>
@@ -343,6 +349,7 @@ export function MobileWorkspace(props: Props) {
         </label>
         <textarea
           ref={editor}
+          data-source-editor
           id="mobile-markdown"
           value={markdown}
           onChange={(e) => onInput(e.target.value)}
@@ -407,6 +414,7 @@ export function MobileWorkspace(props: Props) {
           </button>
         </div>
         <DocumentPreview
+            reviewNotes={isCompiling ? [] : diagnostics}
           markdown={markdown}
           destination={destination}
           isCompiling={isCompiling}
@@ -428,7 +436,6 @@ export function MobileWorkspace(props: Props) {
         warningsCount={warnings.length}
         output={output}
         setSheet={setSheet}
-        print={print}
         chooseTarget={chooseTarget}
       />
       {sheet && (

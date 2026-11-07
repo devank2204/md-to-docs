@@ -15,6 +15,8 @@ import {
 } from '@mdtodocs/renderers';
 
 export interface AppState {
+  appAppearance: 'cream' | 'dark' | 'system';
+  setAppAppearance: (value: 'cream' | 'dark' | 'system') => void;
   markdown: string;
   destination: DestinationType;
   htmlOutput: boolean;
@@ -29,7 +31,9 @@ export interface AppState {
   compiledDoc: Root | null;
   isCompiling: boolean;
   diagnostics: DocumentDiagnostic[];
-  setDiagnostics: (diagnostics: DocumentDiagnostic[]) => void;
+  diagnosticsKey: string;
+  diagnosticsFailed: boolean;
+  setDiagnostics: (diagnostics: DocumentDiagnostic[], key?: string, failed?: boolean) => void;
   isReviewMode: boolean;
   isCommandPaletteOpen: boolean;
   isInspectorOpen: boolean;
@@ -98,6 +102,8 @@ export const useStore = create<AppState>()(
       destination: 'google-docs',
       htmlOutput: false,
       setHtmlOutput: (htmlOutput) => set({ htmlOutput }),
+      appAppearance: 'cream',
+      setAppAppearance: (appAppearance) => set({ appAppearance }),
       themeId: 'default',
       activePresetId: 'default',
       baseFontSize: THEMES['default'].typography.baseFontSizePt,
@@ -108,7 +114,9 @@ export const useStore = create<AppState>()(
       compiledDoc: null,
       isCompiling: false,
       diagnostics: [],
-      setDiagnostics: (diagnostics) => set({ diagnostics }),
+      diagnosticsKey: '',
+      diagnosticsFailed: false,
+      setDiagnostics: (diagnostics, diagnosticsKey = '', diagnosticsFailed = false) => set({ diagnostics, diagnosticsKey, diagnosticsFailed }),
       isReviewMode:
         typeof window !== 'undefined' &&
         (new URLSearchParams(window.location.search).get('mode') === 'review' ||
@@ -424,6 +432,7 @@ export const useStore = create<AppState>()(
         markdown: state.markdown,
         destination: state.destination,
         htmlOutput: state.htmlOutput,
+        appAppearance: state.appAppearance,
         themeId: state.themeId,
         activePresetId: state.activePresetId,
         baseFontSize: state.baseFontSize,

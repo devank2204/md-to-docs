@@ -12,8 +12,7 @@ export function WorkspaceSidebar() {
   const renameDocument = useStore((s) => s.renameDocument);
   const setIsHistoryModalOpen = useStore((s) => s.setIsHistoryModalOpen);
   const setIsInspectorOpen = useStore((s) => s.setIsInspectorOpen);
-  const themeId = useStore((s) => s.themeId);
-  const setThemeId = useStore((s) => s.setThemeId);
+  const setAppAppearance = useStore((s) => s.setAppAppearance);
   const isSidebarOpen = useStore((s) => s.isSidebarOpen);
   const setIsSidebarOpen = useStore((s) => s.setIsSidebarOpen);
   const toggleSidebar = useStore((s) => s.toggleSidebar);
@@ -49,7 +48,7 @@ export function WorkspaceSidebar() {
   };
 
   const handleToggleTheme = () => {
-    setThemeId(themeId === 'dark' ? 'default' : 'dark');
+    setAppAppearance(document.documentElement.dataset.appearance === 'dark' ? 'cream' : 'dark');
   };
 
   return (
@@ -125,10 +124,11 @@ export function WorkspaceSidebar() {
             type="button"
             onClick={handleToggleTheme}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
-            title={themeId === 'dark' ? 'Switch to Light theme' : 'Switch to Dark theme'}
+            aria-label="Toggle app appearance"
+            title="Toggle cream/dark app appearance"
           >
             <span className="material-symbols-outlined text-[16px]">
-              {themeId === 'dark' ? 'light_mode' : 'dark_mode'}
+              contrast
             </span>
           </button>
         </div>

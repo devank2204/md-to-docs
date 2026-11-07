@@ -22,6 +22,8 @@ import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
 import { SuggestEditModal } from '@/components/SuggestEditModal';
 import { WorkspaceSidebar } from '@/components/WorkspaceSidebar';
+import { LinkedReview } from './LinkedReview';
+import { WorkspaceSheet } from './WorkspaceSheet';
 import { MobileWorkspace } from './MobileWorkspace';
 
 
@@ -230,7 +232,7 @@ export function Workspace({
             validationReport,
           });
           setCompiledDoc(doc);
-          setDiagnostics(combinedDiagnostics);
+          setDiagnostics(combinedDiagnostics, compileKey);
         }
       } catch (e: any) {
         if (!controller.signal.aborted) {
@@ -258,7 +260,7 @@ export function Workspace({
             validationReport: null,
           });
           setCompiledDoc(null);
-          setDiagnostics([]);
+          setDiagnostics([], compileKey, true);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -273,6 +275,13 @@ export function Workspace({
     };
   }, [markdown, destination, activeTheme, activeDocumentId, compileKey, setCompiledDoc, setDiagnostics, setIsCompiling]);
 
+  const [linkedReviewOpen, setLinkedReviewOpen] = useState(false);
+  useEffect(() => {
+    if (isMobile) return;
+    const open = () => setLinkedReviewOpen(true);
+    window.addEventListener('mdtodocs:review', open);
+    return () => window.removeEventListener('mdtodocs:review', open);
+  }, [isMobile]);
   const { diagnostics, stats, validationReport } = compiledState;
   const warnings = diagnostics.filter(d => d.severity === 'warning' || d.severity === 'error');
   const statsText = formatStats(stats);
@@ -285,6 +294,7 @@ export function Workspace({
         <div className="flex-1 w-full overflow-y-auto px-4 py-8 bg-surface-container-lowest">
           <div className="w-full flex justify-center pb-20">
             <DocumentPreview
+              reviewNotes={isCompiling ? [] : warnings}
               markdown={markdown}
               destination={destination}
               isCompiling={isCompiling}
@@ -309,6 +319,7 @@ export function Workspace({
 
             <div className="flex flex-col col-span-7 lg:col-span-8 h-full min-h-0">
               <DocumentPreview
+              reviewNotes={isCompiling ? [] : warnings}
                 markdown={markdown}
                 destination={destination}
                 isCompiling={isCompiling}
@@ -319,6 +330,12 @@ export function Workspace({
         </div>
       )}
 
+      {linkedReviewOpen && <WorkspaceSheet title="Review your document" onClose={() => setLinkedReviewOpen(false)}>
+        <LinkedReview notes={warnings} pending={isCompiling || compilationError} onNavigate={(view) => {
+          if (view === 'edit') useStore.getState().setIsReviewMode(false);
+          setLinkedReviewOpen(false);
+        }} />
+      </WorkspaceSheet>}
       <SuggestEditModal
         isOpen={isSuggestModalOpen}
         onClose={() => setIsSuggestModalOpen(false)}

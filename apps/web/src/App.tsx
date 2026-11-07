@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useAppAppearance } from '@/hooks/useAppAppearance';
 import { useMobileLayout } from '@/hooks/useMobileLayout';
 import { EmptyState } from '@/components/EmptyState';
 import { Workspace } from '@/components/Workspace';
@@ -20,6 +21,7 @@ import { analytics, getDocLengthBucket } from '@/utils/analytics';
 export type AppState = 'EMPTY' | 'WORKSPACE';
 
 function App() {
+  useAppAppearance();
   const isMobile = useMobileLayout();
   const markdown = useStore(state => state.markdown);
   const currentView = useStore(state => state.currentView);
@@ -53,10 +55,10 @@ function App() {
 
   const appState: AppState = currentView === 'landing' ? 'EMPTY' : 'WORKSPACE';
 
-  const activeTheme: DocumentTheme = {
+  const activeTheme: DocumentTheme = useMemo(() => ({
     ...THEMES[themeId],
     typography: { ...THEMES[themeId].typography, baseFontSizePt: baseFontSize },
-  };
+  }), [themeId, baseFontSize]);
 
   const handleNavigateRoute = (path: LandingRoutePath) => {
     if (typeof window !== 'undefined') {

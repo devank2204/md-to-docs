@@ -11,7 +11,6 @@ interface Props {
   warningsCount: number;
   output: ReturnType<typeof useDocumentExport>;
   setSheet: (sheet: MobileSheet) => void;
-  print: () => void;
   chooseTarget: (target: ExportTarget) => void;
 }
 export function MobileExportBar({
@@ -22,7 +21,6 @@ export function MobileExportBar({
   warningsCount,
   output,
   setSheet,
-  print,
   chooseTarget,
 }: Props) {
   const selected = mobileDestinations.find((item) => item.value === target)!;
@@ -72,18 +70,20 @@ export function MobileExportBar({
           {output.message}
         </p>
       )}
-      {!output.data || target === 'pdf' ? (
+      {!output.data ? (
         <button
           type="button"
           className="mobile-primary"
           disabled={
-            !hasContent || output.busy || (target === 'pdf' && isCompiling)
+            !hasContent || output.busy
           }
-          onClick={target === 'pdf' ? print : output.prepare}
+          onClick={output.prepare}
         >
           {output.busy ? 'Preparing your document…' : selected.action}
           <span aria-hidden="true">{output.busy ? '…' : '→'}</span>
         </button>
+       ) : output.data.kind === 'print' ? (
+        <button className="mobile-primary" type="button" disabled={output.busy} onClick={() => output.deliver('print')}>Open Print / Save as PDF</button>
       ) : output.data.kind === 'file' ? (
         <div className="mobile-delivery-actions">
           {canShare && (
@@ -134,6 +134,7 @@ export function MobileExportBar({
           )}
         </>
       )}
+      {output.preparing && <button type="button" className="mobile-secondary" onClick={output.cancel}>Cancel preparation</button>}
       {!hasContent && (
         <p className="mobile-private-note">
           Start with your text. No account needed.

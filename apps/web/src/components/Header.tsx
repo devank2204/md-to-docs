@@ -2,11 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import type { AppState } from '@/App';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { SegmentedControl } from '@/components/interior/segmented-control';
-import { LoadingButton } from '@/components/interior/loading-button';
+import { WorkspaceSheet } from './WorkspaceSheet';
+import { MobileExportBar } from './MobileExportBar';
+import { useDocumentExport } from '@/hooks/useDocumentExport';
 import { useStore } from '@/store';
-import { exportDocx, copyFormattedDoc, printPdf, downloadHtml } from '@/utils/exportHelpers';
 import { getCommandShortcut } from '@/utils/platform';
 import { analytics } from '@/utils/analytics';
+import { AppAppearance } from './AppAppearance';
 import { BrandWordmark } from './BrandWordmark';
 
 interface HeaderProps {
@@ -28,7 +30,6 @@ export function Header({
   documentSignature,
   onOpenCommandPalette,
 }: HeaderProps) {
-  const compiledDoc = useStore(state => state.compiledDoc);
   const isReviewMode = useStore(state => state.isReviewMode);
   const setIsReviewMode = useStore(state => state.setIsReviewMode);
   const activeDocumentId = useStore(state => state.activeDocumentId);
@@ -39,6 +40,9 @@ export function Header({
   const isSidebarOpen = useStore(state => state.isSidebarOpen);
   const toggleSidebar = useStore(state => state.toggleSidebar);
   const diagnostics = useStore(state => state.diagnostics);
+  const diagnosticsKey = useStore(state => state.diagnosticsKey);
+  const diagnosticsFailed = useStore(state => state.diagnosticsFailed);
+  const isChecking = diagnosticsKey !== JSON.stringify([activeDocumentId, markdown, destination, activeTheme]);
 
   const [isLogoMenuOpen, setIsLogoMenuOpen] = useState(false);
   const [isEyeBlinking, setIsEyeBlinking] = useState(false);
@@ -57,90 +61,26 @@ export function Header({
 
   const activeDocTitle =
     documents.find(d => d.id === activeDocumentId)?.title || 'Untitled Document';
-  const recordSuccessfulExport = useStore(state => state.recordSuccessfulExport);
-
-  const handleDownloadDocx = async () => {
-    const startTime = Date.now();
-    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
-    analytics.track('export_attempt', { destination: 'word', format: 'docx', hasWarnings });
-    try {
-      const success = await exportDocx(markdown, compiledDoc, activeTheme, documentSignature);
-      if (success) {
-        recordSuccessfulExport();
-        analytics.trackExportCompleted('word', 'docx', Date.now() - startTime);
-      } else {
-        analytics.track('export_failure', { destination: 'word', format: 'docx', errorType: 'export_failed' });
-      }
-      return success;
-    } catch {
-      analytics.track('export_failure', { destination: 'word', format: 'docx', errorType: 'export_failed' });
-      return false;
-    }
-  };
-
-  const handleCopyFormatted = async () => {
-    const startTime = Date.now();
-    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
-    analytics.track('export_attempt', { destination, format: 'clipboard_html', hasWarnings });
-    try {
-      const success = await copyFormattedDoc(markdown, compiledDoc, destination, activeTheme, documentSignature);
-      if (success) {
-        recordSuccessfulExport();
-        analytics.trackExportCompleted(destination, 'clipboard_html', Date.now() - startTime);
-      } else {
-        analytics.track('export_failure', { destination, format: 'clipboard_html', errorType: 'copy_failed' });
-      }
-      return success;
-    } catch {
-      analytics.track('export_failure', { destination, format: 'clipboard_html', errorType: 'export_failed' });
-      return false;
-    }
-  };
-
-  const handleDownloadHtml = async () => {
-    const startTime = Date.now();
-    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
-    analytics.track('export_attempt', { destination: 'html', format: 'html', hasWarnings });
-    try {
-      const success = await downloadHtml(markdown, compiledDoc, activeTheme, activeDocTitle);
-      if (success) {
-        recordSuccessfulExport();
-        analytics.trackExportCompleted('html', 'html', Date.now() - startTime);
-      } else {
-        analytics.track('export_failure', { destination: 'html', format: 'html', errorType: 'html_failed' });
-      }
-      return success;
-    } catch {
-      analytics.track('export_failure', { destination: 'html', format: 'html', errorType: 'export_failed' });
-      return false;
-    }
-  };
-
-  const handlePrintPdf = () => {
-    const hasWarnings = diagnostics.some(d => d.severity === 'warning');
-    analytics.track('export_attempt', { destination: 'pdf', format: 'pdf', hasWarnings });
-    printPdf();
-    // Browser print does not tell us whether a PDF was saved.
-    analytics.track('document_delivery', { destination: 'pdf', result: 'print_opened' });
-  };
-
   const isHtmlRoute = useStore(state => state.htmlOutput);
-
-  const primaryAction = async () => {
-    if (isHtmlRoute && destination === 'clipboard') {
-      return await handleDownloadHtml();
-    }
-    switch (destination) {
-      case 'google-docs':
-      case 'clipboard':
-        return await handleCopyFormatted();
-      case 'word':
-        return await handleDownloadDocx();
-      case 'pdf':
-        handlePrintPdf();
-        return Promise.resolve();
-    }
-  };
+  const [deliveryOpen, setDeliveryOpen] = useState(false);
+  const [appearanceOpen, setAppearanceOpen] = useState(false);
+  const target = isHtmlRoute && destination === 'clipboard' ? 'html' : destination;
+  const output = useDocumentExport({ markdown, destination: target, theme: activeTheme,
+    signature: documentSignature, title: activeDocTitle }, activeDocumentId);
+  useEffect(() => {
+    const open = (event: Event) => {
+      const requested = (event as CustomEvent).detail || 'pdf';
+      useStore.getState().setHtmlOutput(requested === 'html');
+      onDestinationChange(requested === 'html' ? 'clipboard' : requested);
+      setDeliveryOpen(true);
+    };
+    window.addEventListener('mdtodocs:prepare-print', open);
+    window.addEventListener('mdtodocs:deliver', open);
+    return () => {
+      window.removeEventListener('mdtodocs:prepare-print', open);
+      window.removeEventListener('mdtodocs:deliver', open);
+    };
+  }, [onDestinationChange]);
 
   const primaryLabel = () => {
     if (isHtmlRoute && destination === 'clipboard') {
@@ -308,6 +248,8 @@ export function Header({
         )}
       </div>
 
+      {appearanceOpen && <WorkspaceSheet title="App appearance" onClose={() => setAppearanceOpen(false)}><div className="sheet-options"><AppAppearance /><p className="sheet-description">Only the app changes. Your document style and prepared files stay the same.</p></div></WorkspaceSheet>}
+      {appState === 'EMPTY' && <button type="button" aria-label="Change app appearance" title="App appearance" className="w-8 h-8 rounded hover:bg-surface-container" onClick={() => setAppearanceOpen(true)}><span className="material-symbols-outlined text-[18px]">contrast</span></button>}
       {appState === 'WORKSPACE' && (
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Commands Trigger */}
@@ -354,20 +296,35 @@ export function Header({
             }}
           />
 
+          <button type="button" aria-label="Change app appearance" title="App appearance" className="w-8 h-8 rounded hover:bg-surface-container" onClick={() => setAppearanceOpen(true)}><span className="material-symbols-outlined text-[18px]">contrast</span></button>
           {/* Primary Action Button */}
-          <LoadingButton
-            onAction={primaryAction}
-            destination={destination}
-            successLabel={destination === 'word' || (isHtmlRoute && destination === 'clipboard') ? 'Download started' : destination === 'pdf' ? 'Print opened' : 'Copied!'}
-            pendingLabel={destination === 'word' ? 'Compiling...' : destination === 'pdf' ? 'Preparing...' : 'Copying...'}
-            idleIcon={<span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>}
-            className="min-w-fit px-2.5 sm:px-3 sm:min-w-[145px]"
-          >
-            <span className="hidden sm:inline">{primaryLabel() ?? 'Export'}</span>
-            <span className="inline sm:hidden">
-              {destination === 'google-docs' ? 'Copy Docs' : destination === 'word' ? 'Export' : destination === 'pdf' ? 'Print' : 'Copy'}
-            </span>
-          </LoadingButton>
+          <button type="button" aria-label={primaryLabel()} onClick={() => setDeliveryOpen(true)}
+            disabled={!markdown.trim()}
+            className="desktop-delivery-trigger relative inline-flex h-8 select-none items-center justify-center rounded-lg px-2.5 sm:px-3 font-code-sm text-code-sm font-medium outline-none cursor-pointer transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed bg-zinc-900 text-white hover:bg-zinc-800 border border-black/5 min-w-fit sm:min-w-[145px] gap-1.5">
+            <span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>
+            <span>{primaryLabel()}</span>
+          </button>
+          {deliveryOpen && (
+            <WorkspaceSheet title="Deliver your document" onClose={() => setDeliveryOpen(false)}>
+              <p className="sheet-description">{activeDocTitle} · Uses your latest text when you prepare. No account needed.</p>
+              <div className="sheet-options">
+                <label>Save as
+                  <select aria-label="Save as" id="desktop-delivery-target" value={target} onChange={(event) => {
+                    const value = event.target.value;
+                    useStore.getState().setHtmlOutput(value === 'html');
+                    onDestinationChange((value === 'html' ? 'clipboard' : value) as DestinationType);
+                  }}>
+                    <option value="google-docs">Google Docs</option><option value="word">Word</option>
+                    <option value="pdf">PDF</option><option value="html">HTML</option><option value="clipboard">Formatted text</option>
+                  </select>
+                </label>
+              </div>
+              <MobileExportBar target={target} hasContent={!!markdown.trim()} compilationError={!isChecking && diagnosticsFailed}
+                isCompiling={isChecking} warningsCount={diagnostics.filter(note => note.severity === 'warning' || note.severity === 'error').length}
+                output={output} setSheet={(sheet) => { if (sheet === 'destination') document.getElementById('desktop-delivery-target')?.focus(); else { setDeliveryOpen(false); window.dispatchEvent(new CustomEvent('mdtodocs:review')); } }}
+                chooseTarget={(value) => { useStore.getState().setHtmlOutput(value === 'html'); onDestinationChange(value === 'html' ? 'clipboard' : value); }} />
+            </WorkspaceSheet>
+          )}
 
           {/* Reading View Button with Eye Blink Micro-Interaction */}
           {!isReviewMode && (

@@ -13,8 +13,8 @@ Preserve existing cream tokens in apps/web/tailwind.config.js and incumbent
 values in apps/web/src/index.css. Desktop surface/background: #faf9f6. Mobile
 workspace ground: #fafaf7. Preserve white document paper and existing state colors.
 Do not unify similar values, recolor an accent, or infer a new palette from a mock.
-Dark app appearance is a future opt-in expansion, not implemented or approved
-candidate token values. It must never mutate the chosen document theme.
+Dark app appearance is an optional Cream/Dark/System preference. Dark tokens
+apply only to app chrome; they must never mutate the chosen document theme.
 
 ## Typography
 

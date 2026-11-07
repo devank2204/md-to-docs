@@ -23,6 +23,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
           </span>
         </div>
         <div className="flex items-center gap-2 font-code-sm text-[11px] text-secondary">
+          <button type="button" className="px-2 py-1 rounded hover:bg-surface-container" onClick={() => window.dispatchEvent(new CustomEvent('mdtodocs:review'))}>Review & outline</button>
           <span className="tabular-nums font-mono">{words} words</span>
           <span className="text-outline-variant">·</span>
           <span className="tabular-nums font-mono">{lines} lines</span>
@@ -45,6 +46,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
       {/* Editor Textarea */}
       <div className="flex-1 min-h-0 relative">
         <textarea
+          data-source-editor
+          aria-label="Markdown text"
           className="w-full h-full p-space-md font-code-md text-code-md text-on-surface bg-transparent resize-none focus:outline-none leading-relaxed overflow-y-auto selection:bg-primary/15"
           value={markdown}
           onChange={(e) => onInput(e.target.value)}

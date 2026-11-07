@@ -2,40 +2,54 @@
 
 Updated: 2026-11-07. Branch: v3.
 
-## What exists
+## Current implementation
 
-- 809a445: mobile conversion flow and fresh-source export implementation; pushed.
-- 049d135: ambitious UX proposal, storyboard and review evidence; local proposal.
-- 687c116 restores the web home typography/wordmark on mobile while preserving
-  preview and conversion behavior. Current documentation adds the decision/evidence
-  workflow and the director critique/reference research.
+The latest user request authorizes starting the ambitious UX implementation.
+See [implementation and evidence](designs/studio-implementation.md) for concrete
+behavior, reproduction commands and remaining scope.
 
-## Settled constraints
+- Shared current-source preparation/delivery on desktop and mobile, including
+  command and reading-view entry points, cancellation and recoverable failures.
+- Isolated PDF print snapshot with resource readiness and explicit print gesture.
+- Optional Cream/Dark/System app appearance, independent of document styling.
+- Source-linked formatting review, object markers, outline, proposed rescue
+  changes, backups and guarded undo; exact duplicate/nested source selection.
+- Independent abortable image requests prevent preview cancellation from
+  canceling another export. Desktop check status is source-revision-bound.
+- Cream palette and existing typography are protected. Home and desktop control
+  typography have browser assertions; appearance does not invalidate artifacts.
 
-DESIGN.md and docs/decisions/README.md are authoritative for current identity.
-No future font/typography change without an explicit user request. Cream stays.
-Dark app appearance is requested in the roadmap and remains unimplemented.
+## Executed verification
 
-## Next useful work
+Final full build/prerender passed. All 35 Chromium browser scenarios passed;
+149 validation tests across 28 files passed; all 20 fidelity fixtures passed.
+Lint passed with pre-existing diagram/canvas warnings; no new warnings. Actual
+cream/dark captures and control-bound measurements cover 390, 1024 and 1440px.
+No page overflow or offscreen header controls were observed in those captures.
+The broader browser layout scenarios cover 320, 360, 390, 430, 768, 1024 and 1440px.
 
-The user has requested a design critique, references, and smoother future decision
-making, not implementation of every proposed feature. See the [director critique and proof plan](designs/director-critique-and-proof-plan.md)
-and [reference selection](research/reference-repositories.md). A future feature task should select one concrete
-journey and its evidence rather than implement the entire roadmap at once.
+New cancellation regression failed against the old shared abortable image cache
+and passed after the fix. Earlier development failures were corrected (test
+selectors, prerender build order, source-range return typing); they were not counted
+as passing runs. Visual review caught an inherited desktop button font and restored
+the existing 11px JetBrains Mono control role before the final typography check.
 
-Physical iPhone/Android receiving-app, keyboard and print checks remain pending.
-The earlier WebKit launch failed for missing Linux libraries; do not count it as
-Safari evidence. No claimed Product Hunt/xAI endorsement or validated case study.
+## Constraints and remaining evidence
 
-## Evidence for this correction
+DESIGN.md and the decision register remain authoritative. No future typography
+change without explicit user instruction. Continuous source/preview scroll sync,
+universal transformed-node mapping, handoff kits and large-document performance
+research remain outside this completed foundation. Kits still require evidence
+of repeated multi-format work.
 
-Browser identity regressions verify the shared incumbent title, description,
-wordmark, and responsive role sizes at phone/desktop widths. See tests/browser
-and the final task report for executed checks. Do not treat this file's planned
-checks as executed outcomes. This correction does not authorize a broad redesign.
+Physical iPhone/Android, receiving-app paste and native print/save checks remain
+pending. WebKit could not launch because Linux libraries were missing; Chromium
+emulation is not Safari evidence. Automated print inspection/stubbing does not
+prove a PDF was saved. No production or usability-study outcome is claimed.
 
-Executed for this correction: full build/prerender passed; 26 browser scenarios
-passed (including desktop/mobile identity); 146 validation tests passed; lint
-passed with pre-existing diagram/canvas warnings. The stronger exact typography
-assertions were also rerun separately and passed. Physical-device coverage did
-not change. Preview/renderer/font-import files were not edited.
+## Git / continuity
+
+809a445 is the last known pushed v3 revision. Subsequent planning, identity
+restoration and decision-workflow commits remain intact locally, followed by this
+implementation. The current request did not ask for a push, and repository policy
+requires an explicit push request in the current prompt. No deployment occurred.

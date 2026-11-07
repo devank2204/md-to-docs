@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { planRepresentation, DiagnosticsCollector } from '@mdtodocs/compiler-core';
+import { planRepresentation, DiagnosticsCollector, type DocumentDiagnostic } from '@mdtodocs/compiler-core';
 import type { Root } from 'mdast';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,6 +19,25 @@ interface DocumentPreviewProps {
   documentSignature?: { enabled: boolean; placement: 'every-page' | 'last-page' };
   isReviewMode?: boolean;
   readingLayout?: boolean;
+  reviewNotes?: DocumentDiagnostic[];
+}
+
+// Only source positions preserved by the planner receive anchors. No fuzzy text matching.
+function sourceReviewPlugin(notes: DocumentDiagnostic[]) {
+  return () => (tree: any) => {
+    tree.children = tree.children.flatMap((node: any) => {
+      if (node.type !== 'element' || !node.position) return [node];
+      const line = node.position.start.line;
+      const issues = notes.filter(note => note.position && note.position.line >= line && note.position.line <= node.position.end.line);
+      const anchor = { type: 'element', tagName: 'span', properties: { 'data-source-line': line, className: ['source-anchor'], tabIndex: -1 }, children: [] };
+      const marker = { type: 'element', tagName: 'button', properties: {
+        type: 'button', 'data-review-marker': line, 'data-print-hide': true,
+        className: ['review-marker', 'font-code-sm', 'text-code-sm'],
+        'aria-label': `Review formatting at line ${line}`,
+      }, children: [{ type: 'text', value: `Review formatting · ${issues.length} ${issues.length === 1 ? 'note' : 'notes'}` }] };
+      return issues.length ? [anchor, node, marker] : [anchor, node];
+    });
+  };
 }
 
 // Rehype plugin to wrap headings and their section content into collapsible <details>
@@ -138,6 +157,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   isCompiling,
   isReviewMode = false,
   readingLayout = false,
+  reviewNotes = [],
 }) => {
   const zoom = useStore((state) => state.zoom);
   const setZoom = useStore((state) => state.setZoom);
@@ -170,6 +190,11 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             borderColor: isDark ? '#374151' : '#e5e7eb',
             fontSize: `${baseFontSize}pt`,
           }}
+          onClick={(event) => {
+            if ((event.target as HTMLElement).closest('[data-review-marker]'))
+              window.dispatchEvent(new CustomEvent('mdtodocs:review'));
+          }}
+          data-document-paper
           className={`w-full max-w-[816px] min-w-0 transition-all duration-300 p-4 sm:p-space-md md:p-space-xxl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_28px_-4px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] rounded-sm flex flex-col h-auto min-h-[1056px] relative border box-border break-words [overflow-wrap:anywhere] mb-space-xxl ${
             isDark ? 'prose prose-invert' : 'prose prose-slate'
           }`}
@@ -191,7 +216,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
-                rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], rehypeCollapsibleHeadings]}
+                rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], sourceReviewPlugin(reviewNotes), rehypeCollapsibleHeadings]}
                 components={{
                   p({ children, ...props }: any) {
                     return (
