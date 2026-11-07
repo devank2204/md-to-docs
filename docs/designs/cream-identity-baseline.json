@@ -1,0 +1,21 @@
+{
+  "revision": "809a4457e1e529f866db8347000cb37fcc1ea04d",
+  "purpose": "Identify current cream/font sources; compare actual protected role values in future changes, not whole-file hashes.",
+  "files": {
+    "apps/web/tailwind.config.js": {
+      "sha256": "3223fdf9de957505e217946afd55f6ab1d1e99d018d9dd5e535d681e323852d5"
+    },
+    "apps/web/src/index.css": {
+      "sha256": "2ff1170b3253916e04d1197ddea3165ba112b40848d1b348673e78ad7fab4661"
+    },
+    "apps/web/index.html": {
+      "sha256": "7f6b8aab13fc0aa91add82cc1c546b8c8db44dbcc59e80d037002821cbae8154"
+    },
+    "packages/compiler-core/src/theme/default.ts": {
+      "sha256": "143ed9ef025b3fd108c57e9cebf60c96e33e28815b703c35b5af3f29ce35a1fc"
+    },
+    "packages/compiler-core/src/theme/dark.ts": {
+      "sha256": "f4c5b20656401e31e9fa2d945ccb524c304ab8d7fd753fd22dd5a7a556b1eb13"
+    }
+  }
+}
