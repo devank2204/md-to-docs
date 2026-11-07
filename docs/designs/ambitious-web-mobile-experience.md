@@ -1,5 +1,11 @@
 # md.to.docs: a document studio worth borrowing ideas from
 
+**Current identity authority:** [DESIGN.md](../../DESIGN.md) and decision D002.
+The user has rejected the separate mobile-home typography introduced in 809a445.
+The restoration shares the incumbent web introduction and wordmark. This older
+proposal and its source-hash baseline do not authorize preserving that rejected
+treatment or changing fonts in a later UX task.
+
 Status: proposed web/mobile UX plan, not implementation approval.
 Baseline: v3 at `809a445`. User constraints recorded 2026-11-07.
 Target: existing React web app on desktop, tablet, and phones. No native app is implied.

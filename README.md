@@ -73,3 +73,12 @@ Text and recent documents stay in this browser on this device. Export important
 work before clearing browser storage. File imports and pastes are limited to
 1 MB and are never truncated. See [mobile verification](docs/MOBILE_QA.md) for
 browser-test commands and the real-device release checklist.
+
+## Product and design decisions
+
+Start with [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and the
+[active decision register](docs/decisions/README.md). [program.md](program.md)
+defines the bounded implementation/evidence loop. The historical docs remain a
+reference library; [WORKSTATE](docs/WORKSTATE.md) identifies current work.
+See the [design critique and case-study proof plan](docs/designs/director-critique-and-proof-plan.md)
+and [evaluated reference repositories](docs/research/reference-repositories.md).
