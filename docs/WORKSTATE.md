@@ -66,3 +66,23 @@ and [public evidence snapshot](operations/domain-access-evidence.json). The inci
 is not resolved until an affected company user can load and use the site. The next
 necessary input is the office browser error/block category; local read-only DNS/
 HTTP comparison commands and an unsent IT draft are in the investigation document.
+
+## Mermaid repair and image actions — 2026-11-07
+
+The user paused the office DNS incident and requested Mermaid compatibility
+repair, copy-image and working diagram options. Implemented a local renderer-
+validated review/apply/batch/undo assistant; exact source ranges and stale guards
+protect document edits. Azure import normalization and conservative flowchart
+repairs preserve valid syntax. Shared strict rendering/image actions cover
+inline preview, Canvas and both utility routes. Existing typography and cream
+palette remain protected.
+
+See [implementation, research and test-gap report](qa/mermaid-repair-and-actions.md).
+No new AI provider or dependency. No production DNS change. No push authorized
+in this prompt; completion is local to v3 until a subsequent explicit push.
+
+Final source commit `901403e`: build/prerender and lint passed (existing warnings),
+49 Chromium browser scenarios, 166 validation tests and 20 fidelity fixtures passed.
+Pinned gstack manual review found two additional layout defects; native regressions
+verify their fixes. Its formal manual pass remains inconclusive after two client
+timeouts; see the report for evidence and physical-device/paste limitations.
