@@ -189,7 +189,7 @@ function App() {
       />}
       <main className={`flex-1 flex flex-col relative ${isMobile && !currentPath.startsWith('/mermaid-') ? 'mobile-main' : 'mt-12'}`}>
         {(!routeSpec) ? <section className="p-10"><h1>Page Not Found (404)</h1><a href="/">Return to MDToDocs</a></section> : null}
-        {routeSpec && currentPath !== '/' && appState !== 'EMPTY' && !currentPath.startsWith('/mermaid-') && <HomeIntroduction />}
+        {routeSpec && currentPath !== '/' && appState !== 'EMPTY' && !isMobile && !currentPath.startsWith('/mermaid-') && <HomeIntroduction />}
         {!routeSpec ? null : currentPath === '/mermaid-to-svg' || currentPath === '/mermaid-to-png' ? (
           <MermaidUtilityView
             currentPath={currentPath}

@@ -13,7 +13,7 @@ describe('Prompt 04: Technical SEO Foundation & Netlify Prerendering', () => {
 
     expect(netlifyContent).toContain('publish = "apps/web/dist"');
     expect(netlifyContent).toContain('command = "pnpm --filter web build && pnpm prerender"');
-    expect(netlifyContent).toContain('status = 200');
+    expect(netlifyContent).toContain('status = 404');
     expect(netlifyContent).toContain('X-Frame-Options');
     expect(netlifyContent).toContain('X-Content-Type-Options');
     expect(netlifyContent).toContain('Cache-Control');
@@ -40,11 +40,11 @@ describe('Prompt 04: Technical SEO Foundation & Netlify Prerendering', () => {
   it('prerendered HTML files exist with unique meta, canonical, JSON-LD and SSR content', async () => {
     const targetRoutes = [
       { dir: '', canonical: 'https://mdtodocs.com/', expectedH1: 'Markdown to Docs' },
-      { dir: 'markdown-to-word', canonical: 'https://mdtodocs.com/markdown-to-word', expectedH1: 'Convert Markdown to Microsoft Word (.docx)' },
-      { dir: 'markdown-to-pdf', canonical: 'https://mdtodocs.com/markdown-to-pdf', expectedH1: 'Convert Markdown to PDF' },
-      { dir: 'markdown-to-google-docs', canonical: 'https://mdtodocs.com/markdown-to-google-docs', expectedH1: 'Paste Markdown into Google Docs' },
-      { dir: 'markdown-to-html', canonical: 'https://mdtodocs.com/markdown-to-html', expectedH1: 'Convert Markdown to Standalone HTML' },
-      { dir: 'markdown-to-rich-text', canonical: 'https://mdtodocs.com/markdown-to-rich-text', expectedH1: 'Convert Markdown to Rich Text' },
+      { dir: 'markdown-to-word', canonical: 'https://mdtodocs.com/markdown-to-word/', expectedH1: 'Convert Markdown to Microsoft Word (.docx)' },
+      { dir: 'markdown-to-pdf', canonical: 'https://mdtodocs.com/markdown-to-pdf/', expectedH1: 'Convert Markdown to PDF' },
+      { dir: 'markdown-to-google-docs', canonical: 'https://mdtodocs.com/markdown-to-google-docs/', expectedH1: 'Paste Markdown into Google Docs' },
+      { dir: 'markdown-to-html', canonical: 'https://mdtodocs.com/markdown-to-html/', expectedH1: 'Convert Markdown to Standalone HTML' },
+      { dir: 'markdown-to-rich-text', canonical: 'https://mdtodocs.com/markdown-to-rich-text/', expectedH1: 'Convert Markdown to Rich Text' },
     ];
 
     const seenTitles = new Set<string>();
@@ -93,8 +93,8 @@ describe('Prompt 04: Technical SEO Foundation & Netlify Prerendering', () => {
       // 6. Verify SSR markup inside <div id="root"> (Crawlable with JS disabled)
       expect(html).toContain(`<h1`);
       expect(html).toContain(route.expectedH1);
-      expect(html).toContain('Fidelity &amp; Layout Guarantees');
-      expect(html).toContain('Frequently Asked Questions');
+      expect(html).toContain('How to convert');
+      expect(html).toContain('Is my document private?');
     }
   });
 
@@ -107,4 +107,32 @@ describe('Prompt 04: Technical SEO Foundation & Netlify Prerendering', () => {
     expect(html).toContain('Page Not Found (404)');
     expect(html).toContain('Return to mdtodocs App');
   });
+});
+
+describe('all authoritative routes in production output', () => {
+ it('emits one metadata set, primary heading and valid internal links for every route', async () => {
+  const { LANDING_ROUTES } = await import('../../../apps/web/src/routes/landingData');
+  const { load } = await import('cheerio');
+  const dist = path.resolve(__dirname, '../../../apps/web/dist');
+  const sitemap = await fs.readFile(path.join(dist, 'sitemap.xml'), 'utf8');
+  for (const spec of Object.values(LANDING_ROUTES)) {
+   const html = await fs.readFile(path.join(dist, spec.path, 'index.html'), 'utf8');
+   const $ = load(html);
+   expect($('h1').length).toBe(1);
+   expect($('h1').text()).toBe(spec.h1);
+   expect($('title').length).toBe(1);
+   expect($('title').text()).toBe(spec.title);
+   expect($('meta[name="description"]').attr('content')).toBe(spec.description);
+   expect($('link[rel="canonical"]').length).toBe(1);
+   expect($('link[rel="canonical"]').attr('href')).toBe(spec.canonical);
+   expect(JSON.parse($('script[type="application/ld+json"]').text()).url).toBe(spec.canonical);
+   expect(sitemap).toContain(`<loc>${spec.canonical}</loc>`);
+   expect($('meta[name="robots"]').attr('content')).not.toBe('noindex');
+   for (const a of $('nav a').toArray()) {
+    const href = $(a).attr('href')!;
+    expect(href.endsWith('/')).toBe(true);
+    expect(await fs.stat(path.join(dist, href, 'index.html')).then(()=>true)).toBe(true);
+   }
+  }
+ });
 });

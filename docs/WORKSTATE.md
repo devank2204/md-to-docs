@@ -123,3 +123,13 @@ See [implementation and evidence](qa/synchronized-scroll.md). Production build/
 prerender and lint passed (existing warnings only). All 65 Chromium browser
 scenarios passed in 1.5m, including six new sync-scroll checks. No push requested
 for this task.
+
+## SEO Iteration 01 — 2026-11-08
+
+Implemented shared static/client landing components, stable route metadata,
+trailing-slash canonical/sitemap/link conventions, destination-specific native
+introductions and compact guidance, preserved saved destination on reload, and
+Netlify 404 fallback. Home identity and converter engines preserved. Added static
+and Chromium initialization/navigation/no-JavaScript/width checks. See
+[implementation and evidence](qa/seo-iteration-01.md). Local only; no push or
+deployment. Production Netlify status and real receiving-app checks remain pending.

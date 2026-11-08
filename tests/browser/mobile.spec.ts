@@ -62,7 +62,7 @@ test('paste permission denial offers native paste without losing text', async ({
   ).toHaveValue(/My document/);
 });
 
-test('route default applies once; later destination selection survives typing and reload uses route', async ({
+test('route default applies once; later destination selection survives typing and reload preserves selection', async ({
   page,
 }) => {
   await page.goto('/markdown-to-word');
@@ -79,7 +79,7 @@ test('route default applies once; later destination selection survives typing an
   await page.reload();
   await openExport(page);
   await expect(
-    page.getByRole('button', { name: 'Prepare Word document' }),
+    page.getByRole('button', { name: 'Prepare for Google Docs' }),
   ).toBeVisible();
 });
 

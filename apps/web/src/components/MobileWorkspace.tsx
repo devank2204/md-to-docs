@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { LandingContext } from '../routes/LandingContext';
+import { useContext, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { deviceStorageHealth } from '@/utils/deviceStorage';
 import type {
   DocumentTheme,
@@ -34,6 +35,7 @@ interface Props {
 }
 
 export function MobileWorkspace(props: Props) {
+  const landingSpec = useContext(LandingContext);
   const {
     markdown,
     onInput,
@@ -291,7 +293,7 @@ export function MobileWorkspace(props: Props) {
         className="mobile-edit-panel"
         data-print-hide
       >
-        {!hasContent && (
+        {(!hasContent || landingSpec.path !== "/") && (
           <div className="mobile-intro">
             <HomeIntroduction />
           </div>

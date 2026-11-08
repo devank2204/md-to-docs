@@ -37,10 +37,6 @@ describe('Prompt 05: Five Core Conversion Landing Pages', () => {
       expect(spec.h1.length).toBeGreaterThan(10);
       expect(spec.lead.length).toBeGreaterThan(30);
       expect(spec.badge.length).toBeGreaterThan(3);
-      expect(spec.featureBullets.length).toBeGreaterThanOrEqual(4);
-      expect(spec.limitations.length).toBeGreaterThanOrEqual(2);
-      expect(spec.formatMatrix.length).toBeGreaterThanOrEqual(4);
-      expect(spec.faqs.length).toBeGreaterThanOrEqual(2);
       expect(spec.sampleMarkdown.length).toBeGreaterThan(50);
     }
   });
@@ -53,24 +49,15 @@ describe('Prompt 05: Five Core Conversion Landing Pages', () => {
     expect(getRouteSpec('/markdown-to-rich-text')?.destination).toBe('clipboard');
   });
 
-  it('documents authentic format boundaries with evidence and marks blocked capabilities', () => {
-    const wordSpec = getRouteSpec('/markdown-to-word');
-    expect(wordSpec?.limitations.some(l => l.boundary.includes('63'))).toBe(true);
-    expect(wordSpec?.limitations.some(l => l.boundary.includes('HTML'))).toBe(true);
-
-    const docsSpec = getRouteSpec('/markdown-to-google-docs');
-    expect(docsSpec?.limitations.some(l => l.boundary.includes('SVG'))).toBe(true);
-    expect(docsSpec?.limitations.some(l => l.boundary.includes('Wide Tables'))).toBe(true);
-
-    const pdfSpec = getRouteSpec('/markdown-to-pdf');
-    expect(pdfSpec?.limitations.some(l => l.boundary.includes('Page Break'))).toBe(true);
-    expect(pdfSpec?.limitations.some(l => l.boundary.includes('Privacy'))).toBe(true);
-
-    const htmlSpec = getRouteSpec('/markdown-to-html');
-    expect(htmlSpec?.limitations.some(l => l.boundary.includes('Offline') || l.boundary.includes('External'))).toBe(true);
-
-    const richSpec = getRouteSpec('/markdown-to-rich-text');
-    expect(richSpec?.limitations.some(l => l.boundary.includes('Email') || l.boundary.includes('Outlook'))).toBe(true);
+  it('uses final URLs and accurate destination handoff descriptions', () => {
+    expect(getRouteSpec('/')).toBe(LANDING_ROUTES['/']);
+    for (const spec of Object.values(LANDING_ROUTES)) {
+      expect(spec.canonical.endsWith('/')).toBe(true);
+      expect(getRouteSpec(spec.path + (spec.path === '/' ? '' : '/'))).toBe(spec);
+    }
+    expect(getRouteSpec('/markdown-to-pdf')?.lead).toContain('browser print');
+    expect(getRouteSpec('/markdown-to-google-docs')?.lead).toContain('paste');
+    expect(getRouteSpec('/missing')).toBeNull();
   });
 
   it('successfully compiles and exports all route sample markdowns on ONE shared engine', async () => {
