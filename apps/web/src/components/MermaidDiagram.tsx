@@ -4,6 +4,12 @@ import { useDiagramActions } from '@/hooks/useDiagramActions';
 import { renderMermaid, autoFixMermaidCode } from '@mdtodocs/asset-pipeline';
 import { useStore } from '@/store';
 import { DiagramCanvasModal } from './DiagramCanvasModal';
+import { WorkspaceSheet } from './WorkspaceSheet';
+import { useMobileLayout } from '@/hooks/useMobileLayout';
+
+function DiagramOptions({ mobile, onClose, children }: { mobile: boolean; onClose: () => void; children: React.ReactNode }) {
+  return mobile ? <WorkspaceSheet title="Diagram options" onClose={onClose}>{children}</WorkspaceSheet> : <>{children}</>;
+}
 
 export type MermaidTheme = 'neutral' | 'default' | 'dark' | 'forest' | 'base';
 
@@ -15,6 +21,7 @@ interface MermaidDiagramProps {
 }
 
 export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStart }) => {
+  const mobile = useMobileLayout();
   const containerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -51,6 +58,14 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
   const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
   useLayoutEffect(() => {
     if (!isMenuOpen) return;
+    if (mobile) {
+      const trigger = menuButtonRef.current;
+      if (trigger) {
+        const inherited = getComputedStyle(trigger);
+        setMenuStyle({ fontFamily: inherited.fontFamily, letterSpacing: inherited.letterSpacing });
+      }
+      return;
+    }
     const place = () => {
       const trigger = menuButtonRef.current;
       if (!trigger) return;
@@ -64,12 +79,12 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
     return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, mobile]);
   const closeMenu = () => { setIsMenuOpen(false); menuButtonRef.current?.focus(); };
 
   // Close overflow menu on outside click or Escape
   useEffect(() => {
-    if (!isMenuOpen) return;
+    if (!isMenuOpen || mobile) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -99,7 +114,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('touchstart', handlePointerDown);
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, mobile]);
 
   useEffect(() => {
     let active = true;
@@ -192,11 +207,12 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
 
               {/* Overflow Dropdown */}
               {isMenuOpen && createPortal(
+                <DiagramOptions mobile={mobile} onClose={closeMenu}>
                 <div
                   id={menuId}
                   style={menuStyle}
                   ref={menuRef}
-                  role="dialog"
+                  role={mobile ? undefined : 'dialog'}
                   aria-label="Diagram options"
                   onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); closeMenu(); } }}
                   className="diagram-options rounded-lg bg-surface-container-highest backdrop-blur-md border border-outline-variant/70 shadow-lg py-1.5 text-xs text-on-surface z-[200]"
@@ -304,7 +320,8 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
                     <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-secondary">terminal</span>
                     <span>{copiedType === 'code' ? 'Copied Source!' : 'Copy Mermaid Source'}</span>
                   </button>
-                </div>, document.body
+                </div>
+                </DiagramOptions>, document.body
               )}
             </div>
           </div>
@@ -315,6 +332,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
           onClick={() => {
             if (!error && svg) setIsCanvasOpen(true);
           }}
+          data-diagram-viewport
           className={`relative p-6 flex flex-col items-center justify-center min-h-[140px] max-h-[460px] overflow-hidden rounded-xl transition-colors ${
             !error && svg ? 'cursor-pointer' : ''
           } ${theme === 'dark' ? 'bg-[#1e1e24]' : 'bg-white'}`}

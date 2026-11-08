@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import type { AppState } from '@/App';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { SegmentedControl } from '@/components/interior/segmented-control';
 import { WorkspaceSheet } from './WorkspaceSheet';
 import { MobileExportBar } from './MobileExportBar';
 import { useDocumentExport } from '@/hooks/useDocumentExport';
 import { useStore } from '@/store';
 import { getCommandShortcut } from '@/utils/platform';
-import { analytics } from '@/utils/analytics';
 import { AppAppearance } from './AppAppearance';
 import { BrandWordmark } from './BrandWordmark';
 
@@ -81,31 +79,6 @@ export function Header({
       window.removeEventListener('mdtodocs:deliver', open);
     };
   }, [onDestinationChange]);
-
-  const primaryLabel = () => {
-    if (isHtmlRoute && destination === 'clipboard') {
-      return 'Download .html';
-    }
-    switch (destination) {
-      case 'google-docs': return 'Copy for Google Docs';
-      case 'clipboard': return 'Copy formatted';
-      case 'word': return 'Download .docx';
-      case 'pdf': return 'Print / Save as PDF';
-    }
-  };
-
-  const primaryIcon = () => {
-    if (isHtmlRoute && destination === 'clipboard') {
-      return 'code';
-    }
-    switch (destination) {
-      case 'google-docs':
-      case 'clipboard':
-        return 'content_copy';
-      case 'word': return 'download';
-      case 'pdf': return 'picture_as_pdf';
-    }
-  };
 
   return (
     <header className="fixed top-0 left-0 right-0 h-12 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-space-md gap-space-md border-b border-outline-variant/30">
@@ -279,47 +252,19 @@ export function Header({
             </button>
           )}
 
-          {/* Destination Selector */}
-          <SegmentedControl
-            options={[
-              { value: 'google-docs', label: 'Google Docs', shortLabel: 'Docs' },
-              { value: 'word', label: 'Word', shortLabel: 'Word' },
-              { value: 'pdf', label: 'PDF', shortLabel: 'PDF' },
-              { value: 'clipboard', label: 'Copy', shortLabel: 'Copy' },
-            ]}
-            label="Destination"
-            value={destination}
-            onValueChange={(val) => {
-              analytics.track('destination_change', { from: destination, to: val });
-              useStore.getState().setHtmlOutput(false);
-              onDestinationChange(val as DestinationType);
-            }}
-          />
-
           <button type="button" aria-label="Change app appearance" title="App appearance" className="w-8 h-8 rounded hover:bg-surface-container" onClick={() => setAppearanceOpen(true)}><span className="material-symbols-outlined text-[18px]">contrast</span></button>
           {/* Primary Action Button */}
-          <button type="button" aria-label={primaryLabel()} onClick={() => setDeliveryOpen(true)}
+          <button type="button" aria-label="Export document" onClick={() => setDeliveryOpen(true)}
             disabled={!markdown.trim()}
             className="desktop-delivery-trigger relative inline-flex h-8 select-none items-center justify-center rounded-lg px-2.5 sm:px-3 font-code-sm text-code-sm font-medium outline-none cursor-pointer transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed bg-zinc-900 text-white hover:bg-zinc-800 border border-black/5 min-w-fit sm:min-w-[145px] gap-1.5">
-            <span className="material-symbols-outlined text-[16px]">{primaryIcon()}</span>
-            <span>{primaryLabel()}</span>
+            <span className="material-symbols-outlined text-[16px]">download</span>
+            <span>Export</span>
           </button>
           {deliveryOpen && (
-            <WorkspaceSheet title="Deliver your document" onClose={() => setDeliveryOpen(false)}>
+            <WorkspaceSheet placement="export" title="Deliver your document" onClose={() => setDeliveryOpen(false)}>
               <p className="sheet-description">{activeDocTitle} · Uses your latest text when you prepare. No account needed.</p>
-              <div className="sheet-options">
-                <label>Save as
-                  <select aria-label="Save as" id="desktop-delivery-target" value={target} onChange={(event) => {
-                    const value = event.target.value;
-                    useStore.getState().setHtmlOutput(value === 'html');
-                    onDestinationChange((value === 'html' ? 'clipboard' : value) as DestinationType);
-                  }}>
-                    <option value="google-docs">Google Docs</option><option value="word">Word</option>
-                    <option value="pdf">PDF</option><option value="html">HTML</option><option value="clipboard">Formatted text</option>
-                  </select>
-                </label>
-              </div>
-              <MobileExportBar target={target} hasContent={!!markdown.trim()} compilationError={!isChecking && diagnosticsFailed}
+              <div className="sheet-options"><label>Save as<select aria-label="Save as" id="desktop-delivery-target" value={target} onChange={event => { const value = event.target.value; useStore.getState().setHtmlOutput(value === 'html'); onDestinationChange((value === 'html' ? 'clipboard' : value) as DestinationType); }}><option value="word">Word document</option><option value="pdf">PDF</option><option value="google-docs">Google Docs</option><option value="html">HTML</option><option value="clipboard">Formatted text</option></select></label></div>
+              <MobileExportBar hideDestination target={target} hasContent={!!markdown.trim()} compilationError={!isChecking && diagnosticsFailed}
                 isCompiling={isChecking} warningsCount={diagnostics.filter(note => note.severity === 'warning' || note.severity === 'error').length}
                 output={output} setSheet={(sheet) => { if (sheet === 'destination') document.getElementById('desktop-delivery-target')?.focus(); else { setDeliveryOpen(false); window.dispatchEvent(new CustomEvent('mdtodocs:review')); } }}
                 chooseTarget={(value) => { useStore.getState().setHtmlOutput(value === 'html'); onDestinationChange(value === 'html' ? 'clipboard' : value); }} />

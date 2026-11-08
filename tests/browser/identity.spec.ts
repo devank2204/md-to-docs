@@ -89,7 +89,7 @@ test('desktop delivery keeps the incumbent control typography in cream and dark'
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.locator('textarea').first().fill('# Protected controls');
-  const trigger = page.locator('header').getByRole('button', { name: 'Copy for Google Docs', exact: true });
+  const trigger = page.locator('header').getByRole('button', { name: 'Export document', exact: true });
   for (const appearance of ['cream', 'dark']) {
     await page.getByRole('button', { name: 'Change app appearance' }).click();
     await page.getByRole('combobox', { name: 'App appearance', exact: true }).selectOption(appearance);

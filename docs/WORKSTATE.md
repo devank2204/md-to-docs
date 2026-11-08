@@ -86,3 +86,26 @@ Final source commit `901403e`: build/prerender and lint passed (existing warning
 Pinned gstack manual review found two additional layout defects; native regressions
 verify their fixes. Its formal manual pass remains inconclusive after two client
 timeouts; see the report for evidence and physical-device/paste limitations.
+
+## Document actions and compact mobile layout — 2026-11-08
+
+The user's feedback work was restarted on their newly pushed `d534754` (including
+`901403e` Mermaid repair/image improvements). Local changes were rebased and
+conflicts resolved around the updated diagram implementation; no repair, renderer
+or shared image-action code was replaced with the older version.
+
+Implemented one Export entry with a desktop anchored panel/mobile sheet, secondary
+exact-source Markdown download, import after New document, recoverable Clear all,
+a 52px mobile document header, reduced preview/heading/diagram spacing and no
+persistent mobile export footer. Page layout is under Document options. Diagram
+options now use the existing native sheet on mobile and preserve the current
+portalled popup on desktop. Narrow desktop editor/table toolbars wrap whole
+controls so Import/Clear all remain reachable. Existing cream and typography
+assertions are preserved.
+
+See [implementation and bounded evaluation](qa/document-actions-and-mobile-layout.md).
+Build and prerender passed. All 166 validation tests across 29 files passed on
+the integrated implementation. Lint passed with existing warnings. All 59 Chromium browser scenarios passed
+(1.4m), including the new narrow-editor bounds regression and all latest Mermaid
+image/repair scenarios. No physical-device, Safari,
+receiving-app or production deployment claim. No push was requested or performed.
