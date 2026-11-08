@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { diagramFontForContext } from '@/utils/diagramImages';
+import { useDiagramActions } from '@/hooks/useDiagramActions';
 import { createPortal } from 'react-dom';
 
 interface DiagramCanvasModalProps {
@@ -12,10 +14,12 @@ interface DiagramCanvasModalProps {
 export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
   isOpen,
   onClose,
-  svg,
+  svg: sourceSvg,
   code,
   diagramTitle = 'Mermaid Diagram',
 }) => {
+  const svg = useMemo(() => diagramFontForContext(sourceSvg, getComputedStyle(document.body).fontFamily), [sourceSvg]);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +40,8 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
     height: 600,
   });
 
-  const [copiedType, setCopiedType] = useState<'png' | 'svg' | 'code' | null>(null);
+  const actions = useDiagramActions(svg, code, isOpen ? 'canvas-open' : 'canvas-closed');
+  const copiedType = actions.copied === 'image' ? 'png' : actions.copied;
   const [showMinimap, setShowMinimap] = useState(true);
 
   // Parse width & height from SVG viewBox or attributes
@@ -124,6 +129,14 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
     return () => {
       document.body.style.overflow = originalOverflow;
     };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => { dialog?.close(); if (previous?.isConnected) previous.focus({ preventScroll: true }); };
   }, [isOpen]);
 
   // Keyboard navigation shortcuts
@@ -226,93 +239,29 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
     }
   };
 
-  // Export & Copy Handlers
-  const handleCopySvg = async () => {
-    if (!svg) return;
-    try {
-      await navigator.clipboard.writeText(svg);
-      setCopiedType('svg');
-      setTimeout(() => setCopiedType(null), 2000);
-    } catch (e) {
-      console.error('Failed to copy SVG:', e);
-    }
-  };
-
-  const handleCopyCode = async () => {
-    if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopiedType('code');
-      setTimeout(() => setCopiedType(null), 2000);
-    } catch (e) {
-      console.error('Failed to copy code:', e);
-    }
-  };
-
-  const handleDownloadSvg = () => {
-    if (!svg) return;
-    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'diagram.svg';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleCopyPng = async () => {
-    if (!svg) return;
-    try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(svg, 'image/svg+xml');
-      const svgEl = doc.querySelector('svg');
-      if (!svgEl) return;
-
-      const scale = 2; // High-DPI 2x
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(svgDimensions.width * scale);
-      canvas.height = Math.round(svgDimensions.height * scale);
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-      const img = new Image();
-
-      img.onload = async () => {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
-
-        canvas.toBlob(async (blob) => {
-          if (!blob) return;
-          try {
-            await navigator.clipboard.write([
-              new ClipboardItem({ 'image/png': blob }),
-            ]);
-            setCopiedType('png');
-            setTimeout(() => setCopiedType(null), 2000);
-          } catch (err) {
-            console.error('Failed to copy PNG to clipboard:', err);
-          }
-        }, 'image/png');
-      };
-
-      img.src = url;
-    } catch (e) {
-      console.error('Failed to rasterize PNG:', e);
-    }
-  };
+  // Same gesture-safe image clipboard and recovery path as the inline diagram.
+  const handleCopySvg = () => actions.run('svg');
+  const handleCopyCode = () => actions.run('code');
+  const handleDownloadSvg = () => actions.run('download-svg');
+  const handleCopyPng = () => actions.run('image');
 
   if (!isOpen) return null;
 
   return createPortal(
-    <div
+    <dialog
+      ref={dialogRef}
+      onKeyDown={(event) => {
+        if (event.key !== 'Tab') return;
+        const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]), [tabindex="0"]')).filter(node => node.getClientRects().length);
+        const first = controls[0], last = controls.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }}
+      onCancel={(event) => { event.preventDefault(); onClose(); }}
       role="dialog"
       aria-modal="true"
       aria-label="Diagram Canvas Studio"
-      className="fixed inset-0 z-50 flex flex-col select-none overflow-hidden animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 w-full h-full max-w-none max-h-none m-0 p-0 border-0 flex flex-col select-none overflow-hidden animate-in fade-in duration-200"
     >
       {/* Blurred Backdrop */}
       <div
@@ -324,13 +273,13 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
       <header className="relative z-20 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/20 text-primary border border-primary/30">
-            <span className="material-symbols-outlined text-[18px]">schema</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">schema</span>
           </div>
           <div>
             <h2 className="text-sm font-semibold text-white tracking-tight flex items-center gap-2">
               <span>{diagramTitle}</span>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/10 text-slate-300">
-                Ondine Engine
+                Diagram preview
               </span>
             </h2>
             <p className="text-[11px] text-slate-400 font-mono">
@@ -351,11 +300,12 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Close (Esc)"
             className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
       </header>
 
+      {actions.message && <p role={actions.error ? 'alert' : 'status'} className="relative z-20 px-6 py-2 text-xs text-white bg-black/80">{actions.message}</p>}
       {/* Main Interactive Infinite Canvas */}
       <div
         ref={containerRef}
@@ -474,7 +424,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
 
       {/* Floating Island HUD Controls (Bottom-Center, Linear / Raycast Style) */}
       <footer className="relative z-30 pb-6 pointer-events-none flex justify-center">
-        <div className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-slate-900/90 dark:bg-slate-950/95 border border-white/15 backdrop-blur-xl shadow-2xl text-xs text-white">
+        <div className="pointer-events-auto flex flex-wrap justify-center max-w-[calc(100vw-24px)] items-center gap-1.5 px-3 py-2 rounded-2xl bg-slate-900/90 dark:bg-slate-950/95 border border-white/15 backdrop-blur-xl shadow-2xl text-xs text-white">
           {/* Fit to Screen */}
           <button
             type="button"
@@ -483,7 +433,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Fit to Screen (F or 0)"
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined text-[16px]">fit_screen</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">fit_screen</span>
             <span className="font-medium text-[11px] hidden sm:inline">Fit</span>
           </button>
 
@@ -508,7 +458,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Zoom Out (-)"
             className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined text-[16px]">remove</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">remove</span>
           </button>
 
           {/* Zoom Level Indicator */}
@@ -529,7 +479,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Zoom In (+)"
             className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined text-[16px]">add</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">add</span>
           </button>
 
           <span className="w-px h-4 bg-white/15 mx-1" aria-hidden="true" />
@@ -542,7 +492,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Copy 2x PNG to clipboard"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium text-[11px] transition-all cursor-pointer active:scale-95 shadow-xs"
           >
-            <span className="material-symbols-outlined text-[15px] text-primary">
+            <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-primary">
               {copiedType === 'png' ? 'check' : 'content_copy'}
             </span>
             <span>{copiedType === 'png' ? 'Copied PNG!' : 'Copy PNG'}</span>
@@ -556,7 +506,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Download SVG vector file"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white text-[11px] transition-colors cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined text-[15px]">download</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[15px]">download</span>
             <span className="hidden sm:inline">SVG</span>
           </button>
 
@@ -568,7 +518,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Copy SVG to clipboard"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white text-[11px] transition-colors cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined text-[15px] text-secondary">code</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-secondary">code</span>
             <span className="hidden sm:inline">{copiedType === 'svg' ? 'Copied!' : 'Copy SVG'}</span>
           </button>
 
@@ -580,7 +530,7 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
             title="Copy Mermaid source code"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white text-[11px] transition-colors cursor-pointer active:scale-95"
           >
-            <span className="material-symbols-outlined text-[15px] text-secondary">terminal</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-secondary">terminal</span>
             <span className="hidden sm:inline">{copiedType === 'code' ? 'Copied!' : 'Source'}</span>
           </button>
 
@@ -594,11 +544,11 @@ export const DiagramCanvasModal: React.FC<DiagramCanvasModalProps> = ({
               showMinimap ? 'text-primary bg-primary/10' : 'text-slate-400'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">map</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">map</span>
           </button>
         </div>
       </footer>
-    </div>,
+    </dialog>,
     document.body
   );
 };

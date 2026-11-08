@@ -12,6 +12,7 @@ Do not read every historical plan to infer today's intent.
 | D004 | Accepted / existing task scope | Local-first conversion remains available without a required account. Never imply clipboard creates a Google Doc or browser print proves a PDF was saved. | Current helpers and browser behavior |
 | D005 | Workflow / this task | Borrow documented techniques from reference repos; add a dependency only for a demonstrated gap within authorized scope. No mass installation or hook activation. | docs/research/reference-repositories.md |
 | D006 | Workflow / this task | Evaluate bounded changes against a fixed baseline, guardrails and evidence; retain useful changes, revert only the experiment's own changes when worse. | program.md, adapted from autoresearch's documented loop |
+| D007 | Accepted / user · 2026-11-08 | Desktop source/preview scrolling synchronizes in both directions by default, with an independent-scrolling toggle. Mobile and reading view remain independent. Preview editing is outside this request. | docs/qa/synchronized-scroll.md; browser geometry checks |
 
 ## Implementation scope update · 2026-11-07
 
@@ -23,8 +24,9 @@ not turn unimplemented roadmap items or research goals into completed features.
 
 ## Remaining proposals
 
-The remaining studio roadmap, conditional handoff kits, continuous source/preview
-synchronization and broader persistence migration remain proposals. Independent review is evidence about the plan, not user consent.
+The remaining studio roadmap, conditional handoff kits and broader persistence
+migration remain proposals. Desktop source/preview synchronization was separately
+authorized and implemented under D007. Independent review is evidence about the plan, not user consent.
 Older docs that discourage dark mode are superseded only by the explicit request
 for optional app appearance. Older mobile visual experiments are superseded by D002.
 

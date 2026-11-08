@@ -7,6 +7,7 @@ export interface RenderMermaidOptions {
   font?: string;
   scale?: number;
   transparent?: boolean;
+  repair?: boolean;
 }
 
 export interface RenderMermaidResultSuccess {
@@ -80,7 +81,13 @@ export const ONDINE_PALETTES: Record<'light' | 'dark' | 'neutral', OndinePalette
   },
 };
 
+function diagramFont(font: string | undefined, fallback: string): string {
+  // A family list is data, never CSS declarations or markup from an API caller.
+  return font && /^[\p{L}\p{N}\s,'"_\-]+$/u.test(font) ? font : fallback;
+}
+
 export interface InlineOndineOptions {
+  font?: string;
   isDark?: boolean;
   transparent?: boolean;
   background?: string;
@@ -100,6 +107,9 @@ export function inlineOndineColors(
   const isTransparent = !!opts.transparent;
   const p = isDark ? ONDINE_PALETTES.dark : ONDINE_PALETTES.light;
   const bg = isTransparent ? 'transparent' : opts.background || p.bg;
+  // CSS font-name quotes must not terminate the surrounding XML attribute.
+  // Single and double CSS quotes name the same font; this changes serialization only.
+  const attributeFont = diagramFont(opts.font, p.font).replaceAll('"', "'");
   let res = svg;
 
   // 1. Replace fills with concrete hex values
@@ -119,12 +129,12 @@ export function inlineOndineColors(
   // 3. Replace stroke-width and inline colors
   res = res.replace(/stroke-width:var\(--_sw\)/g, `stroke-width:${p.strokeWidth}`);
   res = res.replace(/color:var\(--_fg\)/g, `color:${p.fg}`);
-  res = res.replace(/font-family:[^;"]+/g, `font-family:${p.font}`);
+  res = res.replace(/font-family:[^;"]+/g, `font-family:${attributeFont}`);
 
   // 4. Ensure root <svg> has clean presentation styling
   res = res.replace(
     /(<svg\b[^>]*\bstyle=")([^"]*)(")/,
-    `$1max-width:100%;height:auto;background-color:${bg};color:${p.fg};font-family:${p.font};$3`
+    `$1max-width:100%;height:auto;background-color:${bg};color:${p.fg};font-family:${attributeFont};$3`
   );
 
   // 5. Manage background rect
@@ -273,82 +283,67 @@ function getRenderer() {
   return ondineRenderer;
 }
 
-export async function renderMermaid(source: string, options: RenderMermaidOptions = {}): Promise<RenderMermaidResult> {
-  const isDark = options.theme === 'dark';
-  const isTransparent = !!options.transparent;
-  const background = options.background;
-  const cacheKey = JSON.stringify({ source, isDark, isTransparent, background, v: 'ondine-0.0.4' });
+let mermaidQueue: Promise<unknown> = Promise.resolve();
+let diagramSequence = 0;
 
-  if (renderCache.has(cacheKey)) {
-    return renderCache.get(cacheKey)!;
-  }
-
-  const renderer = getRenderer();
-
-  try {
-    const rawResult = renderer.render(source);
-    const cleanedSvg = inlineOndineColors(rawResult.svg, {
-      isDark,
-      transparent: isTransparent,
-      background,
+async function renderStandardMermaid(source: string, options: RenderMermaidOptions) {
+  const job = mermaidQueue.then(async () => {
+    const { default: mermaid } = await import('mermaid');
+    const theme = options.theme === 'light' ? 'default' : options.theme || 'neutral';
+    mermaid.initialize({ startOnLoad: false, securityLevel: 'strict',
+      theme: theme as 'default', fontFamily: diagramFont(options.font, ONDINE_PALETTES.light.font),
+      flowchart: { htmlLabels: false }, suppressErrorRendering: true,
     });
-    const sanitizedSvg = sanitizeMermaidSvg(cleanedSvg);
-
-    const result: RenderMermaidResultSuccess = {
-      success: true,
-      svg: sanitizedSvg,
-      width: rawResult.width || 600,
-      height: rawResult.height || 400,
-      diagramType: 'mermaid',
-      source,
-    };
-
-    renderCache.set(cacheKey, result);
-    return result;
-  } catch (err: any) {
-    // Attempt auto-repair on syntax failure
-    const repaired = autoFixMermaidCode(source);
-    if (repaired !== source) {
-      try {
-        const rawResult = renderer.render(repaired);
-        const cleanedSvg = inlineOndineColors(rawResult.svg, {
-          isDark,
-          transparent: isTransparent,
-          background,
-        });
-        const sanitizedSvg = sanitizeMermaidSvg(cleanedSvg);
-
-        const result: RenderMermaidResultSuccess = {
-          success: true,
-          svg: sanitizedSvg,
-          width: rawResult.width || 600,
-          height: rawResult.height || 400,
-          diagramType: 'mermaid',
-          source,
-        };
-
-        renderCache.set(cacheKey, result);
-        return result;
-      } catch {
-        // Fall through to error reporting below
-      }
-    }
-
-    const isRenderError = err instanceof RenderError || err?.name === 'Render.RenderError';
-    const errorResult: RenderMermaidResultError = {
-      success: false,
-      source,
-      error: {
-        message: err?.message || 'Failed to render Mermaid diagram',
-        line: isRenderError ? err.line : undefined,
-        column: isRenderError ? err.column : undefined,
-        snippet: isRenderError ? err.snippet : undefined,
-        details: err,
-      },
-    };
-
-    renderCache.set(cacheKey, errorResult);
-    return errorResult;
-  }
+    if (!await mermaid.parse(source, { suppressErrors: true })) throw new Error('Invalid Mermaid syntax');
+    if (typeof document === 'undefined') throw new Error('This diagram type needs a browser to render.');
+    const container = document.createElement('div');
+    container.style.cssText = 'position:absolute;left:-100000px;top:0;';
+    document.body.append(container);
+    try {
+      const result = await mermaid.render(`mermaid-compatible-${++diagramSequence}`, source, container);
+      const dimensions = result.svg.match(/viewBox="[\d. -]+ ([\d.]+) ([\d.]+)"/);
+      return { svg: result.svg, width: Number(dimensions?.[1]) || 800, height: Number(dimensions?.[2]) || 600 };
+    } finally { container.remove(); }
+  });
+  mermaidQueue = job.catch(() => undefined);
+  return job;
 }
 
+export async function renderMermaid(source: string, options: RenderMermaidOptions = {}): Promise<RenderMermaidResult> {
+  const isDark = options.theme === 'dark';
+  const cacheKey = JSON.stringify([source, options]);
+  const cached = renderCache.get(cacheKey);
+  if (cached) return cached;
+  const render = async (code: string) => {
+    let rawResult;
+    let standard = false;
+    try {
+      // Ondine exposes light/dark palettes; other advertised themes use Mermaid's real theme engine.
+      if (options.theme && !['neutral', 'light', 'dark'].includes(options.theme)) throw new Error('Use Mermaid theme engine');
+      rawResult = getRenderer().render(code);
+    } catch (originalError) {
+      try { rawResult = await renderStandardMermaid(code, options); standard = true; }
+      catch { throw originalError; }
+    }
+    const svg = standard
+      ? rawResult.svg.replace(/(<svg\b[^>]*>)/, `$1<rect width="100%" height="100%" fill="${options.transparent ? 'none' : options.background || (isDark ? '#1e1e24' : '#ffffff')}"/>`)
+      : inlineOndineColors(rawResult.svg, { isDark, transparent: !!options.transparent, background: options.background, font: options.font });
+    return { success: true as const, svg: sanitizeMermaidSvg(svg), width: rawResult.width || 600, height: rawResult.height || 400, diagramType: 'mermaid' as const, source };
+  };
+  let result: RenderMermaidResult;
+  try { result = await render(source); }
+  catch (err: any) {
+    const repaired = options.repair === false ? source : autoFixMermaidCode(source);
+    if (repaired !== source) {
+      try { result = await render(repaired); }
+      catch { result = failure(err); }
+    } else result = failure(err);
+  }
+  function failure(err: any): RenderMermaidResultError {
+    const structured = err instanceof RenderError || err?.name === 'Render.RenderError';
+    return { success: false, source, error: { message: err?.message || 'Failed to render Mermaid diagram', line: structured ? err.line : undefined, column: structured ? err.column : undefined, snippet: structured ? err.snippet : undefined } };
+  }
+  if (renderCache.size >= 128) renderCache.delete(renderCache.keys().next().value!);
+  renderCache.set(cacheKey, result);
+  return result;
+}

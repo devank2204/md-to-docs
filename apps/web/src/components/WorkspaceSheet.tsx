@@ -4,10 +4,12 @@ import type { ReactNode } from 'react';
 // Native modal dialog supplies inert background, focus trapping, and Escape.
 export function WorkspaceSheet({
   title,
+  placement = 'default',
   onClose,
   children,
 }: {
   title: string;
+  placement?: 'default' | 'export';
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -26,7 +28,7 @@ export function WorkspaceSheet({
     <dialog
       ref={ref}
       aria-labelledby={id}
-      className="workspace-sheet"
+      className={`workspace-sheet ${placement === 'export' ? 'export-sheet' : ''}`}
       onKeyDown={(e) => {
         if (e.key !== 'Tab') return;
         const items = Array.from(

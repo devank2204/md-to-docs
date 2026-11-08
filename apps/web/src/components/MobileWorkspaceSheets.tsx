@@ -10,6 +10,9 @@ import type { MobileSheet } from '@/utils/mobileDestinations';
 import type { ExportTarget, Signature } from '@/utils/exportHelpers';
 
 interface Props {
+  onImport: () => void;
+  pageLayout: boolean;
+  setPageLayout: (value: boolean) => void;
   sheet: MobileSheet;
   setSheet: (sheet: MobileSheet | null) => void;
   target: ExportTarget;
@@ -23,6 +26,7 @@ interface Props {
   isCompiling: boolean;
 }
 export function MobileWorkspaceSheets({
+  onImport, pageLayout, setPageLayout,
   sheet,
   setSheet,
   target,
@@ -112,6 +116,7 @@ export function MobileWorkspaceSheets({
               ＋ New document
             </button>
           </div>
+          <button type="button" className="mobile-secondary" onClick={onImport}>Import Markdown file</button>
           <p className="sheet-description">
             Up to 6 recent documents are kept. Creating another replaces the
             oldest; download important work first.
@@ -120,6 +125,7 @@ export function MobileWorkspaceSheets({
       )}
       {sheet === 'options' && (
         <div className="sheet-options">
+          <button type="button" className="mobile-secondary" aria-pressed={pageLayout} onClick={() => setPageLayout(!pageLayout)}>{pageLayout ? 'Use reading view' : 'Use page layout'}</button>
           <AppAppearance />
           <label>
             Document name
@@ -210,6 +216,12 @@ export function MobileWorkspaceSheets({
             <button type="button" onClick={() => setSheet('history')}>
               Version history
             </button>
+            {store.markdown.trim() && <button type="button" onClick={() => {
+              store.createSnapshot('Before clearing text');
+              onInput('');
+              setTab('edit');
+              setSheet(null);
+            }}>Clear all text</button>}
             <a href="/mermaid-to-svg">
               Mermaid diagram tools <span aria-hidden="true">→</span>
             </a>

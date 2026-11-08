@@ -1,24 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
-  inlineOndineColors,
-  autoFixMermaidCode,
-  sanitizeMermaidSvg,
+  renderMermaid,
   extractMermaidAccessibleText,
 } from '@mdtodocs/asset-pipeline';
-import { create, RenderError } from 'ondine/compiler/wasm';
-import { wasm as all } from 'ondine/compiler/wasm/all';
+import { useDiagramActions } from '@/hooks/useDiagramActions';
+import { MermaidCodeRepair } from './MermaidCodeRepair';
 import { LandingPageContent } from './LandingPageContent';
 import { getRouteSpec, type LandingRoutePath } from '@/routes/landingData';
-import { analytics } from '@/utils/analytics';
-
-// Singleton in-browser Ondine WASM compiler instance
-let ondineCompiler: ReturnType<typeof create> | null = null;
-function getCompiler() {
-  if (!ondineCompiler) {
-    ondineCompiler = create({ modules: { all } });
-  }
-  return ondineCompiler;
-}
 
 export type DiagramBackground = 'transparent' | 'white' | 'dark';
 export type PngScale = 1 | 2 | 4;
@@ -131,195 +119,31 @@ export function MermaidUtilityView({
   } | null>(null);
   const [isCompiling, setIsCompiling] = useState(false);
 
-  // Compile Mermaid via Ondine WASM on code / background change
   useEffect(() => {
-    let isCancelled = false;
-    setIsCompiling(true);
-
-    try {
-      const compiler = getCompiler();
-      const isDark = background === 'dark';
-      const isTransparent = background === 'transparent';
-      const bgHex = background === 'dark' ? '#1e1e24' : background === 'white' ? '#ffffff' : undefined;
-
-      try {
-        const rawResult = compiler.render(code);
-        if (!isCancelled) {
-          const inlined = inlineOndineColors(rawResult.svg, {
-            isDark,
-            transparent: isTransparent,
-            background: bgHex,
-          });
-          const sanitized = sanitizeMermaidSvg(inlined);
-          setSvgOutput(sanitized);
-          setRawDimensions({
-            width: rawResult.width || 600,
-            height: rawResult.height || 400,
-          });
-          setError(null);
-          setIsCompiling(false);
-        }
-      } catch (renderErr: any) {
-        // Try auto-repair
-        const repaired = autoFixMermaidCode(code);
-        if (repaired !== code) {
-          try {
-            const rawRepaired = compiler.render(repaired);
-            if (!isCancelled) {
-              const inlined = inlineOndineColors(rawRepaired.svg, {
-                isDark,
-                transparent: isTransparent,
-                background: bgHex,
-              });
-              const sanitized = sanitizeMermaidSvg(inlined);
-              setSvgOutput(sanitized);
-              setRawDimensions({
-                width: rawRepaired.width || 600,
-                height: rawRepaired.height || 400,
-              });
-              setError(null);
-              setIsCompiling(false);
-              return;
-            }
-          } catch {
-            // Fall through to error
-          }
-        }
-
-        if (!isCancelled) {
-          const isOndineError =
-            renderErr instanceof RenderError || renderErr?.name === 'Render.RenderError';
-          setError({
-            message: renderErr?.message || 'Failed to render Mermaid diagram',
-            line: isOndineError ? renderErr.line : undefined,
-            column: isOndineError ? renderErr.column : undefined,
-            snippet: isOndineError ? renderErr.snippet : undefined,
-          });
-          setIsCompiling(false);
-        }
-      }
-    } catch (e: any) {
-      if (!isCancelled) {
-        setError({ message: e?.message || 'Compiler failed to initialize' });
-        setIsCompiling(false);
-      }
-    }
-
-    return () => {
-      isCancelled = true;
-    };
+    let active = true;
+    setIsCompiling(true); setSvgOutput('');
+    renderMermaid(code, { repair: false, font: getComputedStyle(document.body).fontFamily, theme: background === 'dark' ? 'dark' : 'neutral', transparent: background === 'transparent', background: background === 'dark' ? '#1e1e24' : background === 'white' ? '#ffffff' : undefined }).then(result => {
+      if (!active) return;
+      if (result.success) { setSvgOutput(result.svg); setRawDimensions({ width: result.width, height: result.height }); setError(null); }
+      else setError(result.error);
+      setIsCompiling(false);
+    }).catch(() => { if (active) { setError({ message: 'Could not render this diagram. Your source is unchanged.' }); setIsCompiling(false); } });
+    return () => { active = false; };
   }, [code, background]);
 
+  const actions = useDiagramActions(svgOutput, code, currentPath, { scale: pngScale, background: background === 'dark' ? '#1e1e24' : background === 'white' ? '#ffffff' : 'transparent' });
+  const [repairOpen, setRepairOpen] = useState(false);
   // Extract accessible text
   const accessibleText = useMemo(() => {
     return extractMermaidAccessibleText(code);
   }, [code]);
 
-  // Handlers
-  const handleCopySvg = async () => {
-    if (!svgOutput) return;
-    try {
-      await navigator.clipboard.writeText(svgOutput);
-      setCopiedType('svg');
-      analytics.track('export_success', { destination: 'mermaid', format: 'svg', durationMs: 0 });
-      setTimeout(() => setCopiedType(null), 2000);
-    } catch (e) {
-      console.error('Failed to copy SVG:', e);
-    }
-  };
-
-  const handleDownloadSvg = () => {
-    if (!svgOutput) return;
-    const blob = new Blob([svgOutput], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `mermaid-diagram-${Date.now()}.svg`;
-    a.click();
-    URL.revokeObjectURL(url);
-    analytics.track('export_success', { destination: 'mermaid', format: 'svg', durationMs: 0 });
-  };
-
-  const rasterizeToCanvas = async (scale: number): Promise<HTMLCanvasElement | null> => {
-    if (!svgOutput) return null;
-
-    return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(rawDimensions.width * scale);
-      canvas.height = Math.round(rawDimensions.height * scale);
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return resolve(null);
-
-      const svgBlob = new Blob([svgOutput], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-      const img = new Image();
-
-      img.onload = () => {
-        if (background === 'white') {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        } else if (background === 'dark') {
-          ctx.fillStyle = '#1e1e24';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
-        resolve(canvas);
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        resolve(null);
-      };
-
-      img.src = url;
-    });
-  };
-
-  const handleCopyPng = async () => {
-    try {
-      const canvas = await rasterizeToCanvas(pngScale);
-      if (!canvas) return;
-
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        try {
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob }),
-          ]);
-          setCopiedType('png');
-          analytics.track('export_success', { destination: 'mermaid', format: 'png', durationMs: 0 });
-          setTimeout(() => setCopiedType(null), 2000);
-        } catch (err) {
-          console.error('Failed to copy PNG to clipboard:', err);
-        }
-      }, 'image/png');
-    } catch (e) {
-      console.error('Failed to rasterize PNG:', e);
-    }
-  };
-
-  const handleDownloadPng = async () => {
-    try {
-      const canvas = await rasterizeToCanvas(pngScale);
-      if (!canvas) return;
-
-      const url = canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `mermaid-diagram-${pngScale}x-${Date.now()}.png`;
-      a.click();
-      analytics.track('export_success', { destination: 'mermaid', format: 'png', durationMs: 0 });
-    } catch (e) {
-      console.error('Failed to download PNG:', e);
-    }
-  };
-
-  const handleAutoFix = () => {
-    const fixed = autoFixMermaidCode(code);
-    setCode(fixed);
-  };
-
+  // Diagram actions share clipboard timing, resource limits and visible failure recovery.
+  const handleCopySvg = () => actions.run('svg');
+  const handleDownloadSvg = () => actions.run('download-svg');
+  const handleCopyPng = () => actions.run('image');
+  const handleDownloadPng = () => actions.run('download-png');
+  const handleAutoFix = () => setRepairOpen(true);
   const handleOpenStudio = () => {
     const docMarkdown = `# Architecture Diagram\n\n\`\`\`mermaid\n${code.trim()}\n\`\`\`\n\nExported from the Mermaid utility workspace.\n`;
     onOpenInStudio(docMarkdown);
@@ -345,7 +169,7 @@ export function MermaidUtilityView({
             onClick={() => onNavigateRoute('/')}
             className="flex items-center gap-1 text-xs font-medium text-secondary hover:text-on-surface px-2 py-1 rounded-md hover:bg-surface-container transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[15px]">arrow_back</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[15px]">arrow_back</span>
             <span>Document Studio</span>
           </button>
 
@@ -362,7 +186,7 @@ export function MermaidUtilityView({
                   : 'text-secondary hover:text-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined text-[14px]">account_tree</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[14px]">account_tree</span>
               <span>Mermaid to SVG</span>
             </button>
 
@@ -375,7 +199,7 @@ export function MermaidUtilityView({
                   : 'text-secondary hover:text-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined text-[14px]">image</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[14px]">image</span>
               <span>Mermaid to PNG</span>
             </button>
           </div>
@@ -388,7 +212,7 @@ export function MermaidUtilityView({
           title="Open this diagram in full document editor"
           className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 text-xs font-medium text-on-surface transition-all active:scale-95 cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[14px] text-primary">edit_document</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[14px] text-primary">edit_document</span>
           <span>Open in Document Studio</span>
         </button>
       </header>
@@ -400,7 +224,7 @@ export function MermaidUtilityView({
           {/* Template Bar */}
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[15px] text-primary">code</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-primary">code</span>
               <span>Mermaid Code</span>
             </span>
 
@@ -435,7 +259,7 @@ export function MermaidUtilityView({
               <div className="p-3 bg-rose-500/10 border-t border-rose-500/20 text-rose-800 dark:text-rose-200 text-xs flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[15px] text-rose-600">error</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-rose-600">error</span>
                     <span>Syntax Error {error.line ? `(Line ${error.line})` : ''}</span>
                   </span>
                   <button
@@ -443,7 +267,7 @@ export function MermaidUtilityView({
                     onClick={handleAutoFix}
                     className="flex items-center gap-1 px-2 py-0.5 rounded bg-rose-600 text-white font-medium text-[11px] hover:bg-rose-700 transition-colors cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[13px]">auto_fix_high</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[13px]">auto_fix_high</span>
                     <span>Auto-Fix</span>
                   </button>
                 </div>
@@ -465,10 +289,10 @@ export function MermaidUtilityView({
               className="w-full px-3 py-2 flex items-center justify-between text-secondary hover:text-on-surface font-medium cursor-pointer"
             >
               <div className="flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[15px]">accessibility</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[15px]">accessibility</span>
                 <span>Accessibility & Diagram Metadata</span>
               </div>
-              <span className="material-symbols-outlined text-[16px] transition-transform duration-200" style={{ transform: isAdvancedOpen ? 'rotate(180deg)' : 'none' }}>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px] transition-transform duration-200" style={{ transform: isAdvancedOpen ? 'rotate(180deg)' : 'none' }}>
                 expand_more
               </span>
             </button>
@@ -483,7 +307,7 @@ export function MermaidUtilityView({
                       onClick={handleCopyAccessible}
                       className="text-primary hover:underline cursor-pointer flex items-center gap-0.5"
                     >
-                      <span className="material-symbols-outlined text-[12px]">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[12px]">
                         {copiedType === 'accessible' ? 'check' : 'content_copy'}
                       </span>
                       <span>{copiedType === 'accessible' ? 'Copied' : 'Copy'}</span>
@@ -509,13 +333,13 @@ export function MermaidUtilityView({
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[15px] text-primary">preview</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-primary">preview</span>
                 <span>Live Vector Preview</span>
               </span>
 
               {isCompiling && (
                 <span className="flex items-center gap-1 text-[11px] text-outline animate-pulse">
-                  <span className="material-symbols-outlined text-[13px] animate-spin">refresh</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[13px] animate-spin">refresh</span>
                   <span>Compiling...</span>
                 </span>
               )}
@@ -535,7 +359,7 @@ export function MermaidUtilityView({
                       : 'text-secondary hover:text-on-surface'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[13px]">grid_view</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[13px]">grid_view</span>
                   <span>Alpha</span>
                 </button>
 
@@ -611,7 +435,7 @@ export function MermaidUtilityView({
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center text-outline select-none py-16">
-                  <span className="material-symbols-outlined text-[36px] opacity-40 mb-2">account_tree</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[36px] opacity-40 mb-2">account_tree</span>
                   <span className="text-xs">Enter valid Mermaid code to compile vector preview</span>
                 </div>
               )}
@@ -625,7 +449,7 @@ export function MermaidUtilityView({
                 title="Zoom out"
                 className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-on-surface cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[15px]">remove</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[15px]">remove</span>
               </button>
               <button
                 type="button"
@@ -641,11 +465,14 @@ export function MermaidUtilityView({
                 title="Zoom in"
                 className="w-6 h-6 rounded flex items-center justify-center hover:bg-surface-container text-on-surface cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[15px]">add</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[15px]">add</span>
               </button>
             </div>
           </div>
 
+          {actions.message && <p role={actions.error ? 'alert' : 'status'} className="font-code-sm text-code-sm">{actions.message}</p>}
+          <MermaidCodeRepair code={code} onApply={setCode} open={repairOpen} onClose={() => setRepairOpen(false)} />
+          <button type="button" className="underline font-code-sm text-code-sm min-h-[44px]" onClick={() => setRepairOpen(true)}>Review diagram fix</button>
           {/* Action Row: Export & Copy Buttons */}
           <div className="flex items-center flex-wrap justify-between gap-2 pt-1">
             {/* Primary Action Button Pair */}
@@ -654,10 +481,10 @@ export function MermaidUtilityView({
               <button
                 type="button"
                 onClick={isSvgFocused ? handleDownloadSvg : handleDownloadPng}
-                disabled={!svgOutput}
+                disabled={!svgOutput || actions.busy}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary hover:bg-primary/90 text-on-primary text-xs font-semibold shadow-xs transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px]">download</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">download</span>
                 <span>{isSvgFocused ? 'Download SVG' : `Download PNG (${pngScale}x)`}</span>
               </button>
 
@@ -665,11 +492,11 @@ export function MermaidUtilityView({
               <button
                 type="button"
                 onClick={isSvgFocused ? handleCopySvg : handleCopyPng}
-                disabled={!svgOutput}
+                disabled={!svgOutput || actions.busy}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 text-on-surface text-xs font-medium shadow-2xs transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[15px] text-primary">
-                  {(isSvgFocused && copiedType === 'svg') || (!isSvgFocused && copiedType === 'png')
+                <span aria-hidden="true" className="material-symbols-outlined text-[15px] text-primary">
+                  {(isSvgFocused && actions.copied === 'svg') || (!isSvgFocused && actions.copied === 'image')
                     ? 'check'
                     : isSvgFocused
                     ? 'code'
@@ -677,10 +504,10 @@ export function MermaidUtilityView({
                 </span>
                 <span>
                   {isSvgFocused
-                    ? copiedType === 'svg'
+                    ? actions.copied === 'svg'
                       ? 'SVG Copied!'
                       : 'Copy SVG Code'
-                    : copiedType === 'png'
+                    : actions.copied === 'image'
                     ? 'Image Copied!'
                     : 'Copy PNG Image'}
                 </span>
@@ -694,25 +521,25 @@ export function MermaidUtilityView({
                   <button
                     type="button"
                     onClick={handleDownloadPng}
-                    disabled={!svgOutput}
+                    disabled={!svgOutput || actions.busy}
                     title={`Export high-res PNG at ${pngScale}x`}
                     className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-xs font-medium text-secondary hover:text-on-surface transition-colors disabled:opacity-40 cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[14px]">image</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px]">image</span>
                     <span>Download PNG</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleCopyPng}
-                    disabled={!svgOutput}
+                    disabled={!svgOutput || actions.busy}
                     title="Copy PNG bitmap directly to clipboard"
                     className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-xs font-medium text-secondary hover:text-on-surface transition-colors disabled:opacity-40 cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[14px]">
-                      {copiedType === 'png' ? 'check' : 'content_copy'}
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px]">
+                      {actions.copied === 'image' ? 'check' : 'content_copy'}
                     </span>
-                    <span>{copiedType === 'png' ? 'Copied' : 'Copy Image'}</span>
+                    <span>{actions.copied === 'image' ? 'Copied' : 'Copy Image'}</span>
                   </button>
                 </>
               ) : (
@@ -720,25 +547,25 @@ export function MermaidUtilityView({
                   <button
                     type="button"
                     onClick={handleDownloadSvg}
-                    disabled={!svgOutput}
+                    disabled={!svgOutput || actions.busy}
                     title="Download vector SVG"
                     className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-xs font-medium text-secondary hover:text-on-surface transition-colors disabled:opacity-40 cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[14px]">account_tree</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px]">account_tree</span>
                     <span>Download SVG</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleCopySvg}
-                    disabled={!svgOutput}
+                    disabled={!svgOutput || actions.busy}
                     title="Copy SVG XML markup"
                     className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-xs font-medium text-secondary hover:text-on-surface transition-colors disabled:opacity-40 cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[14px]">
-                      {copiedType === 'svg' ? 'check' : 'code'}
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px]">
+                      {actions.copied === 'svg' ? 'check' : 'code'}
                     </span>
-                    <span>{copiedType === 'svg' ? 'Copied' : 'Copy SVG'}</span>
+                    <span>{actions.copied === 'svg' ? 'Copied' : 'Copy SVG'}</span>
                   </button>
                 </>
               )}

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { autoFixMermaidCode } from '@mdtodocs/compiler-core';
 
 describe('md.to.docs UX Refinement Validation', () => {
   beforeEach(() => {
@@ -151,41 +152,6 @@ describe('md.to.docs UX Refinement Validation', () => {
   });
 
   describe('Mermaid Auto-Fix Repair Engine', () => {
-    function autoFixMermaidCode(raw: string): string {
-      let fixed = raw;
-      fixed = fixed.replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
-
-      fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\[([^"\n]+?)\](?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
-        if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
-          return `${id}["${text}"]`;
-        }
-        return match;
-      });
-
-      fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\{([^"\n]+?)\}(?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
-        if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
-          return `${id}{"${text}"}`;
-        }
-        return match;
-      });
-
-      fixed = fixed.replace(/(\b[a-zA-Z0-9_-]+)\(([^"\n]+?)\)(?=\s*(?:-->|---|==>|-.->|\||\n|$))/g, (match, id, text) => {
-        if (/[()[\]{}&<>/?!@#$%^+=:;,'`~]/.test(text)) {
-          return `${id}("${text}")`;
-        }
-        return match;
-      });
-
-      const subgraphs = (fixed.match(/\bsubgraph\b/g) || []).length;
-      const ends = (fixed.match(/\bend\b/g) || []).length;
-      if (subgraphs > ends) {
-        fixed = fixed + '\n' + Array(subgraphs - ends).fill('end').join('\n');
-      }
-
-      fixed = fixed.replace(/--\s+>/g, '-->').replace(/--\s+\|\s*([^|]+)\s*\|\s*>/g, '-->|$1|');
-      return fixed;
-    }
-
     it('quotes node labels containing parentheses and special characters', () => {
       const input = 'graph TD\nA[Calculate (Total)] --> B{Is Valid? [Yes/No]}';
       const output = autoFixMermaidCode(input);

@@ -7,6 +7,8 @@ import type {
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { useStore } from '@/store';
 import { DocumentPreview } from './DocumentPreview';
+import { MermaidRepairAssistant } from './MermaidRepairAssistant';
+import { WorkspaceSheet } from './WorkspaceSheet';
 import { MobileExportBar } from './MobileExportBar';
 import { HomeIntroduction } from './HomeIntroduction';
 import { BrandWordmark } from './BrandWordmark';
@@ -51,6 +53,7 @@ export function MobileWorkspace(props: Props) {
   );
   const [tab, setTab] = useState<'edit' | 'preview'>('edit');
   const [sheet, setSheet] = useState<MobileSheet | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
   const [pageLayout, setPageLayout] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [pendingImport, setPendingImport] = useState<string | null>(null);
@@ -210,6 +213,7 @@ export function MobileWorkspace(props: Props) {
       useStore.getState().setHtmlOutput(value === 'html');
       useStore.getState().setDestination(value === 'html' ? 'clipboard' : value);
       setSheet(null);
+      setExportOpen(true);
     };
     window.addEventListener('mdtodocs:deliver', open);
     window.addEventListener('mdtodocs:prepare-print', open);
@@ -228,40 +232,17 @@ export function MobileWorkspace(props: Props) {
     analytics.track('destination_change', { from: target, to: value });
     onDestinationChange(value === 'html' ? 'clipboard' : value);
     setSheet(null);
+    setExportOpen(true);
   };
   return (
     <div className={`mobile-workspace ${keyboardOpen ? 'keyboard-open' : ''}`}>
       <header className="mobile-header" data-print-hide>
-        <a href="/" aria-label="mdtodocs home" className="mobile-brand">
-          <BrandWordmark />
-        </a>
-        <button
-          type="button"
-          className="mobile-menu"
-          onClick={() => setSheet('documents')}
-          aria-label="Open documents"
-          aria-haspopup="dialog"
-        >
-          <span className="material-symbols-outlined" aria-hidden="true">
-            folder_open
-          </span>
-          <span>Documents</span>
+        <button type="button" className="mobile-menu mobile-document-title" onClick={() => setSheet('documents')} aria-label="Open documents" aria-haspopup="dialog">
+          {hasContent ? <><span className="material-symbols-outlined" aria-hidden="true">folder_open</span><span className="truncate">{title}</span></> : <BrandWordmark />}
         </button>
+        <button type="button" aria-label="Document options" onClick={() => setSheet('options')}>•••</button>
+        {hasContent && <button type="button" className="mobile-export-trigger" aria-haspopup="dialog" onClick={() => setExportOpen(true)}>Export <span aria-hidden="true">↑</span></button>}
       </header>
-      <div className="mobile-document-row" data-print-hide>
-        <span className="truncate">
-          {hasContent ? title : 'Your next document'}
-        </span>
-        <button
-          type="button"
-          aria-label="Document options"
-          onClick={() => {
-            setSheet('options');
-          }}
-        >
-          •••
-        </button>
-      </div>
       <div
         className="mobile-tabs"
         role="tablist"
@@ -301,6 +282,7 @@ export function MobileWorkspace(props: Props) {
           </button>
         ))}
       </div>
+      <MermaidRepairAssistant />
       <section
         role="tabpanel"
         id="mobile-edit-panel"
@@ -403,16 +385,6 @@ export function MobileWorkspace(props: Props) {
         hidden={tab !== 'preview'}
         className={`mobile-preview-panel ${pageLayout ? 'page-layout' : ''}`}
       >
-        <div className="mobile-preview-tools" data-print-hide>
-          <span>{hasContent ? 'Your document' : 'Nothing to preview yet'}</span>
-          <button
-            type="button"
-            aria-pressed={pageLayout}
-            onClick={() => setPageLayout(!pageLayout)}
-          >
-            {pageLayout ? 'Reading view' : 'Page layout'}
-          </button>
-        </div>
         <DocumentPreview
             reviewNotes={isCompiling ? [] : diagnostics}
           markdown={markdown}
@@ -428,6 +400,7 @@ export function MobileWorkspace(props: Props) {
           download your document to save it.
         </p>
       )}
+      {exportOpen && !sheet && <WorkspaceSheet title="Export document" onClose={() => setExportOpen(false)}>
       <MobileExportBar
         target={target}
         hasContent={hasContent}
@@ -435,14 +408,18 @@ export function MobileWorkspace(props: Props) {
         isCompiling={isCompiling}
         warningsCount={warnings.length}
         output={output}
-        setSheet={setSheet}
+        setSheet={(next) => { if (next !== 'destination') setExportOpen(false); setSheet(next); }}
         chooseTarget={chooseTarget}
       />
+      </WorkspaceSheet>}
       {sheet && (
         <MobileWorkspaceSheets
           key={sheet}
           sheet={sheet}
           setSheet={setSheet}
+          onImport={() => { setSheet(null); fileInput.current?.click(); }}
+          pageLayout={pageLayout}
+          setPageLayout={setPageLayout}
           target={target}
           chooseTarget={chooseTarget}
           setTab={setTab}

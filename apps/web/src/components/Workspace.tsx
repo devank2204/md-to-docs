@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useSyncedScroll } from '@/hooks/useSyncedScroll';
+import { useState, useEffect, useRef } from 'react';
 import {
   parseMarkdown,
   planRepresentation,
@@ -22,6 +23,7 @@ import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
 import { SuggestEditModal } from '@/components/SuggestEditModal';
 import { WorkspaceSidebar } from '@/components/WorkspaceSidebar';
+import { MermaidRepairAssistant } from './MermaidRepairAssistant';
 import { LinkedReview } from './LinkedReview';
 import { WorkspaceSheet } from './WorkspaceSheet';
 import { MobileWorkspace } from './MobileWorkspace';
@@ -151,6 +153,9 @@ export function Workspace({
   const setDiagnostics = useStore(state => state.setDiagnostics);
   const compilationPending = useStore(state => state.isCompiling);
   const activeDocumentId = useStore(state => state.activeDocumentId);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const [syncScroll, setSyncScroll] = useState(true);
+  useSyncedScroll(workspaceRef, syncScroll && !isMobile && !isReviewMode, markdown, activeDocumentId);
   const compileKey = JSON.stringify([activeDocumentId, markdown, destination, activeTheme]);
   const setIsCompiling = useStore(state => state.setIsCompiling);
 
@@ -289,7 +294,8 @@ export function Workspace({
   if (isMobile) return <MobileWorkspace markdown={markdown} onInput={onInput} destination={destination} onDestinationChange={onDestinationChange} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={isCompiling} diagnostics={diagnostics} compilationError={compilationError && compiledState.inputKey === compileKey}/>;
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
+    <div ref={workspaceRef} className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
+      <MermaidRepairAssistant />
       {isReviewMode ? (
         <div className="flex-1 w-full overflow-y-auto px-4 py-8 bg-surface-container-lowest">
           <div className="w-full flex justify-center pb-20">
@@ -310,6 +316,8 @@ export function Workspace({
           <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
             <div className="flex flex-col col-span-5 lg:col-span-4 h-full min-h-0">
               <DocumentEditor
+                syncScroll={syncScroll}
+                onSyncScrollChange={() => setSyncScroll(value => !value)}
                 markdown={markdown}
                 onInput={onInput}
                 words={words}

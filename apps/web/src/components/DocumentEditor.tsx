@@ -1,20 +1,25 @@
 import React from 'react';
+import { useStore } from '@/store';
+import { ImportMarkdownButton } from './ImportMarkdownButton';
 
 interface DocumentEditorProps {
+  syncScroll: boolean;
+  onSyncScrollChange: () => void;
   markdown: string;
   onInput: (markdown: string) => void;
   words: number;
   lines: number;
 }
 
-export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInput, words, lines }) => {
+export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInput, words, lines, syncScroll, onSyncScrollChange }) => {
   return (
     <div
       data-editor-pane
       className="w-full h-full bg-[#ffffff] flex flex-col border-r border-outline-variant/30 min-h-0 overflow-hidden"
     >
       {/* Editor Sub-Header */}
-      <div className="px-3 py-1.5 bg-[#fafaf9] flex items-center justify-between font-code-sm text-code-sm text-secondary border-b border-outline-variant/30 shrink-0 select-none">
+      <div data-editor-toolbar
+        className="px-3 py-1.5 bg-[#fafaf9] flex flex-wrap gap-1 items-center justify-between font-code-sm text-code-sm text-secondary border-b border-outline-variant/30 shrink-0 select-none">
         <div className="flex items-center gap-1.5">
           <span className="material-symbols-outlined text-[15px] text-primary">edit_note</span>
           <span className="font-semibold text-on-surface text-xs font-sans">Markdown</span>
@@ -22,8 +27,10 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
             GFM
           </span>
         </div>
-        <div className="flex items-center gap-2 font-code-sm text-[11px] text-secondary">
+        <div className="flex flex-wrap min-w-0 max-w-full items-center gap-2 font-code-sm text-[11px] text-secondary">
           <button type="button" className="px-2 py-1 rounded hover:bg-surface-container" onClick={() => window.dispatchEvent(new CustomEvent('mdtodocs:review'))}>Review & outline</button>
+          <ImportMarkdownButton />
+          <button type="button" className="px-2 py-1 rounded hover:bg-surface-container" aria-pressed={syncScroll} title="Keep Markdown and Preview at matching content" onClick={onSyncScrollChange}>Sync scroll</button>
           <span className="tabular-nums font-mono">{words} words</span>
           <span className="text-outline-variant">·</span>
           <span className="tabular-nums font-mono">{lines} lines</span>
@@ -32,11 +39,11 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
               <span className="text-outline-variant">·</span>
               <button
                 type="button"
-                onClick={() => onInput('')}
-                title="Clear editor contents"
+                onClick={() => { useStore.getState().createSnapshot('Before clearing text'); onInput(''); }}
+                title="Clear all text (a version is saved first)"
                 className="text-[11px] text-outline hover:text-error transition-colors px-1.5 py-0.5 rounded hover:bg-surface-container active:scale-95"
               >
-                Clear
+                Clear all
               </button>
             </>
           )}

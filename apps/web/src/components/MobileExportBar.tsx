@@ -1,9 +1,12 @@
+import { useStore } from '@/store';
+import { documentFilename, downloadFile } from '@/utils/exportHelpers';
 import { mobileDestinations } from '@/utils/mobileDestinations';
 import type { MobileSheet } from '@/utils/mobileDestinations';
 import type { ExportTarget } from '@/utils/exportHelpers';
 import type { useDocumentExport } from '@/hooks/useDocumentExport';
 
 interface Props {
+  hideDestination?: boolean;
   target: ExportTarget;
   hasContent: boolean;
   compilationError: boolean;
@@ -14,6 +17,7 @@ interface Props {
   chooseTarget: (target: ExportTarget) => void;
 }
 export function MobileExportBar({
+  hideDestination = false,
   target,
   hasContent,
   compilationError,
@@ -23,6 +27,8 @@ export function MobileExportBar({
   setSheet,
   chooseTarget,
 }: Props) {
+  const markdown = useStore(state => state.markdown);
+  const title = useStore(state => state.documents.find(doc => doc.id === state.activeDocumentId)?.title || 'document');
   const selected = mobileDestinations.find((item) => item.value === target)!;
   let canShare = false;
   try {
@@ -35,7 +41,7 @@ export function MobileExportBar({
   }
   return (
     <footer className="mobile-export" data-print-hide>
-      {hasContent && (
+      {hasContent && (compilationError || isCompiling || warningsCount > 0) && (
         <button
           className="mobile-format-status"
           type="button"
@@ -51,7 +57,7 @@ export function MobileExportBar({
           <span aria-hidden="true">→</span>
         </button>
       )}
-      <button
+      {!hideDestination && <button
         className="mobile-destination"
         type="button"
         aria-haspopup="dialog"
@@ -61,7 +67,7 @@ export function MobileExportBar({
           Save as <strong>{selected.label}</strong>
         </span>
         <span aria-hidden="true">⌄</span>
-      </button>
+      </button>}
       {output.message && (
         <p
           role={output.error ? 'alert' : 'status'}
@@ -135,6 +141,7 @@ export function MobileExportBar({
         </>
       )}
       {output.preparing && <button type="button" className="mobile-secondary" onClick={output.cancel}>Cancel preparation</button>}
+      {hasContent && <button type="button" className="mobile-secondary source-download" onClick={() => downloadFile(new File([markdown], documentFilename(title, 'md'), { type: 'text/markdown;charset=utf-8' }))}>Download Markdown (.md)</button>}
       {!hasContent && (
         <p className="mobile-private-note">
           Start with your text. No account needed.

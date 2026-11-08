@@ -89,7 +89,7 @@ test('desktop delivery keeps the incumbent control typography in cream and dark'
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.locator('textarea').first().fill('# Protected controls');
-  const trigger = page.locator('header').getByRole('button', { name: 'Copy for Google Docs', exact: true });
+  const trigger = page.locator('header').getByRole('button', { name: 'Export document', exact: true });
   for (const appearance of ['cream', 'dark']) {
     await page.getByRole('button', { name: 'Change app appearance' }).click();
     await page.getByRole('combobox', { name: 'App appearance', exact: true }).selectOption(appearance);
@@ -101,4 +101,15 @@ test('desktop delivery keeps the incumbent control typography in cream and dark'
     expect(actual.family).toContain('JetBrains Mono');
     expect(actual).toMatchObject({ size: '11px', weight: '500', lineHeight: '16px', tracking: 'normal' });
   }
+});
+
+test('Mermaid XML fixes preserve the incumbent inherited diagram fonts', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.locator('textarea').first().fill('```mermaid\ngraph TD\nA[Draft] --> B[Document]\n```');
+  await expect(page.locator('.mermaid-preview svg text').first()).toBeVisible();
+  await expect(page.locator('.mermaid-preview svg text').first()).toHaveCSS('font-family', 'Newsreader, serif');
+  const bodyFont = await page.locator('body').evaluate(node => getComputedStyle(node).fontFamily);
+  await page.getByRole('button', { name: 'Inspect in Canvas Studio (Pan & Zoom)', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Diagram Canvas Studio' }).locator('svg text').first()).toHaveCSS('font-family', bodyFont);
 });
