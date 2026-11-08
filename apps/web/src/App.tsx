@@ -1,3 +1,7 @@
+import { structuredData } from './routes/metadata';
+import { LandingContext } from './routes/LandingContext';
+import { HomeIntroduction } from './components/HomeIntroduction';
+import { LandingPageContent } from './components/LandingPageContent';
 import { useEffect, useState, useMemo } from 'react';
 import { useAppAppearance } from '@/hooks/useAppAppearance';
 import { useMobileLayout } from '@/hooks/useMobileLayout';
@@ -62,7 +66,7 @@ function App() {
 
   const handleNavigateRoute = (path: LandingRoutePath) => {
     if (typeof window !== 'undefined') {
-      window.history.pushState({}, '', path);
+      window.history.pushState({}, '', path === '/' ? '/' : `${path}/`);
       setCurrentPath(path);
       const spec = getRouteSpec(path);
       if (spec && path !== '/') {
@@ -130,7 +134,7 @@ function App() {
     if (typeof window === 'undefined') return;
     const pathname = window.location.pathname.toLowerCase().replace(/\/$/, '') || '/';
     const spec = getRouteSpec(pathname);
-    if (spec && pathname !== '/') {
+    if (spec && pathname !== '/' && !useStore.getState().markdown.trim()) {
       setDestination(spec.destination);
       useStore.getState().setHtmlOutput(spec.path === '/markdown-to-html');
       if (!useStore.getState().markdown.trim()) {
@@ -139,24 +143,23 @@ function App() {
     }
   }, [setDestination]);
 
+  const routeSpec = getRouteSpec(currentPath);
   useEffect(() => {
-    if (!markdown.trim()) {
-      const pathname = typeof window !== 'undefined' ? (window.location.pathname.toLowerCase().replace(/\/$/, '') || '/') : '/';
-      const spec = getRouteSpec(pathname);
-      if (spec) {
-        document.title = spec.title;
-      } else {
-        document.title = 'mdtodocs: Markdown to Documents';
+    if (!routeSpec) return;
+    document.title = routeSpec.title;
+    const set = (selector: string, attribute: string, value: string) => {
+      document.querySelector(selector)?.setAttribute(attribute, value);
+    };
+    set('meta[name="description"]', 'content', routeSpec.description);
+    set('link[rel="canonical"]', 'href', routeSpec.canonical);
+    for (const prefix of ['og', 'twitter']) {
+      for (const [key, value] of Object.entries({ title: routeSpec.title, description: routeSpec.description, url: routeSpec.canonical })) {
+        set(`meta[${prefix === 'og' ? 'property' : 'name'}="${prefix}:${key}"]`, 'content', value);
       }
-      return;
     }
-    const match = markdown.match(/^#\s+(.+)$/m);
-    if (match && match[1]?.trim()) {
-      document.title = `${match[1].trim()} | mdtodocs`;
-    } else {
-      document.title = 'mdtodocs: Markdown to Documents';
-    }
-  }, [markdown]);
+    const schema = document.querySelector('script[type="application/ld+json"]');
+    if (schema) schema.textContent = JSON.stringify(structuredData(routeSpec));
+  }, [routeSpec]);
 
   useEffect(() => {
     analytics.track('page_view', {
@@ -174,7 +177,7 @@ function App() {
   };
 
   return (
-    <div className={`${isMobile ? 'mobile-app' : 'min-h-screen'} flex flex-col bg-surface text-on-surface`}>
+    <LandingContext.Provider value={routeSpec || getRouteSpec('/')!}><div className={`${isMobile ? 'mobile-app' : 'min-h-screen'} flex flex-col bg-surface text-on-surface`}>
       {(!isMobile || currentPath.startsWith('/mermaid-')) && <Header
         appState={appState}
         markdown={markdown}
@@ -185,7 +188,9 @@ function App() {
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />}
       <main className={`flex-1 flex flex-col relative ${isMobile && !currentPath.startsWith('/mermaid-') ? 'mobile-main' : 'mt-12'}`}>
-        {currentPath === '/mermaid-to-svg' || currentPath === '/mermaid-to-png' ? (
+        {(!routeSpec) ? <section className="p-10"><h1>Page Not Found (404)</h1><a href="/">Return to MDToDocs</a></section> : null}
+        {routeSpec && currentPath !== '/' && appState !== 'EMPTY' && !currentPath.startsWith('/mermaid-') && <HomeIntroduction />}
+        {!routeSpec ? null : currentPath === '/mermaid-to-svg' || currentPath === '/mermaid-to-png' ? (
           <MermaidUtilityView
             currentPath={currentPath}
             onNavigateRoute={handleNavigateRoute}
@@ -207,6 +212,7 @@ function App() {
             documentSignature={documentSignature}
           />
         )}
+        {routeSpec && !currentPath.startsWith('/mermaid-') && <LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} />}
       </main>
 
       <CommandPalette
@@ -238,7 +244,7 @@ function App() {
       <AboutModal />
 
       {!isMobile && <BookmarkPrompt />}
-    </div>
+    </div></LandingContext.Provider>
   );
 }
 

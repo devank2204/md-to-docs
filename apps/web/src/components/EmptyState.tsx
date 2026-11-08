@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
 import { HomeIntroduction } from './HomeIntroduction';
-import { DOCUMENT_TEMPLATES } from '@/data/templates';
-import { getCommandShortcut, getModifierKey } from '@/utils/platform';
-import { analytics, getDocLengthBucket } from '@/utils/analytics';
+import { DOCUMENT_TEMPLATES } from '../data/templates';
+import { getCommandShortcut, getModifierKey } from '../utils/platform';
+import { analytics, getDocLengthBucket } from '../utils/analytics';
 
 interface EmptyStateProps {
   onInput: (markdown: string) => void;
