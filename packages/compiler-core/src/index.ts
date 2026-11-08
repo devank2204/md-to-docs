@@ -4,3 +4,5 @@ export { planRepresentation } from './planner';
 export * from './theme';
 export * from './presets';
 
+
+export * from './diagnostics/mermaidCompatibility';

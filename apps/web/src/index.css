@@ -852,3 +852,7 @@ html[data-appearance="dark"] :focus-visible:not([data-document-paper] *) {
   outline: 2px solid #bdc8a5;
   outline-offset: 2px;
 }
+
+.diagram-options button, .diagram-options select { min-height: 44px; }
+.diagram-options { overscroll-behavior: contain; }
+@media print { .diagram-options, .mermaid-repair-notice { display: none !important; } }

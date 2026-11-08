@@ -42,7 +42,7 @@ export async function resolveAssets(doc: Root, signal?: AbortSignal): Promise<Ro
       );
     } else if (node.type === 'code' && node.lang === 'mermaid') {
       promises.push(
-        renderMermaid(node.value).then((result) => {
+        renderMermaid(node.value, { repair: false }).then((result) => {
           if (signal?.aborted) return;
           node.data = node.data || {};
           if (result.success) {

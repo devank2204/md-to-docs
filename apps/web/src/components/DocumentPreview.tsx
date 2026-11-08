@@ -170,54 +170,9 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     return [createDestinationPlanPlugin(destination)];
   }, [destination]);
 
-  return (
-    <div
-      data-reading-layout={readingLayout || undefined}
-      data-preview-pane
-      className={
-        isReviewMode
-          ? 'w-full flex flex-col items-center relative overflow-visible bg-transparent'
-          : `w-full ${isDark ? 'bg-[#0f172a]' : 'bg-[#f1f3f5]'} flex flex-col p-1.5 sm:p-space-md relative h-full min-h-0 overflow-hidden`
-      }
-    >
-      <div className="flex-1 flex justify-center items-start p-1.5 sm:p-space-md md:p-space-lg overflow-y-auto overflow-x-hidden min-h-0 w-full">
-        <div
-          style={{
-            transform: readingLayout ? undefined : `scale(${zoom / 100})`,
-            transformOrigin: 'top center',
-            backgroundColor: isDark ? '#111827' : '#ffffff',
-            color: isDark ? '#e5e7eb' : '#1a1a1a',
-            borderColor: isDark ? '#374151' : '#e5e7eb',
-            fontSize: `${baseFontSize}pt`,
-          }}
-          onClick={(event) => {
-            if ((event.target as HTMLElement).closest('[data-review-marker]'))
-              window.dispatchEvent(new CustomEvent('mdtodocs:review'));
-          }}
-          data-document-paper
-          className={`w-full max-w-[816px] min-w-0 transition-all duration-300 p-4 sm:p-space-md md:p-space-xxl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_28px_-4px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] rounded-sm flex flex-col h-auto min-h-[1056px] relative border box-border break-words [overflow-wrap:anywhere] mb-space-xxl ${
-            isDark ? 'prose prose-invert' : 'prose prose-slate'
-          }`}
-        >
-          {isCompiling && (
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-primary/20 overflow-hidden z-20 rounded-t-sm">
-              <div className="h-full bg-primary animate-pulse w-full"></div>
-            </div>
-          )}
-          {markdown.trim().length === 0 ? (
-            <div className="py-32 flex flex-col items-center justify-center text-outline select-none text-center">
-              <span className="material-symbols-outlined text-[42px] text-outline/30 mb-3">edit_document</span>
-              <h3 className="font-serif text-lg text-on-surface font-medium">Untitled Document</h3>
-              <p className="font-code-sm text-xs text-outline/70 mt-1.5 max-w-sm">
-                Paste or type Markdown in the editor to see your document here.
-              </p>
-            </div>
-          ) : (
-            <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
-                rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], sourceReviewPlugin(reviewNotes), rehypeCollapsibleHeadings]}
-                components={{
+  // Stable component types preserve open diagram menus, clipboard work and canvas
+  // state when only compilation status/diagnostics change.
+  const markdownComponents = useMemo(() => ({
                   p({ children, ...props }: any) {
                     return (
                       <p className="break-words [overflow-wrap:anywhere] leading-relaxed my-3" {...props}>
@@ -279,7 +234,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                   code({ inline, className, children, ...props }: any) {
                     const match = /language-(\w+)/.exec(className || '');
                     if (!inline && match && match[1] === 'mermaid') {
-                      return <MermaidDiagram code={String(children).replace(/\n$/, '')} />;
+                      return <MermaidDiagram code={String(children).replace(/\n$/, '')} sourceStart={props.node?.position?.start?.offset} />;
                     }
                     return <code className={`${className || ''} break-words`} {...props}>{children}</code>;
                   },
@@ -313,7 +268,56 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                     }
                     return <a {...props} className="break-words underline hover:text-primary transition-colors">{children}</a>;
                   }
-                }}
+  }), [destination]);
+
+  return (
+    <div
+      data-reading-layout={readingLayout || undefined}
+      data-preview-pane
+      className={
+        isReviewMode
+          ? 'w-full flex flex-col items-center relative overflow-visible bg-transparent'
+          : `w-full ${isDark ? 'bg-[#0f172a]' : 'bg-[#f1f3f5]'} flex flex-col p-1.5 sm:p-space-md relative h-full min-h-0 overflow-hidden`
+      }
+    >
+      <div className="flex-1 flex justify-center items-start p-1.5 sm:p-space-md md:p-space-lg overflow-y-auto overflow-x-hidden min-h-0 w-full">
+        <div
+          style={{
+            transform: readingLayout ? undefined : `scale(${zoom / 100})`,
+            transformOrigin: 'top center',
+            backgroundColor: isDark ? '#111827' : '#ffffff',
+            color: isDark ? '#e5e7eb' : '#1a1a1a',
+            borderColor: isDark ? '#374151' : '#e5e7eb',
+            fontSize: `${baseFontSize}pt`,
+          }}
+          onClick={(event) => {
+            if ((event.target as HTMLElement).closest('[data-review-marker]'))
+              window.dispatchEvent(new CustomEvent('mdtodocs:review'));
+          }}
+          data-document-paper
+          className={`w-full max-w-[816px] min-w-0 transition-all duration-300 p-4 sm:p-space-md md:p-space-xxl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_12px_28px_-4px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] rounded-sm flex flex-col h-auto min-h-[1056px] relative border box-border break-words [overflow-wrap:anywhere] mb-space-xxl ${
+            isDark ? 'prose prose-invert' : 'prose prose-slate'
+          }`}
+        >
+          {isCompiling && (
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-primary/20 overflow-hidden z-20 rounded-t-sm">
+              <div className="h-full bg-primary animate-pulse w-full"></div>
+            </div>
+          )}
+          {markdown.trim().length === 0 ? (
+            <div className="py-32 flex flex-col items-center justify-center text-outline select-none text-center">
+              <span className="material-symbols-outlined text-[42px] text-outline/30 mb-3">edit_document</span>
+              <h3 className="font-serif text-lg text-on-surface font-medium">Untitled Document</h3>
+              <p className="font-code-sm text-xs text-outline/70 mt-1.5 max-w-sm">
+                Paste or type Markdown in the editor to see your document here.
+              </p>
+            </div>
+          ) : (
+            <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
+                rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], sourceReviewPlugin(reviewNotes), rehypeCollapsibleHeadings]}
+                components={markdownComponents}
               >
                 {markdown}
               </ReactMarkdown>

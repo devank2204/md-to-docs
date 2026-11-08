@@ -7,6 +7,7 @@ import type {
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { useStore } from '@/store';
 import { DocumentPreview } from './DocumentPreview';
+import { MermaidRepairAssistant } from './MermaidRepairAssistant';
 import { MobileExportBar } from './MobileExportBar';
 import { HomeIntroduction } from './HomeIntroduction';
 import { BrandWordmark } from './BrandWordmark';
@@ -301,6 +302,7 @@ export function MobileWorkspace(props: Props) {
           </button>
         ))}
       </div>
+      <MermaidRepairAssistant />
       <section
         role="tabpanel"
         id="mobile-edit-panel"

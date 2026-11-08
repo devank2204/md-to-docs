@@ -22,6 +22,7 @@ import { DocumentPreview } from '@/components/DocumentPreview';
 import { StatusBar } from '@/components/StatusBar';
 import { SuggestEditModal } from '@/components/SuggestEditModal';
 import { WorkspaceSidebar } from '@/components/WorkspaceSidebar';
+import { MermaidRepairAssistant } from './MermaidRepairAssistant';
 import { LinkedReview } from './LinkedReview';
 import { WorkspaceSheet } from './WorkspaceSheet';
 import { MobileWorkspace } from './MobileWorkspace';
@@ -290,6 +291,7 @@ export function Workspace({
 
   return (
     <div className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
+      <MermaidRepairAssistant />
       {isReviewMode ? (
         <div className="flex-1 w-full overflow-y-auto px-4 py-8 bg-surface-container-lowest">
           <div className="w-full flex justify-center pb-20">
