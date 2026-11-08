@@ -3,13 +3,15 @@ import { useStore } from '@/store';
 import { ImportMarkdownButton } from './ImportMarkdownButton';
 
 interface DocumentEditorProps {
+  syncScroll: boolean;
+  onSyncScrollChange: () => void;
   markdown: string;
   onInput: (markdown: string) => void;
   words: number;
   lines: number;
 }
 
-export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInput, words, lines }) => {
+export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInput, words, lines, syncScroll, onSyncScrollChange }) => {
   return (
     <div
       data-editor-pane
@@ -28,6 +30,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
         <div className="flex flex-wrap min-w-0 max-w-full items-center gap-2 font-code-sm text-[11px] text-secondary">
           <button type="button" className="px-2 py-1 rounded hover:bg-surface-container" onClick={() => window.dispatchEvent(new CustomEvent('mdtodocs:review'))}>Review & outline</button>
           <ImportMarkdownButton />
+          <button type="button" className="px-2 py-1 rounded hover:bg-surface-container" aria-pressed={syncScroll} title="Keep Markdown and Preview at matching content" onClick={onSyncScrollChange}>Sync scroll</button>
           <span className="tabular-nums font-mono">{words} words</span>
           <span className="text-outline-variant">·</span>
           <span className="tabular-nums font-mono">{lines} lines</span>

@@ -29,7 +29,7 @@ function sourceReviewPlugin(notes: DocumentDiagnostic[]) {
       if (node.type !== 'element' || !node.position) return [node];
       const line = node.position.start.line;
       const issues = notes.filter(note => note.position && note.position.line >= line && note.position.line <= node.position.end.line);
-      const anchor = { type: 'element', tagName: 'span', properties: { 'data-source-line': line, className: ['source-anchor'], tabIndex: -1 }, children: [] };
+      const anchor = { type: 'element', tagName: 'span', properties: { 'data-source-line': line, 'data-source-offset': node.position.start.offset, className: ['source-anchor'], tabIndex: -1 }, children: [] };
       const marker = { type: 'element', tagName: 'button', properties: {
         type: 'button', 'data-review-marker': line, 'data-print-hide': true,
         className: ['review-marker', 'font-code-sm', 'text-code-sm'],
@@ -280,7 +280,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
           : `w-full ${isDark ? 'bg-[#0f172a]' : 'bg-[#f1f3f5]'} flex flex-col p-1.5 sm:p-space-md relative h-full min-h-0 overflow-hidden`
       }
     >
-      <div className="flex-1 flex justify-center items-start p-1.5 sm:p-space-md md:p-space-lg overflow-y-auto overflow-x-hidden min-h-0 w-full">
+      <div data-preview-scroll className="flex-1 flex justify-center items-start p-1.5 sm:p-space-md md:p-space-lg overflow-y-auto overflow-x-hidden min-h-0 w-full">
         <div
           style={{
             transform: readingLayout ? undefined : `scale(${zoom / 100})`,

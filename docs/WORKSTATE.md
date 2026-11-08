@@ -37,8 +37,7 @@ the existing 11px JetBrains Mono control role before the final typography check.
 ## Constraints and remaining evidence
 
 DESIGN.md and the decision register remain authoritative. No future typography
-change without explicit user instruction. Continuous source/preview scroll sync,
-universal transformed-node mapping, handoff kits and large-document performance
+change without explicit user instruction. Universal transformed-node mapping, handoff kits and large-document performance
 research remain outside this completed foundation. Kits still require evidence
 of repeated multi-format work.
 
@@ -109,3 +108,18 @@ the integrated implementation. Lint passed with existing warnings. All 59 Chromi
 (1.4m), including the new narrow-editor bounds regression and all latest Mermaid
 image/repair scenarios. No physical-device, Safari,
 receiving-app or production deployment claim. No push was requested or performed.
+
+
+## Desktop synchronized scroll — 2026-11-08
+
+The user requested two-way desktop Markdown/Preview scrolling. Implemented
+source-block position mapping with measured textarea soft wrapping, exact scroll
+endpoints and a default-on Sync scroll toggle. Cached geometry refreshes after
+content, fonts, dimensions, asynchronous diagrams/images, collapsed sections and
+zoom transitions. Feedback events are suppressed; mobile/reading view are scoped
+out. Markdown, fonts/palette and exports remain unchanged; Preview stays read-only.
+
+See [implementation and evidence](qa/synchronized-scroll.md). Production build/
+prerender and lint passed (existing warnings only). All 65 Chromium browser
+scenarios passed in 1.5m, including six new sync-scroll checks. No push requested
+for this task.
