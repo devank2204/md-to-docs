@@ -1,3 +1,4 @@
+import { MATERIAL_SYMBOLS_URL } from '../apps/web/materialSymbols';
 import { structuredData } from '../apps/web/src/routes/metadata';
 import { renderLanding } from '../apps/web/src/landingStatic';
 import fs from 'fs/promises';
@@ -49,12 +50,14 @@ function cleanBaseTemplate(rawHtml: string): string {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('landing-booting')</script>
+    <style>html.landing-booting #root{visibility:hidden}</style>
     <link rel="icon" type="image/png" href="/mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>mdtodocs: Markdown to Documents</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="${MATERIAL_SYMBOLS_URL}" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet" />
     ${scriptTags.join('\n    ')}
     ${cssTags.join('\n    ')}
@@ -80,13 +83,14 @@ function generate404Html(templateHtml: string): string {
 
   return templateHtml
     .replace(/<title>.*?<\/title>/, '<title>Page Not Found (404) | mdtodocs</title>')
-    .replace(/<script\b[^>]*src=[^>]*><\/script>/g, '')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '')
     .replace('</head>', '<meta name="robots" content="noindex" /></head>')
     .replace(/<div id="root">[\s\S]*?<\/div>/, `<div id="root">${content}</div>`);
 }
 
 export async function runPrerender() {
   const distDir = path.resolve(process.cwd(), 'apps/web/dist');
+  const startup = await fs.readFile(path.resolve(process.cwd(), 'scripts/startup-bootstrap.js'), 'utf8');
   const publicDir = path.resolve(process.cwd(), 'apps/web/public');
   const templatePath = path.join(distDir, 'index.html');
 
@@ -124,6 +128,7 @@ export async function runPrerender() {
     await fs.mkdir(routeDir, { recursive: true });
 
     const ssrHtml = generateSSRHtml(route);
+    const mobileHtml = JSON.stringify(renderLanding(route, true)).replace(/</g, '\\u003c');
     const jsonLd = generateJsonLd(route);
 
     let html = templateHtml;
@@ -169,6 +174,8 @@ ${jsonLd}
 
     // Inject SSR HTML inside <div id="root">
     html = html.replace(/<div id="root">[\s\S]*?<\/div>/, `<div id="root">${ssrHtml}</div>`);
+
+    html = html.replace('</body>', `<script type="application/json" id="mobile-landing">${mobileHtml}</script><script>${startup}</script></body>`);
 
     const outputFilePath = path.join(routeDir, 'index.html');
     await fs.writeFile(outputFilePath, html, 'utf8');

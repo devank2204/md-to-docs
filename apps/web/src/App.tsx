@@ -1,31 +1,48 @@
+import { FeatureBoundary } from './components/FeatureBoundary';
+import { MobileWorkspace } from './components/MobileWorkspace';
 import { structuredData } from './routes/metadata';
 import { LandingContext } from './routes/LandingContext';
 import { HomeIntroduction } from './components/HomeIntroduction';
 import { LandingPageContent } from './components/LandingPageContent';
-import { useEffect, useState, useMemo } from 'react';
+import { lazy, useLayoutEffect, useEffect, useState, useMemo } from 'react';
 import { useAppAppearance } from '@/hooks/useAppAppearance';
 import { useMobileLayout } from '@/hooks/useMobileLayout';
 import { EmptyState } from '@/components/EmptyState';
-import { Workspace } from '@/components/Workspace';
 import { Header } from '@/components/Header';
-import { CommandPalette } from '@/components/CommandPalette';
-import { TemplateGalleryModal } from '@/components/TemplateGalleryModal';
-import { ReconciliationModal } from '@/components/ReconciliationModal';
-import { DocumentHistoryModal } from '@/components/DocumentHistoryModal';
 import { BookmarkPrompt } from '@/components/BookmarkPrompt';
-import { AboutModal } from '@/components/AboutModal';
-import { THEMES } from '@mdtodocs/compiler-core';
+import { THEMES } from '@mdtodocs/compiler-core/src/theme';
 import type { DocumentTheme } from '@mdtodocs/compiler-core';
 import { useStore } from '@/store';
 import { getRouteSpec } from '@/routes/landingData';
 import type { LandingRoutePath } from '@/routes/landingData';
-import { MermaidUtilityView } from '@/components/MermaidUtilityView';
 import { analytics, getDocLengthBucket } from '@/utils/analytics';
+
+const MobileCompilation = lazy(() => import('./hooks/useDocumentCompilation').then(m => ({ default: m.MobileCompilation })));
+const Workspace = lazy(() => import('@/components/Workspace').then(m => ({ default: m.Workspace })));
+const CommandPalette = lazy(() => import('@/components/CommandPalette').then(m => ({ default: m.CommandPalette })));
+const TemplateGalleryModal = lazy(() => import('@/components/TemplateGalleryModal').then(m => ({ default: m.TemplateGalleryModal })));
+const ReconciliationModal = lazy(() => import('@/components/ReconciliationModal').then(m => ({ default: m.ReconciliationModal })));
+const DocumentHistoryModal = lazy(() => import('@/components/DocumentHistoryModal').then(m => ({ default: m.DocumentHistoryModal })));
+const AboutModal = lazy(() => import('@/components/AboutModal').then(m => ({ default: m.AboutModal })));
+const MermaidUtilityView = lazy(() => import('@/components/MermaidUtilityView').then(m => ({ default: m.MermaidUtilityView })));
 
 export type AppState = 'EMPTY' | 'WORKSPACE';
 
 function App() {
   useAppAppearance();
+  useLayoutEffect(() => {
+    const startup = (window as any).__mdStartup;
+    if (startup?.edited && startup.value !== useStore.getState().markdown) useStore.getState().setMarkdown(startup.value || '');
+    const selection = [startup?.start, startup?.end];
+    // React now owns the input; native capture must stop before restoring focus.
+    startup?.dispose();
+    if (startup?.focused) {
+      const input = document.querySelector<HTMLTextAreaElement>('textarea');
+      input?.focus();
+      input?.setSelectionRange(selection[0], selection[1]);
+      startup.focused = false;
+    }
+  }, []);
   const isMobile = useMobileLayout();
   const markdown = useStore(state => state.markdown);
   const currentView = useStore(state => state.currentView);
@@ -36,6 +53,12 @@ function App() {
   const isCommandPaletteOpen = useStore(state => state.isCommandPaletteOpen);
   const isTemplateGalleryOpen = useStore(state => state.isTemplateGalleryOpen);
   const isReconciliationModalOpen = useStore(state => state.isReconciliationModalOpen);
+  const isAboutModalOpen = useStore(state => state.isAboutModalOpen);
+  const diagnostics = useStore(state => state.diagnostics);
+  const diagnosticsFailed = useStore(state => state.diagnosticsFailed);
+  const diagnosticsKey = useStore(state => state.diagnosticsKey);
+  const activeDocumentId = useStore(state => state.activeDocumentId);
+  const isCompiling = useStore(state => state.isCompiling);
   const isHistoryModalOpen = useStore(state => state.isHistoryModalOpen);
   
   const setMarkdown = useStore(state => state.setMarkdown);
@@ -191,18 +214,18 @@ function App() {
         {(!routeSpec) ? <section className="p-10"><h1>Page Not Found (404)</h1><a href="/">Return to MDToDocs</a></section> : null}
         {routeSpec && currentPath !== '/' && appState !== 'EMPTY' && !isMobile && !currentPath.startsWith('/mermaid-') && <HomeIntroduction />}
         {!routeSpec ? null : currentPath === '/mermaid-to-svg' || currentPath === '/mermaid-to-png' ? (
-          <MermaidUtilityView
+          <FeatureBoundary fallback={<><HomeIntroduction /><LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} /></>}><MermaidUtilityView
             currentPath={currentPath}
             onNavigateRoute={handleNavigateRoute}
             onOpenInStudio={(importedMarkdown) => {
               setMarkdown(importedMarkdown);
               handleNavigateRoute('/');
             }}
-          />
-        ) : !isMobile && appState === 'EMPTY' ? (
+          /></FeatureBoundary>
+        ) : isMobile ? <><MobileWorkspace markdown={markdown} onInput={handleInput} destination={destination} onDestinationChange={setDestination} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={!!markdown.trim() && (isCompiling || diagnosticsKey !== JSON.stringify([activeDocumentId, markdown, destination, activeTheme]))} diagnostics={diagnostics} compilationError={diagnosticsFailed} />{markdown.trim() && <FeatureBoundary fallback={null}><MobileCompilation activeTheme={activeTheme} /></FeatureBoundary>}</> : !isMobile && appState === 'EMPTY' ? (
           <EmptyState onInput={handleInput} />
         ) : (
-          <Workspace
+          <FeatureBoundary fallback={<EmptyState onInput={handleInput} pendingValue={markdown} showIntroduction={currentPath === "/"} />}><Workspace
             isMobile={isMobile}
             markdown={markdown}
             onInput={handleInput}
@@ -210,38 +233,38 @@ function App() {
             onDestinationChange={setDestination}
             activeTheme={activeTheme}
             documentSignature={documentSignature}
-          />
+          /></FeatureBoundary>
         )}
         {routeSpec && !currentPath.startsWith('/mermaid-') && <LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} />}
       </main>
 
-      <CommandPalette
+      {isCommandPaletteOpen && <FeatureBoundary><CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onOpenInspector={() => setIsInspectorOpen(true)}
         onOpenFidelityPanel={() => setIsFidelityPanelOpen(true)}
         onOpenSuggestModal={() => setIsSuggestModalOpen(true)}
         activeTheme={activeTheme}
-      />
+      /></FeatureBoundary>}
 
-      <TemplateGalleryModal
+      {isTemplateGalleryOpen && <FeatureBoundary><TemplateGalleryModal
         isOpen={isTemplateGalleryOpen}
         onClose={() => setIsTemplateGalleryOpen(false)}
         onSelectTemplate={setMarkdown}
         currentMarkdownLength={markdown.length}
-      />
+      /></FeatureBoundary>}
 
-      <ReconciliationModal
+      {isReconciliationModalOpen && <FeatureBoundary><ReconciliationModal
         isOpen={isReconciliationModalOpen}
         onClose={() => setIsReconciliationModalOpen(false)}
-      />
+      /></FeatureBoundary>}
 
-      <DocumentHistoryModal
+      {isHistoryModalOpen && <FeatureBoundary><DocumentHistoryModal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
-      />
+      /></FeatureBoundary>}
 
-      <AboutModal />
+      {isAboutModalOpen && <FeatureBoundary><AboutModal /></FeatureBoundary>}
 
       {!isMobile && <BookmarkPrompt />}
     </div></LandingContext.Provider>

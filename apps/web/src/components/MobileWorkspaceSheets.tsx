@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { THEMES } from '@mdtodocs/compiler-core';
+import { THEMES } from '@mdtodocs/compiler-core/src/theme';
 import type { DocumentDiagnostic } from '@mdtodocs/compiler-core';
 import { useStore } from '@/store';
 import { LinkedReview } from './LinkedReview';

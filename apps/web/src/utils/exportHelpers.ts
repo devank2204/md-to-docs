@@ -1,18 +1,6 @@
-import { preparePrintSnapshot, type PrintSnapshot } from './printSnapshot';
-import {
-  parseMarkdown,
-  planRepresentation,
-  DiagnosticsCollector,
-} from '@mdtodocs/compiler-core';
+import type { PrintSnapshot } from './printSnapshot';
 import type { DocumentTheme } from '@mdtodocs/compiler-core';
-import { resolveAssets } from '@mdtodocs/asset-pipeline';
-import {
-  renderToDocxBlob,
-  renderToClipboardHtml,
-  renderToHtml,
-} from '@mdtodocs/renderers';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-
 export type Signature = {
   enabled: boolean;
   placement: 'every-page' | 'last-page';
@@ -42,51 +30,10 @@ export function documentFilename(title: string, extension: string) {
   return `${stem}.${extension}`;
 }
 
-// Never reuse the preview tree: it may be stale or already transformed for a
-// different destination. Each export compiles one immutable source snapshot.
-export async function prepareDocumentExport(
-  input: ExportInput,
-  signal?: AbortSignal,
-): Promise<PreparedExport> {
-  if (!input.markdown.trim()) throw new Error('empty_document');
-  const target = input.destination === 'html' ? 'clipboard' : input.destination;
-  const source = await resolveAssets(parseMarkdown(input.markdown), signal);
-  signal?.throwIfAborted();
-  const doc = planRepresentation(source, target, new DiagnosticsCollector());
-  if (input.destination === 'word') {
-    const blob = await renderToDocxBlob(doc, input.theme, input.signature);
-    return {
-      kind: 'file',
-      file: new File([blob], documentFilename(input.title, 'docx'), {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      }),
-    };
-  }
-  if (input.destination === 'pdf') {
-    let html = renderToHtml(doc, { theme: input.theme, title: input.title, fullDocument: true });
-    // Clipboard renderer already implements the chosen signature and theme.
-    const body = renderToClipboardHtml(doc, input.theme, input.signature);
-    html = html.replace(/<body>[\s\S]*<\/body>/, () => `<body>${body}</body>`);
-    return { kind: 'print', snapshot: await preparePrintSnapshot(html, signal) };
-  }
-  if (input.destination === 'html') {
-    const html = renderToHtml(doc, {
-      theme: input.theme,
-      title: input.title,
-      fullDocument: true,
-    });
-    return {
-      kind: 'file',
-      file: new File([html], documentFilename(input.title, 'html'), {
-        type: 'text/html',
-      }),
-    };
-  }
-  return {
-    kind: 'clipboard',
-    html: renderToClipboardHtml(doc, input.theme, input.signature),
-    plain: input.markdown,
-  };
+export async function prepareDocumentExport(input: ExportInput, signal?: AbortSignal): Promise<PreparedExport> {
+ const module = await import('./exportPreparation');
+ signal?.throwIfAborted();
+ return module.prepareDocumentExport(input, signal);
 }
 
 export function downloadFile(file: File) {

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
+import { takeEditorSelection, restoreEditor } from '../utils/editorHandoff';
 import { useStore } from '@/store';
 import { ImportMarkdownButton } from './ImportMarkdownButton';
 
@@ -12,6 +13,11 @@ interface DocumentEditorProps {
 }
 
 export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInput, words, lines, syncScroll, onSyncScrollChange }) => {
+  const editor = useRef<HTMLTextAreaElement>(null);
+  useLayoutEffect(() => {
+    const selection = takeEditorSelection();
+    if (selection && editor.current) restoreEditor(editor.current, selection);
+  }, []);
   return (
     <div
       data-editor-pane
@@ -53,6 +59,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
       {/* Editor Textarea */}
       <div className="flex-1 min-h-0 relative">
         <textarea
+          ref={editor}
           data-source-editor
           aria-label="Markdown text"
           className="w-full h-full p-space-md font-code-md text-code-md text-on-surface bg-transparent resize-none focus:outline-none leading-relaxed overflow-y-auto selection:bg-primary/15"
