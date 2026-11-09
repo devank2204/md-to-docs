@@ -45,6 +45,9 @@ function App() {
   }, []);
   const isMobile = useMobileLayout();
   const markdown = useStore(state => state.markdown);
+  const [compilationLoaded, setCompilationLoaded] = useState(() => !!markdown.trim());
+  // Once activated, keep compiling clears and document switches as the studio did.
+  if (!compilationLoaded && markdown.trim()) setCompilationLoaded(true);
   const currentView = useStore(state => state.currentView);
   const destination = useStore(state => state.destination);
   const themeId = useStore(state => state.themeId);
@@ -222,7 +225,7 @@ function App() {
               handleNavigateRoute('/');
             }}
           /></FeatureBoundary>
-        ) : isMobile ? <><MobileWorkspace markdown={markdown} onInput={handleInput} destination={destination} onDestinationChange={setDestination} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={!!markdown.trim() && (isCompiling || diagnosticsKey !== JSON.stringify([activeDocumentId, markdown, destination, activeTheme]))} diagnostics={diagnostics} compilationError={diagnosticsFailed} />{markdown.trim() && <FeatureBoundary fallback={null}><MobileCompilation activeTheme={activeTheme} /></FeatureBoundary>}</> : !isMobile && appState === 'EMPTY' ? (
+        ) : isMobile ? <><MobileWorkspace markdown={markdown} onInput={handleInput} destination={destination} onDestinationChange={setDestination} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={compilationLoaded && (isCompiling || diagnosticsKey !== JSON.stringify([activeDocumentId, markdown, destination, activeTheme]))} diagnostics={diagnostics} compilationError={diagnosticsFailed} />{compilationLoaded && <FeatureBoundary fallback={null}><MobileCompilation activeTheme={activeTheme} /></FeatureBoundary>}</> : !isMobile && appState === 'EMPTY' ? (
           <EmptyState onInput={handleInput} />
         ) : (
           <FeatureBoundary fallback={<EmptyState onInput={handleInput} pendingValue={markdown} showIntroduction={currentPath === "/"} />}><Workspace
