@@ -1,0 +1,31 @@
+import { chromium } from '@playwright/test';
+import fs from 'node:fs/promises';
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || '/usr/bin/chromium',args:['--no-sandbox']});
+const rows=[];
+for(const port of (process.env.PERF_PORTS || '4180,4181').split(',').map(Number)) for(let sample=0;sample<3;sample++) {
+ const context=await browser.newContext({viewport:{width:375,height:900}});
+ const page=await context.newPage();const cdp=await context.newCDPSession(page);
+ await cdp.send('Network.enable');
+ await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:150,downloadThroughput:1.6*1024*1024/8,uploadThroughput:750*1024/8});
+ await cdp.send('Emulation.setCPUThrottlingRate',{rate:4});
+ await page.addInitScript(()=>{window.paint={lcp:0,cls:0};new PerformanceObserver(list=>{for(const e of list.getEntries())window.paint.lcp=e.startTime}).observe({type:'largest-contentful-paint',buffered:true});new PerformanceObserver(list=>{for(const e of list.getEntries())if(!e.hadRecentInput)window.paint.cls+=e.value}).observe({type:'layout-shift',buffered:true});});
+ await page.goto(`http://127.0.0.1:${port}/markdown-to-word/`);
+ await page.waitForTimeout(1000);
+ const scripts=new Set();let transfer=0;
+ const response=e=>{if(e.type==='Script')scripts.add(e.requestId)};
+ const finished=e=>{if(scripts.has(e.requestId))transfer+=e.encodedDataLength};
+ cdp.on('Network.responseReceived',response);cdp.on('Network.loadingFinished',finished);
+ await page.reload();await page.waitForTimeout(1000);
+ const warm={...await page.evaluate(()=>window.paint),jsTransfer:transfer};
+ await page.locator('textarea').first().fill('# Returning document\n\nA **technical** report.');
+ await page.getByRole('tab',{name:'Preview',exact:true}).click();
+ await page.locator('[data-preview-pane]').getByText('technical',{exact:false}).first().waitFor();
+ scripts.clear();transfer=0;
+ await page.reload();
+ await page.waitForTimeout(1500);
+ const restored={...await page.evaluate(()=>window.paint),jsTransfer:transfer,value:await page.locator('textarea').first().inputValue()};
+ rows.push({port,sample,warm,restored});
+ await fs.writeFile(process.argv[2] || '/tmp/repeat-visits.json',JSON.stringify(rows,null,2));
+ console.log(rows.at(-1));await context.close();
+}
+await browser.close();

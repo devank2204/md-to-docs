@@ -1,6 +1,28 @@
 # Current workstate
 
-Updated: 2026-11-07. Branch: v3.
+Updated: 2026-11-09. Branch: seo/iteration-02-performance.
+
+## Latest completed iteration
+
+Iteration 02 performance work is complete locally, based on pushed Iteration 01
+commit `04a0e75` on `Seo-fixes`. See [report and reproduction commands](qa/seo-iteration-02.md)
+and [machine-readable measurements](qa/seo-iteration-02-results.json).
+
+- Deferred studio, preview, diagram engines, exports and optional dialogs; retained
+  shared landing UI, all eight SEO routes and existing document ownership.
+- Protected early typing/paste/import, restored documents and mobile layout during
+  streaming startup. Same fonts and palette; Material Symbols transport subset.
+- Three-sample cold mobile homepage medians: initial JS 1,350.3 → 104.1 kB,
+  LCP 14.312 → 0.964s, CLS 0.05685 → 0.00144. Local synthetic data only.
+- First preview after paste costs 2.623s versus 0.445s; first DOCX preparation
+  costs 1.620s versus 0.437s because those capabilities now load on demand.
+- Production build/eight-route prerender passed; 90 browser scenarios, 167 validation
+  tests and 20 fidelity fixtures passed. Existing lint warnings remain.
+- Source commits: `33625e2`, `7c8a58c`, `3cd4e32`; tests/evidence committed separately.
+  No Iteration 02 push, merge or deployment. Three pre-existing dirty DOCX fixtures
+  remain excluded. Receiving-app, real-device and production measurements pending.
+
+The sections below retain the preceding implementation history.
 
 ## Current implementation
 
