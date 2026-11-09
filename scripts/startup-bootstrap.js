@@ -24,6 +24,10 @@
     buffer.start = e.target.selectionStart;
     buffer.end = e.target.selectionEnd;
     buffer.focused = document.activeElement === e.target;
+    if (e.target.getAttribute('aria-label') === 'Markdown terminal input') {
+      const hint = e.target.nextElementSibling;
+      if (hint) hint.style.display = buffer.value ? 'none' : '';
+    }
   };
   const focus = e => { if (buffer.active && e.target instanceof HTMLTextAreaElement) { buffer.focused = true; buffer.start = e.target.selectionStart; buffer.end = e.target.selectionEnd; } };
   document.addEventListener('input', input, true);
@@ -61,7 +65,9 @@
     }
   }, true);
   const readFile = async file => {
-    if (!file || file.size > 1000000 || !/\.(md|markdown|txt)$/i.test(file.name)) return;
+    if (!file) return;
+    if (!/\.(md|markdown|txt)$/i.test(file.name)) { message('Choose a .md, .markdown, or .txt file.'); return; }
+    if (root.querySelector('.mobile-workspace') && file.size > 1000000) { message('Choose a file smaller than 1 MB. Your current text is unchanged.'); return; }
     const editor = root.querySelector('textarea');
     const original = editor?.value;
     if (original?.trim()) { message('Your text is safe. Import again after the editor opens.'); return; }
