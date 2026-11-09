@@ -2,42 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mdtodocs.com/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://mdtodocs.com/markdown-to-word</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://mdtodocs.com/markdown-to-word/</loc>
   </url>
   <url>
-    <loc>https://mdtodocs.com/markdown-to-pdf</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://mdtodocs.com/markdown-to-pdf/</loc>
   </url>
   <url>
-    <loc>https://mdtodocs.com/markdown-to-google-docs</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://mdtodocs.com/markdown-to-google-docs/</loc>
   </url>
   <url>
-    <loc>https://mdtodocs.com/markdown-to-html</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://mdtodocs.com/markdown-to-html/</loc>
   </url>
   <url>
-    <loc>https://mdtodocs.com/markdown-to-rich-text</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://mdtodocs.com/markdown-to-rich-text/</loc>
   </url>
   <url>
-    <loc>https://mdtodocs.com/mermaid-to-svg</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://mdtodocs.com/mermaid-to-svg/</loc>
   </url>
   <url>
-    <loc>https://mdtodocs.com/mermaid-to-png</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <loc>https://mdtodocs.com/mermaid-to-png/</loc>
   </url>
 </urlset>

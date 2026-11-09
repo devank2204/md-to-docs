@@ -7,7 +7,7 @@
     "dev": "pnpm --filter web dev",
     "start": "pnpm --filter web dev",
     "build": "pnpm -r build && pnpm prerender",
-    "prerender": "tsx scripts/prerender.ts",
+    "prerender": "tsx --tsconfig apps/web/tsconfig.app.json scripts/prerender.ts",
     "test": "pnpm --filter @mdtodocs/fidelity-lab test",
     "test:update": "pnpm --filter @mdtodocs/fidelity-lab test:update",
     "test:browser": "playwright test"

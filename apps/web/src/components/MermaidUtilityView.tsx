@@ -1,3 +1,4 @@
+import { HomeIntroduction } from './HomeIntroduction';
 import { useState, useEffect, useMemo } from 'react';
 import {
   renderMermaid,
@@ -161,6 +162,7 @@ export function MermaidUtilityView({
 
   return (
     <div className="w-full flex flex-col min-h-screen bg-surface text-on-surface">
+      <HomeIntroduction />
       {/* Top Utility Nav Header */}
       <header className="sticky top-12 z-20 w-full bg-surface-container-low/90 backdrop-blur-md border-b border-outline-variant/30 px-4 sm:px-6 py-2.5 flex items-center justify-between flex-wrap gap-2 select-none">
         <div className="flex items-center gap-3">
@@ -228,7 +230,7 @@ export function MermaidUtilityView({
               <span>Mermaid Code</span>
             </span>
 
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1">
               <span className="text-[10px] uppercase font-semibold text-outline mr-1">Templates:</span>
               {TEMPLATES.map((tpl) => (
                 <button

@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { deviceStorage } from '../utils/deviceStorage';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { THEMES, type DocumentDiagnostic, type DocumentPresetId } from '@mdtodocs/compiler-core';
+import { THEMES } from '@mdtodocs/compiler-core/src/theme';
+import type { DocumentDiagnostic, DocumentPresetId } from '@mdtodocs/compiler-core';
 import type { Root } from 'mdast';
 import {
   extractDocumentTitle,
@@ -12,7 +13,7 @@ import {
   restoreDocumentSnapshot,
   type DocumentItem,
   type DocumentSnapshot,
-} from '@mdtodocs/renderers';
+} from '@mdtodocs/renderers/src/documentManager';
 
 export interface AppState {
   appAppearance: 'cream' | 'dark' | 'system';

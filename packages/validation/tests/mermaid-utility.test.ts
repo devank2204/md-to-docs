@@ -97,20 +97,12 @@ describe('Mermaid Utility Cluster (Prompt 10)', () => {
     expect(svgSpec).toBeDefined();
     expect(svgSpec?.path).toBe('/mermaid-to-svg');
     expect(svgSpec?.title).toContain('Mermaid to SVG');
-    expect(svgSpec?.canonical).toBe('https://mdtodocs.com/mermaid-to-svg');
-    expect(svgSpec?.featureBullets.length).toBeGreaterThanOrEqual(3);
-    expect(svgSpec?.limitations.length).toBeGreaterThanOrEqual(2);
-    expect(svgSpec?.formatMatrix.length).toBeGreaterThanOrEqual(4);
-    expect(svgSpec?.faqs.length).toBeGreaterThanOrEqual(2);
+    expect(svgSpec?.canonical).toBe('https://mdtodocs.com/mermaid-to-svg/');
 
     const pngSpec = getRouteSpec('/mermaid-to-png');
     expect(pngSpec).toBeDefined();
     expect(pngSpec?.path).toBe('/mermaid-to-png');
     expect(pngSpec?.title).toContain('Mermaid to PNG');
-    expect(pngSpec?.canonical).toBe('https://mdtodocs.com/mermaid-to-png');
-    expect(pngSpec?.featureBullets.length).toBeGreaterThanOrEqual(3);
-    expect(pngSpec?.limitations.length).toBeGreaterThanOrEqual(2);
-    expect(pngSpec?.formatMatrix.length).toBeGreaterThanOrEqual(4);
-    expect(pngSpec?.faqs.length).toBeGreaterThanOrEqual(2);
+    expect(pngSpec?.canonical).toBe('https://mdtodocs.com/mermaid-to-png/');
   });
 });

@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import { visit } from 'unist-util-visit';
+import React, { createContext, useContext, lazy, useMemo } from 'react';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { planRepresentation, DiagnosticsCollector, type DocumentDiagnostic } from '@mdtodocs/compiler-core';
 import type { Root } from 'mdast';
@@ -8,9 +9,16 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { InteractiveTable } from './InteractiveTable';
-import { MermaidDiagram } from './MermaidDiagram';
+import { FeatureBoundary } from './FeatureBoundary';
+const MermaidDiagram = lazy(() => import('./MermaidDiagram').then(m => ({ default: m.MermaidDiagram })));
 import { InteractiveCodeBlock } from './InteractiveCodeBlock';
 import { useStore } from '@/store';
+
+const PreviewImages = createContext<Map<string, string>>(new Map());
+function PreparedPreviewImage({ src, alt, ...props }: any) {
+  const prepared = useContext(PreviewImages).get(src);
+  return <img src={prepared || src} alt={alt || ''} className="max-w-full h-auto rounded my-4 mx-auto block shadow-xs" loading={prepared ? 'eager' : 'lazy'} {...props} />;
+}
 
 interface DocumentPreviewProps {
   markdown: string;
@@ -164,6 +172,23 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   const themeId = useStore((state) => state.themeId);
   const baseFontSize = useStore((state) => state.baseFontSize);
 
+  const compiledDoc = useStore(state => state.compiledDoc);
+  const diagnosticsKey = useStore(state => state.diagnosticsKey);
+  const documentId = useStore(state => state.activeDocumentId);
+  const preparedImages = useMemo(() => {
+    const images = new Map<string, string>();
+    if (!compiledDoc) return images;
+    let revision: any[];
+    try { revision = JSON.parse(diagnosticsKey); } catch { return images; }
+    if (revision[0] !== documentId || revision[1] !== markdown || revision[2] !== destination) return images;
+    // Reuse the compiler's completed image bytes. Offscreen images can settle
+    // without another external request when the deferred preview mounts scrolled.
+    visit(compiledDoc, (node: any) => {
+      if (node.type === 'image' && node.data?.resolvedAsset?.data) images.set(node.url, node.data.resolvedAsset.data);
+    });
+    return images;
+  }, [compiledDoc, diagnosticsKey, documentId, markdown, destination]);
+
   const isDark = themeId === 'dark';
 
   const destinationPlanPlugin = useMemo(() => {
@@ -220,21 +245,11 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                       </InteractiveCodeBlock>
                     );
                   },
-                  img({ src, alt, ...props }: any) {
-                    return (
-                      <img
-                        src={src}
-                        alt={alt || ''}
-                        className="max-w-full h-auto rounded my-4 mx-auto block shadow-xs"
-                        loading="lazy"
-                        {...props}
-                      />
-                    );
-                  },
+                  img: PreparedPreviewImage,
                   code({ inline, className, children, ...props }: any) {
                     const match = /language-(\w+)/.exec(className || '');
                     if (!inline && match && match[1] === 'mermaid') {
-                      return <MermaidDiagram code={String(children).replace(/\n$/, '')} sourceStart={props.node?.position?.start?.offset} />;
+                      return <FeatureBoundary><MermaidDiagram code={String(children).replace(/\n$/, '')} sourceStart={props.node?.position?.start?.offset} /></FeatureBoundary>;
                     }
                     return <code className={`${className || ''} break-words`} {...props}>{children}</code>;
                   },
@@ -271,6 +286,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   }), [destination]);
 
   return (
+    <PreviewImages.Provider value={preparedImages}>
     <div
       data-reading-layout={readingLayout || undefined}
       data-preview-pane
@@ -357,5 +373,6 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         </button>
       </div>
     </div>
+    </PreviewImages.Provider>
   );
 };

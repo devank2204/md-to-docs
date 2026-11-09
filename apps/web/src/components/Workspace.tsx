@@ -1,19 +1,12 @@
+import { useDocumentCompilation } from '@/hooks/useDocumentCompilation';
 import { useSyncedScroll } from '@/hooks/useSyncedScroll';
 import { useState, useEffect, useRef } from 'react';
 import {
-  parseMarkdown,
-  planRepresentation,
-  DiagnosticsCollector,
-  analyzeDocumentForRescue,
   applyRescueFix,
   applyAllRescueFixes,
   type RescueDiagnostic,
 } from '@mdtodocs/compiler-core';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { visit } from 'unist-util-visit';
-import type { Root } from 'mdast';
-import { resolveAssets } from '@mdtodocs/asset-pipeline';
-import { validateDocument } from '@mdtodocs/validation';
 import { useStore } from '@/store';
 import { FidelityCheckPanel } from '@/components/FidelityCheckPanel';
 import { DocumentInspector } from '@/components/DocumentInspector';
@@ -56,65 +49,6 @@ interface DocumentStats {
   readingTimeMinutes: number;
 }
 
-function countElements(doc: Root, rawText: string): DocumentStats {
-  const words = rawText.trim().split(/\s+/).filter(w => w.length > 0).length;
-  const readingTimeMinutes = Math.max(1, Math.ceil(words / 200));
-
-  const stats: DocumentStats = {
-    headings: 0,
-    paragraphs: 0,
-    lists: 0,
-    taskLists: 0,
-    tables: 0,
-    codeBlocks: 0,
-    images: 0,
-    blockquotes: 0,
-    callouts: 0,
-    math: 0,
-    footnotes: 0,
-    mermaid: 0,
-    words,
-    readingTimeMinutes,
-  };
-
-  visit(doc, (node: any) => {
-    switch (node.type) {
-      case 'heading': stats.headings++; break;
-      case 'paragraph': stats.paragraphs++; break;
-      case 'list': {
-        const hasTask = node.children?.some((item: any) => item.checked !== null && item.checked !== undefined);
-        if (hasTask) {
-          stats.taskLists++;
-        } else {
-          stats.lists++;
-        }
-        break;
-      }
-      case 'table': stats.tables++; break;
-      case 'code':
-        if (node.lang === 'mermaid') {
-          stats.mermaid++;
-        } else {
-          stats.codeBlocks++;
-        }
-        break;
-      case 'image': stats.images++; break;
-      case 'blockquote': stats.blockquotes++; break;
-      case 'containerDirective': stats.callouts++; break;
-      case 'math':
-      case 'inlineMath':
-        stats.math++;
-        break;
-      case 'footnoteReference':
-      case 'footnoteDefinition':
-        stats.footnotes++;
-        break;
-    }
-  });
-
-  return stats;
-}
-
 function formatStats(stats: DocumentStats): string {
   const parts: string[] = [];
   if (stats.headings > 0) parts.push(`${stats.headings} heading${stats.headings !== 1 ? 's' : ''}`);
@@ -149,137 +83,15 @@ export function Workspace({
   const setIsSuggestModalOpen = useStore(state => state.setIsSuggestModalOpen);
   
   const isReviewMode = useStore(state => state.isReviewMode);
-  const setCompiledDoc = useStore(state => state.setCompiledDoc);
-  const setDiagnostics = useStore(state => state.setDiagnostics);
-  const compilationPending = useStore(state => state.isCompiling);
   const activeDocumentId = useStore(state => state.activeDocumentId);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [syncScroll, setSyncScroll] = useState(true);
   useSyncedScroll(workspaceRef, syncScroll && !isMobile && !isReviewMode, markdown, activeDocumentId);
-  const compileKey = JSON.stringify([activeDocumentId, markdown, destination, activeTheme]);
-  const setIsCompiling = useStore(state => state.setIsCompiling);
-
-  const docTitleMatch = markdown.match(/^#\s+(.+)$/m);
-  const docTitle = docTitleMatch ? docTitleMatch[1].trim() : 'Document';
-
-  const [compilationError, setCompilationError] = useState(false);
-
-  const [compiledState, setCompiledState] = useState<{
-    inputKey: string;
-    diagnostics: ReturnType<DiagnosticsCollector['getAll']>;
-    stats: any;
-    validationReport: any;
-  }>({
-    inputKey: '',
-    diagnostics: [],
-    stats: {
-      headings: 0,
-      paragraphs: 0,
-      lists: 0,
-      taskLists: 0,
-      tables: 0,
-      codeBlocks: 0,
-      images: 0,
-      blockquotes: 0,
-      callouts: 0,
-      math: 0,
-      footnotes: 0,
-      mermaid: 0,
-      words: 0,
-      readingTimeMinutes: 1,
-    },
-    validationReport: null,
-  });
-
-  const isCompiling = compilationPending || compiledState.inputKey !== compileKey;
-  const words = markdown.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const compiledState = useDocumentCompilation(markdown, destination, activeTheme, activeDocumentId);
+  const { isCompiling, compilationError } = compiledState;
+  const docTitle = markdown.match(/^#\s+(.+)$/m)?.[1].trim() || 'Document';
+  const words = markdown.trim().split(/\s+/).filter(Boolean).length;
   const lines = markdown.split('\n').length;
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(async () => {
-      if (controller.signal.aborted) return;
-      setIsCompiling(true);
-      setCompilationError(false);
-
-      try {
-        const collector = new DiagnosticsCollector();
-        let doc = parseMarkdown(markdown);
-        if (controller.signal.aborted) return;
-
-        // Resolve assets asynchronously with abort signal
-        doc = await resolveAssets(doc, controller.signal);
-        if (controller.signal.aborted) return;
-
-        // Count before planner optimizations
-        const docStats = countElements(doc, markdown);
-
-        doc = planRepresentation(doc, destination, collector);
-        if (controller.signal.aborted) return;
-
-        const validationReport = validateDocument(doc, destination);
-
-        if (!controller.signal.aborted) {
-          const rescueDiags = analyzeDocumentForRescue(markdown, destination, doc);
-          const plannerDiags = collector.getAll();
-          const combinedDiagnostics: any[] = [...rescueDiags];
-
-          for (const pd of plannerDiags) {
-            if (!combinedDiagnostics.some(rd => rd.ruleId === pd.ruleId)) {
-              combinedDiagnostics.push(pd);
-            }
-          }
-
-          setCompiledState({
-            inputKey: compileKey,
-            diagnostics: combinedDiagnostics,
-            stats: docStats,
-            validationReport,
-          });
-          setCompiledDoc(doc);
-          setDiagnostics(combinedDiagnostics, compileKey);
-        }
-      } catch (e: any) {
-        if (!controller.signal.aborted) {
-          console.error('Compilation error:', e);
-          setCompilationError(true);
-          setCompiledState({
-            inputKey: compileKey,
-            diagnostics: [],
-            stats: {
-              headings: 0,
-              paragraphs: 0,
-              lists: 0,
-              taskLists: 0,
-              tables: 0,
-              codeBlocks: 0,
-              images: 0,
-              blockquotes: 0,
-              callouts: 0,
-              math: 0,
-              footnotes: 0,
-              mermaid: 0,
-              words: 0,
-              readingTimeMinutes: 1,
-            },
-            validationReport: null,
-          });
-          setCompiledDoc(null);
-          setDiagnostics([], compileKey, true);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsCompiling(false);
-        }
-      }
-    }, 250);
-
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
-  }, [markdown, destination, activeTheme, activeDocumentId, compileKey, setCompiledDoc, setDiagnostics, setIsCompiling]);
-
   const [linkedReviewOpen, setLinkedReviewOpen] = useState(false);
   useEffect(() => {
     if (isMobile) return;
@@ -291,7 +103,7 @@ export function Workspace({
   const warnings = diagnostics.filter(d => d.severity === 'warning' || d.severity === 'error');
   const statsText = formatStats(stats);
 
-  if (isMobile) return <MobileWorkspace markdown={markdown} onInput={onInput} destination={destination} onDestinationChange={onDestinationChange} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={isCompiling} diagnostics={diagnostics} compilationError={compilationError && compiledState.inputKey === compileKey}/>;
+  if (isMobile) return <MobileWorkspace markdown={markdown} onInput={onInput} destination={destination} onDestinationChange={onDestinationChange} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={isCompiling} diagnostics={diagnostics} compilationError={compilationError}/>;
 
   return (
     <div ref={workspaceRef} className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">

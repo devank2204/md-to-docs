@@ -1,14 +1,28 @@
-import { useState, useRef } from 'react';
+import { rememberEditor, takeEditorSelection, restoreEditor } from '../utils/editorHandoff';
+import { useLayoutEffect, useState, useRef } from 'react';
 import { HomeIntroduction } from './HomeIntroduction';
-import { DOCUMENT_TEMPLATES } from '@/data/templates';
-import { getCommandShortcut, getModifierKey } from '@/utils/platform';
-import { analytics, getDocLengthBucket } from '@/utils/analytics';
+import { DOCUMENT_TEMPLATES } from '../data/templates';
+import { getCommandShortcut, getModifierKey } from '../utils/platform';
+import { analytics, getDocLengthBucket } from '../utils/analytics';
 
 interface EmptyStateProps {
+  pendingValue?: string;
+  showIntroduction?: boolean;
   onInput: (markdown: string) => void;
 }
 
-export function EmptyState({ onInput }: EmptyStateProps) {
+export function EmptyState({ onInput, pendingValue, showIntroduction = true }: EmptyStateProps) {
+  const loadingEditor = pendingValue !== undefined;
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  useLayoutEffect(() => {
+    const input = editorRef.current;
+    if (!input) return;
+    if (loadingEditor) {
+      const selection = takeEditorSelection();
+      if (selection) restoreEditor(input, selection);
+    }
+    return () => rememberEditor(input);
+  }, [loadingEditor]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -87,7 +101,7 @@ export function EmptyState({ onInput }: EmptyStateProps) {
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 flex flex-col items-center select-none">
       {/* Editorial Header */}
-      <HomeIntroduction />
+      {showIntroduction && <HomeIntroduction />}
 
       {/* Mac-Style Code Terminal Frame */}
       <div
@@ -132,14 +146,16 @@ export function EmptyState({ onInput }: EmptyStateProps) {
           {/* Transparent Input Textarea Overlay */}
           <textarea
             className="absolute inset-0 w-full h-full p-6 pl-14 font-code-md text-sm text-on-surface bg-transparent resize-none focus:outline-none z-10 leading-relaxed placeholder-transparent selection:bg-primary/20"
-            onChange={(e) => onInput(e.target.value)}
+            ref={editorRef}
+            defaultValue={pendingValue}
+            onChange={(e) => { rememberEditor(e.currentTarget); onInput(e.target.value); }}
             spellCheck="false"
-            autoFocus
+            autoFocus={!loadingEditor}
             aria-label="Markdown terminal input"
           />
 
           {/* Code Editor Body Simulation (Line numbers + Prompts) */}
-          <div className="absolute inset-0 p-6 flex pointer-events-none select-none font-mono text-xs sm:text-sm leading-relaxed">
+          <div style={pendingValue ? { display: "none" } : undefined} className="absolute inset-0 p-6 flex pointer-events-none select-none font-mono text-xs sm:text-sm leading-relaxed">
             {/* Gutter Line Numbers */}
             <div className="w-8 flex flex-col text-outline/35 text-right pr-4 font-mono select-none space-y-1">
               <span>01</span>
@@ -212,7 +228,7 @@ export function EmptyState({ onInput }: EmptyStateProps) {
               {/* Primary Paste from Clipboard Action */}
               <button
                 type="button"
-                onClick={handlePasteFromClipboard}
+                data-startup-action="paste" onClick={handlePasteFromClipboard}
                 className="px-3.5 py-1.5 bg-primary hover:bg-primary/90 text-on-primary rounded-lg font-code-sm text-xs font-medium transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
                 title="Paste from clipboard"
               >
@@ -226,7 +242,7 @@ export function EmptyState({ onInput }: EmptyStateProps) {
               {/* Browse File */}
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                data-startup-action="file" onClick={() => fileInputRef.current?.click()}
                 className="px-3 py-1.5 bg-surface hover:bg-surface-container border border-outline-variant/60 text-on-surface rounded-lg font-code-sm text-xs font-medium transition-colors flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[15px] text-secondary">folder_open</span>

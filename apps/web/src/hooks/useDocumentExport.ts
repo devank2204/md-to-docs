@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { THEMES } from '@mdtodocs/compiler-core';
+import { THEMES } from '@mdtodocs/compiler-core/src/theme';
 import { analytics } from '@/utils/analytics';
 import { useStore } from '@/store';
 import {

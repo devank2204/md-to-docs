@@ -1,5 +1,3 @@
-import { create, RenderError } from 'ondine/compiler/wasm';
-import { wasm as all } from 'ondine/compiler/wasm/all';
 
 export interface RenderMermaidOptions {
   theme?: 'light' | 'dark' | 'neutral' | string;
@@ -273,14 +271,10 @@ export function extractMermaidAccessibleText(source: string): string {
 import { autoFixMermaidCode } from '@mdtodocs/compiler-core';
 export { autoFixMermaidCode };
 
-let ondineRenderer: ReturnType<typeof create> | null = null;
+let rendererModule: Promise<typeof import('./ondineEngine')> | undefined;
 const renderCache = new Map<string, RenderMermaidResult>();
-
 function getRenderer() {
-  if (!ondineRenderer) {
-    ondineRenderer = create({ modules: { all } });
-  }
-  return ondineRenderer;
+  return rendererModule ||= import('./ondineEngine').catch(error => { rendererModule = undefined; throw error; });
 }
 
 let mermaidQueue: Promise<unknown> = Promise.resolve();
@@ -309,7 +303,20 @@ async function renderStandardMermaid(source: string, options: RenderMermaidOptio
   return job;
 }
 
-export async function renderMermaid(source: string, options: RenderMermaidOptions = {}): Promise<RenderMermaidResult> {
+// Identical diagrams share in-flight work as well as completed results. This also
+// presents duplicate diagram errors together instead of exposing a partial set.
+const pendingRenders = new Map<string, Promise<RenderMermaidResult>>();
+export function renderMermaid(source: string, options: RenderMermaidOptions = {}): Promise<RenderMermaidResult> {
+  const key = JSON.stringify([source, options]);
+  const pending = pendingRenders.get(key);
+  if (pending) return pending;
+  const job = renderMermaidOnce(source, options);
+  pendingRenders.set(key, job);
+  void job.finally(() => { if (pendingRenders.get(key) === job) pendingRenders.delete(key); }).catch(() => {});
+  return job;
+}
+
+async function renderMermaidOnce(source: string, options: RenderMermaidOptions = {}): Promise<RenderMermaidResult> {
   const isDark = options.theme === 'dark';
   const cacheKey = JSON.stringify([source, options]);
   const cached = renderCache.get(cacheKey);
@@ -320,7 +327,7 @@ export async function renderMermaid(source: string, options: RenderMermaidOption
     try {
       // Ondine exposes light/dark palettes; other advertised themes use Mermaid's real theme engine.
       if (options.theme && !['neutral', 'light', 'dark'].includes(options.theme)) throw new Error('Use Mermaid theme engine');
-      rawResult = getRenderer().render(code);
+      rawResult = (await getRenderer()).renderOndine(code);
     } catch (originalError) {
       try { rawResult = await renderStandardMermaid(code, options); standard = true; }
       catch { throw originalError; }
@@ -340,7 +347,7 @@ export async function renderMermaid(source: string, options: RenderMermaidOption
     } else result = failure(err);
   }
   function failure(err: any): RenderMermaidResultError {
-    const structured = err instanceof RenderError || err?.name === 'Render.RenderError';
+    const structured = err?.name === 'Render.RenderError' || typeof err?.line === 'number';
     return { success: false, source, error: { message: err?.message || 'Failed to render Mermaid diagram', line: structured ? err.line : undefined, column: structured ? err.column : undefined, snippet: structured ? err.snippet : undefined } };
   }
   if (renderCache.size >= 128) renderCache.delete(renderCache.keys().next().value!);

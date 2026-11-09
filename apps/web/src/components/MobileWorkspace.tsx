@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { FeatureBoundary } from './FeatureBoundary';
+import { LandingContext } from '../routes/LandingContext';
+import { lazy, useContext, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { deviceStorageHealth } from '@/utils/deviceStorage';
 import type {
   DocumentTheme,
@@ -6,13 +8,13 @@ import type {
 } from '@mdtodocs/compiler-core';
 import type { DestinationType } from '@mdtodocs/capability-graph';
 import { useStore } from '@/store';
-import { DocumentPreview } from './DocumentPreview';
-import { MermaidRepairAssistant } from './MermaidRepairAssistant';
+const DocumentPreview = lazy(() => import('./DocumentPreview').then(m => ({ default: m.DocumentPreview })));
+const MermaidRepairAssistant = lazy(() => import('./MermaidRepairAssistant').then(m => ({ default: m.MermaidRepairAssistant })));
 import { WorkspaceSheet } from './WorkspaceSheet';
 import { MobileExportBar } from './MobileExportBar';
 import { HomeIntroduction } from './HomeIntroduction';
 import { BrandWordmark } from './BrandWordmark';
-import { MobileWorkspaceSheets } from './MobileWorkspaceSheets';
+const MobileWorkspaceSheets = lazy(() => import('./MobileWorkspaceSheets').then(m => ({ default: m.MobileWorkspaceSheets })));
 import type { MobileSheet } from '@/utils/mobileDestinations';
 import { useDocumentExport } from '@/hooks/useDocumentExport';
 import { DOCUMENT_TEMPLATES } from '@/data/templates';
@@ -34,6 +36,7 @@ interface Props {
 }
 
 export function MobileWorkspace(props: Props) {
+  const landingSpec = useContext(LandingContext);
   const {
     markdown,
     onInput,
@@ -51,6 +54,9 @@ export function MobileWorkspace(props: Props) {
     deviceStorageHealth.getSnapshot,
     () => true,
   );
+  const [repairLoaded, setRepairLoaded] = useState(() => markdown.includes('```mermaid'));
+  // Keep an opened assistant mounted so source changes retain stale/undo guards.
+  if (!repairLoaded && markdown.includes('```mermaid')) setRepairLoaded(true);
   const [tab, setTab] = useState<'edit' | 'preview'>('edit');
   const [sheet, setSheet] = useState<MobileSheet | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
@@ -282,7 +288,7 @@ export function MobileWorkspace(props: Props) {
           </button>
         ))}
       </div>
-      <MermaidRepairAssistant />
+      {repairLoaded && <FeatureBoundary fallback={null}><MermaidRepairAssistant /></FeatureBoundary>}
       <section
         role="tabpanel"
         id="mobile-edit-panel"
@@ -291,19 +297,19 @@ export function MobileWorkspace(props: Props) {
         className="mobile-edit-panel"
         data-print-hide
       >
-        {!hasContent && (
+        {(!hasContent || landingSpec.path !== "/") && (
           <div className="mobile-intro">
             <HomeIntroduction />
           </div>
         )}
         <div className="mobile-input-actions">
-          <button type="button" onClick={paste}>
+          <button type="button" data-startup-action="paste" onClick={paste}>
             <span className="material-symbols-outlined" aria-hidden="true">
               content_paste
             </span>
             Paste text
           </button>
-          <button type="button" onClick={() => fileInput.current?.click()}>
+          <button type="button" data-startup-action="file" onClick={() => fileInput.current?.click()}>
             <span className="material-symbols-outlined" aria-hidden="true">
               upload_file
             </span>
@@ -385,14 +391,14 @@ export function MobileWorkspace(props: Props) {
         hidden={tab !== 'preview'}
         className={`mobile-preview-panel ${pageLayout ? 'page-layout' : ''}`}
       >
-        <DocumentPreview
+        {(tab === "preview") && <FeatureBoundary><DocumentPreview
             reviewNotes={isCompiling ? [] : diagnostics}
           markdown={markdown}
           destination={destination}
           isCompiling={isCompiling}
           documentSignature={documentSignature}
           readingLayout={!pageLayout}
-        />
+        /></FeatureBoundary>}
       </section>
       {!storageAvailable && (
         <p className="mobile-storage-warning" role="alert" data-print-hide>
@@ -413,7 +419,7 @@ export function MobileWorkspace(props: Props) {
       />
       </WorkspaceSheet>}
       {sheet && (
-        <MobileWorkspaceSheets
+        <FeatureBoundary><MobileWorkspaceSheets
           key={sheet}
           sheet={sheet}
           setSheet={setSheet}
@@ -429,7 +435,7 @@ export function MobileWorkspace(props: Props) {
           warnings={warnings}
           compilationError={compilationError}
           isCompiling={isCompiling}
-        />
+        /></FeatureBoundary>
       )}
     </div>
   );
