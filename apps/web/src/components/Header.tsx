@@ -77,12 +77,8 @@ export function Header({
       setDeliveryOpen(true);
     };
     window.addEventListener('mdtodocs:delivery-options', open);
-    window.addEventListener('mdtodocs:prepare-print', open);
-    window.addEventListener('mdtodocs:deliver', open);
     return () => {
       window.removeEventListener('mdtodocs:delivery-options', open);
-      window.removeEventListener('mdtodocs:prepare-print', open);
-      window.removeEventListener('mdtodocs:deliver', open);
     };
   }, [onDestinationChange]);
 
@@ -219,7 +215,7 @@ export function Header({
             {appState === 'WORKSPACE' && (
               <div className="hidden xl:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
                 <span className="material-symbols-outlined text-[15px] text-outline">description</span>
-                <span className="truncate max-w-[180px] text-on-surface font-sans" title={activeDocTitle}>
+                <span className="min-w-0 text-on-surface font-sans" title={activeDocTitle}>
                   <RenameTitle />
                 </span>
               </div>

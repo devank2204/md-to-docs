@@ -3,7 +3,7 @@ import { useStore } from "@/store";
 import { safetyVersions } from "@/utils/safetyBackup";
 import { VersionDiff } from "./VersionDiff";
 import { WorkspaceSheet } from "./WorkspaceSheet";
-import { Button, Toggle } from "./Controls";
+import { Button } from "./Controls";
 export function DocumentHistoryModal({
   isOpen,
   onClose,
@@ -33,7 +33,7 @@ function History({ onClose }: { onClose: () => void }) {
   return (
     <WorkspaceSheet title="Version history" onClose={onClose}>
       <form
-        className="flex flex-wrap gap-2 py-3"
+        className="ux-history-toolbar"
         onSubmit={(e) => {
           e.preventDefault();
           const ok = useStore
@@ -56,9 +56,7 @@ function History({ onClose }: { onClose: () => void }) {
         />
         <Button type="submit">Save version</Button>
       </form>
-      <Toggle selected={all} onClick={() => setAll(!all)}>
-        Include other documents and recovery copies
-      </Toggle>
+      <label className="ux-history-scope">Show versions<select value={all?"all":"current"} onChange={e=>setAll(e.target.value==="all")}><option value="current">This document</option><option value="all">All documents & recovery copies</option></select></label>
       <p role="status">{message}</p>
       <div className="ux-version-browser">
         <div className="ux-version-list" aria-label="Saved versions">
@@ -89,7 +87,7 @@ function History({ onClose }: { onClose: () => void }) {
         )}
       </div>
       {version && (
-        <div className="flex flex-wrap gap-2 pt-3">
+        <div className="ux-history-actions">
           <Button
             onClick={() => {
               if (

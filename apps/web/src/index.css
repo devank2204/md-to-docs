@@ -911,3 +911,28 @@ html[data-appearance="dark"] :focus-visible:not([data-document-paper] *) {
 .workspace-sheet:has(.ux-version-browser) {width:min(1080px,94vw);max-width:1080px}
 .mobile-header .ux-menu-items {font-size:13px;min-width:220px}
 .workspace-sheet:has(.ux-version-browser) .sheet-heading {flex-wrap:wrap}
+/* Keep semantic primary colors in every interaction state. */
+.ux-copy:hover:not(:disabled) {background:#363632;color:#fff}
+.ux-copy[data-state="success"]:hover {background:var(--ux-success);color:var(--ux-success-ink)}
+.ux-rename {border:0;background:transparent;padding:3px 0;max-width:min(30vw,320px);justify-content:flex-start;min-width:0}
+.ux-rename:hover {background:transparent}
+.ux-rename-label {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.ux-rename-pencil {opacity:.45;flex-shrink:0}
+.ux-rename:hover .ux-rename-pencil,.ux-rename:focus-visible .ux-rename-pencil {opacity:1}
+.ux-rename-compact {padding:5px;min-width:28px}
+.ux-rename-input {width:clamp(120px,26vw,320px);max-width:100%;min-width:0;background:transparent;border:1px solid currentColor;border-radius:4px;padding:4px 6px;font:inherit}
+.workspace-sheet:has(.ux-version-browser) {width:min(1000px,94vw)}
+.workspace-sheet:has(.ux-version-browser)>section {display:flex;flex-direction:column;gap:16px;font-size:12px;line-height:1.5}
+.workspace-sheet:has(.ux-version-browser) .sheet-heading {padding-bottom:12px;border-bottom:1px solid #8883}
+.workspace-sheet:has(.ux-version-browser) .sheet-heading h2 {font-size:18px}
+.ux-history-toolbar {display:flex;align-items:center;gap:8px}
+.ux-history-toolbar input {width:240px;max-width:65%;min-height:32px;padding:6px 8px;font:inherit}
+.ux-history-scope {display:flex;align-items:center;gap:8px;color:inherit}
+.ux-history-scope select {background:transparent;border:1px solid #8884;border-radius:5px;padding:5px 8px;max-width:100%;font:inherit}
+.ux-version-browser {grid-template-columns:190px minmax(0,1fr);min-height:260px;gap:16px}
+.ux-version-list {border-right:1px solid #8883;padding-right:12px}
+.ux-version-list .ux-button {border:0;padding:10px;box-shadow:none;margin-bottom:4px;line-height:1.5}
+.ux-version-list time {opacity:.65;font-size:11px}
+.ux-history-actions {border-top:1px solid #8883;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.ux-diff-row>span {min-width:72px;font-variant-numeric:tabular-nums;padding-inline:6px;border-right:1px solid #8882;margin-right:8px}
+@media(max-width:600px){.ux-version-browser{grid-template-columns:1fr;grid-template-rows:100px minmax(160px,1fr)}.ux-version-list{border-right:0;border-bottom:1px solid #8883;padding:0 0 8px}.ux-history-scope{flex-wrap:wrap}.ux-rename-input{width:140px}}

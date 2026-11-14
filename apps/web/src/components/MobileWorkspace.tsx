@@ -228,12 +228,8 @@ export function MobileWorkspace(props: Props) {
       setExportOpen(true);
     };
     window.addEventListener('mdtodocs:delivery-options', open);
-    window.addEventListener('mdtodocs:deliver', open);
-    window.addEventListener('mdtodocs:prepare-print', open);
     return () => {
       window.removeEventListener('mdtodocs:delivery-options', open);
-      window.removeEventListener('mdtodocs:deliver', open);
-      window.removeEventListener('mdtodocs:prepare-print', open);
     };
   }, []);
   useEffect(() => {

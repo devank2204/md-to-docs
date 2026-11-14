@@ -61,7 +61,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
     if (mobile) {
       const trigger = menuButtonRef.current;
       if (trigger) {
-        const inherited = getComputedStyle(trigger);
+        const inherited = getComputedStyle(document.querySelector('header') || document.body);
         setMenuStyle({ fontFamily: inherited.fontFamily, letterSpacing: inherited.letterSpacing });
       }
       return;
@@ -70,17 +70,19 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
       const trigger = menuButtonRef.current;
       if (!trigger) return;
       const rect = trigger.getBoundingClientRect();
-      const inherited = getComputedStyle(trigger);
-      const height = Math.min(600, window.innerHeight - 24);
-      setMenuStyle({ position: 'fixed', width: 224, left: Math.max(12, Math.min(rect.right - 224, window.innerWidth - 236)), top: Math.max(12, Math.min(rect.bottom + 8, window.innerHeight - height - 12)), maxHeight: height, overflowY: 'auto', fontFamily: inherited.fontFamily, letterSpacing: inherited.letterSpacing });
+      const inherited = getComputedStyle(document.querySelector('header') || document.body);
+      const height = Math.min(menuRef.current?.scrollHeight || 500, window.innerHeight - 80);
+      const below=rect.bottom+8;
+      const top=below+height<=window.innerHeight-12?below:Math.max(56,rect.top-height-8);
+      setMenuStyle({ position: 'fixed', width: 224, left: Math.max(12, Math.min(rect.right - 224, window.innerWidth - 236)), top, maxHeight: height, overflowY: 'auto', fontFamily: inherited.fontFamily, letterSpacing: inherited.letterSpacing });
     };
     place();
-    menuRef.current?.querySelector<HTMLElement>('select, button')?.focus();
+    menuRef.current?.querySelector<HTMLElement>('select, button')?.focus({ preventScroll: true });
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
     return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); };
   }, [isMenuOpen, mobile]);
-  const closeMenu = () => { setIsMenuOpen(false); menuButtonRef.current?.focus(); };
+  const closeMenu = () => { setIsMenuOpen(false); menuButtonRef.current?.focus({ preventScroll: true }); };
 
   // Close overflow menu on outside click or Escape
   useEffect(() => {
@@ -89,7 +91,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsMenuOpen(false);
-        menuButtonRef.current?.focus();
+        menuButtonRef.current?.focus({ preventScroll: true });
       }
     };
 
@@ -215,7 +217,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
                   role={mobile ? undefined : 'dialog'}
                   aria-label="Diagram options"
                   onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); closeMenu(); } }}
-                  className="diagram-options rounded-lg bg-surface-container-highest backdrop-blur-md border border-outline-variant/70 shadow-lg py-1.5 text-xs text-on-surface z-[200]"
+                  className="diagram-options font-sans rounded-lg bg-surface-container-low border border-outline-variant/70 shadow-lg py-1.5 text-xs text-on-surface z-[200]"
                 >
                   {/* Theme Selector Section */}
                   <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/70">
