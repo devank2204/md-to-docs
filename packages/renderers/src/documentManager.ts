@@ -3,6 +3,7 @@ import type { DestinationType } from '@mdtodocs/capability-graph';
 export interface DocumentItem {
   id: string;
   title: string;
+  customTitle?: boolean;
   content: string;
   createdAt: number;
   updatedAt: number;
@@ -136,7 +137,7 @@ export function restoreDocumentSnapshot(
 
   const updatedDoc: DocumentItem = {
     ...currentDoc,
-    title: extractDocumentTitle(snapshot.content),
+    title: currentDoc.customTitle ? currentDoc.title : extractDocumentTitle(snapshot.content),
     content: snapshot.content,
     updatedAt: Date.now(),
   };

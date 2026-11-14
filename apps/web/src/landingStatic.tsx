@@ -1,3 +1,4 @@
+import { SiteFooter } from './components/SiteFooter';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { LandingContext } from './routes/LandingContext';
 import { HomeIntroduction } from './components/HomeIntroduction';
@@ -15,5 +16,5 @@ export function renderLanding(spec: RouteLandingSpec, mobile = false) {
  {(!mobile || diagram) && <Header appState="EMPTY" markdown="" destination={spec.destination} onDestinationChange={() => {}} activeTheme={THEMES.default} documentSignature={signature} />}
  <main className={`flex-1 flex flex-col relative ${mobile && !diagram ? 'mobile-main' : 'mt-12'}`}>
  {diagram ? <HomeIntroduction /> : mobile ? <MobileWorkspace markdown="" onInput={() => {}} destination={spec.destination} onDestinationChange={() => {}} activeTheme={THEMES.default} documentSignature={signature} isCompiling={false} diagnostics={[]} compilationError={false} /> : <EmptyState onInput={() => {}} />}
- <LandingPageContent spec={spec} /></main></div></LandingContext.Provider>);
+ <LandingPageContent spec={spec} /></main><SiteFooter /></div></LandingContext.Provider>);
 }

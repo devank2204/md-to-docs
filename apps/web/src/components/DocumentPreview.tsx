@@ -1,3 +1,4 @@
+import { DiagramReviewStrip } from './DiagramReviewStrip';
 import { visit } from 'unist-util-visit';
 import React, { createContext, useContext, lazy, useMemo } from 'react';
 import type { DestinationType } from '@mdtodocs/capability-graph';
@@ -296,6 +297,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
           : `w-full ${isDark ? 'bg-[#0f172a]' : 'bg-[#f1f3f5]'} flex flex-col p-1.5 sm:p-space-md relative h-full min-h-0 overflow-hidden`
       }
     >
+      <DiagramReviewStrip />
       <div data-preview-scroll className="flex-1 flex justify-center items-start p-1.5 sm:p-space-md md:p-space-lg overflow-y-auto overflow-x-hidden min-h-0 w-full">
         <div
           style={{

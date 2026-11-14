@@ -135,6 +135,8 @@ export function useDocumentCompilation(markdown: string, destination: any, activ
         doc = await resolveAssets(doc, controller.signal);
         if (controller.signal.aborted) return;
 
+        const assetNotes: any[]=[];
+        visit(doc,node=>{if((node.data as {renderStatus?:string}|undefined)?.renderStatus==='error')assetNotes.push({id:`diagram-render-${node.position?.start.offset}`,ruleId:'diagram-render',severity:'error',destination,nodeType:'code',position:node.position?.start,message:'This diagram could not be rendered. It may be missing from the output.',suggestedAction:'Review diagram fixes or edit the source.'})});
         // Count before planner optimizations
         const docStats = countElements(doc, markdown);
 
@@ -146,7 +148,7 @@ export function useDocumentCompilation(markdown: string, destination: any, activ
         if (!controller.signal.aborted) {
           const rescueDiags = analyzeDocumentForRescue(markdown, destination, doc);
           const plannerDiags = collector.getAll();
-          const combinedDiagnostics: any[] = [...rescueDiags];
+          const combinedDiagnostics: any[] = [...assetNotes, ...rescueDiags];
 
           for (const pd of plannerDiags) {
             if (!combinedDiagnostics.some(rd => rd.ruleId === pd.ruleId)) {

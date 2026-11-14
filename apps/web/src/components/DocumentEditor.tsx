@@ -1,3 +1,4 @@
+import { Toggle } from './Controls';
 import React, { useLayoutEffect, useRef } from 'react';
 import { takeEditorSelection, restoreEditor } from '../utils/editorHandoff';
 import { useStore } from '@/store';
@@ -36,7 +37,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
         <div className="flex flex-wrap min-w-0 max-w-full items-center gap-2 font-code-sm text-[11px] text-secondary">
           <button type="button" className="px-2 py-1 rounded hover:bg-surface-container" onClick={() => window.dispatchEvent(new CustomEvent('mdtodocs:review'))}>Review & outline</button>
           <ImportMarkdownButton />
-          <button type="button" className="px-2 py-1 rounded hover:bg-surface-container" aria-pressed={syncScroll} title="Keep Markdown and Preview at matching content" onClick={onSyncScrollChange}>Sync scroll</button>
+          <Toggle selected={syncScroll} title="Keep Markdown and Preview at matching content" onClick={onSyncScrollChange}><span aria-hidden="true">{syncScroll ? "↔" : "↮"}</span>Sync scroll: {syncScroll ? "On" : "Off"}</Toggle>
           <span className="tabular-nums font-mono">{words} words</span>
           <span className="text-outline-variant">·</span>
           <span className="tabular-nums font-mono">{lines} lines</span>
@@ -45,7 +46,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({ markdown, onInpu
               <span className="text-outline-variant">·</span>
               <button
                 type="button"
-                onClick={() => { useStore.getState().createSnapshot('Before clearing text'); onInput(''); }}
+                onClick={() => { if(useStore.getState().createSnapshot('Before clearing text')) onInput(''); }}
                 title="Clear all text (a version is saved first)"
                 className="text-[11px] text-outline hover:text-error transition-colors px-1.5 py-0.5 rounded hover:bg-surface-container active:scale-95"
               >

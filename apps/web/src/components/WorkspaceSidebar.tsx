@@ -1,3 +1,4 @@
+import { Menu } from './Controls';
 import { useState } from 'react';
 import { useStore } from '../store';
 
@@ -12,7 +13,6 @@ export function WorkspaceSidebar() {
   const renameDocument = useStore((s) => s.renameDocument);
   const setIsHistoryModalOpen = useStore((s) => s.setIsHistoryModalOpen);
   const setIsInspectorOpen = useStore((s) => s.setIsInspectorOpen);
-  const setAppAppearance = useStore((s) => s.setAppAppearance);
   const isSidebarOpen = useStore((s) => s.isSidebarOpen);
   const setIsSidebarOpen = useStore((s) => s.setIsSidebarOpen);
   const toggleSidebar = useStore((s) => s.toggleSidebar);
@@ -47,9 +47,6 @@ export function WorkspaceSidebar() {
     if (!isSidebarOpen) setIsSidebarOpen(true);
   };
 
-  const handleToggleTheme = () => {
-    setAppAppearance(document.documentElement.dataset.appearance === 'dark' ? 'cream' : 'dark');
-  };
 
   return (
     <aside
@@ -118,20 +115,7 @@ export function WorkspaceSidebar() {
           </button>
         </div>
 
-        {/* Bottom actions: Theme Toggle */}
-        <div className="flex flex-col items-center gap-1.5 w-full">
-          <button
-            type="button"
-            onClick={handleToggleTheme}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
-            aria-label="Toggle app appearance"
-            title="Toggle cream/dark app appearance"
-          >
-            <span className="material-symbols-outlined text-[16px]">
-              contrast
-            </span>
-          </button>
-        </div>
+
       </div>
 
       {/* Floating Expand/Collapse Tab on Border */}
@@ -230,18 +214,8 @@ export function WorkspaceSidebar() {
                   </div>
 
                   {/* Actions on hover */}
-                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        duplicateDocument(doc.id);
-                      }}
-                      className="p-0.5 rounded hover:bg-surface-container-highest text-outline hover:text-on-surface transition-colors cursor-pointer"
-                      title="Duplicate this document"
-                    >
-                      <span className="material-symbols-outlined text-[13px]">content_copy</span>
-                    </button>
+                  <div className="flex items-center gap-0.5 opacity-100 transition-opacity shrink-0 ml-1">
+                    <div onClick={e=>e.stopPropagation()}><Menu label="•••"><button onClick={()=>handleStartRename(doc.id,doc.title)}>Rename</button><button onClick={()=>duplicateDocument(doc.id)}>Duplicate</button></Menu></div>
 
                     <button
                       type="button"
@@ -264,7 +238,7 @@ export function WorkspaceSidebar() {
 
           {/* Drawer Footer Tip */}
           <div className="px-3 py-1.5 border-t border-outline-variant/20 text-[10px] text-outline font-mono text-center shrink-0">
-            Double-click to rename
+            Document menu: Rename or Duplicate
           </div>
         </div>
       )}

@@ -1,3 +1,5 @@
+import { SiteFooter } from './components/SiteFooter';
+import { CapacityDecision } from './components/CapacityDecision';
 import { FeatureBoundary } from './components/FeatureBoundary';
 import { MobileWorkspace } from './components/MobileWorkspace';
 import { structuredData } from './routes/metadata';
@@ -240,6 +242,8 @@ function App() {
         )}
         {routeSpec && !currentPath.startsWith('/mermaid-') && <LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} />}
       </main>
+      <SiteFooter onNavigateRoute={handleNavigateRoute} />
+      <CapacityDecision />
 
       {isCommandPaletteOpen && <FeatureBoundary><CommandPalette
         isOpen={isCommandPaletteOpen}

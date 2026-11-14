@@ -21,6 +21,7 @@ interface Review {
   source: string;
   docId: string;
   selected?: number;
+  issueStarts?: number[];
   entries: Entry[] | null;
 }
 
@@ -53,6 +54,7 @@ export function MermaidRepairAssistant() {
         source: state.markdown,
         docId: state.activeDocumentId,
         selected: (event as CustomEvent).detail?.sourceStart,
+        issueStarts: (event as CustomEvent).detail?.issueStarts,
         entries: null,
       });
       setMessage('');
@@ -69,7 +71,7 @@ export function MermaidRepairAssistant() {
     const font = getComputedStyle(paperFont || document.body).fontFamily;
     const blocks = findMermaidBlocks(review.source).filter(
       (block) =>
-        review.selected === undefined || block.start === review.selected,
+        review.issueStarts ? review.issueStarts.includes(block.start) : review.selected === undefined || block.start === review.selected,
     );
     Promise.all(
       blocks.map(async (block) => {

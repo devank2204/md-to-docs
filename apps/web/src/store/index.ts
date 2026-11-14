@@ -1,3 +1,4 @@
+import { persistSafety, safetyVersions } from '../utils/safetyBackup';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { deviceStorage } from '../utils/deviceStorage';
@@ -75,8 +76,10 @@ export interface AppState {
   renameDocument: (id: string, newTitle: string) => void;
   duplicateDocument: (id: string) => string;
   deleteDocument: (id: string) => void;
-  createSnapshot: (label?: string) => void;
-  restoreSnapshot: (snapshotId: string) => void;
+  createSnapshot: (label?: string) => boolean;
+  restoreSnapshot: (snapshotId: string) => boolean;
+  pendingDocument: DocumentItem | null;
+  resolveCapacity: (replaceId?: string) => boolean;
   deleteSnapshot: (snapshotId: string) => void;
 
   // View Routing & About Modal
@@ -103,7 +106,7 @@ export const useStore = create<AppState>()(
       destination: 'google-docs',
       htmlOutput: false,
       setHtmlOutput: (htmlOutput) => set({ htmlOutput }),
-      appAppearance: 'cream',
+      appAppearance: 'system',
       setAppAppearance: (appAppearance) => set({ appAppearance }),
       themeId: 'default',
       activePresetId: 'default',
@@ -164,6 +167,30 @@ export const useStore = create<AppState>()(
       ],
       activeDocumentId: 'doc-default',
       snapshots: [],
+      pendingDocument: null,
+      resolveCapacity: (replaceId) => {
+        const state = get();
+        const pending = state.pendingDocument;
+        if (!replaceId) { set({ pendingDocument: null }); return true; }
+        const old = state.documents.find(d => d.id === replaceId);
+        if (!pending || !old) return false;
+        const backup = createDocumentSnapshot({
+          ...old,
+          content: old.id === state.activeDocumentId ? state.markdown : old.content,
+        }, 'Before capacity replacement');
+        if (!persistSafety(backup)) return false;
+        set({
+          documents: [...state.documents.filter(d => d.id !== replaceId).map(d =>
+            d.id === state.activeDocumentId ? { ...d, content: state.markdown } : d
+          ), pending],
+          activeDocumentId: pending.id,
+          markdown: pending.content,
+          currentView: 'workspace',
+          snapshots: [backup, ...state.snapshots],
+          pendingDocument: null,
+        });
+        return true;
+      },
       sessionExportCount: 0,
       recordSuccessfulExport: () =>
         set((state) => ({ sessionExportCount: state.sessionExportCount + 1 })),
@@ -181,7 +208,7 @@ export const useStore = create<AppState>()(
             updatedDocs[existingDocIndex] = {
               ...updatedDocs[existingDocIndex],
               content: markdown,
-              title,
+              title: updatedDocs[existingDocIndex].customTitle ? updatedDocs[existingDocIndex].title : title,
               updatedAt: Date.now(),
             };
           } else {
@@ -243,18 +270,14 @@ export const useStore = create<AppState>()(
         const title = customTitle?.trim() || extractDocumentTitle(initialMarkdown);
         const newDoc = createDocumentItem(initialMarkdown, title, get().destination);
 
+        if(get().documents.length>=5){set({pendingDocument:newDoc});return ''}
         set((state) => {
           // Sync current active doc first
-          let syncedDocs = state.documents.map((d) =>
+          const syncedDocs = state.documents.map((d) =>
             d.id === state.activeDocumentId
               ? { ...d, content: state.markdown, updatedAt: Date.now() }
               : d
           );
-
-          // Guard against frontend bloat: cap workspace at 6 documents max
-          if (syncedDocs.length >= 6) {
-            syncedDocs = syncedDocs.slice(-5);
-          }
 
           const newSnapshots = initialMarkdown.trim()
             ? [createDocumentSnapshot(newDoc, 'Initial Draft'), ...state.snapshots]
@@ -298,7 +321,7 @@ export const useStore = create<AppState>()(
       renameDocument: (id, newTitle) => {
         set((state) => ({
           documents: state.documents.map((d) =>
-            d.id === id ? { ...d, title: newTitle.trim() || d.title, updatedAt: Date.now() } : d
+            d.id === id ? { ...d, customTitle: true, title: newTitle.trim() || d.title, updatedAt: Date.now() } : d
           ),
         }));
       },
@@ -313,17 +336,16 @@ export const useStore = create<AppState>()(
             ...target,
             content: target.id === state.activeDocumentId ? state.markdown : target.content,
           });
+          if(state.documents.length>=5)return {pendingDocument:clone};
           createdId = clone.id;
 
-          let syncedDocs = state.documents.map((d) =>
+          const syncedDocs = state.documents.map((d) =>
             d.id === state.activeDocumentId
               ? { ...d, content: state.markdown, updatedAt: Date.now() }
               : d
           );
 
-          if (syncedDocs.length >= 6) {
-            syncedDocs = syncedDocs.slice(-5);
-          }
+
 
           const snap = createDocumentSnapshot(clone, 'Document Cloned');
 
@@ -366,6 +388,7 @@ export const useStore = create<AppState>()(
       },
 
       createSnapshot: (label = 'Manual Snapshot') => {
+        let saved=false;
         set((state) => {
           const activeDoc = state.documents.find(
             (d) => d.id === state.activeDocumentId
@@ -382,16 +405,21 @@ export const useStore = create<AppState>()(
             label
           );
 
+          if(!persistSafety(snapshot))return state;
+          saved=true;
           return {
             snapshots: [snapshot, ...state.snapshots].slice(0, 50),
           };
         });
+        return saved;
       },
 
       restoreSnapshot: (snapshotId) => {
+        let restored=false;
         set((state) => {
           const snapshot = state.snapshots.find((s) => s.id === snapshotId);
-          if (!snapshot) return state;
+          const savedSnapshot=snapshot || safetyVersions().find(s=>s.id===snapshotId);
+          if (!savedSnapshot) return state;
 
           const currentDoc = state.documents.find(
             (d) => d.id === state.activeDocumentId
@@ -405,8 +433,10 @@ export const useStore = create<AppState>()(
 
           const { updatedDoc, backupSnapshot } = restoreDocumentSnapshot(
             { ...currentDoc, content: state.markdown },
-            snapshot
+            savedSnapshot
           );
+          if(!persistSafety(backupSnapshot))return state;
+          restored=true;
 
           const updatedDocs = state.documents.map((d) =>
             d.id === state.activeDocumentId ? updatedDoc : d
@@ -418,6 +448,7 @@ export const useStore = create<AppState>()(
             snapshots: [backupSnapshot, ...state.snapshots].slice(0, 50),
           };
         });
+        return restored;
       },
 
       deleteSnapshot: (snapshotId) => {
@@ -452,12 +483,7 @@ export const useStore = create<AppState>()(
           if (!state.currentView) {
             state.currentView = state.markdown && state.markdown.trim().length > 0 ? 'workspace' : 'landing';
           }
-          if (Array.isArray(state.documents) && state.documents.length > 6) {
-            const activeId = state.activeDocumentId;
-            const activeDoc = state.documents.find((d) => d.id === activeId) || state.documents[0];
-            const otherDocs = state.documents.filter((d) => d.id !== activeDoc.id).slice(-5);
-            state.documents = [activeDoc, ...otherDocs];
-          }
+
         }
       },
     }

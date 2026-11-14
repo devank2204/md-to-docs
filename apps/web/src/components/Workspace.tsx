@@ -202,7 +202,7 @@ export function Workspace({
           fidelityScore={validationReport?.summary?.fidelityScore}
           statsText={statsText}
           destination={destination}
-          onToggleFidelityPanel={() => setIsFidelityPanelOpen(!isFidelityPanelOpen)}
+          onToggleFidelityPanel={() => setIsInspectorOpen(true)}
         />
       )}
     </div>

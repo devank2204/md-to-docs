@@ -3,7 +3,6 @@ import { THEMES } from '@mdtodocs/compiler-core/src/theme';
 import type { DocumentDiagnostic } from '@mdtodocs/compiler-core';
 import { useStore } from '@/store';
 import { LinkedReview } from './LinkedReview';
-import { AppAppearance } from './AppAppearance';
 import { WorkspaceSheet } from './WorkspaceSheet';
 import { mobileDestinations } from '@/utils/mobileDestinations';
 import type { MobileSheet } from '@/utils/mobileDestinations';
@@ -118,15 +117,14 @@ export function MobileWorkspaceSheets({
           </div>
           <button type="button" className="mobile-secondary" onClick={onImport}>Import Markdown file</button>
           <p className="sheet-description">
-            Up to 6 recent documents are kept. Creating another replaces the
-            oldest; download important work first.
+            Up to five documents. At capacity, choose one to replace; a recoverable version is saved first.
           </p>
         </>
       )}
       {sheet === 'options' && (
         <div className="sheet-options">
           <button type="button" className="mobile-secondary" aria-pressed={pageLayout} onClick={() => setPageLayout(!pageLayout)}>{pageLayout ? 'Use reading view' : 'Use page layout'}</button>
-          <AppAppearance />
+
           <label>
             Document name
             <input
@@ -208,21 +206,21 @@ export function MobileWorkspaceSheets({
               type="button"
               onClick={() => {
                 store.createSnapshot();
-                setSheet('history');
+                setSheet(null); store.setIsHistoryModalOpen(true);
               }}
             >
               Save a version
             </button>
-            <button type="button" onClick={() => setSheet('history')}>
+            <button type="button" onClick={() => {setSheet(null);store.setIsHistoryModalOpen(true)}}>
               Version history
             </button>
             {store.markdown.trim() && <button type="button" onClick={() => {
-              store.createSnapshot('Before clearing text');
+              if(!store.createSnapshot('Before clearing text'))return;
               onInput('');
               setTab('edit');
               setSheet(null);
             }}>Clear all text</button>}
-            <a href="/mermaid-to-svg">
+            <a href="/mermaid-to-svg/">
               Mermaid diagram tools <span aria-hidden="true">→</span>
             </a>
           </div>
