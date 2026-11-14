@@ -1,0 +1,35 @@
+{
+  "before": {
+    "files": [
+      "/assets/index-Jm4cCRyh.js",
+      "/assets/rolldown-runtime-Dd_uD5pT.js"
+    ],
+    "raw": 338721,
+    "gzipLevel9": 103387
+  },
+  "after": {
+    "files": [
+      "/assets/index-BolVNtd_.js",
+      "/assets/rolldown-runtime-Dd_uD5pT.js"
+    ],
+    "raw": 344631,
+    "gzipLevel9": 105180
+  },
+  "history": [
+    {
+      "file": "assets/DocumentHistoryModal-B1fqQwzY.js",
+      "bytes": 12660,
+      "gzip": 4885
+    }
+  ],
+  "verification": {
+    "fullBrowserPassed": 106,
+    "finalFocusedPassed": 33,
+    "validationPassed": 167,
+    "validationFiles": 29,
+    "fidelityFixturesPassed": 20,
+    "prerenderRoutes": 8
+  },
+  "branch": "ux/direct-handoff-version-review",
+  "sourceCommit": "9de3844"
+}

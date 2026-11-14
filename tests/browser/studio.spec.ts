@@ -32,14 +32,7 @@ for (const width of [390, 1440]) {
         s.fontStyle,
       ];
     });
-    if (width < 1024)
-      await page.getByRole('button', { name: 'Document options' }).click();
-    if (width >= 1024)
-      await page.getByRole('button', { name: 'Change app appearance' }).click();
-    await page
-      .getByRole('combobox', { name: 'App appearance', exact: true })
-      .selectOption('dark');
-    await page.getByRole('button', { name: /^Close / }).click();
+    await page.getByRole('button',{name:'Switch to dark appearance'}).click();
     if (width < 1024) await expect(page.locator('.mobile-workspace > .mobile-export')).toHaveCount(0);
     await expect(page.locator('html')).toHaveAttribute(
       'data-appearance',
@@ -60,9 +53,7 @@ for (const width of [390, 1440]) {
     ).toEqual(before);
     await fillSource(page, '# Appearance independent\n\nExact output.');
     if (width >= 1024) {
-      await page
-        .getByRole('button', { name: 'Export document', exact: true })
-        .click();
+      await openExport(page);
       await page
         .getByRole('dialog')
         .getByRole('combobox', { name: 'Save as', exact: true })
@@ -83,13 +74,7 @@ for (const width of [390, 1440]) {
     expect(html).toContain('Appearance independent');
     expect(html).not.toContain('data-appearance');
     await page.getByRole('button', { name: /^Close / }).click();
-    if (width < 1024) await page.getByRole('button', { name: 'Document options' }).click();
-    if (width >= 1024)
-      await page.getByRole('button', { name: 'Change app appearance' }).click();
-    await page
-      .getByRole('combobox', { name: 'App appearance', exact: true })
-      .selectOption('cream');
-    await page.getByRole('button', { name: /^Close / }).click();
+    await page.getByRole('button',{name:'Switch to light appearance'}).click();
     await openExport(page);
     // Changing chrome appearance must retain the already prepared artifact.
     await expect(
@@ -121,11 +106,6 @@ test('system appearance follows OS changes without changing document paper', asy
   page,
 }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Document options' }).click();
-  await page
-    .getByRole('combobox', { name: 'App appearance', exact: true })
-    .selectOption('system');
-  await page.getByRole('button', { name: /^Close / }).click();
   await page.emulateMedia({ colorScheme: 'dark' });
   await expect(page.locator('html')).toHaveAttribute('data-appearance', 'dark');
   await fillSource(page, '# White paper');
@@ -147,9 +127,7 @@ test('desktop delivery discards stale source and downloads the latest real DOCX'
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await fillSource(page, '# Old source');
-  await page
-    .getByRole('button', { name: 'Export document', exact: true })
-    .click();
+  await openExport(page);
   await page
     .getByRole('dialog')
     .getByRole('combobox', { name: 'Save as', exact: true })

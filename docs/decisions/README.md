@@ -41,3 +41,20 @@ in multiple new policy files. Keep historical evidence; clearly mark its authori
 See [D002 restoration evidence](typography-restoration.md).
 
 Register established: 2026-11-07. Supporting historical discussions remain in docs/.
+
+## D008 — accepted user UX update · 2026-11-14
+
+The attached UX implementation brief supersedes the earlier normal Prepare/Deliver
+entry and appearance chooser: primary Copy for Google Docs, a Download menu and
+one sun/moon switch. Preparation remains internal; PDF remains browser print.
+Device appearance is the initial default; explicit choice persists independently
+of document/export styling. D001/D002 typography and identity constraints remain.
+Muted semantic green/amber states and bounded native transitions are authorized.
+
+Five documents is the new capacity gate. New/duplicate actions require an explicit
+replacement choice at capacity; legacy workspaces with six documents are retained,
+never truncated on hydration. Restoration and capacity replacement must verify a
+separate local recovery journal write before changing source/removing a document.
+Recovery copies are visible in the version browser across document names and IDs;
+quota failure cancels the destructive change. jsdiff is loaded with history only.
+See `docs/qa/direct-handoff-and-history.md` for actual checks and limitations.

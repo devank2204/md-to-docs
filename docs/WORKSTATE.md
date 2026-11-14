@@ -1,6 +1,28 @@
 # Current workstate
 
-Updated: 2026-11-09. Branch: seo/iteration-02-performance.
+Updated: 2026-11-14. Branch: ux/direct-handoff-version-review.
+
+## Current UX implementation
+
+The attached user UX brief is implemented on top of Iteration 02 (`fb62415`).
+See [scope, verification and SEO handoff](qa/direct-handoff-and-history.md).
+Normal header actions are direct formatted copy and Download; advanced delivery
+remains available. Shared controls, initial system appearance with one-click toggle,
+explicit rename, contextual diagram review and the editorial footer preserve the
+existing identity and all eight SEO routes.
+
+Version history uses deferred jsdiff. Verified local recovery writes precede
+restore/capacity replacement; quota failure leaves source and documents unchanged.
+The actual six-document silent rotation was replaced with the explicitly requested
+five-document choice; legacy six-document workspaces are not truncated. See D008.
+
+Production build/eight-route prerender, lint (existing warnings only), 167 validation
+tests and 20 fidelity fixtures pass. Full Chromium suite: 106 passed; final
+navigation/identity/UX rerun: 33 passed. Source commit `9de3844`.
+
+This task is local only; no push or deployment. Iteration 02 was previously pushed
+to `Seo-fixes` at `fb62415`. The next SEO work is Iteration 03 destination-app
+fidelity evidence, not additional page generation; it is not implemented here.
 
 ## Latest completed iteration
 

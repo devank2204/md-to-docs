@@ -136,6 +136,9 @@ test('file import preserves existing text until a deliberate replacement, with h
     .getByRole('button', { name: 'Version history', exact: true })
     .click();
   await page.getByRole('button', { name: /Before replacing text/ }).click();
+  page.once('dialog',d=>d.accept());
+  await page.getByRole('button',{name:'Restore this version',exact:true}).click();
+  await page.getByRole('button',{name:'Close Version history',exact:true}).click();
   await expect(
     page.getByRole('textbox', { name: 'Markdown text' }),
   ).toHaveValue('# Original document');
@@ -211,7 +214,7 @@ test('clipboard failure has explicit fallbacks and share cancel does not downloa
   await enter(page);
   await openExport(page);
   await page.getByRole('button', { name: 'Prepare for Google Docs' }).click();
-  await page
+  await page.locator('.mobile-export')
     .getByRole('button', { name: 'Copy for Google Docs', exact: true })
     .click();
   await expect(page.getByRole('alert')).toContainText('unavailable');
@@ -278,7 +281,7 @@ for (const width of [320, 360, 390, 430, 768, 1024, 1440]) {
     if (width < 1024) {
       await page.getByRole('tab', { name: 'Preview' }).click();
       await expect(
-        page.getByRole('button', { name: /^Export/ }),
+        page.getByRole('button', { name: 'Copy for Google Docs', exact: true }),
       ).toBeInViewport();
       await expect(page.getByRole('dialog')).toHaveCount(0);
     } else {
@@ -307,14 +310,14 @@ test('hardware focus keeps actions visible, simulated soft keyboard makes room, 
   });
   await enter(page);
   await page.getByRole('textbox', { name: 'Markdown text' }).focus();
-  await expect(page.getByRole('button', { name: /^Export/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Copy for Google Docs', exact: true })).toBeVisible();
   await page.evaluate(() => (window as any).setKeyboardHeight(480));
   await expect(page.locator('.mobile-workspace > .mobile-export')).toHaveCount(0);
   await expect(
     page.getByRole('textbox', { name: 'Markdown text' }),
   ).toBeInViewport();
   await page.getByRole('tab', { name: 'Preview' }).click();
-  await expect(page.getByRole('button', { name: /^Export/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Copy for Google Docs', exact: true })).toBeVisible();
 });
 
 test('PDF prepares isolated content and reports only the print dialog outcome', async ({ page }) => {
