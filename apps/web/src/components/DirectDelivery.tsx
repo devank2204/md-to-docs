@@ -53,6 +53,12 @@ function DeliveryControls() {
     const t = setTimeout(() => setStatus("idle"), 2000);
     return () => clearTimeout(t);
   }, [status]);
+  useEffect(() => {
+    const deliver=(event:Event)=>run(((event as CustomEvent).detail || 'pdf') as ExportTarget);
+    window.addEventListener('mdtodocs:deliver',deliver);
+    window.addEventListener('mdtodocs:prepare-print',deliver);
+    return()=>{window.removeEventListener('mdtodocs:deliver',deliver);window.removeEventListener('mdtodocs:prepare-print',deliver)};
+  });
   function run(target: ExportTarget | "markdown", confirmed = false) {
     if (status === "working") return;
     const state = useStore.getState();

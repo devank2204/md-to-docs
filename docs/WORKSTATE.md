@@ -2,6 +2,14 @@
 
 Updated: 2026-11-14. Branch: ux/direct-handoff-version-review.
 
+## Screenshot-driven corrections
+
+The user's review rejected the prior visual acceptance. Fixed command/keyboard
+exports entering legacy delivery, copy hover contrast, clipped/boxed header title,
+Mermaid menu focus scrolling and viewport placement, and history control hierarchy.
+See [correction evidence](qa/ux-corrections.md). Prior passing test counts did not
+establish satisfactory visual quality. No push or deployment in this correction.
+
 ## Current UX implementation
 
 The attached user UX brief is implemented on top of Iteration 02 (`fb62415`).

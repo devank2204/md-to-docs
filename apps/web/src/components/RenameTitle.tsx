@@ -16,7 +16,7 @@ export function RenameTitle({
   return editing ? (
     <input
       aria-label="Document name"
-      className="min-w-0 max-w-full bg-transparent border rounded px-1"
+      className="ux-rename-input"
       autoFocus
       value={value}
       maxLength={100}
@@ -32,6 +32,7 @@ export function RenameTitle({
     />
   ) : (
     <Button
+      className={`ux-rename ${compact ? "ux-rename-compact" : ""}`}
       title={`Rename ${doc.title}`}
       aria-label={`Rename ${doc.title}`}
       onClick={() => {
@@ -39,8 +40,8 @@ export function RenameTitle({
         setEditing(true);
       }}
     >
-      {!compact && <span className="truncate max-w-[180px]">{doc.title}</span>}
-      <span aria-hidden="true">✎</span>
+      {!compact && <span className="ux-rename-label">{doc.title}</span>}
+      <span className="ux-rename-pencil" aria-hidden="true">✎</span>
     </Button>
   );
 }

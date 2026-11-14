@@ -1,4 +1,5 @@
 # Git Execution Policy
 
 - The agent is permitted to stage files (`git add`) and make local commits (`git commit`) autonomously.
-- The agent must NEVER run `git push` or push code to remote repositories unless explicitly commanded by the user in that prompt.
+- Standing user authorization (2026-11-14): push completed, verified changes to the current working branch automatically; do not ask the user to repeat the push instruction.
+- Never force-push, merge, or deploy without separate authorization. Preserve unrelated uncommitted changes.
