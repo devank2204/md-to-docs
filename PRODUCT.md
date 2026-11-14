@@ -21,7 +21,9 @@ clipboard rendering; diagrams, tables, equations, diagnostics, rescue tools,
 local documents and history, and an optional headless API application.
 The source and tests establish specific supported behavior, not universal fidelity.
 
-Core browser workflow: input → inspect when needed → prepare → copy/download/share.
+Core browser workflow: input → inspect when needed → copy or download.
+Preparation runs internally for direct handoff; advanced delivery options retain
+the existing preparation/share controls.
 No sign-in is required. Browser storage is local to this browser/device and can
 be unavailable or full. PDF is the browser print/save flow. Google Docs uses
 formatted clipboard or a Word-file handoff; it does not create a cloud Doc.
@@ -32,7 +34,8 @@ formatted clipboard or a Word-file handoff; it does not create a cloud Doc.
   user explicitly asks to change typography. A general UX request does not do so.
 - Web and mobile home share the incumbent web introduction and wordmark.
 - Preserve the working mobile flow and unchanged document preview.
-- Dark app appearance is implemented as an optional Cream/Dark/System preference.
+- App appearance initially follows the device, with a single light/dark toggle
+  persisting explicit choice.
   It must stay separate from document styling and export options.
 - Show useful context at the user's next decision; avoid technical machinery in
   the normal conversion flow.

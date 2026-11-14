@@ -7,6 +7,9 @@ import { useDocumentExport } from '@/hooks/useDocumentExport';
 import { useStore } from '@/store';
 import { getCommandShortcut } from '@/utils/platform';
 import { AppAppearance } from './AppAppearance';
+import { DirectDelivery } from './DirectDelivery';
+import { RenameTitle } from './RenameTitle';
+import { ToolsLinks } from './SiteFooter';
 import { BrandWordmark } from './BrandWordmark';
 
 interface HeaderProps {
@@ -61,20 +64,23 @@ export function Header({
     documents.find(d => d.id === activeDocumentId)?.title || 'Untitled Document';
   const isHtmlRoute = useStore(state => state.htmlOutput);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
-  const [appearanceOpen, setAppearanceOpen] = useState(false);
+
   const target = isHtmlRoute && destination === 'clipboard' ? 'html' : destination;
   const output = useDocumentExport({ markdown, destination: target, theme: activeTheme,
     signature: documentSignature, title: activeDocTitle }, activeDocumentId);
   useEffect(() => {
     const open = (event: Event) => {
+      if(event.type==='mdtodocs:delivery-options'){setDeliveryOpen(true);return}
       const requested = (event as CustomEvent).detail || 'pdf';
       useStore.getState().setHtmlOutput(requested === 'html');
       onDestinationChange(requested === 'html' ? 'clipboard' : requested);
       setDeliveryOpen(true);
     };
+    window.addEventListener('mdtodocs:delivery-options', open);
     window.addEventListener('mdtodocs:prepare-print', open);
     window.addEventListener('mdtodocs:deliver', open);
     return () => {
+      window.removeEventListener('mdtodocs:delivery-options', open);
       window.removeEventListener('mdtodocs:prepare-print', open);
       window.removeEventListener('mdtodocs:deliver', open);
     };
@@ -187,7 +193,7 @@ export function Header({
                     </div>
                   </button>
 
-                  <div className="my-1 border-t border-outline-variant/30" />
+                  <ToolsLinks />
                 </div>
               )}
             </div>
@@ -209,11 +215,12 @@ export function Header({
               </button>
             )}
 
+            {appState === 'WORKSPACE' && <div className="xl:hidden"><RenameTitle compact /></div>}
             {appState === 'WORKSPACE' && (
               <div className="hidden xl:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
                 <span className="material-symbols-outlined text-[15px] text-outline">description</span>
                 <span className="truncate max-w-[180px] text-on-surface font-sans" title={activeDocTitle}>
-                  {activeDocTitle}
+                  <RenameTitle />
                 </span>
               </div>
             )}
@@ -221,8 +228,7 @@ export function Header({
         )}
       </div>
 
-      {appearanceOpen && <WorkspaceSheet title="App appearance" onClose={() => setAppearanceOpen(false)}><div className="sheet-options"><AppAppearance /><p className="sheet-description">Only the app changes. Your document style and prepared files stay the same.</p></div></WorkspaceSheet>}
-      {appState === 'EMPTY' && <button type="button" aria-label="Change app appearance" title="App appearance" className="w-8 h-8 rounded hover:bg-surface-container" onClick={() => setAppearanceOpen(true)}><span className="material-symbols-outlined text-[18px]">contrast</span></button>}
+      {appState === 'EMPTY' && <AppAppearance />}
       {appState === 'WORKSPACE' && (
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Commands Trigger */}
@@ -252,14 +258,8 @@ export function Header({
             </button>
           )}
 
-          <button type="button" aria-label="Change app appearance" title="App appearance" className="w-8 h-8 rounded hover:bg-surface-container" onClick={() => setAppearanceOpen(true)}><span className="material-symbols-outlined text-[18px]">contrast</span></button>
-          {/* Primary Action Button */}
-          <button type="button" aria-label="Export document" onClick={() => setDeliveryOpen(true)}
-            disabled={!markdown.trim()}
-            className="desktop-delivery-trigger relative inline-flex h-8 select-none items-center justify-center rounded-lg px-2.5 sm:px-3 font-code-sm text-code-sm font-medium outline-none cursor-pointer transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed bg-zinc-900 text-white hover:bg-zinc-800 border border-black/5 min-w-fit sm:min-w-[145px] gap-1.5">
-            <span className="material-symbols-outlined text-[16px]">download</span>
-            <span>Export</span>
-          </button>
+          <AppAppearance />
+          <DirectDelivery />
           {deliveryOpen && (
             <WorkspaceSheet placement="export" title="Deliver your document" onClose={() => setDeliveryOpen(false)}>
               <p className="sheet-description">{activeDocTitle} · Uses your latest text when you prepare. No account needed.</p>

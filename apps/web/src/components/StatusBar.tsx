@@ -20,8 +20,6 @@ const DEST_LABELS: Record<DestinationType, string> = {
 export const StatusBar: React.FC<StatusBarProps> = ({
   isCompiling,
   warningsCount,
-  fidelityScore,
-  statsText,
   destination,
   onToggleFidelityPanel,
 }) => {
@@ -30,7 +28,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({
       <div className="flex items-center gap-space-sm">
         <button 
           onClick={onToggleFidelityPanel}
-          className="flex items-center gap-space-xxs hover:text-on-surface transition-colors focus:outline-none"
+          className="flex items-center gap-space-xxs hover:text-on-surface transition-colors focus-visible:outline focus-visible:outline-2"
         >
           {isCompiling ? (
             <span className="flex items-center gap-space-xxs text-secondary">
@@ -40,21 +38,16 @@ export const StatusBar: React.FC<StatusBarProps> = ({
           ) : warningsCount === 0 ? (
             <span className="flex items-center gap-space-xxs text-primary">
               <span className="material-symbols-outlined text-[13px]">check_circle</span>
-              Everything preserved {fidelityScore !== undefined && `(${fidelityScore}%)`}
+              No structural issues found
             </span>
           ) : (
             <span className="flex items-center gap-space-xxs text-error">
               <span className="material-symbols-outlined text-[13px]">warning</span>
-              {warningsCount} {warningsCount === 1 ? 'issue' : 'issues'} {fidelityScore !== undefined && `(${fidelityScore}%)`}
+              {warningsCount} {warningsCount === 1 ? 'issue' : 'issues'}
             </span>
           )}
         </button>
-        {statsText && !isCompiling && (
-          <>
-            <span className="text-outline-variant">·</span>
-            <span>{statsText}</span>
-          </>
-        )}
+
       </div>
       <div className="flex items-center gap-space-sm text-outline">
         <span>Target: {DEST_LABELS[destination]}</span>

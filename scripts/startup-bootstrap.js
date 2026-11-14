@@ -7,7 +7,7 @@
   const buffer = window.__mdStartup = { active: true, edited: false };
   try {
     const saved = JSON.parse(localStorage.getItem('md-to-docs-storage') || 'null')?.state;
-    const appearance = saved?.appAppearance;
+    const appearance = saved?.appAppearance || 'system';
     document.documentElement.dataset.appearance = appearance === 'dark' || (appearance === 'system' && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'cream';
     if (saved?.markdown?.trim() && saved.currentView !== 'landing') {
       buffer.restored = true;

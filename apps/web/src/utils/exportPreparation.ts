@@ -1,3 +1,4 @@
+import { visit } from 'unist-util-visit';
 import { documentFilename } from './exportHelpers';
 import type { ExportInput, PreparedExport } from './exportHelpers';
 import {
@@ -19,6 +20,7 @@ export async function prepareDocumentExport(
   const target = input.destination === 'html' ? 'clipboard' : input.destination;
   const source = await resolveAssets(parseMarkdown(input.markdown), signal);
   signal?.throwIfAborted();
+  if(input.reviewDiagramFailures){let failed=false;visit(source,node=>{if((node.data as {renderStatus?:string}|undefined)?.renderStatus==='error')failed=true});if(failed)throw new Error('diagram_review_required')}
   const doc = planRepresentation(source, target, new DiagnosticsCollector());
   if (input.destination === 'word') {
     const { renderToDocxBlob } = await import('@mdtodocs/renderers/src/docx');

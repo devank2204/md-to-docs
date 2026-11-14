@@ -5,7 +5,7 @@ async function enter(page: Page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.locator('textarea').first().fill(source);
-  await expect(page.getByRole('button', { name: 'Sync scroll', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /^Sync scroll:/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.mermaid-preview svg')).toBeVisible();
 }
 async function sourceTop(page: Page, section: number, markdown = source) {
@@ -51,11 +51,11 @@ test('top/bottom align and disabling sync permits independent scrolling', async 
   await expect.poll(() => page.locator('[data-preview-scroll]').evaluate(node => node.scrollHeight - node.clientHeight - node.scrollTop)).toBeLessThan(2);
   await page.locator('[data-preview-scroll]').evaluate(node => { node.scrollTop = 0; });
   await expect.poll(() => page.locator('textarea').evaluate(node => node.scrollTop)).toBeLessThan(2);
-  await page.getByRole('button', { name: 'Sync scroll', exact: true }).click();
+  await page.getByRole('button', { name: /^Sync scroll:/ }).click();
   await sourceTop(page, 14);
   await page.waitForTimeout(100);
   expect(await page.locator('[data-preview-scroll]').evaluate(node => node.scrollTop)).toBe(0);
-  await page.getByRole('button', { name: 'Sync scroll', exact: true }).click();
+  await page.getByRole('button', { name: /^Sync scroll:/ }).click();
   await expect.poll(async () => Math.abs(await anchorDistance(page, 14))).toBeLessThan(4);
 });
 
@@ -67,11 +67,11 @@ test('geometry updates after zoom and sidebar resizing; mobile and reading view 
   await page.getByTitle('Collapse sidebar (Ctrl+B)', { exact: true }).first().click();
   await expect.poll(async () => Math.abs(await anchorDistance(page, 14))).toBeLessThan(4);
   await page.getByTitle('Switch to clean reading view', { exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Sync scroll', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Sync scroll:/ })).toHaveCount(0);
   await page.getByRole('button', { name: /Back to Editor/ }).click();
-  await expect(page.getByRole('button', { name: 'Sync scroll', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Sync scroll:/ })).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(page.getByRole('button', { name: 'Sync scroll', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Sync scroll:/ })).toHaveCount(0);
   await expect(page.getByRole('tab', { name: 'Preview', exact: true })).toBeVisible();
 });
 

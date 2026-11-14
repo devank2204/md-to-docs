@@ -12,6 +12,7 @@ export interface ExportInput {
   theme: DocumentTheme;
   signature: Signature;
   title: string;
+  reviewDiagramFailures?: boolean;
 }
 export type PreparedExport =
   | { kind: 'print'; snapshot: PrintSnapshot }

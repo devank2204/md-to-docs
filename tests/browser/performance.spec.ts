@@ -72,8 +72,8 @@ test('deferred command palette, history and reconciliation open on demand', asyn
   await search.fill(query); await search.press('Enter');
  };
  await command('Browse Document History');
- await expect(page.getByRole('heading',{name:'Document History & Version Snapshots'})).toBeVisible();
- await page.getByTitle('Close',{exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Version history'})).toBeVisible();
+ await page.getByRole('button',{name:'Close Version history',exact:true}).click();
  await command('Sync Word Comments');
  await expect(page.getByRole('heading',{name:'Reconciliation & Review Patch Studio'})).toBeVisible();
 });
@@ -82,10 +82,8 @@ test('deferred formatted handoff writes HTML and plain text on the copy gesture'
  await context.grantPermissions(['clipboard-read','clipboard-write']);
  await page.goto('/markdown-to-google-docs/');
  await fillSource(page, '# Clipboard sample\n\nA **formatted** report.\n\n| Item | State |\n| --- | --- |\n| Test | Ready |');
- await openExport(page);
- await page.getByRole('button',{name:'Prepare for Google Docs',exact:true}).click();
- await page.getByRole('button',{name:/^Copy for Google Docs/}).click();
- await expect(page.getByRole('status').filter({hasText:'Copied. Open Google Docs'})).toBeVisible();
+ await page.getByRole('button',{name:'Copy for Google Docs',exact:true}).click();
+ await expect(page.getByRole('status').filter({hasText:'Copied to clipboard'})).toBeVisible();
  const contents=await page.evaluate(async()=>{
   const items=await navigator.clipboard.read();
   const item=items.find(value=>value.types.includes('text/html'))!;
@@ -107,7 +105,7 @@ test('pending desktop studio retains readable source and one route introduction'
  await expect(page.locator('textarea')).toHaveValue('# Source while the studio loads');
  await expect(page.getByText('Start by pasting here',{exact:true})).toBeHidden();
  release();
- await expect(page.getByRole('button',{name:'Sync scroll',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:/^Sync scroll:/})).toBeVisible();
 });
 
 test('a clipboard read started before mount cannot replace a newly selected document', async ({page}) => {

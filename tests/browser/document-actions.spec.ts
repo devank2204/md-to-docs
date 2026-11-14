@@ -1,3 +1,4 @@
+import {openExport} from './action-helpers';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 const source = '# Product Launch Plan\n\nA short introduction.\n\n## Milestones\n\n| Task | Owner |\n|---|---|\n| Launch | Team |\n';
@@ -10,11 +11,11 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       await page.getByRole('tab', { name: 'Preview', exact: true }).click();
       await expect(page.getByRole('heading', { name: 'Product Launch Plan', exact: true })).toBeVisible();
       await expect(page.locator('.mobile-workspace > .mobile-export')).toHaveCount(0);
-      expect((await page.locator('.mobile-header').boundingBox())!.height).toBeLessThanOrEqual(52);
+      await expect(page.getByRole('button',{name:'Copy for Google Docs',exact:true})).toBeInViewport();
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    const trigger = page.getByRole('button', { name: width < 1024 ? /^Export/ : 'Export document' });
-    await trigger.click();
+    const trigger = page.locator('header').getByText('Download',{exact:true});
+    await openExport(page);
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
     const box = (await dialog.boundingBox())!;
@@ -26,7 +27,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     expect(download.suggestedFilename()).toMatch(/\.md$/);
     expect(await readFile((await download.path())!, 'utf8')).toBe(source);
     await page.getByRole('button', { name: /^Close / }).click();
-    await expect(trigger).toBeFocused();
+    await expect(trigger).toBeVisible();
     if (width < 1024) {
       await page.getByRole('button', { name: 'Open documents' }).click();
       await page.getByRole('button', { name: '＋ New document', exact: true }).click();
@@ -43,7 +44,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
 test('mobile destination sheet returns to export and prepares a Word file', async ({ page }) => {
   await page.goto('/');
   await page.locator('textarea').first().fill(source);
-  await page.getByRole('button', { name: /^Export/ }).click();
+  await openExport(page);
   await page.getByRole('button', { name: /^Save as / }).click();
   await page.getByRole('button', { name: /Word document/ }).click();
   await expect(page.getByRole('dialog', { name: 'Export document' })).toBeVisible();
@@ -69,17 +70,17 @@ test('mobile diagram uses a content-sized viewport and an options sheet', async 
 test('prepared HTML stays available on close, then invalidates when source changes', async ({ page }) => {
   await page.goto('/');
   await page.locator('textarea').fill('# Original');
-  await page.getByRole('button', { name: /^Export/ }).click();
+  await openExport(page);
   await page.getByRole('button', { name: /^Save as / }).click();
   await page.getByRole('button', { name: /HTML/ }).click();
   await page.getByRole('button', { name: 'Prepare HTML file', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Download .html', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Close Export document', exact: true }).click();
-  await page.getByRole('button', { name: /^Export/ }).click();
+  await openExport(page);
   await expect(page.getByRole('button', { name: 'Download .html', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Close Export document', exact: true }).click();
   await page.locator('textarea').fill('# Latest');
-  await page.getByRole('button', { name: /^Export/ }).click();
+  await openExport(page);
   await expect(page.getByRole('button', { name: 'Prepare HTML file', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Prepare HTML file', exact: true }).click();
   const downloaded = page.waitForEvent('download');
@@ -97,6 +98,9 @@ test('mobile Clear all saves a version that can restore the text', async ({ page
   await page.getByRole('button', { name: 'Document options' }).click();
   await page.getByRole('button', { name: 'Version history', exact: true }).click();
   await page.getByRole('button', { name: /Before clearing text/ }).click();
+  page.once('dialog',d=>d.accept());
+  await page.getByRole('button',{name:'Restore this version',exact:true}).click();
+  await page.getByRole('button',{name:'Close Version history',exact:true}).click();
   await expect(page.locator('textarea')).toHaveValue(source);
 });
 

@@ -1,3 +1,8 @@
+import { Menu } from './Controls';
+import { ToolsLinks } from './SiteFooter';
+import { DirectDelivery } from './DirectDelivery';
+import { AppAppearance } from './AppAppearance';
+import { RenameTitle } from './RenameTitle';
 import { FeatureBoundary } from './FeatureBoundary';
 import { LandingContext } from '../routes/LandingContext';
 import { lazy, useContext, useEffect, useRef, useState, useSyncExternalStore } from 'react';
@@ -215,15 +220,18 @@ export function MobileWorkspace(props: Props) {
   };
   useEffect(() => {
     const open = (event: Event) => {
+      if(event.type==='mdtodocs:delivery-options'){setSheet(null);setExportOpen(true);return}
       const value = ((event as CustomEvent).detail || 'pdf') as ExportTarget;
       useStore.getState().setHtmlOutput(value === 'html');
       useStore.getState().setDestination(value === 'html' ? 'clipboard' : value);
       setSheet(null);
       setExportOpen(true);
     };
+    window.addEventListener('mdtodocs:delivery-options', open);
     window.addEventListener('mdtodocs:deliver', open);
     window.addEventListener('mdtodocs:prepare-print', open);
     return () => {
+      window.removeEventListener('mdtodocs:delivery-options', open);
       window.removeEventListener('mdtodocs:deliver', open);
       window.removeEventListener('mdtodocs:prepare-print', open);
     };
@@ -247,7 +255,7 @@ export function MobileWorkspace(props: Props) {
           {hasContent ? <><span className="material-symbols-outlined" aria-hidden="true">folder_open</span><span className="truncate">{title}</span></> : <BrandWordmark />}
         </button>
         <button type="button" aria-label="Document options" onClick={() => setSheet('options')}>•••</button>
-        {hasContent && <button type="button" className="mobile-export-trigger" aria-haspopup="dialog" onClick={() => setExportOpen(true)}>Export <span aria-hidden="true">↑</span></button>}
+        {hasContent && <RenameTitle compact />}<Menu label="Tools"><ToolsLinks /></Menu><AppAppearance />{hasContent && <DirectDelivery />}
       </header>
       <div
         className="mobile-tabs"

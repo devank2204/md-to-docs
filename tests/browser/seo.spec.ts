@@ -12,7 +12,7 @@ for (const spec of Object.values(LANDING_ROUTES)) {
   await expect(page.locator('h1')).toHaveText(spec.h1);
   await expect(page).toHaveTitle(spec.title);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', spec.canonical);
-  await expect(page.getByRole('navigation', { name: 'Related conversion tools' })).toBeVisible();
+  await expect(page.locator('footer')).toBeVisible();
   await page.reload();
   await expect(page.locator('h1')).toHaveText(spec.h1);
  });
@@ -22,7 +22,9 @@ test('document heading, navigation and refresh preserve route metadata and sourc
  await page.goto('/markdown-to-word/');
  await page.getByRole('textbox', {name:'Markdown terminal input'}).fill('# Quarterly Engineering Review\n\nA report.');
  await expect(page).toHaveTitle(LANDING_ROUTES['/markdown-to-word'].title);
- await page.getByRole('navigation', {name:'Related conversion tools'}).getByRole('link', {name:'Paste Markdown into Google Docs', exact:true}).click();
+ await page.evaluate(()=>(window as any).routeSentinel='keep');
+ await page.locator('footer').getByRole('link', {name:'Markdown to Google Docs', exact:true}).click();
+ expect(await page.evaluate(()=>(window as any).routeSentinel)).toBe('keep');
  await expect(page).toHaveTitle(LANDING_ROUTES['/markdown-to-google-docs'].title);
  await page.goBack();
  await expect(page).toHaveTitle(LANDING_ROUTES['/markdown-to-word'].title);
@@ -48,7 +50,7 @@ test('all landing descriptions and links remain readable without JavaScript', as
   await page.goto(spec.path === '/' ? '/' : spec.path + '/');
   await expect(page.locator('h1')).toHaveText(spec.h1);
   await expect(page.getByRole('heading', {name:'How to convert'})).toBeVisible();
-  await expect(page.getByRole('navigation', {name:'Related conversion tools'}).getByRole('link')).toHaveCount(7);
+  await expect(page.locator('footer nav').getByRole('link')).toHaveCount(7);
  }
  await context.close();
 });
