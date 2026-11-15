@@ -61,6 +61,6 @@ test('sidebar duplicate at capacity leaves all five documents intact on cancella
   const before = await page.evaluate(() => JSON.parse(localStorage.getItem('md-to-docs-storage')!).state.documents);
   await sidebar.locator('summary[aria-label="More actions for Project notes"]').click();
   await sidebar.getByRole('button', { name: 'Duplicate', exact: true }).click();
-  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('button', { name: 'Cancel import', exact: true }).click();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('md-to-docs-storage')!).state.documents)).toEqual(before);
 });

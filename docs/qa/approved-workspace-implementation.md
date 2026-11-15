@@ -99,3 +99,28 @@ are excluded from the commits.
 Next SEO work remains Iteration 03: measured destination fidelity, downloadable
 fixtures/artifacts and evidence-based compatibility claims. This task does not
 start that iteration or create additional SEO pages.
+
+## Rebase integration · 2026-11-15
+
+Rebased the two implementation commits onto `origin/main` at `d30741c` (PR #16).
+Kept main's grouped sidebar, Lucide menus and approved Inter wordmark. Snow now
+lands on the current text wordmark rather than restoring its removed image.
+Combined the shared Menu accessibility/appearance APIs. Renumbered the workspace
+scope decision D010 to preserve main's D009. Updated only stale test selectors
+for the removed rail's New Document control and the current capacity cancel label.
+
+Production TypeScript/Vite build, eight-route prerender and lint pass. Rebase
+browser checks include a 19-test passing rerun of document actions, synchronized
+scrolling and grouped-sidebar integration after updating stale selectors. Fourteen fresh light/dark
+screenshots are in `/workspace/rebase-main-evidence`; desktop workspace reviewed.
+The three unrelated DOCX files were backed up and restored with identical SHA-256
+hashes; temporary local attributes/stash were cleaned up. The pushed branch still
+has its pre-rebase history until an authorized force-with-lease update.
+
+Combined browser run: 129 passed; two failures were obsolete New Document rail
+selectors at 1024/1440, not application errors. After correcting those selectors,
+the full affected document-actions/sync-scroll/grouped-sidebar set passed 19/19,
+including both formerly failing scenarios. No skipped or remaining failing checks.
+No validation/fidelity rerun was needed: rebase conflict resolution changed shell,
+menu and logo integration, not compiler/renderer behavior; the production build
+and browser suite exercised that integration. No remote history rewrite performed.

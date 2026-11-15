@@ -1,5 +1,18 @@
 # Current workstate
 
+## Rebase onto main · 2026-11-15
+
+User requested rebasing `ux/direct-handoff-version-review` onto current main
+`d30741c`. Resolved conflicts by retaining main's grouped sidebar/Lucide actions
+and approved Inter wordmark, adding local logo snow to that wordmark, and combining
+both shared-menu APIs. D009 remains the grouped-sidebar decision; the subsequent
+workspace decision is D010. Production build, prerender and lint pass. Rebase
+validation: 129 passed in the combined run, two obsolete selector failures fixed;
+the affected 19-test rerun passes. Details are in the implementation report. Local fixture files
+were restored byte-for-byte. Remote update needs `--force-with-lease`; the git rule
+requires separate authorization for that history rewrite. No force push performed.
+
+
 Updated: 2026-11-15. Branch: ux/direct-handoff-version-review.
 
 ## Approved workspace implementation

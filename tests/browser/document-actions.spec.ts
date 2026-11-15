@@ -34,7 +34,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       await page.getByRole('button', { name: '＋ New document', exact: true }).click();
       await expect(page.getByRole('button', { name: 'Choose file', exact: true })).toBeVisible();
     } else {
-      await page.getByTitle('New Document (Alt+N)', { exact: true }).click();
+      await page.getByRole('button', { name: 'Create New Document', exact: true }).click();
       await expect(page.getByRole('button', { name: 'Import Markdown', exact: true })).toBeVisible();
     }
     await page.getByLabel('Import Markdown file', { exact: true }).setInputFiles({ name: 'again.md', mimeType: 'text/markdown', buffer: Buffer.from('# Imported again') });
