@@ -233,11 +233,11 @@ function DeliveryControls() {
             <span className="material-symbols-outlined" aria-hidden="true">
               {status === "success" ? "check" : "download"}
             </span>
-            {status === "success"
+            <span className="export-action-label">{status === "success"
               ? "Copied"
               : status === "working"
                 ? "Preparing…"
-                : "Export"}
+                : "Export"}</span>
             <span className="material-symbols-outlined" aria-hidden="true">
               expand_more
             </span>

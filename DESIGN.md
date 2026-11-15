@@ -88,3 +88,7 @@ local and hover-only, respecting reduced motion and Save-Data.
 D011 supersedes D010 title outline with a borderless flexible navbar field.
 Neutral hover is shared across header actions. History/diagram review have a
 visible secondary toolbar; CSS wink respects reduced motion.
+
+D012 authorizes 14px mobile title at rest, 16px editing; compact Export, visible
+appearance/Tools, non-collapsible mobile headings and 12px paper padding. Shared
+CSS shimmer respects reduced motion. Desktop heading/document roles remain.

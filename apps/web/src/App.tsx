@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from "./components/LoadingSkeleton";
 import { SupportDialog } from "./components/SupportDialog";
 import { GlobalFileDrop } from './components/GlobalFileDrop';
 import { SiteFooter } from './components/SiteFooter';
@@ -231,7 +232,7 @@ function App() {
         {(!routeSpec) ? <section className="p-10"><h1>Page Not Found (404)</h1><a href="/">Return to MDToDocs</a></section> : null}
         {routeSpec && currentPath !== '/' && appState !== 'EMPTY' && !isMobile && !currentPath.startsWith('/mermaid-') && <HomeIntroduction />}
         {!routeSpec ? null : currentPath === '/mermaid-to-svg' || currentPath === '/mermaid-to-png' ? (
-          <FeatureBoundary fallback={<><HomeIntroduction /><LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} /></>}><MermaidUtilityView
+          <FeatureBoundary fallback={<><HomeIntroduction /><LoadingSkeleton label="Loading diagram tool" /><LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} /></>}><MermaidUtilityView
             currentPath={currentPath}
             onNavigateRoute={handleNavigateRoute}
             onOpenInStudio={(importedMarkdown) => {
@@ -242,7 +243,7 @@ function App() {
         ) : isMobile ? <><MobileWorkspace markdown={markdown} onInput={handleInput} destination={destination} onDestinationChange={setDestination} activeTheme={activeTheme} documentSignature={documentSignature} isCompiling={compilationLoaded && (isCompiling || diagnosticsKey !== JSON.stringify([activeDocumentId, markdown, destination, activeTheme]))} diagnostics={diagnostics} compilationError={diagnosticsFailed} />{compilationLoaded && <FeatureBoundary fallback={null}><MobileCompilation activeTheme={activeTheme} /></FeatureBoundary>}</> : !isMobile && appState === 'EMPTY' ? (
           <EmptyState onInput={handleInput} />
         ) : (
-          <FeatureBoundary fallback={<EmptyState onInput={handleInput} pendingValue={markdown} showIntroduction={currentPath === "/"} />}><Workspace
+          <FeatureBoundary fallback={<><LoadingSkeleton label="Loading workspace" compact /><EmptyState onInput={handleInput} pendingValue={markdown} showIntroduction={currentPath === "/"} /></>}><Workspace
             onNavigateRoute={handleNavigateRoute}
             isMobile={isMobile}
             markdown={markdown}

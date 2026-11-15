@@ -1,3 +1,5 @@
+import { takeDiagramReviewRequest } from "@/utils/diagramReviewRequest";
+import { LoadingSkeleton } from "./LoadingSkeleton";
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import {
   findMermaidBlocks,
@@ -49,6 +51,7 @@ export function MermaidRepairAssistant() {
   );
   useEffect(() => {
     const open = (event: Event) => {
+      takeDiagramReviewRequest();
       const state = useStore.getState();
       setReview({
         source: state.markdown,
@@ -60,6 +63,8 @@ export function MermaidRepairAssistant() {
       setMessage('');
     };
     window.addEventListener('mdtodocs:mermaid-review', open);
+    const queued = takeDiagramReviewRequest();
+    if (queued) open(new CustomEvent('mdtodocs:mermaid-review', { detail: queued.detail }));
     return () => window.removeEventListener('mdtodocs:mermaid-review', open);
   }, []);
   useEffect(() => {
@@ -176,17 +181,6 @@ export function MermaidRepairAssistant() {
             {message ||
               `${candidates.length} diagram compatibility ${candidates.length === 1 ? 'suggestion' : 'suggestions'}`}
           </span>
-          {candidates.length > 0 && (
-            <button
-              type="button"
-              className="underline min-h-[44px]"
-              onClick={() =>
-                window.dispatchEvent(new CustomEvent('mdtodocs:mermaid-review'))
-              }
-            >
-              Review diagram fixes
-            </button>
-          )}
           {undo && documentId === undo.docId && (
             <button
               type="button"
@@ -221,9 +215,7 @@ export function MermaidRepairAssistant() {
               source is backed up.
             </p>
             {!review.entries && (
-              <p role="status">
-                Checking diagrams and validating proposed fixes…
-              </p>
+              <LoadingSkeleton label="Checking diagrams and validating proposed fixes" />
             )}
             {review.entries?.length === 0 && (
               <p role="alert">

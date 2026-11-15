@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from "./LoadingSkeleton";
 import { useMemo, useState } from 'react';
 import {
   parseMarkdown,
@@ -65,7 +66,7 @@ export function LinkedReview({ notes, pending, onNavigate }: Props) {
     <div className="linked-review sheet-options">
       <p className="sheet-description">
         {pending
-          ? 'Checking your latest text…'
+          ? <LoadingSkeleton label="Checking your latest text" compact />
           : notes.length
             ? 'Review what may change in your chosen app.'
             : 'No structural formatting issues found.'}

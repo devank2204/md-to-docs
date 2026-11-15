@@ -1,3 +1,4 @@
+import { requestDiagramReview } from "@/utils/diagramReviewRequest";
 import { useDocumentCompilation } from '@/hooks/useDocumentCompilation';
 import { useSyncedScroll } from '@/hooks/useSyncedScroll';
 import { useState, useEffect, useRef } from 'react';
@@ -111,7 +112,7 @@ export function Workspace({
   return (
     <div ref={workspaceRef} className="flex flex-col w-full h-[calc(100vh-3rem)] overflow-hidden">
       <div className="document-action-bar" aria-label="Document actions">          <button type="button" className="ux-button" onClick={() => useStore.getState().setIsHistoryModalOpen(true)}><span className="material-symbols-outlined" aria-hidden="true">history</span>Version history</button>
-          {/```mermaid\b/i.test(markdown) && <button type="button" className="ux-button" onClick={() => window.dispatchEvent(new CustomEvent('mdtodocs:mermaid-review'))}><span className="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>Review diagram fixes</button>}
+          {/(?:```|:::)\s*mermaid\b/i.test(markdown) && <button type="button" className="ux-button" onClick={() => requestDiagramReview()}><span className="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>Review diagram fixes</button>}
 </div>
       <MermaidRepairAssistant />
       {isReviewMode ? (
