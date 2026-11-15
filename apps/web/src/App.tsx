@@ -1,3 +1,4 @@
+import { SupportDialog } from "./components/SupportDialog";
 import { GlobalFileDrop } from './components/GlobalFileDrop';
 import { SiteFooter } from './components/SiteFooter';
 import { CapacityDecision } from './components/CapacityDecision';
@@ -255,7 +256,7 @@ function App() {
         {routeSpec && !currentPath.startsWith('/mermaid-') && <LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} />}
       </main>
       <SiteFooter onNavigateRoute={handleNavigateRoute} />
-      <CapacityDecision /><GlobalFileDrop />
+      <CapacityDecision /><GlobalFileDrop /><SupportDialog />
 
       {isCommandPaletteOpen && <FeatureBoundary><CommandPalette
         isOpen={isCommandPaletteOpen}

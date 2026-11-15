@@ -94,3 +94,17 @@ spacing. Preview formatting never silently changes source Markdown.
 
 Evidence: [implementation and checks](../qa/approved-workspace-implementation.md).
 D001/D002 identity constraints and verified recovery remain binding.
+
+## D011 — accepted quiet workspace corrections · 2026-11-15
+
+Owner: user. Latest explicit feedback supersedes D010's outlined title and advanced
+export entry. The title uses available navbar width without pill/border; explicit
+save and cancellation remain. Direct exports are the only normal export flow;
+remove duplicate delivery modals. Header controls share neutral hover surfaces.
+Reading entry uses a reduced-motion-aware CSS wink; no animation dependency added.
+History and diagram review are visible in the secondary document toolbar, including
+mobile. Logo menu omits session status and redundant command access. The command
+palette exposes seven core actions and no heading jump list. Supporting Privacy,
+About and Feedback use shared dialogs. Feedback is a local draft/copy interface
+until an endpoint is supplied, never a fake successful submission. Existing
+recovery, exports, document styling, home and scoped Inter wordmark remain.

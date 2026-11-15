@@ -28,10 +28,10 @@ async function seed(page: any, state = saved()) {
 async function history(page: any) {
   await page.keyboard.press("Control+k");
   await page
-    .getByPlaceholder("Type a command, destination, theme, or heading...")
+    .getByPlaceholder("Search commands…")
     .fill("Browse Document History");
   await page
-    .getByPlaceholder("Type a command, destination, theme, or heading...")
+    .getByPlaceholder("Search commands…")
     .press("Enter");
 }
 test("direct formatted copy handles denial and only reports actual success", async ({

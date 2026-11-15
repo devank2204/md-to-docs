@@ -69,7 +69,7 @@ test('deferred command palette, history and reconciliation open on demand', asyn
  await fillSource(page, '# Optional tools');
  const command = async (query: string) => {
   await page.keyboard.press('Control+k');
-  const search=page.getByPlaceholder('Type a command, destination, theme, or heading...');
+  const search=page.getByPlaceholder('Search commands…');
   await search.fill(query); await search.press('Enter');
  };
  await command('Browse Document History');

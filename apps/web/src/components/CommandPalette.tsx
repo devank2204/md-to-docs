@@ -49,7 +49,6 @@ function CommandPaletteModal({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const markdown = useStore((state) => state.markdown);
   const themeId = useStore((state) => state.themeId);
   const isReviewMode = useStore((state) => state.isReviewMode);
   const documents = useStore((state) => state.documents);
@@ -75,43 +74,6 @@ function CommandPaletteModal({
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
-
-  // Extract headings from markdown
-  const headingCommands = useMemo<CommandItem[]>(() => {
-    if (!markdown) return [];
-    const lines = markdown.split('\n');
-    const items: CommandItem[] = [];
-
-    lines.forEach((line, idx) => {
-      const match = line.match(/^(#{1,4})\s+(.+)$/);
-      if (match) {
-        const level = match[1].length;
-        const headingText = match[2].trim();
-        items.push({
-          id: `heading-${idx}`,
-          category: 'Document Headings',
-          title: headingText,
-          description: `Jump to Heading ${level} (Line ${idx + 1})`,
-          icon: level === 1 ? 'title' : 'format_size',
-          action: () => {
-            // Find heading elements in the preview sheet and scroll smoothly
-            const previewEl = document.querySelector('[data-preview-pane]');
-            if (previewEl) {
-              const headings = previewEl.querySelectorAll('h1, h2, h3, h4');
-              for (const h of Array.from(headings)) {
-                if (h.textContent?.includes(headingText)) {
-                  h.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  break;
-                }
-              }
-            }
-          },
-        });
-      }
-    });
-
-    return items;
-  }, [markdown]);
 
   const mod = getModifierKey();
 
@@ -314,7 +276,8 @@ function CommandPaletteModal({
   // Filter commands by search query
   const filteredCommands = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const all = [...baseCommands, ...headingCommands];
+    const allowed = new Set(['export-gdocs','export-word','export-pdf','mode-review','doc-new','doc-history','action-rescue']);
+    const all = baseCommands.filter(item => allowed.has(item.id));
     if (!q) return all;
 
     return all.filter((item) => {
@@ -323,7 +286,7 @@ function CommandPaletteModal({
       const matchDesc = item.description?.toLowerCase().includes(q);
       return matchTitle || matchCat || matchDesc;
     });
-  }, [query, baseCommands, headingCommands]);
+  }, [query, baseCommands]);
 
   // Scroll active item into view
   useEffect(() => {
@@ -362,6 +325,7 @@ function CommandPaletteModal({
       onClick={onClose}
     >
       <div
+        role="dialog" aria-modal="true" aria-label="Commands"
         className="bg-surface-container-high border border-outline-variant/60 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden text-on-surface flex flex-col max-h-[75vh] animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
@@ -374,7 +338,7 @@ function CommandPaletteModal({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type a command, destination, theme, or heading..."
+            placeholder="Search commands…"
             className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-outline focus:outline-none"
           />
           {query ? (
@@ -395,13 +359,13 @@ function CommandPaletteModal({
         <div ref={listRef} className="flex-1 overflow-y-auto p-2 divide-y divide-outline-variant/20">
           {filteredCommands.length === 0 ? (
             <div className="py-12 text-center text-xs text-on-surface-variant">
-              No matching commands or document headings found for "{query}".
+              No matching commands found for "{query}".
             </div>
           ) : (
             filteredCommands.map((command, idx) => {
               const isSelected = idx === selectedIndex;
               return (
-                <div
+                <button type="button"
                   key={command.id}
                   data-selected={isSelected}
                   onClick={() => {
@@ -409,9 +373,9 @@ function CommandPaletteModal({
                     onClose();
                   }}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors text-xs ${
+                  className={`w-full text-left flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors text-xs ${
                     isSelected
-                      ? 'bg-primary/10 text-primary font-medium'
+                      ? 'bg-surface-container text-on-surface font-medium'
                       : 'text-on-surface hover:bg-surface-container'
                   }`}
                 >
@@ -457,7 +421,7 @@ function CommandPaletteModal({
                       </span>
                     )}
                   </div>
-                </div>
+                </button>
               );
             })
           )}

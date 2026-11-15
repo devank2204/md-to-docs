@@ -55,20 +55,14 @@ export function SiteFooter({onNavigateRoute}:Navigation={}) {
         <ToolsLinks onNavigateRoute={onNavigateRoute} />
       </div>
       <div className="ux-footer-bottom">
-        <a href="#document-privacy">Privacy</a>
+        <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("mdtodocs:support", {detail:"privacy"}))}>Privacy</button>
         <button
           type="button"
           onClick={() => useStore.getState().setIsAboutModalOpen(true)}
         >
           About
         </button>
-        <a
-          href="https://github.com/devank2204/md-to-docs/issues/new"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Feedback
-        </a>
+        <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("mdtodocs:support", {detail:"feedback"}))}>Feedback</button>
         <span>Documents stay in this browser.</span>
       </div>
     </footer>

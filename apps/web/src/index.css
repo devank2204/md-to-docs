@@ -1031,3 +1031,29 @@ html[data-appearance="dark"] {--ux-neutral-hover:#30332c}
  .mobile-header .export-menu>summary {width:104px;min-height:44px;padding:6px 7px;gap:4px}
  .mobile-header .workspace-menu>summary {width:44px;min-height:44px}
 }
+
+/* One neutral interaction language across app chrome; semantic diff colors stay scoped. */
+:root {--ux-neutral-hover:#eeede7}
+html[data-appearance="dark"] {--ux-neutral-hover:#353533}
+header button:not(:disabled):hover,header summary:hover {background:var(--ux-neutral-hover);color:inherit}
+header .export-menu>summary:hover {background:#3b3b38;color:#fff}
+.header-document-name {max-width:none;flex:1;min-width:0}
+header>div:first-child {flex:1;min-width:0}
+.document-name {max-width:none}
+.document-name input {border:0;border-radius:0;background:transparent;padding-inline:2px}
+.document-name input:focus {outline:0;box-shadow:0 1px 0 currentColor}
+.document-name:focus-within {outline:0;border:0;box-shadow:none}
+.reading-wink {animation:reading-wink .22s ease-in-out}
+@keyframes reading-wink {0%,100% {transform:scaleY(1)} 50% {transform:scaleY(.08)}}
+@media(prefers-reduced-motion:reduce){.reading-wink {animation:none}}
+.support-copy p,.support-form p {margin:0 0 16px;line-height:1.6}
+.support-form label {display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.support-form input,.support-form textarea {width:100%;padding:10px;border:1px solid #8885;border-radius:6px;background:transparent;font:inherit}
+header>div:first-child>div {flex:1;min-width:0}
+header>div:first-child .relative {flex-shrink:0}
+header>div:last-child {flex-shrink:0}
+.mobile-document-actions {display:flex;gap:8px;flex-wrap:wrap;padding:6px 12px;border-bottom:1px solid #8883;font-size:11px}
+@media(min-width:1024px){.header-document-name .document-name {min-width:220px}}
+.document-action-bar {display:flex;flex-wrap:wrap;gap:8px;padding:6px 16px;border-bottom:1px solid #8883;background:var(--ux-menu-bg,#faf9f6);font-size:11px;flex-shrink:0}
+[data-appearance="dark"] .document-action-bar {background:#252522}
+.document-action-bar .material-symbols-outlined,.mobile-document-actions .material-symbols-outlined {font-size:17px}

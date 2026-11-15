@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { AppState } from '@/App';
 import type { DestinationType } from '@mdtodocs/capability-graph';
-import { WorkspaceSheet } from './WorkspaceSheet';
-import { MobileExportBar } from './MobileExportBar';
-import { useDocumentExport } from '@/hooks/useDocumentExport';
 import { useStore } from '@/store';
 import { getCommandShortcut } from '@/utils/platform';
 import { AppAppearance } from './AppAppearance';
@@ -24,11 +21,6 @@ interface HeaderProps {
 
 export function Header({
   appState,
-  markdown,
-  destination,
-  onDestinationChange,
-  activeTheme,
-  documentSignature,
   onOpenCommandPalette,
 }: HeaderProps) {
   const isReviewMode = useStore(state => state.isReviewMode);
@@ -40,11 +32,6 @@ export function Header({
   const setIsAboutModalOpen = useStore(state => state.setIsAboutModalOpen);
   const isSidebarOpen = useStore(state => state.isSidebarOpen);
   const toggleSidebar = useStore(state => state.toggleSidebar);
-  const diagnostics = useStore(state => state.diagnostics);
-  const diagnosticsKey = useStore(state => state.diagnosticsKey);
-  const diagnosticsFailed = useStore(state => state.diagnosticsFailed);
-  const isChecking = diagnosticsKey !== JSON.stringify([activeDocumentId, markdown, destination, activeTheme]);
-
   const [isLogoMenuOpen, setIsLogoMenuOpen] = useState(false);
   const [isEyeBlinking, setIsEyeBlinking] = useState(false);
   const logoMenuRef = useRef<HTMLDivElement>(null);
@@ -62,25 +49,6 @@ export function Header({
 
   const activeDocTitle =
     documents.find(d => d.id === activeDocumentId)?.title || 'Untitled Document';
-  const isHtmlRoute = useStore(state => state.htmlOutput);
-  const [deliveryOpen, setDeliveryOpen] = useState(false);
-
-  const target = isHtmlRoute && destination === 'clipboard' ? 'html' : destination;
-  const output = useDocumentExport({ markdown, destination: target, theme: activeTheme,
-    signature: documentSignature, title: activeDocTitle }, activeDocumentId);
-  useEffect(() => {
-    const open = (event: Event) => {
-      if(event.type==='mdtodocs:delivery-options'){setDeliveryOpen(true);return}
-      const requested = (event as CustomEvent).detail || 'pdf';
-      useStore.getState().setHtmlOutput(requested === 'html');
-      onDestinationChange(requested === 'html' ? 'clipboard' : requested);
-      setDeliveryOpen(true);
-    };
-    window.addEventListener('mdtodocs:delivery-options', open);
-    return () => {
-      window.removeEventListener('mdtodocs:delivery-options', open);
-    };
-  }, [onDestinationChange]);
 
   return (
     <header className="fixed top-0 left-0 right-0 h-12 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex items-center justify-between px-space-md gap-space-md border-b border-outline-variant/30">
@@ -128,16 +96,6 @@ export function Header({
               {/* Glassmorphic Logo Dropdown */}
               {isLogoMenuOpen && (
                 <div className="absolute left-0 top-full mt-2 w-64 rounded-xl bg-surface/95 dark:bg-surface-container-high/95 backdrop-blur-xl border border-outline-variant/60 shadow-xl p-1.5 z-50 text-xs text-on-surface animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-2 border-b border-outline-variant/30 mb-1">
-                    <div className="font-semibold text-on-surface text-[13px]">mdtodocs</div>
-                    <div className="text-[11px] text-outline mt-0.5">Markdown to Google Docs, Word &amp; PDF</div>
-                    {appState === 'WORKSPACE' && (
-                      <div className="text-[10px] text-primary font-mono mt-1 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
-                        <span>Active Document Session</span>
-                      </div>
-                    )}
-                  </div>
 
                   <button
                     type="button"
@@ -150,7 +108,7 @@ export function Header({
                     <span className="material-symbols-outlined text-[17px] text-secondary group-hover:text-primary">home</span>
                     <div>
                       <div className="font-medium">Back to Home Page</div>
-                      <div className="text-[10px] text-outline">Reset view &amp; start fresh</div>
+                      <div className="text-[10px] text-outline">Return to the converter</div>
                     </div>
                   </button>
 
@@ -164,28 +122,8 @@ export function Header({
                   >
                     <span className="material-symbols-outlined text-[17px] text-secondary group-hover:text-primary">info</span>
                     <div>
-                      <div className="font-medium">About mdtodocs</div>
+                      <div className="font-medium flex items-center gap-1">About <BrandWordmark /></div>
                       <div className="text-[10px] text-outline">Capabilities &amp; author info</div>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLogoMenuOpen(false);
-                      onOpenCommandPalette?.();
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-surface-container text-left transition-colors cursor-pointer group"
-                  >
-                    <span className="material-symbols-outlined text-[17px] text-secondary group-hover:text-primary">search</span>
-                    <div className="flex-1 flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">Command Palette</div>
-                        <div className="text-[10px] text-outline">All shortcuts &amp; tools</div>
-                      </div>
-                      <kbd className="px-1.5 py-0.5 rounded bg-surface-container-high border border-outline-variant/40 text-[10px] font-mono text-outline">
-                        {getCommandShortcut()}
-                      </kbd>
                     </div>
                   </button>
 
@@ -256,35 +194,23 @@ export function Header({
 
           <AppAppearance />
           <DirectDelivery />
-          {deliveryOpen && (
-            <WorkspaceSheet placement="export" title="Deliver your document" onClose={() => setDeliveryOpen(false)}>
-              <p className="sheet-description">{activeDocTitle} · Uses your latest text when you prepare. No account needed.</p>
-              <div className="sheet-options"><label>Save as<select aria-label="Save as" id="desktop-delivery-target" value={target} onChange={event => { const value = event.target.value; useStore.getState().setHtmlOutput(value === 'html'); onDestinationChange((value === 'html' ? 'clipboard' : value) as DestinationType); }}><option value="word">Word document</option><option value="pdf">PDF</option><option value="google-docs">Google Docs</option><option value="html">HTML</option><option value="clipboard">Formatted text</option></select></label></div>
-              <MobileExportBar hideDestination target={target} hasContent={!!markdown.trim()} compilationError={!isChecking && diagnosticsFailed}
-                isCompiling={isChecking} warningsCount={diagnostics.filter(note => note.severity === 'warning' || note.severity === 'error').length}
-                output={output} setSheet={(sheet) => { if (sheet === 'destination') document.getElementById('desktop-delivery-target')?.focus(); else { setDeliveryOpen(false); window.dispatchEvent(new CustomEvent('mdtodocs:review')); } }}
-                chooseTarget={(value) => { useStore.getState().setHtmlOutput(value === 'html'); onDestinationChange(value === 'html' ? 'clipboard' : value); }} />
-            </WorkspaceSheet>
-          )}
-
           {/* Reading View Button with Eye Blink Micro-Interaction */}
           {!isReviewMode && (
             <button
               type="button"
               onClick={() => {
+                if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setIsReviewMode(true); return; }
                 setIsEyeBlinking(true);
                 setTimeout(() => {
                   setIsReviewMode(true);
                   setIsEyeBlinking(false);
                 }, 220);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-outline-variant/60 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all active:scale-95 cursor-pointer group"
+              className="ux-button reading-control text-xs font-medium"
               title="Switch to clean reading view"
             >
               <span
-                className={`material-symbols-outlined text-[16px] transition-all duration-200 ${
-                  isEyeBlinking ? 'scale-y-[0.05] text-primary -translate-y-0.5' : 'group-hover:scale-115'
-                }`}
+                className={`material-symbols-outlined text-[16px] ${isEyeBlinking ? 'reading-wink' : ''}`}
               >
                 visibility
               </span>

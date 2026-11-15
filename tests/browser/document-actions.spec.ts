@@ -16,18 +16,17 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const trigger = page.locator('header .export-menu>summary');
-    await openExport(page);
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible();
-    const box = (await dialog.boundingBox())!;
+    await trigger.click();
+    const menu = page.locator('header .export-menu .ux-menu-items');
+    await expect(menu).toBeVisible();
+    const box = (await menu.boundingBox())!;
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.x + box.width).toBeLessThanOrEqual(width);
     const downloadPromise = page.waitForEvent('download');
-    await page.getByRole('button', { name: 'Download Markdown (.md)', exact: true }).click();
+    await page.getByRole('button', { name: 'Markdown (.md)', exact: true }).click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/\.md$/);
     expect(await readFile((await download.path())!, 'utf8')).toBe(source);
-    await page.getByRole('button', { name: /^Close / }).click();
     await expect(trigger).toBeVisible();
     if (width < 1024) {
       await page.getByRole('button', { name: 'Open documents' }).click();
@@ -42,17 +41,11 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     await page.screenshot({ path: `artifacts/mobile/actions-${width}.png` });
   });
 }
-test('mobile destination sheet returns to export and prepares a Word file', async ({ page }) => {
-  await page.goto('/');
-  await page.locator('textarea').first().fill(source);
-  await openExport(page);
-  await page.getByRole('button', { name: /^Save as / }).click();
-  await page.getByRole('button', { name: /Word document/ }).click();
-  await expect(page.getByRole('dialog', { name: 'Export document' })).toBeVisible();
-  await page.getByRole('button', { name: 'Prepare Word document', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Download .docx', exact: true })).toBeVisible();
+test('mobile Word export downloads directly', async ({ page }) => {
+  await page.goto('/');await page.locator('textarea').first().fill(source);
+  await page.locator('header .export-menu>summary').click();
   const downloaded = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download .docx', exact: true }).click();
+  await page.getByRole('button',{name:'Word document (.docx)',exact:true}).click();
   expect((await downloaded).suggestedFilename()).toMatch(/\.docx$/);
 });
 
@@ -68,25 +61,15 @@ test('mobile diagram uses a content-sized viewport and an options sheet', async 
   await expect(page.getByRole('button', { name: 'More diagram options', exact: true })).toBeFocused();
 });
 
-test('prepared HTML stays available on close, then invalidates when source changes', async ({ page }) => {
-  await page.goto('/');
-  await page.locator('textarea').fill('# Original');
-  await openExport(page);
-  await page.getByRole('button', { name: /^Save as / }).click();
-  await page.getByRole('button', { name: /HTML/ }).click();
-  await page.getByRole('button', { name: 'Prepare HTML file', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Download .html', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Close Export document', exact: true }).click();
-  await openExport(page);
-  await expect(page.getByRole('button', { name: 'Download .html', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Close Export document', exact: true }).click();
-  await page.locator('textarea').fill('# Latest');
-  await openExport(page);
-  await expect(page.getByRole('button', { name: 'Prepare HTML file', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Prepare HTML file', exact: true }).click();
-  const downloaded = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download .html', exact: true }).click();
-  expect(await readFile((await (await downloaded).path())!, 'utf8')).toContain('Latest');
+test('direct HTML export uses the latest source after editing', async ({ page }) => {
+  await page.goto('/');await page.locator('textarea').first().fill('# Original');
+  for(const heading of ['Original','Latest']) {
+    await page.locator('textarea').first().fill('# '+heading);
+    await page.locator('header .export-menu>summary').click();
+    const downloaded = page.waitForEvent('download');
+    await page.getByRole('button',{name:'HTML (.html)',exact:true}).click();
+    expect(await readFile((await (await downloaded).path())!,'utf8')).toContain(heading);
+  }
 });
 
 test('mobile Clear all saves a version that can restore the text', async ({ page }) => {
