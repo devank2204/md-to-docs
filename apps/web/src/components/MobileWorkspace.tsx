@@ -1,3 +1,4 @@
+import { requestDiagramReview } from "@/utils/diagramReviewRequest";
 import { Menu } from './Controls';
 import { ToolsLinks } from './SiteFooter';
 import { DirectDelivery } from './DirectDelivery';
@@ -219,12 +220,12 @@ export function MobileWorkspace(props: Props) {
         </button>
         {hasContent&&<RenameTitle/>}
         {hasContent&&<DirectDelivery/>}
-        <Menu name="Workspace menu" className="workspace-menu" label={<span className="material-symbols-outlined" aria-hidden="true">more_horiz</span>}><button onClick={()=>setSheet('options')}>Document options</button><AppAppearance/><ToolsLinks/></Menu>
+        <AppAppearance/><Menu name="Tools" className="workspace-menu mobile-tools" label="Tools"><button onClick={()=>setSheet('options')}>Document options</button><ToolsLinks/></Menu>
 
       </header>
       {hasContent && <div className="mobile-document-actions" aria-label="Document actions">
         <button className="ux-button" onClick={() => useStore.getState().setIsHistoryModalOpen(true)}><span className="material-symbols-outlined" aria-hidden="true">history</span>Version history</button>
-        {/```mermaid\b/i.test(markdown) && <button className="ux-button" onClick={() => window.dispatchEvent(new CustomEvent('mdtodocs:mermaid-review'))}><span className="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>Review diagram fixes</button>}
+        {/(?:```|:::)\s*mermaid\b/i.test(markdown) && <button className="ux-button" onClick={() => {setRepairLoaded(true);requestDiagramReview();}}><span className="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>Review diagram fixes</button>}
       </div>}
       <div
         className="mobile-tabs"
@@ -374,6 +375,7 @@ export function MobileWorkspace(props: Props) {
           destination={destination}
           isCompiling={isCompiling}
           documentSignature={documentSignature}
+          collapsibleHeadings={false}
           readingLayout={!pageLayout}
         /></FeatureBoundary>}
       </section>

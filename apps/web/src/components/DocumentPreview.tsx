@@ -28,6 +28,7 @@ interface DocumentPreviewProps {
   documentSignature?: { enabled: boolean; placement: 'every-page' | 'last-page' };
   isReviewMode?: boolean;
   readingLayout?: boolean;
+  collapsibleHeadings?: boolean;
   reviewNotes?: DocumentDiagnostic[];
 }
 
@@ -166,6 +167,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   isCompiling,
   isReviewMode = false,
   readingLayout = false,
+  collapsibleHeadings = true,
   reviewNotes = [],
 }) => {
   const zoom = useStore((state) => state.zoom);
@@ -319,7 +321,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         >
           {isCompiling && (
             <div className="absolute inset-x-0 top-0 h-0.5 bg-primary/20 overflow-hidden z-20 rounded-t-sm">
-              <div className="h-full bg-primary animate-pulse w-full"></div>
+              <div className="skeleton-line w-full h-full !m-0"></div>
             </div>
           )}
           {markdown.trim().length === 0 ? (
@@ -334,7 +336,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             <div className="relative z-10 w-full min-w-0 font-serif text-on-surface break-words [overflow-wrap:anywhere] [&>h1]:text-headline-xl [&>h2]:text-headline-lg [&>h3]:text-headline-md [&_*]:transition-colors [&_*]:duration-500">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath, ...destinationPlanPlugin]}
-                rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], sourceReviewPlugin(reviewNotes), rehypeCollapsibleHeadings]}
+                rehypePlugins={[[rehypeKatex, { strict: false, throwOnError: false }], sourceReviewPlugin(reviewNotes), ...(collapsibleHeadings ? [rehypeCollapsibleHeadings] : [])]}
                 components={markdownComponents}
               >
                 {markdown}

@@ -108,3 +108,14 @@ palette exposes seven core actions and no heading jump list. Supporting Privacy,
 About and Feedback use shared dialogs. Feedback is a local draft/copy interface
 until an endpoint is supplied, never a fake successful submission. Existing
 recovery, exports, document styling, home and scoped Inter wordmark remain.
+
+## D012 — accepted mobile reading refinement · 2026-11-15
+
+Owner: user. Tools replaces mobile ellipsis; appearance is directly visible.
+Mobile heading collapse is removed, with 12px paper padding. Desktop disclosure
+remains. Smaller title at rest (14px) uses 16px editing to preserve iOS behavior;
+compact accessible Export reserves title space. Shared CSS shimmer, with reduced
+motion, adds no runtime dependency. Support content uses the established body role
+and native fields with a complete focus outline. Privacy/About dedicated URLs are
+recommended pending owner copy; feedback collection service is research only.
+See docs/qa/mobile-reading-refinement.md. D011 direct exports/history remain.

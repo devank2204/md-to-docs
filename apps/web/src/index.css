@@ -1057,3 +1057,39 @@ header>div:last-child {flex-shrink:0}
 .document-action-bar {display:flex;flex-wrap:wrap;gap:8px;padding:6px 16px;border-bottom:1px solid #8883;background:var(--ux-menu-bg,#faf9f6);font-size:11px;flex-shrink:0}
 [data-appearance="dark"] .document-action-bar {background:#252522}
 .document-action-bar .material-symbols-outlined,.mobile-document-actions .material-symbols-outlined {font-size:17px}
+
+/* Mobile reading: no heading disclosure gutters; desktop documents stay unchanged. */
+@media(max-width:1023px) {
+ .mobile-preview-panel [data-preview-pane],.mobile-preview-panel [data-preview-scroll] {padding:0!important}
+ .mobile-preview-panel [data-document-paper],.mobile-preview-panel [data-reading-layout] .prose {padding:12px!important;margin-bottom:12px}
+ .mobile-header .ux-icon {width:36px;min-width:36px;min-height:44px}
+ .mobile-header .mobile-tools>summary {width:auto;min-width:52px;padding:6px;font-size:12px;min-height:44px}
+ .mobile-header .export-menu>summary {width:44px;padding:6px;gap:1px}
+ .mobile-header .export-action-label {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ .mobile-header .document-name {font-size:14px;gap:0}
+ .mobile-header .document-name input {font-size:14px;padding-inline:0}
+ .mobile-header .document-name input:focus {font-size:16px}
+ .mobile-header .document-name button {width:32px;min-width:32px!important;min-height:44px}
+}
+/* Native fields, matching the existing app body role; a complete inset focus ring. */
+.support-copy,.support-form {@apply font-body-md text-body-md;color:inherit}
+.support-copy p,.support-form p {margin-bottom:16px}
+.support-form label {font-size:12px;font-weight:500;gap:8px}
+.support-form input,.support-form textarea {box-sizing:border-box;font:inherit;border:1px solid #8886;border-radius:6px;padding:10px 12px;background:transparent;box-shadow:none}
+.support-form input:focus,.support-form textarea:focus {border:1px solid currentColor;outline:2px solid currentColor;outline-offset:-3px;box-shadow:none}
+.support-hint {font-size:12px;opacity:.7}
+.support-form>.ux-button {font-size:12px}
+@media(max-width:1023px){.support-form input,.support-form textarea {font-size:16px}}
+/* Shared shimmer: no runtime package, no blank editor, still shapes under reduced motion. */
+.loading-skeleton {width:100%;min-width:0;padding:20px;min-height:150px;box-sizing:border-box;overflow:hidden}
+.skeleton-line {display:block;height:12px;border-radius:4px;margin:12px 0;background:linear-gradient(100deg,#8881 20%,#8883 45%,#8881 70%);background-size:220% 100%;animation:app-shimmer 1.6s ease-in-out infinite}
+.skeleton-title {height:22px;width:60%;margin-bottom:22px}
+.skeleton-short {width:75%}
+.loading-skeleton-compact {min-height:0;width:100px;padding:0 8px;display:inline-block;vertical-align:middle}
+.loading-skeleton-compact .skeleton-title {height:10px;width:100%;margin:0}
+[aria-busy="true"].ux-button,.export-menu:has([aria-label="Preparing export"])>summary {background-image:linear-gradient(100deg,transparent 20%,#8883 45%,transparent 70%);background-size:220% 100%;animation:app-shimmer 1.6s ease-in-out infinite}
+@keyframes app-shimmer {from {background-position:150% 0} to {background-position:-70% 0}}
+@media(prefers-reduced-motion:reduce){.skeleton-line,[aria-busy="true"].ux-button {animation:none!important}}
+@media(max-width:1023px){.mobile-header .mobile-tools>summary {border:1px solid #8884;border-radius:7px}}
+button[aria-busy="true"] {background-image:linear-gradient(100deg,transparent 20%,#8883 45%,transparent 70%);background-size:220% 100%;animation:app-shimmer 1.6s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){button[aria-busy="true"],.export-menu>summary {animation:none!important}}

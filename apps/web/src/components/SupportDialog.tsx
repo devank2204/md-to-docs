@@ -27,7 +27,7 @@ export function SupportDialog() {
       <p>Tell us what happened or what would make MDToDocs better. Please leave private document content out.</p>
       <label>Email (optional)<input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label>Your feedback<textarea required rows={5} value={feedback} onChange={e => {setFeedback(e.target.value);setCopied(false);}} /></label>
-      <p>Online submission is not connected yet. This draft stays here while the app is open; nothing is sent.</p>
+      <p className="support-hint">Copy a draft of your feedback. Nothing is sent from this form.</p>
       <button type="submit" className="ux-button" disabled={!feedback.trim()}>Copy feedback</button>
       <span role="status">{copied ? 'Copied. Your feedback has not been submitted.' : ''}</span>
     </form>}

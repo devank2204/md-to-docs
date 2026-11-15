@@ -1,5 +1,20 @@
 # Current workstate
 
+## Mobile reading refinement · 2026-11-15
+
+D012: visible Tools/appearance, compact accessible Export, smaller unfocused mobile
+title, mobile heading collapse removed and paper padding 12px. Shared CSS-only
+shimmer covers deferred tools/preview/diagrams; reduced motion supported. Native
+support fields use existing body typography and a complete focus outline. No new
+dependency or feedback backend. Official-source hosting/page recommendations and
+test scope: [report](qa/mobile-reading-refinement.md). Production build/eight-route prerender
+and lint pass (existing warnings only). Final broader run: 49 passed, one new
+single-diagram label assertion corrected; all eight focused refinement tests then
+pass. Actual Azure/syntax repair and undo: one passed. Typography checks pass.
+First repair click is now queued safely across deferred loading; duplicate lower
+review CTA removed. No physical-device or deployment claim.
+
+
 ## Quiet workspace correction · 2026-11-15
 
 D011 supersedes the outlined title and duplicate advanced export path. Borderless

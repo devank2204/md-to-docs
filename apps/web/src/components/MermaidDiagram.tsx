@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from "./LoadingSkeleton";
 import React, { useEffect, useState, useRef, useLayoutEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { useDiagramActions } from '@/hooks/useDiagramActions';
@@ -340,10 +341,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ code, sourceStar
           } ${theme === 'dark' ? 'bg-[#1e1e24]' : 'bg-white'}`}
         >
           {isRendering ? (
-            <div className="flex items-center gap-2 text-secondary font-code-sm text-code-sm py-8">
-              <span aria-hidden="true" className="material-symbols-outlined text-[16px] animate-spin">refresh</span>
-              <span>Rendering diagram ({theme})...</span>
-            </div>
+            <LoadingSkeleton label="Rendering diagram" />
           ) : error ? (
             <div
               className="w-full p-4 rounded bg-error-container/20 border border-error/30 text-on-surface"

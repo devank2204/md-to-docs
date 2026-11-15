@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from "./LoadingSkeleton";
 import { HomeIntroduction } from './HomeIntroduction';
 import { useState, useEffect, useMemo } from 'react';
 import {
@@ -340,10 +341,7 @@ export function MermaidUtilityView({
               </span>
 
               {isCompiling && (
-                <span className="flex items-center gap-1 text-[11px] text-outline animate-pulse">
-                  <span aria-hidden="true" className="material-symbols-outlined text-[13px] animate-spin">refresh</span>
-                  <span>Compiling...</span>
-                </span>
+                <LoadingSkeleton label="Rendering diagram" compact />
               )}
             </div>
 
