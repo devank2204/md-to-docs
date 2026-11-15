@@ -1,3 +1,4 @@
+import { openDocumentOptions } from './action-helpers';
 import { openExport, fillSource } from './action-helpers';
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
@@ -131,7 +132,7 @@ test('file import preserves existing text until a deliberate replacement, with h
   await expect(
     page.getByRole('textbox', { name: 'Markdown text' }),
   ).toHaveValue('# Imported document');
-  await page.getByRole('button', { name: 'Document options' }).click();
+  await openDocumentOptions(page);
   await page
     .getByRole('button', { name: 'Version history', exact: true })
     .click();
@@ -281,7 +282,7 @@ for (const width of [320, 360, 390, 430, 768, 1024, 1440]) {
     if (width < 1024) {
       await page.getByRole('tab', { name: 'Preview' }).click();
       await expect(
-        page.getByRole('button', { name: 'Copy for Google Docs', exact: true }),
+        page.locator('header .export-menu>summary'),
       ).toBeInViewport();
       await expect(page.getByRole('dialog')).toHaveCount(0);
     } else {
@@ -310,14 +311,14 @@ test('hardware focus keeps actions visible, simulated soft keyboard makes room, 
   });
   await enter(page);
   await page.getByRole('textbox', { name: 'Markdown text' }).focus();
-  await expect(page.getByRole('button', { name: 'Copy for Google Docs', exact: true })).toBeVisible();
+  await expect(page.locator('header .export-menu>summary')).toBeVisible();
   await page.evaluate(() => (window as any).setKeyboardHeight(480));
   await expect(page.locator('.mobile-workspace > .mobile-export')).toHaveCount(0);
   await expect(
     page.getByRole('textbox', { name: 'Markdown text' }),
   ).toBeInViewport();
   await page.getByRole('tab', { name: 'Preview' }).click();
-  await expect(page.getByRole('button', { name: 'Copy for Google Docs', exact: true })).toBeVisible();
+  await expect(page.locator('header .export-menu>summary')).toBeVisible();
 });
 
 test('PDF prepares isolated content and reports only the print dialog outcome', async ({ page }) => {

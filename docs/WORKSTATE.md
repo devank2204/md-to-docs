@@ -1,5 +1,28 @@
 # Current workstate
 
+Updated: 2026-11-15. Branch: ux/direct-handoff-version-review.
+
+## Approved workspace implementation
+
+Latest user request supersedes the older Copy/Download and fixed-five composition
+below. Single Export, explicit title/check, neutral controls, Material icons,
+tabbed history and viewport-safe mobile sheets are implemented under D010.
+Global Markdown drops preserve current work and open new internal documents.
+Capacity grows only through explicit Open anyway and persists across reloads.
+Code/JSON formatting uses real lazy parsers; source remains unchanged. Local
+logo snow loads on hover and respects reduced motion/Save-Data.
+
+Production build/eight-route prerender pass. Full Chromium suite: 128 passed;
+final affected/identity/SEO suite after touch sizing: 35 passed. Validation:
+173 passed; fidelity fixtures: 20 passed. Lint passes with existing warnings.
+Initial static JS gzip: 105,153 → 106,572 bytes; new engines remain deferred.
+See [report and reproduction](qa/approved-workspace-implementation.md).
+Standing user authorization requires pushing verified work to this branch; no
+merge/deployment is authorized. Three unrelated dirty DOCX fixtures stay excluded.
+
+Earlier sections below are historical snapshots, superseded where noted.
+
+
 ## Grouped sidebar reference · 2026-11-15
 
 Implemented the owner's selected screenshot on local branch

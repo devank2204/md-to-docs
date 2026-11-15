@@ -1,3 +1,4 @@
+import { copyForDocs } from './action-helpers';
 import { test, expect } from '@playwright/test';
 import { fillSource, openExport } from './action-helpers';
 
@@ -7,7 +8,7 @@ for (const width of [375, 1440]) test(`prerender accepts typing before entry mod
  const gate = new Promise<void>(resolve => release = resolve);
  await page.route('**/assets/index-*.js', async route => { await gate; await route.continue(); });
  await page.goto('/markdown-to-word/', { waitUntil: 'commit' });
- const input = page.getByRole('textbox').first();
+ const input = page.locator('textarea:visible').first();
  await input.pressSequentially('# Early paste survives');
  await expect(input).toHaveValue('# Early paste survives');
  if (width < 1024) await expect(page.getByRole('textbox', {name:'Markdown terminal input'})).toHaveCount(0);
@@ -82,7 +83,7 @@ test('deferred formatted handoff writes HTML and plain text on the copy gesture'
  await context.grantPermissions(['clipboard-read','clipboard-write']);
  await page.goto('/markdown-to-google-docs/');
  await fillSource(page, '# Clipboard sample\n\nA **formatted** report.\n\n| Item | State |\n| --- | --- |\n| Test | Ready |');
- await page.getByRole('button',{name:'Copy for Google Docs',exact:true}).click();
+ await copyForDocs(page);
  await expect(page.getByRole('status').filter({hasText:'Copied to clipboard'})).toBeVisible();
  const contents=await page.evaluate(async()=>{
   const items=await navigator.clipboard.read();
@@ -128,13 +129,13 @@ for (const width of [375,1440]) test(`startup import preserves the existing file
  const gate=new Promise<void>(resolve=>release=resolve);
  await page.route('**/assets/index-*.js',async route=>{await gate;await route.continue()});
  await page.goto('/markdown-to-word/',{waitUntil:'commit'});
- await expect(page.getByRole('textbox').first()).toBeVisible();
+ await expect(page.locator('textarea').first()).toBeVisible();
  await page.locator('input[type=file]').setInputFiles({name:'large.md',mimeType:'text/markdown',buffer:Buffer.alloc(1000001,'x')});
  if(width<1024) {
   await expect(page.getByRole('status')).toContainText('smaller than 1 MB');
-  await expect(page.getByRole('textbox')).toHaveValue('');
+  await expect(page.locator('textarea')).toHaveValue('');
  } else {
-  await expect.poll(async()=>(await page.getByRole('textbox').inputValue()).length).toBe(1000001);
+  await expect.poll(async()=>(await page.locator('textarea').inputValue()).length).toBe(1000001);
  }
  release();
 });

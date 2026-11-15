@@ -21,7 +21,7 @@ clipboard rendering; diagrams, tables, equations, diagnostics, rescue tools,
 local documents and history, and an optional headless API application.
 The source and tests establish specific supported behavior, not universal fidelity.
 
-Core browser workflow: input → inspect when needed → copy or download.
+Core browser workflow: input → inspect when needed → Export → destination.
 Preparation runs internally for direct handoff; advanced delivery options retain
 the existing preparation/share controls.
 No sign-in is required. Browser storage is local to this browser/device and can
@@ -39,6 +39,11 @@ formatted clipboard or a Word-file handoff; it does not create a cloud Doc.
   It must stay separate from document styling and export options.
 - Show useful context at the user's next decision; avoid technical machinery in
   the normal conversion flow.
+
+Markdown file drops open new internal documents. At capacity, users can remove
+a document with verified recovery, cancel the import, or explicitly increase the
+persisted capacity with Open anyway. Initial capacity is five; subsequent prompts
+use the actual saved limit. See D010.
 
 ## Product principles
 

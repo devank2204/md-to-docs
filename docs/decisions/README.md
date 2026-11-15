@@ -71,3 +71,26 @@ separate local recovery journal write before changing source/removing a document
 Recovery copies are visible in the version browser across document names and IDs;
 quota failure cancels the destructive change. jsdiff is loaded with history only.
 See `docs/qa/direct-handoff-and-history.md` for actual checks and limitations.
+
+## D010 — accepted screenshot/mockup feedback · 2026-11-15
+
+Owner: user. Latest implementation request and reviewed rename/export reference
+supersede D008's primary Copy/Download composition and fixed capacity rule.
+Use a single Export menu, an editable title with one outline and explicit check,
+Material Symbols actions, neutral ordinary hover/selection, and tabbed history
+with a restrained save disclosure. Preserve home, brand and document typography.
+
+Markdown dropped anywhere opens a new internal document, never replaces current
+source or opens a browser tab. Initial capacity is five; Open anyway explicitly
+accepts an extra document and persists the increased capacity. All gates and
+warning counts derive from that capacity. Cancel skips import; Remove verifies
+recovery before replacing the chosen document and closing the prompt. Legacy
+workspaces remain intact.
+
+The user explicitly authorized contained logo snow: local, hover-triggered,
+reduced-motion/Save-Data aware, with no whole-page effect. Code formatting uses
+lazy language parsers where supported; unsupported languages say Normalize
+spacing. Preview formatting never silently changes source Markdown.
+
+Evidence: [implementation and checks](../qa/approved-workspace-implementation.md).
+D001/D002 identity constraints and verified recovery remain binding.
