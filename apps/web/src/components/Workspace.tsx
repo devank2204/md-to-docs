@@ -20,9 +20,11 @@ import { MermaidRepairAssistant } from './MermaidRepairAssistant';
 import { LinkedReview } from './LinkedReview';
 import { WorkspaceSheet } from './WorkspaceSheet';
 import { MobileWorkspace } from './MobileWorkspace';
+import type { LandingRoutePath } from '@/routes/landingData';
 
 
 interface WorkspaceProps {
+  onNavigateRoute: (path: LandingRoutePath) => void;
   isMobile?: boolean;
   markdown: string;
   onInput: (markdown: string) => void;
@@ -65,6 +67,7 @@ function formatStats(stats: DocumentStats): string {
 
 
 export function Workspace({
+  onNavigateRoute,
   isMobile = false,
   markdown,
   onInput,
@@ -123,7 +126,7 @@ export function Workspace({
         </div>
       ) : (
         <div className="flex-1 flex flex-col md:flex-row h-full min-h-0 overflow-hidden">
-          <WorkspaceSidebar />
+          <WorkspaceSidebar onNavigateRoute={onNavigateRoute} />
 
           <div className="flex-1 w-full grid grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
             <div className="flex flex-col col-span-5 lg:col-span-4 h-full min-h-0">

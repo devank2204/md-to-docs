@@ -231,6 +231,7 @@ function App() {
           <EmptyState onInput={handleInput} />
         ) : (
           <FeatureBoundary fallback={<EmptyState onInput={handleInput} pendingValue={markdown} showIntroduction={currentPath === "/"} />}><Workspace
+            onNavigateRoute={handleNavigateRoute}
             isMobile={isMobile}
             markdown={markdown}
             onInput={handleInput}

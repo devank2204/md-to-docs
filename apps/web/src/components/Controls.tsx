@@ -43,9 +43,11 @@ export function Toggle({
 // Native disclosure with ordinary links/buttons retains Tab navigation and semantics.
 export function Menu({
   label,
+  accessibleLabel,
   children,
 }: {
-  label: string;
+  label: ReactNode;
+  accessibleLabel?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
@@ -78,7 +80,7 @@ export function Menu({
         }
       }}
     >
-      <summary className="ux-button">{label}</summary>
+      <summary className="ux-button" aria-label={accessibleLabel}>{label}</summary>
       <div
         className="ux-menu-items"
         onClick={(e) => {

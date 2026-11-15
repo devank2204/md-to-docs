@@ -42,6 +42,19 @@ See [D002 restoration evidence](typography-restoration.md).
 
 Register established: 2026-11-07. Supporting historical discussions remain in docs/.
 
+## D009 — accepted user screenshot · 2026-11-15
+
+Owner selected Grouped sidebar, then requested its exact UI/look and the same text
+font for mdtodocs.com. Supersedes the header-only Tools proposal and D001's brand
+typography lock only for the scoped sidebar/shared wordmark. Reference is the
+owner-attached image.png from this conversation; no other typography is changed.
+Use Inter Variable, the screenshot's 248px rail-free sidebar and Lucide outline
+icons. Keep existing document identities, capacity/recovery, exports, mobile shell
+and SEO URLs. Markdown editor opens the existing source editor; Mermaid entries
+reuse the existing SVG/PNG utility routes. No speculative editor routes or engines.
+History and Close remain in document overflow menus; global command access remains.
+Implementation/verification: docs/qa/grouped-sidebar-reference.md.
+
 ## D008 — accepted user UX update · 2026-11-14
 
 The attached UX implementation brief supersedes the earlier normal Prepare/Deliver

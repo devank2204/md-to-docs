@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 for (const width of [390, 1440]) {
-  test(`incumbent home typography and wordmark are preserved at ${width}px`, async ({
+  test(`incumbent home typography and approved reference wordmark at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -66,14 +66,18 @@ for (const width of [390, 1440]) {
         tracking: style.letterSpacing,
       };
     });
-    expect(brandStyle.family).toContain('JetBrains Mono');
+    // Explicitly approved by the user's grouped-sidebar screenshot, 2026-11-15.
+    expect(brandStyle.family).toContain('Inter Variable');
     expect(brandStyle).toMatchObject({
-      size: '14px',
+      size: '16px',
       weight: '600',
-      lineHeight: '22px',
-      tracking: '-0.7px',
+      lineHeight: '24px',
+      tracking: '-0.5px',
     });
     await expect(page.getByText('.com', { exact: true }).first()).toBeVisible();
+    await expect(page.locator('.brand-wordmark img')).toHaveCount(0);
+    await expect(page.locator('.brand-wordmark-domain').first()).toHaveCSS('font-size', '16px');
+    await expect(page.locator('.brand-wordmark-domain').first()).toHaveCSS('font-weight', '400');
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

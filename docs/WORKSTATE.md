@@ -1,5 +1,23 @@
 # Current workstate
 
+## Grouped sidebar reference · 2026-11-15
+
+Implemented the owner's selected screenshot on local branch
+`ux/grouped-sidebar-reference`, based on main `965c8b9`. The 248px rail-free
+sidebar and shared Inter wordmark are authorized by D009; other typography,
+source/preview, exports and current mobile shell remain unchanged. Existing tools
+are linked through the existing route handler, preserving the active draft.
+
+Recursive production build, eight-route prerender, lint and static crawlable-link
+checks passed. Live browser checks covered rename/cancel, switching, navigation,
+history, five-slot cancellation, collapse, light/dark and responsive 390/320px
+iframe layouts. Automated browser scenarios were added but could not execute
+because the configured preview server could not start in this environment.
+See [actual evidence and limits](qa/grouped-sidebar-reference.md).
+
+Root AGENTS.md requires an explicit current-prompt push request. Local changes
+only; no push, merge or deployment. Prior workstate below is historical.
+
 Updated: 2026-11-14. Branch: ux/direct-handoff-version-review.
 
 ## Screenshot-driven corrections
