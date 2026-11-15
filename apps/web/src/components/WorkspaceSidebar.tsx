@@ -92,9 +92,9 @@ export function WorkspaceSidebar({ onNavigateRoute }: { onNavigateRoute: (path: 
           </nav>
         </section>
         <nav className="workspace-sidebar-footer" aria-label="Supporting links">
-          <a href="#document-privacy">Privacy</a><span aria-hidden="true">·</span>
+          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("mdtodocs:support", {detail:"privacy"}))}>Privacy</button><span aria-hidden="true">·</span>
           <button type="button" onClick={() => setIsAboutModalOpen(true)}>About</button><span aria-hidden="true">·</span>
-          <a href="https://github.com/devank2204/md-to-docs/issues/new" target="_blank" rel="noopener noreferrer">Feedback</a>
+          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("mdtodocs:support", {detail:"feedback"}))}>Feedback</button>
         </nav>
       </div>
     </aside>

@@ -15,13 +15,10 @@ import type { DestinationType } from '@mdtodocs/capability-graph';
 import { useStore } from '@/store';
 const DocumentPreview = lazy(() => import('./DocumentPreview').then(m => ({ default: m.DocumentPreview })));
 const MermaidRepairAssistant = lazy(() => import('./MermaidRepairAssistant').then(m => ({ default: m.MermaidRepairAssistant })));
-import { WorkspaceSheet } from './WorkspaceSheet';
-import { MobileExportBar } from './MobileExportBar';
 import { HomeIntroduction } from './HomeIntroduction';
 import { BrandWordmark } from './BrandWordmark';
 const MobileWorkspaceSheets = lazy(() => import('./MobileWorkspaceSheets').then(m => ({ default: m.MobileWorkspaceSheets })));
 import type { MobileSheet } from '@/utils/mobileDestinations';
-import { useDocumentExport } from '@/hooks/useDocumentExport';
 import { DOCUMENT_TEMPLATES } from '@/data/templates';
 import { analytics, getDocLengthBucket } from '@/utils/analytics';
 import type { ExportTarget, Signature } from '@/utils/exportHelpers';
@@ -47,7 +44,6 @@ export function MobileWorkspace(props: Props) {
     onInput,
     destination,
     onDestinationChange,
-    activeTheme,
     documentSignature,
     isCompiling,
     diagnostics,
@@ -64,7 +60,6 @@ export function MobileWorkspace(props: Props) {
   if (!repairLoaded && markdown.includes('```mermaid')) setRepairLoaded(true);
   const [tab, setTab] = useState<'edit' | 'preview'>('edit');
   const [sheet, setSheet] = useState<MobileSheet | null>(null);
-  const [exportOpen, setExportOpen] = useState(false);
   const [pageLayout, setPageLayout] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [pendingImport, setPendingImport] = useState<string | null>(null);
@@ -73,21 +68,7 @@ export function MobileWorkspace(props: Props) {
   const editor = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const hasContent = !!markdown.trim();
-  const title =
-    store.documents.find((doc) => doc.id === store.activeDocumentId)?.title ||
-    'Untitled document';
-  const target: ExportTarget =
-    htmlOutput && destination === 'clipboard' ? 'html' : destination;
-  const output = useDocumentExport(
-    {
-      markdown,
-      destination: target,
-      theme: activeTheme,
-      signature: documentSignature,
-      title,
-    },
-    store.activeDocumentId,
-  );
+  const target: ExportTarget = htmlOutput && destination === 'clipboard' ? 'html' : destination;
   const warnings = diagnostics.filter(
     (d) => d.severity === 'warning' || d.severity === 'error',
   );
@@ -219,31 +200,16 @@ export function MobileWorkspace(props: Props) {
     }
   };
   useEffect(() => {
-    const open = (event: Event) => {
-      if(event.type==='mdtodocs:delivery-options'){setSheet(null);setExportOpen(true);return}
-      const value = ((event as CustomEvent).detail || 'pdf') as ExportTarget;
-      useStore.getState().setHtmlOutput(value === 'html');
-      useStore.getState().setDestination(value === 'html' ? 'clipboard' : value);
-      setSheet(null);
-      setExportOpen(true);
-    };
-    window.addEventListener('mdtodocs:delivery-options', open);
-    return () => {
-      window.removeEventListener('mdtodocs:delivery-options', open);
-    };
-  }, []);
-  useEffect(() => {
     const review = () => setSheet('notes');
     window.addEventListener('mdtodocs:review', review);
     return () => window.removeEventListener('mdtodocs:review', review);
   }, []);
-  useEffect(()=>{const opened=()=>{setSheet(null);setExportOpen(false);setTab('edit')};window.addEventListener('mdtodocs:document-opened',opened);return()=>window.removeEventListener('mdtodocs:document-opened',opened)},[]);
+  useEffect(()=>{const opened=()=>{setSheet(null);setTab('edit')};window.addEventListener('mdtodocs:document-opened',opened);return()=>window.removeEventListener('mdtodocs:document-opened',opened)},[]);
   const chooseTarget = (value: ExportTarget) => {
     setHtmlOutput(value === 'html');
     analytics.track('destination_change', { from: target, to: value });
     onDestinationChange(value === 'html' ? 'clipboard' : value);
     setSheet(null);
-    setExportOpen(true);
   };
   return (
     <div className={`mobile-workspace ${keyboardOpen ? 'keyboard-open' : ''}`}>
@@ -256,6 +222,10 @@ export function MobileWorkspace(props: Props) {
         <Menu name="Workspace menu" className="workspace-menu" label={<span className="material-symbols-outlined" aria-hidden="true">more_horiz</span>}><button onClick={()=>setSheet('options')}>Document options</button><AppAppearance/><ToolsLinks/></Menu>
 
       </header>
+      {hasContent && <div className="mobile-document-actions" aria-label="Document actions">
+        <button className="ux-button" onClick={() => useStore.getState().setIsHistoryModalOpen(true)}><span className="material-symbols-outlined" aria-hidden="true">history</span>Version history</button>
+        {/```mermaid\b/i.test(markdown) && <button className="ux-button" onClick={() => window.dispatchEvent(new CustomEvent('mdtodocs:mermaid-review'))}><span className="material-symbols-outlined" aria-hidden="true">auto_fix_high</span>Review diagram fixes</button>}
+      </div>}
       <div
         className="mobile-tabs"
         role="tablist"
@@ -413,18 +383,6 @@ export function MobileWorkspace(props: Props) {
           download your document to save it.
         </p>
       )}
-      {exportOpen && !sheet && <WorkspaceSheet title="Export document" onClose={() => setExportOpen(false)}>
-      <MobileExportBar
-        target={target}
-        hasContent={hasContent}
-        compilationError={compilationError}
-        isCompiling={isCompiling}
-        warningsCount={warnings.length}
-        output={output}
-        setSheet={(next) => { if (next !== 'destination') setExportOpen(false); setSheet(next); }}
-        chooseTarget={chooseTarget}
-      />
-      </WorkspaceSheet>}
       {sheet && (
         <FeatureBoundary><MobileWorkspaceSheets
           key={sheet}

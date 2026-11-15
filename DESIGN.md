@@ -84,3 +84,7 @@ tabbed version history. Existing home, brand, source and preview roles remain.
 Mobile title editing uses the existing 16px input role to avoid focus zoom.
 Logo snow is an explicit exception to the decoration restriction: contained,
 local and hover-only, respecting reduced motion and Save-Data.
+
+D011 supersedes D010 title outline with a borderless flexible navbar field.
+Neutral hover is shared across header actions. History/diagram review have a
+visible secondary toolbar; CSS wink respects reduced motion.

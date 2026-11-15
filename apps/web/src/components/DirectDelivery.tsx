@@ -278,13 +278,7 @@ function DeliveryControls() {
         >
           Copy rich text
         </button>
-        <button
-          onClick={() =>
-            window.dispatchEvent(new CustomEvent("mdtodocs:delivery-options"))
-          }
-        >
-          Advanced export options
-        </button>
+
       </Menu>
       {message && (
         <div className="ux-feedback" role="alert">

@@ -1,5 +1,18 @@
 # Current workstate
 
+## Quiet workspace correction · 2026-11-15
+
+D011 supersedes the outlined title and duplicate advanced export path. Borderless
+flexible navbar name, neutral header hover, CSS reading wink, visible secondary
+history/diagram actions, quiet logo menu and seven-action palette are implemented.
+Privacy/About/Feedback dialogs use the existing shell. Feedback has an optional
+email and copyable local draft; submission awaits a real endpoint. See
+[scope and verification](qa/quiet-workspace.md). Production build/prerender pass;
+47 broader browser checks passed and the corrected final seven UX checks pass.
+Lint succeeds with existing diagram warnings. Changes are authorized for the same
+working branch under the standing push instruction.
+
+
 ## Rebase onto main · 2026-11-15
 
 User requested rebasing `ux/direct-handoff-version-review` onto current main
