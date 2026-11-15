@@ -1,3 +1,4 @@
+import { GlobalFileDrop } from './components/GlobalFileDrop';
 import { SiteFooter } from './components/SiteFooter';
 import { CapacityDecision } from './components/CapacityDecision';
 import { FeatureBoundary } from './components/FeatureBoundary';
@@ -106,6 +107,16 @@ function App() {
       }
     }
   };
+
+  useEffect(()=>{
+    const open=()=>{
+      useStore.setState({isHistoryModalOpen:false,isTemplateGalleryOpen:false,isReconciliationModalOpen:false,isCommandPaletteOpen:false,isAboutModalOpen:false,isInspectorOpen:false,isSuggestModalOpen:false});
+      useStore.getState().setIsReviewMode(false);
+      if(currentPath.startsWith('/mermaid-')||!getRouteSpec(currentPath)){window.history.pushState({},'', '/');setCurrentPath('/');}
+    };
+    window.addEventListener('mdtodocs:document-opened',open);
+    return()=>window.removeEventListener('mdtodocs:document-opened',open);
+  },[currentPath]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -244,7 +255,7 @@ function App() {
         {routeSpec && !currentPath.startsWith('/mermaid-') && <LandingPageContent spec={routeSpec} onNavigateRoute={handleNavigateRoute} />}
       </main>
       <SiteFooter onNavigateRoute={handleNavigateRoute} />
-      <CapacityDecision />
+      <CapacityDecision /><GlobalFileDrop />
 
       {isCommandPaletteOpen && <FeatureBoundary><CommandPalette
         isOpen={isCommandPaletteOpen}

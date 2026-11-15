@@ -1,3 +1,5 @@
+import {switchAppearance} from './action-helpers';
+import { copyForDocs } from './action-helpers';
 import { test, expect } from "@playwright/test";
 const saved = (content = "# Original") => ({
   state: {
@@ -52,9 +54,7 @@ test("direct formatted copy handles denial and only reports actual success", asy
     });
   });
   await page.goto("/");
-  await page
-    .getByRole("button", { name: "Copy for Google Docs", exact: true })
-    .click();
+  await copyForDocs(page);
   await expect(page.getByRole("alert")).toContainText("Could not complete");
   await expect(
     page.getByRole("button", { name: "Copied", exact: true }),
@@ -65,12 +65,10 @@ test("direct formatted copy handles denial and only reports actual success", asy
     .first()
     .fill("# Latest copy\n\n**Latest** content");
   await page.evaluate(() => ((window as any).allowCopy = true));
-  const button = page.getByRole("button", {
-    name: "Copy for Google Docs",
-    exact: true,
-  });
+  const button = page.locator('header .export-menu>summary');
   const width = (await button.boundingBox())!.width;
   await button.click();
+  await page.getByRole("button",{name:"Copy for Google Docs",exact:true}).click();
   await expect(
     page.getByRole("button", { name: "Copied", exact: true }),
   ).toBeVisible();
@@ -83,7 +81,7 @@ test("direct formatted copy handles denial and only reports actual success", asy
     "Latest copy",
   );
   await expect(
-    page.getByRole("button", { name: "Copy for Google Docs", exact: true }),
+    page.locator('header .export-menu>summary'),
   ).toBeVisible();
 });
 test("rename retains identity and history; restore backup failure changes nothing", async ({
@@ -105,7 +103,7 @@ test("rename retains identity and history; restore backup failure changes nothin
   await seed(page, data);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  await page.getByTitle("Rename Original").filter({ visible: true }).click();
+  await page.getByRole('textbox',{name:'Document name',exact:true}).filter({visible:true}).focus();
   await page
     .getByRole("textbox", { name: "Document name", exact: true })
     .fill("Renamed");
@@ -114,7 +112,7 @@ test("rename retains identity and history; restore backup failure changes nothin
     .press("Enter");
   await page.locator("textarea").first().fill("# Current text\n\nNew wording");
   await expect(
-    page.getByTitle("Rename Renamed").filter({ visible: true }),
+    page.getByRole('textbox',{name:'Document name',exact:true}).filter({visible:true}),
   ).toBeVisible();
   await history(page);
   await expect(page.getByRole("button", { name: /Earlier/ })).toBeVisible();
@@ -164,6 +162,7 @@ test("successful restore preserves recoverable current text and unnamed save", a
     await page.evaluate(() => localStorage.getItem("md-to-docs-recovery")),
   ).toContain("# Current text");
   await page.getByRole("button", { name: "Save version", exact: true }).click();
+ await page.getByRole("button",{name:"Save",exact:true}).click();
   await expect(page.getByRole("status")).toContainText("Version saved");
   await page
     .getByRole("button", { name: "Close Version history", exact: true })
@@ -188,9 +187,9 @@ test("duplicate capacity requires choice, cancellation and backup failure are sa
   await page.locator("aside .ux-menu summary").first().click();
   await page.getByRole("button", { name: "Duplicate", exact: true }).click();
   await expect(
-    page.getByRole("dialog", { name: "Choose a document to replace" }),
+    page.getByRole("dialog", { name: "Make room for this document" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel import", exact: true }).click();
   expect(
     JSON.parse(
       (await page.evaluate(() => localStorage.getItem("md-to-docs-storage")))!,
@@ -206,9 +205,9 @@ test("duplicate capacity requires choice, cancellation and backup failure are sa
     };
   });
   await page
-    .getByRole("button", { name: "Replace Document 1", exact: true })
+    .getByRole("button", { name: "Remove Document 1", exact: true })
     .click();
-  await expect(page.getByRole("alert")).toContainText("Nothing was replaced");
+  await expect(page.getByRole("alert")).toContainText("Nothing was removed");
   expect(await page.locator("textarea").first().inputValue()).toBe(
     "# Original",
   );
@@ -222,9 +221,7 @@ for (const width of [320, 375, 390, 768, 1024, 1440])
       "data-appearance",
       "dark",
     );
-    await page
-      .getByRole("button", { name: "Switch to light appearance" })
-      .click();
+    await switchAppearance(page,"Switch to light appearance");
     await expect(page.locator("html")).toHaveAttribute(
       "data-appearance",
       "cream",
@@ -234,7 +231,7 @@ for (const width of [320, 375, 390, 768, 1024, 1440])
       .first()
       .fill("# Very long document title ".repeat(8) + "\n\nDocument source");
     await expect(
-      page.getByRole("button", { name: "Copy for Google Docs", exact: true }),
+      page.locator('header .export-menu>summary'),
     ).toBeVisible();
     expect(
       await page.evaluate(
@@ -265,8 +262,8 @@ test("direct Word and HTML downloads use the latest source without Prepare", asy
     .locator("textarea")
     .first()
     .fill("# Latest direct output\n\nLatest body");
-  for (const name of ["Word (.docx)", "HTML (.html)"]) {
-    await page.locator("header").getByText("Download", { exact: true }).click();
+  for (const name of ["Word document (.docx)", "HTML (.html)"]) {
+    await page.locator('header .export-menu>summary').click();
     const download = page.waitForEvent("download");
     await page.getByRole("button", { name, exact: true }).click();
     const file = await download;
@@ -301,7 +298,7 @@ test("capacity replacement keeps a recoverable version and five documents", asyn
   await page.locator("aside .ux-menu summary").first().click();
   await page.getByRole("button", { name: "Duplicate", exact: true }).click();
   await page
-    .getByRole("button", { name: "Replace Document 1", exact: true })
+    .getByRole("button", { name: "Remove Document 1", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   const stored = await page.evaluate(() => ({
@@ -342,8 +339,8 @@ test("diagram failure attention does not replay for ordinary edits and offers re
   await page
     .getByRole("button", { name: "Close Review Mermaid fixes", exact: true })
     .click();
-  await page.locator("header").getByText("Download", { exact: true }).click();
-  await page.getByRole("button", { name: "Word (.docx)", exact: true }).click();
+  await page.locator('header .export-menu>summary').click();
+  await page.getByRole("button", { name: "Word document (.docx)", exact: true }).click();
   await expect(
     page.getByRole("dialog", { name: "Review before delivery", exact: true }),
   ).toBeVisible();
@@ -408,14 +405,12 @@ test("editing during direct copy rejects stale clipboard content", async ({
     });
   });
   await page.goto("/");
-  await page
-    .getByRole("button", { name: "Copy for Google Docs", exact: true })
-    .click();
+  await copyForDocs(page);
   await waiting;
   await page.locator("textarea").first().fill("# New current text");
   release();
   await expect(
-    page.getByRole("button", { name: "Copy for Google Docs", exact: true }),
+    page.locator('header .export-menu>summary'),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Copied", exact: true }),
@@ -430,8 +425,8 @@ test("failed direct download retries the selected format", async ({ page }) => {
     fail ? route.abort() : route.continue(),
   );
   await page.goto("/");
-  await page.locator("header").getByText("Download", { exact: true }).click();
-  await page.getByRole("button", { name: "Word (.docx)", exact: true }).click();
+  await page.locator('header .export-menu>summary').click();
+  await page.getByRole("button", { name: "Word document (.docx)", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("Could not complete");
   fail = false;
   const download = page.waitForEvent("download");

@@ -43,11 +43,15 @@ export function Toggle({
 // Native disclosure with ordinary links/buttons retains Tab navigation and semantics.
 export function Menu({
   label,
+  name,
   accessibleLabel,
+  className = "",
   children,
 }: {
   label: ReactNode;
+  name?: string;
   accessibleLabel?: string;
+  className?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDetailsElement>(null);
@@ -62,7 +66,12 @@ export function Menu({
   return (
     <details
       ref={ref}
-      className="ux-menu"
+      className={`ux-menu ${className}`}
+      onToggle={(e) =>
+        e.currentTarget
+          .querySelector("summary")
+          ?.setAttribute("aria-expanded", String(e.currentTarget.open))
+      }
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.currentTarget.open = false;
@@ -80,7 +89,14 @@ export function Menu({
         }
       }}
     >
-      <summary className="ux-button" aria-label={accessibleLabel}>{label}</summary>
+      <summary
+        role="button"
+        aria-expanded="false"
+        className="ux-button"
+        aria-label={accessibleLabel ?? name}
+      >
+        {label}
+      </summary>
       <div
         className="ux-menu-items"
         onClick={(e) => {

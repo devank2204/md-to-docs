@@ -939,3 +939,95 @@ html[data-appearance="dark"] :focus-visible:not([data-document-paper] *) {
 .ux-history-actions {border-top:1px solid #8883;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap}
 .ux-diff-row>span {min-width:72px;font-variant-numeric:tabular-nums;padding-inline:6px;border-right:1px solid #8882;margin-right:8px}
 @media(max-width:600px){.ux-version-browser{grid-template-columns:1fr;grid-template-rows:100px minmax(160px,1fr)}.ux-version-list{border-right:0;border-bottom:1px solid #8883;padding:0 0 8px}.ux-history-scope{flex-wrap:wrap}.ux-rename-input{width:140px}}
+/* Approved interaction treatment: neutral chrome, one title field, one output menu. */
+.ux-button:hover {background:var(--ux-neutral-hover,#eeede7)}
+html[data-appearance="dark"] {--ux-neutral-hover:#30332c}
+.ux-button[data-state="selected"] {background:var(--ux-neutral-hover,#eeede7);box-shadow:none}
+.ux-menu summary {outline-offset:3px}
+.document-actions>summary,.workspace-menu>summary {border:0;padding:4px;min-width:28px}
+.document-actions .material-symbols-outlined,.workspace-menu .material-symbols-outlined {font-size:18px}
+.document-actions>summary {background:transparent}
+.document-name {display:flex;align-items:center;gap:5px;min-width:0;width:100%;max-width:340px}
+.document-name input {width:100%;min-width:0;border:1px solid #8885;border-radius:18px;background:transparent;padding:5px 12px;height:32px;font:inherit;outline-offset:0}
+.document-name input:focus {outline:1px solid #7b7b6d;border-color:transparent}
+.document-name button {border:0;background:transparent;padding:4px;flex-shrink:0;color:inherit;min-width:26px}
+.document-name button span {font-size:17px;color:inherit;opacity:.7}
+.header-document-name {min-width:100px;max-width:340px;flex:1;padding:0!important;border:0!important}
+.export-menu>summary {background:#292923;color:white;border:0;border-radius:18px;padding:6px 12px;min-height:32px;gap:6px}
+.export-menu>summary:hover {background:#414139;color:white}
+.export-menu>summary .material-symbols-outlined {font-size:17px}
+.export-menu.export-success>summary {background:var(--ux-success);color:white}
+.export-menu .ux-menu-items {min-width:230px;border-radius:10px;background:var(--mobile-fafaf7,#faf9f6);padding:5px}
+.export-menu .ux-menu-items button {padding:10px 12px;font-family:inherit}
+.export-menu hr {border:0;border-top:1px solid #8883;margin:4px 6px}
+.file-drop-overlay {position:fixed;inset:12px;z-index:200;border:2px dashed #888;background:var(--mobile-fafaf7,#faf9f6);display:grid;place-items:center;pointer-events:none;color:var(--mobile-242622,#242622);border-radius:12px}
+.import-error {position:fixed;bottom:20px;left:20px;right:20px;z-index:200;background:var(--ux-warning);color:var(--ux-warning-ink);padding:12px;border-radius:8px}
+.import-error button {margin-left:16px;text-decoration:underline}
+.capacity-list {list-style:none;padding:0;margin:10px 0;display:flex;flex-direction:column}
+.capacity-list li {display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid #8883}
+.capacity-list li>span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.capacity-actions {display:flex;justify-content:space-between;gap:12px;padding-top:12px}
+.workspace-sheet {max-height:min(88dvh,var(--sheet-available-height,88dvh));overflow:hidden}
+.workspace-sheet>section {display:flex;flex-direction:column;max-height:inherit;min-height:0}
+.workspace-sheet .sheet-heading {flex-shrink:0}
+.workspace-sheet .sheet-body {min-height:0;overflow-y:auto;overscroll-behavior:contain;scroll-padding-bottom:24px;padding-bottom:4px}
+.sheet-options input[type="checkbox"] {appearance:auto;width:18px;min-height:18px;height:18px;padding:0;flex-shrink:0;accent-color:#414139}
+.sheet-options .signature-option {padding-block:8px}
+.history-sheet .sheet-body {display:flex;flex-direction:column;gap:14px}
+.history-document {font-size:12px;color:var(--mobile-707560,#707560);margin:0}
+.history-toolbar {display:flex;align-items:center;justify-content:space-between;gap:12px}
+.history-scope {display:flex;gap:14px}
+.history-scope button {border:0;border-radius:0;background:transparent;font-size:12px;padding:6px 0;border-bottom:2px solid transparent}
+.history-scope button[aria-selected="true"] {border-bottom-color:currentColor}
+.history-save {position:relative}
+.history-save>.ux-button {border:0;font-size:12px;padding:4px}
+.history-save>.ux-button span {font-size:17px}
+.history-save-form {display:flex;gap:6px;flex-wrap:wrap;padding:8px 0}
+.history-save-form input {background:transparent;border:1px solid #8885;border-radius:5px;padding:6px;min-width:0;max-width:170px;font:inherit}
+.history-sheet .ux-version-browser {min-height:180px;max-height:45dvh;grid-template-columns:184px minmax(0,1fr);border-top:1px solid #8883;border-bottom:1px solid #8883;padding-block:12px}
+.history-sheet .ux-version-list .ux-button[data-state="selected"] {background:var(--ux-neutral-hover,#eeede7);border-left:2px solid #888;border-radius:4px}
+.history-sheet .ux-history-actions {border:0;padding-top:0;justify-content:space-between;flex-shrink:0}
+.history-sheet .ux-history-actions>.ux-button {border:0;font-size:12px}
+.history-sheet .ux-history-actions>.history-restore {background:#292923;color:white;font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 12px}
+.brand-snow-box {position:relative;isolation:isolate}
+.brand-snow-box piix-weather {pointer-events:none}
+@media(max-width:1023px){
+ .mobile-header {height:52px!important;min-height:52px!important;flex-wrap:nowrap!important;gap:6px;padding:6px 12px}
+ .mobile-header .mobile-document-title:has(.material-symbols-outlined) {flex:0 0 28px;min-width:28px!important;padding:0}
+ .mobile-header .document-name {flex:1;min-width:0;font-size:12px;gap:2px}
+ .mobile-header .document-name input {height:32px;padding:5px 8px}
+ .mobile-header .document-name button {min-width:24px!important;min-height:32px}
+ .mobile-header .ux-delivery {margin:0;flex-shrink:0}
+ .mobile-header .export-menu>summary {padding:6px 9px}
+ .mobile-header .export-menu>summary .material-symbols-outlined {font-size:16px}
+ .mobile-header .workspace-menu {flex-shrink:0}
+ .mobile-header .workspace-menu>summary {min-height:32px}
+ .workspace-sheet>section {padding:14px 16px calc(18px + env(safe-area-inset-bottom))}
+ .workspace-sheet .sheet-heading h2 {font-size:22px}
+ .workspace-sheet .sheet-options {gap:14px}
+ .workspace-sheet .sheet-options select {font-size:16px}
+ .history-sheet .ux-version-browser {grid-template-columns:1fr;grid-template-rows:88px minmax(140px,1fr);max-height:46dvh}
+ .history-sheet .ux-version-list {border-right:0}
+ .history-toolbar {flex-wrap:wrap}
+ .history-save-form input {font-size:16px}
+}
+.export-menu>summary {width:112px;white-space:nowrap}
+.export-menu .ux-menu-items {font-family:Söhne,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.5}
+.history-sheet.workspace-sheet .sheet-heading h2 {font-size:23px}
+.history-document {overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-save-form {position:absolute;right:0;top:100%;z-index:20;width:270px;max-width:76vw;padding:10px;margin-top:6px;background:var(--mobile-fafaf7,#faf9f6);border:1px solid #8884;border-radius:6px;box-shadow:0 4px 14px #0001;flex-wrap:nowrap}
+.history-save-form input {min-width:0;flex:1}
+@media(max-width:1023px){.history-sheet.workspace-sheet .sheet-heading h2 {font-size:22px}}
+@media(max-width:1023px){.mobile-header .document-name input {font-size:16px;line-height:20px}}
+.ux-menu-items button:disabled,.interactive-code-block button:disabled {opacity:.45;cursor:not-allowed}
+/* Decorative particles stay out of flex layout; touch controls retain full targets. */
+.brand-snow-box piix-weather {position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+@media(max-width:1023px){
+ .mobile-header {padding:4px 10px;gap:4px}
+ .mobile-header .mobile-document-title:has(.material-symbols-outlined) {flex-basis:44px;min-width:44px!important;height:44px}
+ .mobile-header .document-name {height:44px}
+ .mobile-header .document-name input {height:36px}
+ .mobile-header .document-name button {width:44px;min-width:44px!important;min-height:44px}
+ .mobile-header .export-menu>summary {width:104px;min-height:44px;padding:6px 7px;gap:4px}
+ .mobile-header .workspace-menu>summary {width:44px;min-height:44px}
+}

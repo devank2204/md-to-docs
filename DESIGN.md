@@ -14,7 +14,7 @@ values in apps/web/src/index.css. Desktop surface/background: #faf9f6. Mobile
 workspace ground: #fafaf7. Preserve white document paper and existing state colors.
 Do not unify similar values, recolor an accent, or infer a new palette from a mock.
 App appearance follows the device initially; an explicit light/dark toggle persists
-the user choice (D008). Dark tokens
+the user choice (D008/D010). Dark tokens
 apply only to app chrome; they must never mutate the chosen document theme.
 
 ## Typography
@@ -75,3 +75,12 @@ with keyboard and touch. App and print/document appearance have separate scopes.
 - Do not call a draft plan approved because an agent review passed.
 - Do not add decorative effects or a new library to signal ambition.
 - Do not update identity regression expectations to hide an unauthorized change.
+
+## Approved workspace refinement · 2026-11-15
+
+D010 authorizes the reviewed single Export menu, one-outline rename field/check,
+neutral ordinary hover states, Material Symbols ellipsis/link actions, and compact
+tabbed version history. Existing home, brand, source and preview roles remain.
+Mobile title editing uses the existing 16px input role to avoid focus zoom.
+Logo snow is an explicit exception to the decoration restriction: contained,
+local and hover-only, respecting reduced motion and Save-Data.

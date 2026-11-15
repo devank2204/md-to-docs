@@ -211,11 +211,11 @@ export function Header({
               </button>
             )}
 
-            {appState === 'WORKSPACE' && <div className="xl:hidden"><RenameTitle compact /></div>}
+
             {appState === 'WORKSPACE' && (
-              <div className="hidden xl:flex items-center gap-1.5 pl-3 border-l border-outline-variant/40 text-xs text-on-surface-variant font-medium">
+              <div className="header-document-name flex items-center gap-1.5 text-xs text-on-surface-variant font-medium">
                 <span className="material-symbols-outlined text-[15px] text-outline">description</span>
-                <span className="min-w-0 text-on-surface font-sans" title={activeDocTitle}>
+                <span className="min-w-0 flex-1 text-on-surface font-sans">
                   <RenameTitle />
                 </span>
               </div>

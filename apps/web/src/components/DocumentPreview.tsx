@@ -241,7 +241,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                       : '';
 
                     return (
-                      <InteractiveCodeBlock className={className} rawCode={rawCode} {...props}>
+                      <InteractiveCodeBlock key={rawCode} className={className} rawCode={rawCode} {...props}>
                         {children}
                       </InteractiveCodeBlock>
                     );

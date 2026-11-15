@@ -54,10 +54,14 @@ function DeliveryControls() {
     return () => clearTimeout(t);
   }, [status]);
   useEffect(() => {
-    const deliver=(event:Event)=>run(((event as CustomEvent).detail || 'pdf') as ExportTarget);
-    window.addEventListener('mdtodocs:deliver',deliver);
-    window.addEventListener('mdtodocs:prepare-print',deliver);
-    return()=>{window.removeEventListener('mdtodocs:deliver',deliver);window.removeEventListener('mdtodocs:prepare-print',deliver)};
+    const deliver = (event: Event) =>
+      run(((event as CustomEvent).detail || "pdf") as ExportTarget);
+    window.addEventListener("mdtodocs:deliver", deliver);
+    window.addEventListener("mdtodocs:prepare-print", deliver);
+    return () => {
+      window.removeEventListener("mdtodocs:deliver", deliver);
+      window.removeEventListener("mdtodocs:prepare-print", deliver);
+    };
   });
   function run(target: ExportTarget | "markdown", confirmed = false) {
     if (status === "working") return;
@@ -210,33 +214,55 @@ function DeliveryControls() {
       className="ux-delivery font-code-sm text-code-sm font-medium"
       data-print-hide
     >
-      <Button
-        className="ux-copy"
-        state={status}
-        disabled={!markdown.trim() || status === "working"}
-        onClick={() => run("google-docs")}
-      >
-        <span aria-hidden="true">
-          {status === "success" ? "✓" : status === "working" ? "…" : ""}
-        </span>
-        {status === "success"
-          ? "Copied"
-          : status === "working"
-            ? "Preparing…"
-            : "Copy for Google Docs"}
-      </Button>
       {status === "success" && (
         <span role="status" className="sr-only">
           Copied to clipboard. Paste into Google Docs.
         </span>
       )}
-      <Menu label="Download">
+      <Menu
+        className={`export-menu ${status === "success" ? "export-success" : ""}`}
+        name={
+          status === "success"
+            ? "Copied"
+            : status === "working"
+              ? "Preparing export"
+              : "Export"
+        }
+        label={
+          <>
+            <span className="material-symbols-outlined" aria-hidden="true">
+              {status === "success" ? "check" : "download"}
+            </span>
+            {status === "success"
+              ? "Copied"
+              : status === "working"
+                ? "Preparing…"
+                : "Export"}
+            <span className="material-symbols-outlined" aria-hidden="true">
+              expand_more
+            </span>
+          </>
+        }
+      >
         <button
           disabled={!markdown.trim() || status === "working"}
           onClick={() => run("word")}
         >
-          Word (.docx)
+          Word document (.docx)
         </button>
+        <button
+          disabled={!markdown.trim() || status === "working"}
+          onClick={() => run("pdf")}
+        >
+          Print / Save as PDF
+        </button>
+        <button
+          disabled={!markdown.trim() || status === "working"}
+          onClick={() => run("google-docs")}
+        >
+          Copy for Google Docs
+        </button>
+        <hr />
         <button disabled={!markdown.trim()} onClick={() => run("markdown")}>
           Markdown (.md)
         </button>
@@ -245,12 +271,6 @@ function DeliveryControls() {
           onClick={() => run("html")}
         >
           HTML (.html)
-        </button>
-        <button
-          disabled={!markdown.trim() || status === "working"}
-          onClick={() => run("pdf")}
-        >
-          Print / Save as PDF
         </button>
         <button
           disabled={!markdown.trim() || status === "working"}
@@ -263,7 +283,7 @@ function DeliveryControls() {
             window.dispatchEvent(new CustomEvent("mdtodocs:delivery-options"))
           }
         >
-          Document options
+          Advanced export options
         </button>
       </Menu>
       {message && (

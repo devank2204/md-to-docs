@@ -118,7 +118,7 @@ test('wrapped Unicode source stays aligned and changing documents clears the old
   }, markdown.indexOf('## Section 14\n'));
   await page.locator('textarea').press('ArrowRight');
   expect(Math.abs(await page.locator('textarea').evaluate(node => node.scrollTop) - aligned)).toBeLessThan(2);
-  await page.getByTitle('New Document (Alt+N)', { exact: true }).click();
+  await page.getByRole('button', { name: 'Create New Document', exact: true }).click();
   await page.locator('textarea').fill(source);
   await sourceTop(page, 14);
   await expect.poll(async () => Math.abs(await anchorDistance(page, 14))).toBeLessThan(4);
