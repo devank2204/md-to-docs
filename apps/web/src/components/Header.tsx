@@ -189,7 +189,7 @@ export function Header({
                     </div>
                   </button>
 
-                  <ToolsLinks />
+                  {appState === 'EMPTY' && <ToolsLinks />}
                 </div>
               )}
             </div>

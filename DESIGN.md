@@ -30,11 +30,21 @@ Protected roles and implementation authorities:
 | --- | --- |
 | Home title | HomeIntroduction.tsx: existing font-serif (Newsreader), text-3xl / sm:text-4xl / lg:text-5xl, leading-tight, tracking-tight, font-medium |
 | Home description | Same component: existing font-serif, text-base / sm:text-lg, leading-relaxed, text-secondary |
-| Brand | BrandWordmark.tsx: existing JetBrains Mono code-lg 14px/22px, semibold, tracking-tighter; existing smaller .com suffix |
+| Brand | BrandWordmark.tsx: user-approved screenshot wordmark, Inter Variable 16px/24px, -0.5px tracking; mdtodocs 600 and same-size .com 400, no square mark. Explicit typography exception D009. |
 | Source | Existing JetBrains Mono source roles; retain mobile 16px input behavior and desktop role sizes |
 | Document preview | DocumentPreview.tsx and current document theme/typography; unchanged by the home correction |
 | Other UI | Existing Söhne/system fallback and mapped code/label roles in Tailwind |
 | Export | Existing compiler theme and renderer font choices; app appearance is not an export preference |
+
+### Approved grouped sidebar and wordmark exception (2026-11-15)
+
+The user's attached Grouped sidebar screenshot and explicit request for its exact
+UI/font authorize the Inter sidebar and shared sans wordmark (D009). Scope:
+248px cream sidebar, flat selected rows, Lucide outlines, small uppercase section
+labels, Documents/Diagrams tool groups and supporting links. Sidebar text is 13px;
+its small labels are 11px. This does not change home copy, source, document preview,
+delivery controls or exported-document typography. The sidebar scrolls at short
+heights rather than clipping tools; mobile retains its current workspace shell.
 
 Use the existing responsive type scale. Do not create separate mobile title
 copy, an italic accent, a fluid display scale, or an unrequested sans-serif home
