@@ -1,47 +1,79 @@
 import { useState } from "react";
 import { useStore } from "@/store";
-import { Button } from "./Controls";
 export function RenameTitle({
   id,
-  compact = false,
+  compact: _compact,
 }: {
   id?: string;
   compact?: boolean;
 }) {
   const active = useStore((s) => s.activeDocumentId);
   const doc = useStore((s) => s.documents.find((d) => d.id === (id || active)));
-  const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState("");
   if (!doc) return null;
-  return editing ? (
-    <input
-      aria-label="Document name"
-      className="ux-rename-input"
-      autoFocus
-      value={value}
-      maxLength={100}
-      onChange={(e) => setValue(e.target.value)}
-      onBlur={() => setEditing(false)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          useStore.getState().renameDocument(doc.id, value);
-          setEditing(false);
-        }
-        if (e.key === "Escape") setEditing(false);
-      }}
-    />
-  ) : (
-    <Button
-      className={`ux-rename ${compact ? "ux-rename-compact" : ""}`}
-      title={`Rename ${doc.title}`}
-      aria-label={`Rename ${doc.title}`}
-      onClick={() => {
-        setValue(doc.title);
-        setEditing(true);
+  return <DocumentName key={doc.id} id={doc.id} title={doc.title} />;
+}
+function DocumentName({ id, title }: { id: string; title: string }) {
+  const [draft, setDraft] = useState({ title, value: title });
+  const [focused, setFocused] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [saved, setSaved] = useState(false);
+  if (!focused && !dirty && draft.title !== title)
+    setDraft({ title, value: title });
+  const value = draft.value;
+  const setValue = (value: string) => setDraft({ title, value });
+  const save = () => {
+    const normalized = value.trim();
+    if (normalized) useStore.getState().renameDocument(id, normalized);
+    setValue(normalized || title);
+    setFocused(false);
+    setDirty(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1600);
+  };
+  return (
+    <form
+      className="document-name"
+      onClick={e=>{if(e.target===e.currentTarget)e.currentTarget.querySelector("input")?.focus()}}
+      onSubmit={(e) => {
+        e.preventDefault();
+        save();
+        (e.currentTarget.querySelector("input") as HTMLInputElement)?.blur();
       }}
     >
-      {!compact && <span className="ux-rename-label">{doc.title}</span>}
-      <span className="ux-rename-pencil" aria-hidden="true">✎</span>
-    </Button>
+      <input
+        aria-label="Document name"
+        value={value}
+        maxLength={100}
+        onFocus={() => {
+          setFocused(true);
+          setSaved(false);
+        }}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setDirty(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            setValue(title);
+            setDirty(false);
+            setFocused(false);
+            e.currentTarget.blur();
+          }
+        }}
+        onBlur={() => setFocused(false)}
+      />
+      <button
+        type="submit"
+        aria-label="Save document name"
+        onMouseDown={(e) => e.preventDefault()}
+      >
+        <span className="material-symbols-outlined" aria-hidden="true">
+          check
+        </span>
+      </button>
+      <span aria-live="polite" className="sr-only">
+        {saved ? "Document name saved." : ""}
+      </span>
+    </form>
   );
 }

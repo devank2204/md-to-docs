@@ -237,6 +237,7 @@ export function MobileWorkspace(props: Props) {
     window.addEventListener('mdtodocs:review', review);
     return () => window.removeEventListener('mdtodocs:review', review);
   }, []);
+  useEffect(()=>{const opened=()=>{setSheet(null);setExportOpen(false);setTab('edit')};window.addEventListener('mdtodocs:document-opened',opened);return()=>window.removeEventListener('mdtodocs:document-opened',opened)},[]);
   const chooseTarget = (value: ExportTarget) => {
     setHtmlOutput(value === 'html');
     analytics.track('destination_change', { from: target, to: value });
@@ -247,11 +248,13 @@ export function MobileWorkspace(props: Props) {
   return (
     <div className={`mobile-workspace ${keyboardOpen ? 'keyboard-open' : ''}`}>
       <header className="mobile-header" data-print-hide>
-        <button type="button" className="mobile-menu mobile-document-title" onClick={() => setSheet('documents')} aria-label="Open documents" aria-haspopup="dialog">
-          {hasContent ? <><span className="material-symbols-outlined" aria-hidden="true">folder_open</span><span className="truncate">{title}</span></> : <BrandWordmark />}
+        <button type="button" className="mobile-menu mobile-document-title" onClick={()=>setSheet('documents')} aria-label="Open documents" aria-haspopup="dialog">
+          {hasContent?<span className="material-symbols-outlined" aria-hidden="true">folder_open</span>:<BrandWordmark/>}
         </button>
-        <button type="button" aria-label="Document options" onClick={() => setSheet('options')}>•••</button>
-        {hasContent && <RenameTitle compact />}<Menu label="Tools"><ToolsLinks /></Menu><AppAppearance />{hasContent && <DirectDelivery />}
+        {hasContent&&<RenameTitle/>}
+        {hasContent&&<DirectDelivery/>}
+        <Menu name="Workspace menu" className="workspace-menu" label={<span className="material-symbols-outlined" aria-hidden="true">more_horiz</span>}><button onClick={()=>setSheet('options')}>Document options</button><AppAppearance/><ToolsLinks/></Menu>
+
       </header>
       <div
         className="mobile-tabs"

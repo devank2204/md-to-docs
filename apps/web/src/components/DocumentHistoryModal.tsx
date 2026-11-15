@@ -14,6 +14,8 @@ export function DocumentHistoryModal({
   return isOpen ? <History onClose={onClose} /> : null;
 }
 function History({ onClose }: { onClose: () => void }) {
+  const [saveOpen, setSaveOpen] = useState(false);
+  const documents = useStore((s) => s.documents);
   const snapshots = useStore((s) => s.snapshots);
   const id = useStore((s) => s.activeDocumentId);
   const markdown = useStore((s) => s.markdown);
@@ -31,32 +33,68 @@ function History({ onClose }: { onClose: () => void }) {
   }, [snapshots, id, all]);
   const version = versions.find((s) => s.id === selected) || versions[0];
   return (
-    <WorkspaceSheet title="Version history" onClose={onClose}>
-      <form
-        className="ux-history-toolbar"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const ok = useStore
-            .getState()
-            .createSnapshot(label.trim() || undefined);
-          if (ok) setLabel("");
-          setMessage(
-            ok
-              ? "Version saved."
-              : "Could not save this version. Your document is unchanged.",
-          );
-        }}
-      >
-        <input
-          aria-label="Version name (optional)"
-          placeholder="Version name (optional)"
-          className="min-w-0 bg-transparent border rounded px-2"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-        />
-        <Button type="submit">Save version</Button>
-      </form>
-      <label className="ux-history-scope">Show versions<select value={all?"all":"current"} onChange={e=>setAll(e.target.value==="all")}><option value="current">This document</option><option value="all">All documents & recovery copies</option></select></label>
+    <WorkspaceSheet
+      title="Version history"
+      className="history-sheet"
+      onClose={onClose}
+    >
+      <p className="history-document">
+        {documents.find((d) => d.id === id)?.title}
+      </p>
+      <div className="history-toolbar">
+        <div
+          className="history-scope"
+          role="tablist"
+          aria-label="Version scope"
+        >
+          <button role="tab" aria-selected={!all} onClick={() => setAll(false)}>
+            This document
+          </button>
+          <button role="tab" aria-selected={all} onClick={() => setAll(true)}>
+            All documents
+          </button>
+        </div>
+        <div className="history-save">
+          <Button
+            onClick={() => setSaveOpen(!saveOpen)}
+            aria-expanded={saveOpen}
+          >
+            <span className="material-symbols-outlined" aria-hidden="true">
+              add
+            </span>
+            Save version
+          </Button>
+          {saveOpen && (
+            <form
+              className="history-save-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const ok = useStore
+                  .getState()
+                  .createSnapshot(label.trim() || undefined);
+                if (ok) {
+                  setLabel("");
+                  setSaveOpen(false);
+                }
+                setMessage(
+                  ok
+                    ? "Version saved."
+                    : "Could not save this version. Your document is unchanged.",
+                );
+              }}
+            >
+              <input
+                aria-label="Version name (optional)"
+                placeholder="Version name (optional)"
+                className="min-w-0 bg-transparent border rounded px-2"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+              />
+              <Button type="submit">Save</Button>
+            </form>
+          )}
+        </div>
+      </div>
       <p role="status">{message}</p>
       <div className="ux-version-browser">
         <div className="ux-version-list" aria-label="Saved versions">
@@ -89,24 +127,6 @@ function History({ onClose }: { onClose: () => void }) {
       {version && (
         <div className="ux-history-actions">
           <Button
-            onClick={() => {
-              if (
-                !confirm(
-                  "Restore this version? Your current document must be saved as a recoverable copy first.",
-                )
-              )
-                return;
-              const ok = useStore.getState().restoreSnapshot(version.id);
-              setMessage(
-                ok
-                  ? "Version restored. The previous document is in recovery history."
-                  : "Could not save a recovery copy. Nothing was changed.",
-              );
-            }}
-          >
-            Restore this version
-          </Button>
-          <Button
             onClick={() =>
               navigator.clipboard
                 .writeText(version.content)
@@ -117,6 +137,26 @@ function History({ onClose }: { onClose: () => void }) {
             }
           >
             Copy saved Markdown
+          </Button>
+          <Button
+            className="history-restore"
+            onClick={() => {
+              if (
+                !confirm(
+                  "Restore this version? Your current document must be saved as a recoverable copy first.",
+                )
+              )
+                return;
+              setSelected(version.id);
+              const ok = useStore.getState().restoreSnapshot(version.id);
+              setMessage(
+                ok
+                  ? "Version restored. The previous document is in recovery history."
+                  : "Could not save a recovery copy. Nothing was changed.",
+              );
+            }}
+          >
+            Restore this version
           </Button>
         </div>
       )}

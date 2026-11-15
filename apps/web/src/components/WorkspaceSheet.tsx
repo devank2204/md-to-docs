@@ -1,15 +1,17 @@
-import { useEffect, useId, useRef } from 'react';
-import type { ReactNode } from 'react';
+import { useEffect, useId, useRef } from "react";
+import type { ReactNode } from "react";
 
 // Native modal dialog supplies inert background, focus trapping, and Escape.
 export function WorkspaceSheet({
   title,
-  placement = 'default',
+  placement = "default",
+  className = "",
   onClose,
   children,
 }: {
   title: string;
-  placement?: 'default' | 'export';
+  placement?: "default" | "export";
+  className?: string;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -19,7 +21,17 @@ export function WorkspaceSheet({
     const previous = document.activeElement as HTMLElement | null;
     const dialog = ref.current;
     dialog?.showModal();
+    const resize = () =>
+      dialog?.style.setProperty(
+        "--sheet-available-height",
+        `${Math.max(160, (window.visualViewport?.height || innerHeight) - 24)}px`,
+      );
+    resize();
+    window.visualViewport?.addEventListener("resize", resize);
+    window.addEventListener("resize", resize);
     return () => {
+      window.visualViewport?.removeEventListener("resize", resize);
+      window.removeEventListener("resize", resize);
       dialog?.close();
       if (previous?.isConnected) previous.focus({ preventScroll: true });
     };
@@ -28,9 +40,9 @@ export function WorkspaceSheet({
     <dialog
       ref={ref}
       aria-labelledby={id}
-      className={`workspace-sheet ${placement === 'export' ? 'export-sheet' : ''}`}
+      className={`workspace-sheet ${placement === "export" ? "export-sheet" : ""} ${className}`}
       onKeyDown={(e) => {
-        if (e.key !== 'Tab') return;
+        if (e.key !== "Tab") return;
         const items = Array.from(
           e.currentTarget.querySelectorAll<HTMLElement>(
             'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
@@ -67,10 +79,12 @@ export function WorkspaceSheet({
             onClick={onClose}
             aria-label={`Close ${title}`}
           >
-            ✕
+            <span className="material-symbols-outlined" aria-hidden="true">
+              close
+            </span>
           </button>
         </div>
-        {children}
+        <div className="sheet-body">{children}</div>
       </section>
     </dialog>
   );

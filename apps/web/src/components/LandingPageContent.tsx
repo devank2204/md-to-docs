@@ -7,12 +7,12 @@ export function LandingPageContent({ spec }: {
   onNavigateRoute?: (path: LandingRoutePath) => void;
 }) {
   const diagram = spec.path.startsWith('/mermaid-');
-  const action = spec.path === '/markdown-to-word' ? 'Choose Download, then Word (.docx).'
-    : spec.path === '/markdown-to-pdf' ? 'Choose Download, then Print / Save as PDF. Open Print and choose a browser save or print option.'
-    : spec.path === '/markdown-to-html' ? 'Choose Download, then HTML.'
+  const action = spec.path === '/markdown-to-word' ? 'Choose Export, then Word document (.docx).'
+    : spec.path === '/markdown-to-pdf' ? 'Choose Export, then Print / Save as PDF. Open Print and choose a browser save or print option.'
+    : spec.path === '/markdown-to-html' ? 'Choose Export, then HTML.'
     : diagram ? `Download the ${spec.path.endsWith('svg') ? 'SVG' : 'PNG'} from the diagram toolbar.`
-    : spec.path === '/' ? 'Choose your destination, then copy or export the prepared document.'
-    : 'Choose Copy for Google Docs, then paste into your destination editor.';
+    : spec.path === '/' ? 'Choose an output from Export, then copy or download the document.'
+    : 'Choose Export, then Copy for Google Docs, and paste into your destination editor.';
   return <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-10 text-secondary text-sm leading-relaxed select-text" aria-label={`${spec.h1} guidance`}>
     <h2 className="font-serif text-lg font-medium text-on-surface mb-3">How to convert</h2>
     <ol className="list-decimal pl-5 mb-6"><li>{diagram ? 'Paste Mermaid source into the diagram editor.' : 'Paste Markdown or import a Markdown file.'}</li><li>{diagram ? 'Inspect the rendered diagram and resolve any syntax errors.' : 'Inspect the preview and review formatting warnings.'}</li><li>{action}</li></ol>

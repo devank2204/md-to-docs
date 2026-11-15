@@ -81,7 +81,7 @@
   };
   document.addEventListener('change', e => { if (buffer.active && e.target.type === 'file') void readFile(e.target.files?.[0]); }, true);
   document.addEventListener('dragover', e => { if (buffer.active && e.dataTransfer?.types.includes('Files')) e.preventDefault(); }, true);
-  document.addEventListener('drop', e => { if (buffer.active && e.dataTransfer?.files.length) { e.preventDefault(); void readFile(e.dataTransfer.files[0]); } }, true);
+  document.addEventListener('drop', e => { if (buffer.active && e.dataTransfer?.files.length) { e.preventDefault(); e.stopImmediatePropagation(); window.__mdDroppedFiles=(window.__mdDroppedFiles||[]).concat(Array.from(e.dataTransfer.files)); } }, true);
   document.documentElement.classList.remove('landing-booting');
   if (!buffer.restored && !matchMedia('(max-width: 1023px)').matches) root.querySelector('textarea')?.focus();
 })();

@@ -78,6 +78,8 @@ export interface AppState {
   deleteDocument: (id: string) => void;
   createSnapshot: (label?: string) => boolean;
   restoreSnapshot: (snapshotId: string) => boolean;
+  documentCapacity: number;
+  openPendingAnyway: () => void;
   pendingDocument: DocumentItem | null;
   resolveCapacity: (replaceId?: string) => boolean;
   deleteSnapshot: (snapshotId: string) => void;
@@ -167,6 +169,26 @@ export const useStore = create<AppState>()(
       ],
       activeDocumentId: 'doc-default',
       snapshots: [],
+      documentCapacity: 5,
+      openPendingAnyway: () => {
+        const state = get();
+        const pending = state.pendingDocument;
+        if (!pending) return;
+        const documents = state.documents.map((document) =>
+          document.id === state.activeDocumentId
+            ? { ...document, content: state.markdown }
+            : document,
+        );
+        set({
+          documents: [...documents, pending],
+          activeDocumentId: pending.id,
+          markdown: pending.content,
+          currentView: 'workspace',
+          snapshots: [createDocumentSnapshot(pending, 'Initial Draft'), ...state.snapshots],
+          pendingDocument: null,
+          documentCapacity: Math.max(state.documentCapacity, state.documents.length + 1),
+        });
+      },
       pendingDocument: null,
       resolveCapacity: (replaceId) => {
         const state = get();
@@ -186,7 +208,7 @@ export const useStore = create<AppState>()(
           activeDocumentId: pending.id,
           markdown: pending.content,
           currentView: 'workspace',
-          snapshots: [backup, ...state.snapshots],
+          snapshots: [createDocumentSnapshot(pending,'Initial Draft'), backup, ...state.snapshots],
           pendingDocument: null,
         });
         return true;
@@ -270,7 +292,7 @@ export const useStore = create<AppState>()(
         const title = customTitle?.trim() || extractDocumentTitle(initialMarkdown);
         const newDoc = createDocumentItem(initialMarkdown, title, get().destination);
 
-        if(get().documents.length>=5){set({pendingDocument:newDoc});return ''}
+        if(get().documents.length>=get().documentCapacity){set({pendingDocument:newDoc});return ''}
         set((state) => {
           // Sync current active doc first
           const syncedDocs = state.documents.map((d) =>
@@ -336,7 +358,7 @@ export const useStore = create<AppState>()(
             ...target,
             content: target.id === state.activeDocumentId ? state.markdown : target.content,
           });
-          if(state.documents.length>=5)return {pendingDocument:clone};
+          if(state.documents.length>=state.documentCapacity)return {pendingDocument:clone};
           createdId = clone.id;
 
           const syncedDocs = state.documents.map((d) =>
@@ -470,6 +492,7 @@ export const useStore = create<AppState>()(
         baseFontSize: state.baseFontSize,
         documentSignature: state.documentSignature,
         documents: state.documents,
+        documentCapacity: state.documentCapacity,
         activeDocumentId: state.activeDocumentId,
         snapshots: state.snapshots,
         currentView: state.currentView,
@@ -477,6 +500,11 @@ export const useStore = create<AppState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
+          state.documentCapacity = Math.max(
+            5,
+            Number.isSafeInteger(state.documentCapacity) ? state.documentCapacity : 5,
+            state.documents?.length || 0,
+          );
           if (!state.activePresetId) {
             state.activePresetId = 'default';
           }
