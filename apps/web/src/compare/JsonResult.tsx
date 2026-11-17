@@ -1,13 +1,20 @@
 import { Button } from "../components/Controls";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { compareJSON, changesFromDelta, jsonError, type Change } from "./model";
+import {
+  compareJSON,
+  changesFromDelta,
+  jsonError,
+  type Change,
+  type JSONScrollPair,
+} from "./model";
 export type JSONReviewStatus = {
   a: string;
   b: string;
   count: number;
   ready: boolean;
   changes?: Change[];
+  scrollPairs?: JSONScrollPair[];
   error?: string;
   errors?: [string | undefined, string | undefined];
 };
@@ -53,9 +60,17 @@ export default function JsonResult({
         if (!a.trim() || !b.trim())
           next = { a, b, count: 0, ready: false, errors };
         else {
-          const { delta, left } = compareJSON(a, b);
+          const { delta, left, scrollPairs } = compareJSON(a, b);
           const changes = changesFromDelta(delta, left);
-          next = { a, b, count: changes.length, changes, ready: true, errors };
+          next = {
+            a,
+            b,
+            count: changes.length,
+            changes,
+            scrollPairs,
+            ready: true,
+            errors,
+          };
         }
       } catch (error) {
         next = {

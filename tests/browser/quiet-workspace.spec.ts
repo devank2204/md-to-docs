@@ -18,7 +18,7 @@ test('header appearance and reading controls share neutral hover in both appeara
  await page.setViewportSize({width:1440,height:900});await page.goto('/');await page.locator('textarea').first().fill('# Hover');
  for(const mode of ['cream','dark']){
   await page.evaluate(mode=>document.documentElement.setAttribute('data-appearance',mode),mode);
-  const appearance=page.getByRole('button',{name:/Switch to .* appearance/});const reading=page.getByTitle('Switch to clean reading view');
+  const appearance=page.getByRole('button',{name:/^Appearance:/});const reading=page.getByTitle('Switch to clean reading view');
   const color=mode==='cream'?'rgb(238, 237, 231)':'rgb(53, 53, 51)';await appearance.hover();await expect(appearance).toHaveCSS('background-color',color);await reading.hover();await expect(reading).toHaveCSS('background-color',color);
  }
 });

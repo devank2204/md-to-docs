@@ -14,5 +14,10 @@ export async function fillSource(page: Page, text: string) {
 }
 export async function openOutputMenu(page:Page){const menu=page.locator('header .export-menu');if(!await menu.evaluate(el=>el.hasAttribute('open')))await menu.locator('summary').click();}
 export async function openDocumentOptions(page:Page){const button=page.getByRole('button',{name:'Document options',exact:true});if(!await button.isVisible())await page.locator('header .workspace-menu>summary').click();await button.click();}
-export async function switchAppearance(page:Page,label:string){const button=page.getByRole('button',{name:label});if(!await button.isVisible())await page.locator('header .workspace-menu>summary').click();await button.click();}
+export async function switchAppearance(page:Page,label:'Cream'|'Dark green'|'Black') {
+  const chooser=page.getByRole('button',{name:/^Appearance:/});
+  if(!await chooser.isVisible()) await page.locator('header .workspace-menu>summary').click();
+  await chooser.click();
+  await page.getByRole('button',{name:label,exact:true}).click();
+}
 export async function copyForDocs(page:Page){await openOutputMenu(page);await page.getByRole('button',{name:'Copy for Google Docs',exact:true}).click();}

@@ -1,4 +1,5 @@
-import type { Change } from "./model";
+import { scrollAnchors, matchingScrollTop } from "./jsonScroll";
+import type { Change, JSONScrollPair } from "./model";
 import { locateChanges, type ChangeLocation } from "./jsonLocations";
 import {
   jsonHighlightState,
@@ -35,6 +36,8 @@ export default function JsonEditors({
   changes,
   selected,
   onSelect,
+  syncScroll,
+  scrollPairs,
 }: {
   a: string;
   b: string;
@@ -44,11 +47,14 @@ export default function JsonEditors({
   changes: Change[];
   selected: number;
   onSelect: (index: number) => void;
+  syncScroll: boolean;
+  scrollPairs: JSONScrollPair[];
 }) {
   const hosts = useRef<(HTMLDivElement | null)[]>([]),
     views = useRef<EditorView[]>([]),
     syncing = useRef(false),
     change = useRef(onChange);
+  const scrollLeader = useRef<number | null>(null);
   const clickedSide = useRef<number | null>(null);
   const selectedIndex = useRef(selected);
   selectedIndex.current = selected;
@@ -58,7 +64,9 @@ export default function JsonEditors({
   change.current = onChange;
   const palette = useRef(new Compartment());
   const colors = () => {
-    const dark = document.documentElement.dataset.appearance === "dark";
+    const dark = ["dark", "black"].includes(
+      document.documentElement.dataset.appearance ?? "",
+    );
     return [
       EditorView.theme({}, { dark }),
       syntaxHighlighting(dark ? oneDarkHighlightStyle : defaultHighlightStyle),
@@ -167,6 +175,7 @@ export default function JsonEditors({
         }),
       }),
     );
+    scrollLeader.current = null;
     const clicked = clickedSide.current;
     clickedSide.current = null;
     if (selected < 0) return;
@@ -187,6 +196,95 @@ export default function JsonEditors({
     });
     return () => cancelAnimationFrame(frame);
   }, [selected, active, mobile, changes]);
+  useEffect(() => {
+    if (mobile || !syncScroll || views.current.length !== 2) return;
+    const pair = views.current;
+    const anchors = scrollPairs.length
+      ? scrollAnchors(a, b, scrollPairs)
+      : [[], []];
+    scrollLeader.current = null;
+    let frame = 0,
+      correctionFrame = 0;
+    let disposed = false;
+    const measureKey = {};
+    const handlers = pair.map((view, side) => {
+      const handler = () => {
+        if (scrollLeader.current !== side) return;
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          const other = side ? 0 : 1;
+          // No stale path offsets during typing; the status supplies no pairs
+          // until both current inputs have been compared successfully.
+          const top = matchingScrollTop(view, pair[other], anchors[side]);
+          pair[other].scrollDOM.scrollTop = top;
+          // Virtualized lines can acquire their measured heights after scrolling.
+          // Correct once in CodeMirror's own read/write layout cycle.
+          pair[other].requestMeasure({
+            key: measureKey,
+            read: () => !disposed,
+            write: (ready) => {
+              if (!ready) return;
+              cancelAnimationFrame(correctionFrame);
+              // CodeMirror applies its own scroll anchoring after measure writes.
+              // Align after that pass, using the now-rendered token coordinates.
+              correctionFrame = requestAnimationFrame(() => {
+                if (!disposed && scrollLeader.current === side)
+                  pair[other].scrollDOM.scrollTop = matchingScrollTop(
+                    view,
+                    pair[other],
+                    anchors[side],
+                  );
+              });
+            },
+          });
+        });
+      };
+      const intent = () => {
+        scrollLeader.current = side;
+        cancelAnimationFrame(frame);
+        cancelAnimationFrame(correctionFrame);
+      };
+      const keyIntent = (event: KeyboardEvent) => {
+        if (
+          [
+            "PageDown",
+            "PageUp",
+            "Home",
+            "End",
+            "ArrowDown",
+            "ArrowUp",
+          ].includes(event.key)
+        )
+          intent();
+      };
+      const pointerIntent = (event: PointerEvent) => {
+        const bounds = view.scrollDOM.getBoundingClientRect();
+        if (
+          event.clientX >= bounds.left + view.scrollDOM.clientWidth ||
+          event.clientY >= bounds.top + view.scrollDOM.clientHeight
+        )
+          intent();
+      };
+      view.scrollDOM.addEventListener("scroll", handler, { passive: true });
+      view.scrollDOM.addEventListener("wheel", intent, { passive: true });
+      view.scrollDOM.addEventListener("touchstart", intent, { passive: true });
+      view.scrollDOM.addEventListener("keydown", keyIntent);
+      view.scrollDOM.addEventListener("pointerdown", pointerIntent);
+      return () => {
+        view.scrollDOM.removeEventListener("scroll", handler);
+        view.scrollDOM.removeEventListener("wheel", intent);
+        view.scrollDOM.removeEventListener("touchstart", intent);
+        view.scrollDOM.removeEventListener("keydown", keyIntent);
+        view.scrollDOM.removeEventListener("pointerdown", pointerIntent);
+      };
+    });
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(correctionFrame);
+      handlers.forEach((dispose) => dispose());
+    };
+  }, [a, b, mobile, syncScroll, scrollPairs]);
   return (
     <div className="json-editors compare-editors">
       {[0, 1].map((side) => (

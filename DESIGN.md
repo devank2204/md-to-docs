@@ -13,8 +13,9 @@ Preserve existing cream tokens in apps/web/tailwind.config.js and incumbent
 values in apps/web/src/index.css. Desktop surface/background: #faf9f6. Mobile
 workspace ground: #fafaf7. Preserve white document paper and existing state colors.
 Do not unify similar values, recolor an accent, or infer a new palette from a mock.
-App appearance follows the device initially; an explicit light/dark toggle persists
-the user choice (D008/D010). Dark tokens
+App appearance follows the device initially. D013 supersedes the two-state toggle
+with explicit Cream, Dark green and Black choices. Preserve the existing cream
+and dark-green tokens; Black adds #000000 screen surfaces. All appearance tokens
 apply only to app chrome; they must never mutate the chosen document theme.
 
 ## Typography

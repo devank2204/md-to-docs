@@ -8,6 +8,8 @@ import {
   ArrowLeftRight,
   LockKeyhole,
   Clipboard,
+  Link2,
+  Unlink2,
   CheckCircle2,
   Circle,
   AlertCircle,
@@ -137,6 +139,7 @@ export default function CompareApp({
   useAppAppearance();
   const sidebarOpen = useStore((state) => state.isSidebarOpen);
   const root = useRef<HTMLDivElement>(null);
+  const [syncScroll, setSyncScroll] = useState(true);
   const [selectedJSON, setSelectedJSON] = useState(-1);
   const [jsonStatus, setJSONStatus] = useState<JSONReviewStatus>();
   const [activeChange, setActiveChange] = useState(0);
@@ -392,6 +395,26 @@ export default function CompareApp({
                       onStatus={setJSONStatus}
                     />
                   </Suspense>
+                  {!mobile && (
+                    <Button
+                      className="json-sync-scroll"
+                      state={syncScroll ? "selected" : "idle"}
+                      aria-pressed={syncScroll}
+                      title={
+                        canReview
+                          ? "Keep corresponding JSON fields together while scrolling. Turn off to scroll independently."
+                          : "Scroll together by position until both inputs contain valid JSON."
+                      }
+                      onClick={() => setSyncScroll((value) => !value)}
+                    >
+                      {syncScroll ? (
+                        <Link2 size={14} aria-hidden="true" />
+                      ) : (
+                        <Unlink2 size={14} aria-hidden="true" />
+                      )}
+                      Sync scroll
+                    </Button>
+                  )}
                 </>
               )}
               <Button
@@ -689,6 +712,10 @@ export default function CompareApp({
                     changes={jsonChanges}
                     selected={selectedJSON}
                     onSelect={setSelectedJSON}
+                    syncScroll={syncScroll}
+                    scrollPairs={
+                      canReview ? (jsonStatus.scrollPairs ?? []) : []
+                    }
                   />
                 </Suspense>
               ) : (

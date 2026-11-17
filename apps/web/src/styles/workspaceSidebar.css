@@ -7,7 +7,7 @@
   --sidebar-selected: #e7e7e0;
   --sidebar-ui-font: 'Inter Variable', Inter, system-ui, sans-serif;
 }
-html[data-appearance="dark"] {
+html:is([data-appearance="dark"], [data-appearance="black"]) {
   --sidebar-paper: #20201e;
   --sidebar-text: #e9e7e3;
   --sidebar-muted: #b5b5ac;
@@ -122,4 +122,14 @@ html[data-appearance="dark"] {
   .workspace-sidebar :is(button,summary,a) { min-height: 44px; }
   .workspace-sidebar-document .ux-menu > summary { width: 44px; }
   .workspace-sidebar-icon { width: 44px; }
+}
+
+@media screen {
+html[data-appearance="black"] {
+  --sidebar-paper: #000;
+  --sidebar-text: #eee;
+  --sidebar-muted: #b4b4b4;
+  --sidebar-line: #383838;
+  --sidebar-selected: #1a1a1a;
+}
 }

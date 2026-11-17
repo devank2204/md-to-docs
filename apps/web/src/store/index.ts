@@ -17,8 +17,8 @@ import {
 } from '@mdtodocs/renderers/src/documentManager';
 
 export interface AppState {
-  appAppearance: 'cream' | 'dark' | 'system';
-  setAppAppearance: (value: 'cream' | 'dark' | 'system') => void;
+  appAppearance: 'cream' | 'dark' | 'black' | 'system';
+  setAppAppearance: (value: 'cream' | 'dark' | 'black' | 'system') => void;
   markdown: string;
   destination: DestinationType;
   htmlOutput: boolean;

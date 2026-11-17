@@ -1,3 +1,4 @@
+import { switchAppearance } from "./action-helpers";
 import { test, expect } from "@playwright/test";
 for (const width of [320, 390, 1366])
   test(`large JSON stays editable with structural context at ${width}`, async ({
@@ -110,9 +111,7 @@ for (const width of [320, 390, 1366])
     }
     // Capture settled appearance using the supported reduced-motion preference.
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page
-      .getByRole("button", { name: "Switch to dark appearance", exact: true })
-      .click();
+    await switchAppearance(page, "Dark green");
     await expect(page.locator("html")).toHaveAttribute(
       "data-appearance",
       "dark",
@@ -179,13 +178,11 @@ test("91 structural changes stay in context across reordered 300-line JSON", asy
     ["Original", a],
     ["Updated", b],
   ] as const)
-    await page
-      .getByLabel(`Import ${side}`, { exact: true })
-      .setInputFiles({
-        name: `${side}.json`,
-        mimeType: "application/json",
-        buffer: Buffer.from(value),
-      });
+    await page.getByLabel(`Import ${side}`, { exact: true }).setInputFiles({
+      name: `${side}.json`,
+      mimeType: "application/json",
+      buffer: Buffer.from(value),
+    });
   await expect(page.locator(".json-inline-status")).toHaveText("91 changes");
   const jump = page.getByRole("combobox", { name: "Jump to JSON change" });
   await expect(jump.locator("option")).toHaveCount(92);
