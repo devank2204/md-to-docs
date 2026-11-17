@@ -267,3 +267,15 @@ Netlify 404 fallback. Home identity and converter engines preserved. Added stati
 and Chromium initialization/navigation/no-JavaScript/width checks. See
 [implementation and evidence](qa/seo-iteration-01.md). Local only; no push or
 deployment. Production Netlify status and real receiving-app checks remain pending.
+
+## Comparison tools · 2026-11-17
+
+Local branch `feat/comparison-tools` from main `80632fa` adds standalone text/JSON
+comparison routes using CodeMirror Merge and jsondiffpatch, with existing jsdiff
+patch exports. Payloads remain in module memory; no document persistence or URL
+handoff. Metadata/prerender/sitemap and Compare navigation are added without new
+export destinations. See [implementation and actual verification](qa/comparison-tools.md)
+for limits, licenses, commands and desktop/mobile screenshots. Exact CRLF
+comparison uses the documented lineSeparator facet; undo history resets across
+route changes. The wider regression failures remain untriaged, so this is not
+certified as fully satisfying the production-ready brief. No push, merge or deployment.

@@ -1,0 +1,24 @@
+{
+  "main": {
+    "initial_static_js_gzip_bytes": 104761,
+    "files": [
+      "index-B-hteCgA.js",
+      "jsx-runtime-DREnUpxT.js",
+      "rolldown-runtime-Dd_uD5pT.js"
+    ]
+  },
+  "comparison": {
+    "initial_static_js_gzip_bytes": 105986,
+    "files": [
+      "index-rJid8pUT.js",
+      "jsx-runtime-DREnUpxT.js",
+      "react-CQOZoUwg.js",
+      "rolldown-runtime-Dd_uD5pT.js"
+    ]
+  },
+  "deferred": {
+    "JsonResult-CAz-aRKe.js": 6207,
+    "TextEditors-yMdzf1cZ.js": 100047,
+    "CompareApp-CqSmKgkn.js": 3481
+  }
+}

@@ -1,3 +1,6 @@
+import { COMPARE_ROUTES } from "../apps/web/src/routes/compareRoutes";
+import { renderToStaticMarkup } from "react-dom/server";
+import { createElement } from "react";
 import { MATERIAL_SYMBOLS_URL } from '../apps/web/materialSymbols';
 import { structuredData } from '../apps/web/src/routes/metadata';
 import { renderLanding } from '../apps/web/src/landingStatic';
@@ -6,11 +9,30 @@ import path from 'path';
 
 import { LANDING_ROUTES, type RouteLandingSpec, BASE_URL } from '../apps/web/src/routes/landingData';
 
-type RouteSEO = RouteLandingSpec;
+type RouteSEO = Pick<RouteLandingSpec,'path'|'title'|'description'|'canonical'|'h1'> | (typeof COMPARE_ROUTES)[keyof typeof COMPARE_ROUTES];
 
-const ROUTES: RouteSEO[] = Object.values(LANDING_ROUTES);
+const ROUTES: RouteSEO[] = [...Object.values(LANDING_ROUTES),...Object.values(COMPARE_ROUTES)];
 
-const generateSSRHtml = renderLanding;
+const generateSSRHtml = (spec: RouteSEO, mobile = false) =>
+  spec.path.includes("-compare")
+    ? renderToStaticMarkup(
+        createElement(
+          "main",
+          null,
+          createElement("a", { href: "/" }, "MDToDocs"),
+          createElement("h1", null, spec.h1),
+          createElement("p", null, spec.description),
+          createElement(
+            "p",
+            null,
+            "Compare AI-generated drafts, Markdown revisions and JSON in technical specifications. Processing stays local in your browser; inputs are never saved.",
+          ),
+          createElement("a", { href: "/text-compare/" }, "Text Compare"),
+          createElement("a", { href: "/json-compare/" }, "JSON Compare"),
+        ),
+      )
+    : renderLanding(spec as RouteLandingSpec, mobile);
+
 
 function generateJsonLd(route: RouteSEO): string {
   const schema = structuredData(route);
@@ -128,7 +150,7 @@ export async function runPrerender() {
     await fs.mkdir(routeDir, { recursive: true });
 
     const ssrHtml = generateSSRHtml(route);
-    const mobileHtml = JSON.stringify(renderLanding(route, true)).replace(/</g, '\\u003c');
+    const mobileHtml = JSON.stringify(generateSSRHtml(route, true)).replace(/</g, '\\u003c');
     const jsonLd = generateJsonLd(route);
 
     let html = templateHtml;

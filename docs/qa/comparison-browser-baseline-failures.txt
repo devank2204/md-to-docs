@@ -1,0 +1,30 @@
+Initial full Chromium suite before final focused fixes: 126 passed, 24 failed.
+Two representative failures also reproduce on main. Others are not all triaged.
+The SEO link-count assertion is updated for the two explicitly requested Compare links.
+
+  24 failed
+    tests/browser/document-actions.spec.ts:7:3 › compact actions, Markdown roundtrip and import at 320 
+    tests/browser/mobile.spec.ts:66:1 › route default applies once; later destination selection survives typing and reload preserves selection 
+    tests/browser/mobile.spec.ts:119:1 › file import preserves existing text until a deliberate replacement, with history backup 
+    tests/browser/mobile.spec.ts:169:1 › prepared files invalidate on edit and DOCX contains the latest source 
+    tests/browser/mobile.spec.ts:198:1 › clipboard failure has explicit fallbacks and share cancel does not download 
+    tests/browser/mobile.spec.ts:239:1 › HTML is an explicit output option and print is labelled honestly 
+    tests/browser/mobile.spec.ts:324:1 › PDF prepares isolated content and reports only the print dialog outcome 
+    tests/browser/mobile.spec.ts:338:1 › HTML preference survives reload at the root route ─────────
+    tests/browser/mobile.spec.ts:402:1 › full browser storage does not break editing or falsely claim the draft was saved 
+    tests/browser/mobile.spec.ts:427:1 › a double tap starts only one file download ────────────────
+    tests/browser/performance.spec.ts:5:34 › prerender accepts typing before entry module and preserves focus at 375 
+    tests/browser/performance.spec.ts:5:34 › prerender accepts typing before entry module and preserves focus at 1440 
+    tests/browser/performance.spec.ts:46:1 › DOCX import delay cannot publish output for a replaced source 
+    tests/browser/performance.spec.ts:66:1 › deferred command palette, history and reconciliation open on demand 
+    tests/browser/seo.spec.ts:46:1 › all landing descriptions and links remain readable without JavaScript 
+    tests/browser/studio.spec.ts:16:3 › appearance is persistent and independent of prepared output at 390 
+    tests/browser/studio.spec.ts:16:3 › appearance is persistent and independent of prepared output at 1440 
+    tests/browser/studio.spec.ts:125:1 › desktop delivery discards stale source and downloads the latest real DOCX 
+    tests/browser/studio.spec.ts:162:1 › duplicate wide tables link to exact source; fixes are previewed and undoable 
+    tests/browser/studio.spec.ts:204:1 › print snapshot invalidates on source edits and excludes application chrome 
+    tests/browser/studio.spec.ts:236:1 › canceling preparation cannot publish a late result or revive old content 
+    tests/browser/studio.spec.ts:274:1 › an unavailable print image fails recoverably instead of claiming readiness 
+    tests/browser/ux-corrections.spec.ts:3:1 › copy hover stays legible and command copy bypasses legacy delivery 
+    tests/browser/ux-handoff.spec.ts:314:1 › diagram failure attention does not replay for ordinary edits and offers review 
+  126 passed (10.9m)
