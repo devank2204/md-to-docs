@@ -1,145 +1,76 @@
+/* Compare uses the established font roles and cream/dark tokens. No global UI overrides. */
 .compare-app {
   min-height: 100vh;
 }
 .compare-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 28px;
   padding: 12px 24px;
-  border-bottom: 1px solid #dedbd3;
-  gap: 12px;
+  border-bottom: 1px solid var(--sidebar-line);
+  background: rgb(var(--app-surface));
+  position: sticky;
+  top: 0;
+  z-index: 40;
 }
-.compare-header nav {
+.compare-header > .compare-brand {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
+  flex: 0 0 224px;
+  min-width: 0;
+}
+.compare-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.compare-tool-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.compare-tool-switch > a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  color: var(--sidebar-muted);
+}
+.compare-tool-switch > a[aria-current="page"] {
+  background: var(--sidebar-selected);
+  color: var(--sidebar-text);
+}
+.compare-app[data-sidebar="false"] .compare-header > .compare-brand {
+  flex-basis: auto;
 }
 .compare-layout {
   display: flex;
+  align-items: flex-start;
 }
 .compare-sidebar {
   flex: 0 0 248px;
+  position: sticky;
+  top: 57px;
+  height: calc(100svh - 57px);
+}
+.compare-sidebar[hidden] {
+  display: none;
 }
 .compare-sidebar .workspace-sidebar {
   position: relative;
   top: 0;
-  height: calc(100vh - 60px);
+  height: 100%;
 }
 .compare-main {
   padding: 28px;
   min-width: 0;
   flex: 1;
 }
-.compare-title,
-.compare-toolbar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-.compare-title > div:first-child {
-  flex: 1;
-}
-.compare-app details label {
-  display: block;
-  padding: 6px;
-}
-.compare-menu {
-  display: grid;
-  gap: 4px;
-}
-.compare-input-labels {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-.compare-input-labels > label {
-  flex: 1;
-  min-width: 0;
-}
-.compare-input-labels input[hidden] {
-  display: none;
-}
-.compare-input-labels textarea {
-  display: block;
-  width: 100%;
-  height: 240px;
-  padding: 12px;
-  background: transparent;
-  border: 1px solid #dedbd3;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.compare-editors {
-  border: 1px solid #dedbd3;
-  min-height: 340px;
-}
-.compare-editors .cm-editor {
-  height: 480px;
-  min-width: 0;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.compare-editors .cm-scroller {
-  font-family: inherit;
-  line-height: inherit;
-  overflow: auto;
-}
-.compare-editors .cm-mergeView {
-  height: 480px;
-}
-.compare-editors .cm-mergeViewEditor {
-  min-width: 0;
-}
-.compare-support {
-  margin-top: 32px;
-  max-width: 800px;
-}
-.compare-support p {
-  margin-top: 12px;
-}
-.json-change {
-  border-top: 1px solid #dedbd3;
-  padding: 12px 0;
-}
-.json-change pre {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  max-height: 300px;
-  overflow: auto;
-}
-.compare-app :focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-@media (max-width: 767px) {
-  .compare-sidebar {
-    display: none;
-  }
-  .compare-header {
-    padding: 12px;
-    flex-wrap: wrap;
-  }
-  .compare-main {
-    padding: 16px;
-    max-width: 100vw;
-  }
-  .compare-input-labels {
-    flex-direction: column;
-  }
-  .compare-editors .cm-editor,
-  .compare-input-labels textarea {
-    font-size: 16px;
-    line-height: 1.65;
-  }
-  .compare-toolbar {
-    gap: 6px;
-  }
-}
-/* Comparison layout only. Font roles, shared controls and sidebar tokens stay authoritative. */
 .compare-heading {
   display: flex;
   align-items: flex-start;
@@ -155,55 +86,82 @@
   min-width: 0;
 }
 .compare-heading p {
-  max-width: none;
   margin-inline: 0;
+  max-width: none;
 }
 .compare-title {
-  margin: 0;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+}
+.compare-menu {
+  display: grid;
+  gap: 4px;
 }
 .compare-tool-surface {
   border: 1px solid var(--sidebar-line);
   border-radius: 8px;
-  overflow: clip;
   background: rgb(var(--app-surface-container-lowest));
 }
 .compare-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   padding: 12px 16px;
-  margin: 0;
   border-bottom: 1px solid var(--sidebar-line);
-  gap: 8px;
+  position: sticky;
+  top: 57px;
+  z-index: 20;
+  background: rgb(var(--app-surface));
+  border-radius: 8px 8px 0 0;
 }
-.compare-toolbar > button:first-child {
-  order: 3;
+.compare-toolbar [role="tablist"] {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--sidebar-line);
+  border-radius: 8px;
+}
+.compare-toolbar [role="tablist"] > .ux-button {
+  border: 0;
+  box-shadow: none;
+}
+.compare-example.ux-button {
   margin-left: auto;
   border: 0;
 }
-.compare-local {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.compare-current-change {
   color: var(--sidebar-muted);
-  margin-left: auto;
-  order: 2;
 }
-.compare-toolbar:has(.compare-local) > button:first-child {
-  margin-left: 0;
+.compare-toolbar .ux-menu {
+  position: static;
+}
+.compare-toolbar .ux-menu-items {
+  top: calc(100% - 4px);
+  right: 12px;
+  max-width: calc(100vw - 48px);
+}
+.compare-toolbar label {
+  display: block;
+  padding: 6px;
 }
 .compare-input-labels {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
-  margin: 0;
+}
+.compare-input-labels[hidden],
+.compare-editor-stage[hidden] {
+  display: none;
 }
 .compare-input-labels > section {
-  min-width: 0;
-  padding: 14px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--sidebar-line);
 }
 .compare-input-labels > section + section {
@@ -214,13 +172,30 @@
   gap: 4px;
   min-width: 0;
 }
+.compare-step {
+  color: var(--sidebar-muted);
+  margin-right: 5px;
+}
 .compare-input-name > span {
   color: var(--sidebar-muted);
+}
+.compare-input-valid {
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.compare-input-valid[data-valid="false"] {
+  color: var(--ux-warning-ink);
 }
 .compare-input-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
+}
+.compare-input-actions input[hidden],
+.compare-character-count[hidden] {
+  display: none;
 }
 .compare-input-actions > .ux-button {
   border: 0;
@@ -228,13 +203,36 @@
 .compare-input-actions svg {
   flex-shrink: 0;
 }
+.compare-editor-stage {
+  position: relative;
+  min-height: clamp(320px, 42vh, 480px);
+}
+.compare-editor-stage[data-kind="json"] {
+  min-height: clamp(260px, 34vh, 400px);
+}
 .compare-editors {
   border: 0;
   min-height: 0;
 }
-.compare-editors .cm-editor,
+.compare-editors .cm-editor {
+  height: clamp(320px, 42vh, 480px);
+  min-width: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  background: rgb(var(--app-surface-container-lowest));
+  color: rgb(var(--app-on-surface));
+}
 .compare-editors .cm-mergeView {
-  height: clamp(300px, 42vh, 440px);
+  height: clamp(320px, 42vh, 480px);
+}
+.compare-editors .cm-scroller {
+  font-family: inherit;
+  line-height: inherit;
+  overflow: auto;
+}
+.compare-editors .cm-mergeViewEditor {
+  min-width: 0;
 }
 .compare-editors .cm-gutters {
   background: rgb(var(--app-surface));
@@ -261,6 +259,68 @@
 .json-editors > div + div {
   border-left: 1px solid var(--sidebar-line);
 }
+.json-editors .cm-editor {
+  height: clamp(260px, 34vh, 400px);
+}
+.compare-empty-hints {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  pointer-events: none;
+}
+.compare-empty-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+.compare-empty-cell[data-empty="false"] {
+  visibility: hidden;
+}
+.compare-empty-cell > div > svg {
+  margin: 0 auto 12px;
+  color: var(--sidebar-muted);
+}
+.compare-empty-cell p + p {
+  margin-top: 6px;
+  color: var(--sidebar-muted);
+}
+.compare-empty-cell > div > div {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+  pointer-events: auto;
+}
+.compare-empty-cell .ux-button + button {
+  border: 0;
+}
+.compare-editor-stage:has(.compare-empty-hints) .cm-placeholder {
+  visibility: hidden;
+}
+.compare-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-top: 1px solid var(--sidebar-line);
+  color: var(--sidebar-muted);
+}
+.compare-legend {
+  display: flex;
+  gap: 12px;
+}
+.compare-privacy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sidebar-muted);
+  margin-top: 16px;
+}
 .compare-notice {
   margin: 0;
   padding: 0 16px;
@@ -270,18 +330,43 @@
   border-top: 1px solid var(--sidebar-line);
 }
 .compare-guidance {
-  margin-top: 20px;
+  margin-top: 12px;
   color: var(--sidebar-muted);
 }
 .compare-guidance > summary {
   cursor: pointer;
   padding-block: 12px;
 }
-.compare-guidance .compare-support {
-  margin-top: 0;
+.compare-support {
+  max-width: 800px;
+  padding-block: 12px;
+}
+.compare-support p {
+  margin-top: 12px;
+}
+.json-review-ready {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-top: 1px solid var(--sidebar-line);
+  background: rgb(var(--app-surface));
+  border-radius: 0 0 8px 8px;
+}
+.json-review-ready p {
+  margin-top: 4px;
+  color: var(--sidebar-muted);
+}
+.compare-review-button.ux-button,
+.compare-review-button.ux-button:hover {
+  background: var(--ux-success);
+  color: var(--ux-success-ink);
+  border-color: transparent;
+  padding: 8px 14px;
 }
 .json-results {
-  border-top: 1px solid var(--sidebar-line);
+  border-top: 0;
 }
 .json-result-toolbar {
   display: flex;
@@ -307,10 +392,10 @@
 .json-change-row {
   display: grid;
   grid-template-columns:
-    90px minmax(140px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)
+    minmax(160px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)
     32px;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 16px;
+  padding: 14px 16px;
   align-items: start;
 }
 .json-table-heading {
@@ -319,16 +404,21 @@
   border-top: 1px solid var(--sidebar-line);
 }
 .json-change {
-  padding: 0;
-  border-color: var(--sidebar-line);
+  border-top: 1px solid var(--sidebar-line);
+}
+.json-change-location {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
 }
 .json-kind {
-  padding-block: 6px;
+  padding-block: 4px;
+  color: var(--sidebar-muted);
 }
 .json-path.ux-button {
   border: 0;
   justify-content: flex-start;
-  padding: 5px 0;
+  padding: 3px 0;
   white-space: normal;
   text-align: left;
   overflow-wrap: anywhere;
@@ -340,7 +430,7 @@
 }
 .json-old,
 .json-new {
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: 4px;
   min-width: 0;
 }
@@ -366,9 +456,10 @@
 }
 .json-change pre {
   margin: 0;
-  max-height: 140px;
+  max-height: 180px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  overflow: auto;
 }
 .json-mobile-value-label {
   display: none;
@@ -416,37 +507,62 @@
   overflow-wrap: anywhere;
   margin-top: 8px;
 }
-@media (max-width: 1100px) and (min-width: 768px) {
-  .compare-input-labels > section {
-    flex-wrap: wrap;
+.compare-app :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+@media (max-width: 1100px) and (min-width: 1024px) {
+  .compare-header > .compare-brand {
+    flex-basis: 200px;
   }
-  .json-table-heading,
-  .json-change-row {
-    grid-template-columns:
-      75px minmax(90px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)
-      28px;
-    gap: 6px;
+  .compare-header {
+    gap: 16px;
+  }
+  .compare-input-labels > section {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
-@media (max-width: 767px) {
-  .compare-heading {
-    display: block;
-    margin-bottom: 16px;
+@media (max-width: 1023px) {
+  .compare-header {
+    padding: 10px 12px;
+    gap: 8px;
   }
-  .compare-heading .compare-title {
-    margin-top: 16px;
+  .compare-header > .compare-brand {
+    flex: 1;
+    justify-content: flex-start;
+  }
+  .compare-header-actions {
+    gap: 8px;
+  }
+  .compare-sidebar-toggle,
+  .compare-tool-switch,
+  .compare-sidebar {
+    display: none;
   }
   .compare-main {
-    padding: 16px 12px;
+    padding: 18px 12px;
+    max-width: 100vw;
+  }
+  .compare-heading {
+    display: block;
+    margin-bottom: 18px;
+  }
+  .compare-title {
+    justify-content: flex-end;
+    margin-top: 16px;
   }
   .compare-toolbar {
     padding: 10px;
-    gap: 6px;
+    gap: 8px;
+    top: 53px;
   }
-  .compare-local {
-    width: 100%;
-    order: 4;
-    margin: 4px 0 0;
+  .compare-example.ux-button {
+    margin-left: auto;
+  }
+  .compare-toolbar [role="tablist"] {
+    max-width: 100%;
+    flex-wrap: wrap;
   }
   .compare-input-labels {
     grid-template-columns: 1fr 1fr;
@@ -456,7 +572,7 @@
     flex-wrap: wrap;
     gap: 6px;
   }
-  .compare-input-name > span {
+  .compare-character-count {
     display: none;
   }
   .compare-input-actions {
@@ -482,46 +598,72 @@
     border-left: 0;
   }
   .compare-editors .cm-editor,
-  .compare-editors .cm-mergeView {
-    height: 330px;
+  .compare-editors .cm-mergeView,
+  .json-editors .cm-editor {
+    font-size: 16px;
+    line-height: 1.65;
+    height: 340px;
+  }
+  .compare-empty-hints {
+    grid-template-columns: 1fr;
+  }
+  .compare-empty-cell[data-active="false"] {
+    display: none;
+  }
+  .compare-editor-footer {
+    padding: 12px;
+    gap: 8px;
+  }
+  .compare-editor-footer > span:last-child {
+    display: none;
+  }
+  .json-review-ready {
+    padding: 14px 12px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .json-review-ready > .ux-button {
+    width: 100%;
   }
   .json-table-heading {
     display: none;
   }
   .json-result-toolbar {
     padding: 12px;
-    gap: 10px;
+    gap: 12px;
   }
   .json-result-toolbar nav {
     width: 100%;
     justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 6px;
   }
   .json-result-toolbar nav > span {
     margin-right: auto;
+    min-width: 0;
+    flex: 1;
   }
   .json-change-row {
     grid-template-columns: 1fr 1fr 28px;
-    padding: 12px;
-    gap: 8px;
+    padding: 14px 12px;
+    gap: 10px;
   }
-  .json-kind {
-    grid-column: 1;
-  }
-  .json-path.ux-button {
+  .json-change-location {
     grid-column: 1/3;
-    grid-row: 2;
-  }
-  .json-old {
-    grid-column: 1;
-    grid-row: 3;
-  }
-  .json-new {
-    grid-column: 2/4;
-    grid-row: 3;
+    grid-row: 1;
   }
   .json-copy {
     grid-column: 3;
     grid-row: 1;
+  }
+  .json-old {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .json-new {
+    grid-column: 2/4;
+    grid-row: 2;
   }
   .json-mobile-value-label {
     display: block;
@@ -534,33 +676,25 @@
     grid-template-columns: 1fr;
   }
 }
-.compare-toolbar {
-  position: relative;
-}
-.compare-toolbar .ux-menu {
-  position: static;
-}
-.compare-toolbar .ux-menu-items {
-  top: calc(100% - 4px);
-  right: 12px;
-  max-width: calc(100vw - 48px);
-}
-@media (max-width: 767px) {
-  .compare-heading .compare-title {
-    justify-content: flex-end;
-  }
-}
 
-.json-editors .cm-editor {
-  height: clamp(180px, 26vh, 300px);
-}
-@media (max-width: 767px) {
-  .json-editors .cm-editor {
-    height: 300px;
+@media (max-width: 1023px) {
+  .compare-editor-stage,
+  .compare-editor-stage[data-kind="json"] {
+    min-height: 340px;
   }
 }
-.compare-toolbar-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+/* MergeView owns the shared scroll container. Fill short documents so the whole
+   visible pane remains an editable hit target without replacing native scrolling. */
+.compare-editors {
+  --compare-text-height: clamp(320px, 42vh, 480px);
+}
+.compare-editors .cm-mergeView .cm-editor,
+.compare-editors .cm-mergeView .cm-scroller,
+.compare-editors .cm-mergeView .cm-content {
+  min-height: var(--compare-text-height);
+}
+@media (max-width: 1023px) {
+  .compare-editors {
+    --compare-text-height: 340px;
+  }
 }

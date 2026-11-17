@@ -1,5 +1,25 @@
 # Current workstate
 
+## Comparison UX research revision · 2026-11-17
+
+Owner rejected the comparison workflow and appearance-control alignment. Reviewed
+public Diffchecker/JSONDiff/jsondiffpatch demos and official Meld, VS Code, Beyond
+Compare and NN/g guidance; [research and decisions](research/comparison-ux.md).
+Comparison header now keeps shared appearance/Tools controls together at the right,
+with the sidebar control beside the existing wordmark. Guided input actions, live
+JSON validity and explicit Inputs → Review changes → Inputs navigation preserve
+both editable sources and undo. Text uses native chunk navigation/current position
+and shared aligned scrolling; narrow layouts use the existing 1023px breakpoint.
+Dark JSON syntax uses CodeMirror’s MIT One Dark highlighting only. Approved fonts,
+sidebar tokens and document/export behavior remain unchanged.
+
+Production build/TypeScript and ten-route prerender pass; 40 focused Chromium
+browser tests and 20 model/engine tests pass; lint exits zero with warnings.
+Homepage initial static JS increases 1,592 gzip bytes versus main 80632fa; engines
+remain deferred. [Verification and screenshots](qa/comparison-tools.md). Existing
+full-suite export failures remain unresolved; no physical-device/user-research
+validation claimed. Local commit only; not pushed, merged or deployed.
+
 ## Mobile reading refinement · 2026-11-15
 
 D012: visible Tools/appearance, compact accessible Export, smaller unfocused mobile

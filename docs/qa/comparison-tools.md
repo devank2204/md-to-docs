@@ -183,3 +183,71 @@ Rendered evidence for the owner feedback case:
 were also refreshed. These are real rendered local pages, not mockups. Physical
 phone and screen-reader testing remain outside the evidence. No claim that tests
 alone establish ideal UX. Local revision only; no push, merge or deployment.
+
+
+## Research-driven UX revision · 2026-11-17
+
+[Primary references and decisions](../research/comparison-ux.md) record actual
+public-demo interactions and official documentation. No commercial UI source or
+AGPL code was copied. This revision addresses the owner's workflow and theme
+alignment objections, without changing the approved font roles or homepage hero.
+
+- Shared appearance/Tools controls are grouped on the right. Sidebar toggle sits
+  beside the wordmark and really expands the workspace. Active tool navigation
+  uses single-entry browser history. Existing compact Tools menu is retained.
+- Empty sources offer explicit Paste/Open file actions; clipboard denial leaves
+  normal manual paste available. Lazy loading reserves useful editor space and
+  accepts early input. The whole empty text pane accepts click-to-type.
+- JSON has stable per-source validation and an explicit Review changes action.
+  Inputs/Changes views keep source editors and undo alive. Review shows path,
+  Original value and Updated value; context is optional. No stale success is
+  displayed during recomputation or after resource-limit failures.
+- Text navigation reports the current chunk and uses native F7/Shift-F7 commands.
+  CodeMirror's common merge scroller preserves alignment; no second scroll or
+  diff engine was added. Comparison projection retains the selected layout.
+- Existing shared mobile breakpoint (1023px) provides one readable source pane.
+  Resize preserves inputs and the intended desktop/compact view. Previous/Next
+  remain usable at 320px. No horizontal page overflow at tested widths.
+- Dark mode updates CodeMirror theme compartments without replacing sources or
+  editor history. @codemirror/theme-one-dark 6.1.3 supplies MIT syntax highlighting
+  only; MDToDocs supplies the shell, palette and typography. Notice retained.
+
+Final commands/results:
+
+- `pnpm --config.verify-deps-before-run=false build`: pass; recursive packages,
+  web TypeScript/build and all ten prerendered routes.
+- `node_modules/.bin/tsx --test apps/web/src/compare/model.test.ts`: 20 passed,
+  zero failed (retained engine fixtures and safety coverage).
+- `pnpm --config.verify-deps-before-run=false --filter web lint`: exit 0 with
+  warnings; no claim of a warning-free codebase.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium node_modules/.bin/playwright test
+  tests/browser/compare-experience.spec.ts tests/browser/compare-workspace.spec.ts
+  tests/browser/compare.spec.ts tests/browser/compare-identity.spec.ts
+  tests/browser/seo.spec.ts`: **40 passed, zero failed**. Includes native aligned
+  text navigation, whole-pane input hit area, dark/light controls at 320/390/900/
+  1366px, actual sidebar collapse, loading/typing/resize, invalid and large JSON,
+  copy/import/drop/format, inputs/review round trips, unchanged font assertions,
+  local state/history and existing SEO routes.
+
+[Current bundle measurement](comparison-research-bundle.json): homepage initial
+static JS graph is 106,353 gzip bytes versus 104,761 on main 80632fa: +1,592 bytes.
+This is a per-file gzip sum, excludes CSS/fonts/deferred modules, and is not a
+network-speed claim. Browser coverage verifies comparison engines are deferred
+on the homepage. Individual chunk sizes in the report exclude shared imports.
+
+Rendered local captures, using the built-in sample and settled animations:
+
+- [Desktop empty state](compare-final-empty-desktop.png),
+  [inputs](compare-final-inputs-desktop.png),
+  [changes](compare-final-changes-desktop.png).
+- [Mobile inputs](compare-final-inputs-mobile.png),
+  [changes](compare-final-changes-mobile.png),
+  [dark changes](compare-final-changes-dark-mobile.png).
+- [Desktop dark inputs](compare-final-inputs-dark-desktop.png),
+  [dark changes](compare-final-changes-dark-desktop.png).
+
+The original six text/JSON width captures and owner-case laptop/mobile captures
+are also refreshed. These checks do not establish that the design is ideal or
+replace user testing. Physical phones, screen readers and the full existing
+export suite were not newly validated. Earlier full-suite failures remain as
+recorded above. Revision stays local; no push, merge or deployment.

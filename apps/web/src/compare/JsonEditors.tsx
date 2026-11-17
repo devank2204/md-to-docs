@@ -1,5 +1,6 @@
+import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
 import { useLayoutEffect, useEffect, useRef } from "react";
-import { EditorState } from "@codemirror/state";
+import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
   keymap,
@@ -24,18 +25,28 @@ export default function JsonEditors({
   onChange,
   active,
   mobile,
+  visible = true,
 }: {
   a: string;
   b: string;
   onChange: (side: 0 | 1, value: string) => void;
   active: 0 | 1;
   mobile: boolean;
+  visible?: boolean;
 }) {
   const hosts = useRef<(HTMLDivElement | null)[]>([]),
     views = useRef<EditorView[]>([]),
     syncing = useRef(false),
     change = useRef(onChange);
   change.current = onChange;
+  const palette = useRef(new Compartment());
+  const colors = () => {
+    const dark = document.documentElement.dataset.appearance === "dark";
+    return [
+      EditorView.theme({}, { dark }),
+      syntaxHighlighting(dark ? oneDarkHighlightStyle : defaultHighlightStyle),
+    ];
+  };
   useLayoutEffect(() => {
     views.current = hosts.current.map(
       (parent, side) =>
@@ -53,7 +64,7 @@ export default function JsonEditors({
               history(),
               keymap.of([...defaultKeymap, ...historyKeymap]),
               json(),
-              syntaxHighlighting(defaultHighlightStyle),
+              palette.current.of(colors()),
               EditorView.lineWrapping,
               EditorView.contentAttributes.of({
                 "aria-label": side ? "Updated" : "Original",
@@ -66,7 +77,17 @@ export default function JsonEditors({
           }),
         }),
     );
+    const observer = new MutationObserver(() => {
+      views.current.forEach((view) =>
+        view.dispatch({ effects: palette.current.reconfigure(colors()) }),
+      );
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-appearance"],
+    });
     return () => {
+      observer.disconnect();
       views.current.forEach((view) => view.destroy());
       views.current = [];
     };
@@ -88,7 +109,7 @@ export default function JsonEditors({
   }, [a, b]);
   useEffect(() => {
     views.current.forEach((view) => view.requestMeasure());
-  }, [active, mobile]);
+  }, [active, mobile, visible]);
   return (
     <div className="json-editors compare-editors">
       {[0, 1].map((side) => (

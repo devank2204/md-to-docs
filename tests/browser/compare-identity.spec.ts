@@ -50,7 +50,7 @@ for (const width of [390, 1440])
             size: getComputedStyle(node).fontSize,
           }));
         expect(source.font).toContain("JetBrains Mono");
-        expect(source.size).toBe(width < 768 ? "16px" : "12px");
+        expect(source.size).toBe(width < 1024 ? "16px" : "12px");
       }
       expect(
         await page.evaluate(

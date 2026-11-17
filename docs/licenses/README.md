@@ -12,3 +12,9 @@ Workspace revision: @codemirror/lang-json 6.0.2 and @codemirror/language 6.13.1
 provide the JSON input editor's parser and standard syntax highlighting. Both
 use the MIT notice retained in codemirror-json-MIT.txt. jsondiffpatch remains the
 sole structural comparison engine; the editor does not calculate JSON differences.
+
+Research-led experience revision: @codemirror/theme-one-dark 6.1.3 supplies only
+its exported syntax highlighting style for dark JSON editing. It does not supply
+MDToDocs chrome, fonts, layout or diff algorithms. Its MIT notice is retained in
+codemirror-one-dark-MIT.txt. Color selection uses CodeMirror compartments and the
+existing appearance preference; payloads are never stored with that preference.

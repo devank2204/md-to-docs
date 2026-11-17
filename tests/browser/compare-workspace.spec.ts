@@ -24,10 +24,13 @@ for (const width of [390, 1366])
       sorting: original.sorting,
     };
     await input(page, "Original", original);
-    if (width < 768)
+    if (width < 1024)
       await page.getByRole("tab", { name: "Updated", exact: true }).click();
     await input(page, "Updated", updated);
     await expect(page.getByRole("status").first()).toHaveText("1 change");
+    await page
+      .getByRole("button", { name: "Review changes", exact: true })
+      .click();
     const change = page.locator(".json-change");
     await expect(change).toContainText("Removed");
     await expect(change.locator(".json-old")).toContainText("LTE");
@@ -57,7 +60,7 @@ for (const width of [390, 1366])
     await expect(change.locator(".json-context")).toContainText(
       "Parent payload context",
     );
-    if (width < 768) {
+    if (width < 1024) {
       await page.getByRole("tab", { name: "Original", exact: true }).click();
       await expect(
         page.getByRole("textbox", { name: "Original", exact: true }),
@@ -71,20 +74,16 @@ test("per-side JSON actions and file drop preserve source", async ({
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/json-compare/");
-  await page
-    .getByLabel("Import Original", { exact: true })
-    .setInputFiles({
-      name: "original.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"x":1}'),
-    });
-  await page
-    .getByLabel("Import Updated", { exact: true })
-    .setInputFiles({
-      name: "updated.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"x":2}'),
-    });
+  await page.getByLabel("Import Original", { exact: true }).setInputFiles({
+    name: "original.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"x":1}'),
+  });
+  await page.getByLabel("Import Updated", { exact: true }).setInputFiles({
+    name: "updated.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"x":2}'),
+  });
   await expect(page.getByRole("status").first()).toHaveText("1 change");
   await page
     .getByRole("button", { name: "Format Original", exact: true })
@@ -116,5 +115,8 @@ test("per-side JSON actions and file drop preserve source", async ({
   await expect(
     page.getByRole("textbox", { name: "Original", exact: true }),
   ).toContainText("1");
+  await page
+    .getByRole("button", { name: "Review changes", exact: true })
+    .click();
   await expect(page.locator(".json-new")).toContainText("3");
 });

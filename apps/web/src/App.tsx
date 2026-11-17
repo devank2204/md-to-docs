@@ -304,6 +304,7 @@ function App() {
     const pop = () =>
       setPath(window.location.pathname.replace(/\/$/, "") || "/");
     const click = (event: MouseEvent) => {
+      if(event.defaultPrevented||event.shiftKey||event.altKey)return;
       const anchor = (event.target as Element).closest?.("a");
       if (
         anchor &&

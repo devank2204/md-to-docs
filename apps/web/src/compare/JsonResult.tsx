@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Check,
   Braces,
+  ArrowRight,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { compareJSON, changesFromDelta, jsonError, type Change } from "./model";
@@ -26,11 +27,20 @@ function parentContext(root: unknown, segments: (string | number)[]) {
   }
   return value;
 }
+export type JSONReviewStatus = {
+  a: string;
+  b: string;
+  count: number;
+  ready: boolean;
+  error?: string;
+  errors?: [string | undefined, string | undefined];
+};
 type Result = {
   a: string;
   b: string;
   changes: Change[];
   error?: string;
+  syntaxError?: boolean;
   left?: unknown;
   right?: unknown;
 };
@@ -38,19 +48,37 @@ export default function JsonResult({
   a,
   b,
   copy,
+  view = "changes",
+  onReview,
+  onStatus,
 }: {
   a: string;
   b: string;
   copy: (value: string) => Promise<void>;
+  view?: string;
+  onReview?: () => void;
+  onStatus?: (status: JSONReviewStatus) => void;
 }) {
   const [result, setResult] = useState<Result>();
   const [selected, setSelected] = useState(-1);
   const rows = useRef<(HTMLElement | null)[]>([]);
+  const status = useRef(onStatus);
+  status.current = onStatus;
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
         if (!a.trim() || !b.trim()) {
           setResult({ a, b, changes: [] });
+          status.current?.({
+            a,
+            b,
+            count: 0,
+            ready: false,
+            errors: [
+              a.trim() ? jsonError(a) : undefined,
+              b.trim() ? jsonError(b) : undefined,
+            ],
+          });
           return;
         }
         if (a.length > 200000 || b.length > 200000)
@@ -68,10 +96,36 @@ export default function JsonResult({
               .join("\n"),
           );
         const { delta, left, right } = compareJSON(a, b);
-        setResult({ a, b, changes: changesFromDelta(delta), left, right });
+        const changes = changesFromDelta(delta);
+        setResult({ a, b, changes, left, right });
+        status.current?.({
+          a,
+          b,
+          count: changes.length,
+          ready: true,
+          errors: [undefined, undefined],
+        });
         setSelected(-1);
       } catch (error) {
-        setResult({ a, b, changes: [], error: (error as Error).message });
+        const errors: [string | undefined, string | undefined] = [
+          a.length > 200000 ? undefined : jsonError(a),
+          b.length > 200000 ? undefined : jsonError(b),
+        ];
+        setResult({
+          a,
+          b,
+          changes: [],
+          error: (error as Error).message,
+          syntaxError: errors.some(Boolean),
+        });
+        status.current?.({
+          a,
+          b,
+          count: 0,
+          ready: false,
+          error: (error as Error).message,
+          errors,
+        });
         setSelected(-1);
       }
     }, 200);
@@ -108,10 +162,13 @@ export default function JsonResult({
   if (result.error)
     return (
       <section className="json-error" role="alert">
-        <strong>Check your JSON</strong>
+        <strong>
+          {result.syntaxError ? "Fix JSON syntax" : "Comparison unavailable"}
+        </strong>
         <p>{result.error}</p>
         <p className="font-code-sm text-code-sm">
-          Both inputs are preserved. Correct the syntax above to compare.
+          Both inputs are preserved. Edit the source above to address this
+          message.
         </p>
       </section>
     );
@@ -131,6 +188,28 @@ export default function JsonResult({
         ?.focus({ preventScroll: true });
     });
   };
+  if (view === "inputs")
+    return (
+      <section className="json-review-ready">
+        <div>
+          <strong role="status">
+            {changes.length} {changes.length === 1 ? "change" : "changes"}
+          </strong>
+          <p className="font-code-sm text-code-sm">
+            {changes.length
+              ? "Ready to review · Formatting and key order are ignored"
+              : "The JSON values match · No structural changes"}
+          </p>
+        </div>
+        <Button
+          className="compare-review-button font-code-sm text-code-sm"
+          onClick={onReview}
+        >
+          {changes.length ? "Review changes" : "Review comparison"}
+          <ArrowRight size={15} aria-hidden="true" />
+        </Button>
+      </section>
+    );
   return (
     <section className="json-results" aria-label="JSON changes">
       <header className="json-result-toolbar">
@@ -160,7 +239,7 @@ export default function JsonResult({
           >
             <span>
               {selected < 0
-                ? "Select a change"
+                ? "Select a field"
                 : `${selected + 1} of ${changes.length}`}
             </span>
             <Button
@@ -189,8 +268,7 @@ export default function JsonResult({
             className="json-table-heading font-code-sm text-code-sm"
             aria-hidden="true"
           >
-            <span>Change</span>
-            <span>JSON path</span>
+            <span>Changed field</span>
             <span>Original value</span>
             <span>Updated value</span>
             <span />
@@ -206,22 +284,25 @@ export default function JsonResult({
               }}
             >
               <div className="json-change-row">
-                <span className="json-kind font-code-sm text-code-sm">
-                  {change.type === "Added"
-                    ? "+"
-                    : change.type === "Removed"
-                      ? "−"
-                      : "~"}{" "}
-                  {change.type}
-                </span>
-                <Button
-                  className="json-path font-code-md text-code-md"
-                  aria-expanded={selected === index}
-                  onClick={() => setSelected(selected === index ? -1 : index)}
-                >
-                  <code>{change.path}</code>
-                  <ChevronDown size={12} aria-hidden="true" />
-                </Button>
+                <div className="json-change-location">
+                  <span className="json-kind font-code-sm text-code-sm">
+                    {change.type === "Added"
+                      ? "+"
+                      : change.type === "Removed"
+                        ? "−"
+                        : "~"}{" "}
+                    {change.type}
+                  </span>
+                  <Button
+                    className="json-path font-code-md text-code-md"
+                    aria-expanded={selected === index}
+                    title="Inspect surrounding JSON"
+                    onClick={() => setSelected(selected === index ? -1 : index)}
+                  >
+                    <code>{change.path}</code>
+                    <ChevronDown size={12} aria-hidden="true" />
+                  </Button>
+                </div>
                 <div className="json-old">
                   <span className="json-mobile-value-label font-code-sm text-code-sm">
                     Original

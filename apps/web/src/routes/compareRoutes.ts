@@ -5,7 +5,7 @@ export const COMPARE_ROUTES = {
     title: "Text Compare — Markdown & AI Revisions | MDToDocs",
     description:
       "Compare text and Markdown revisions locally with editable side-by-side and unified differences.",
-    lead: "Review changes in AI drafts, Markdown and plain text. Your inputs stay in this tab.",
+    lead: "Paste two versions to see what changed. Edit either side and review the differences as you type.",
     canonical: "https://mdtodocs.com/text-compare/",
   },
   "/json-compare": {
@@ -14,7 +14,7 @@ export const COMPARE_ROUTES = {
     title: "JSON Compare — Structural Changes | MDToDocs",
     description:
       "Compare JSON specifications locally, ignoring formatting and object key order while preserving array order.",
-    lead: "Review structural changes in JSON specifications and API payloads. Your inputs stay in this tab.",
+    lead: "Paste the original and updated JSON, then review the fields and values that changed.",
     canonical: "https://mdtodocs.com/json-compare/",
   },
 } as const;
