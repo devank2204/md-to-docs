@@ -87,6 +87,8 @@ that upstream tests alone establish our integration's correctness.
 
 ### Bundle impact
 
+These measurements describe the initial implementation before the typography correction.
+
 A detached main build using the same installed dependencies supplies the baseline.
 Summing gzip(level 9) sizes over each homepage entry's static JS import graph:
 104,761 → 105,986 bytes: **+1,225 bytes (1.17%)**. This excludes lazy imports.
@@ -101,3 +103,30 @@ build measurements, not network/production performance claims.
 
 The three dirty DOCX fixtures present immediately after clone were preserved and
 excluded from the implementation commit. No push, merge or deployment performed.
+
+## Typography correction following owner review
+
+The initial comparison shell incorrectly forked the incumbent introduction:
+smaller headings, default sans description/controls, custom button geometry, and
+CodeMirror's own scroller monospace declaration. This was an implementation error,
+not an approved visual direction. Both tools now reuse HomeIntroduction with
+explicit standalone content (unchanged default behavior for existing callers),
+shared Button controls, existing body/code roles and existing supporting-content
+typography. Custom compare button styling is removed. The CodeMirror scroller
+inherits JetBrains Mono. Source roles use 12px/18px desktop and 16px/1.65 mobile.
+No new fonts or changes to homepage, sidebar or wordmark styles.
+
+Added compare-identity.spec.ts to compare computed heading/description styles
+against the real homepage at desktop/mobile widths, and assert shared control
+and source typography. Existing identity expectations remain unchanged.
+
+Correction verification: production build/TypeScript and ten-route prerender pass;
+lint exits 0 with warnings. First focused browser run passed 16/16. After the
+scroller inheritance correction, 15/16 passed: both cross-page typography checks,
+existing home typography/wordmark checks, Mermaid font check and all comparison
+scenarios pass; the existing desktop export-control typography scenario timed out
+waiting for its control. Its expectations were not altered. Updated screenshots
+are captured at 320px, 390px and 1440px. This correction does not resolve the wider
+export/regression failures recorded above.
+The isolated desktop export-control recheck also timed out; no typography assertion
+or existing export implementation was changed to hide the failure.

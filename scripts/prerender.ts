@@ -1,3 +1,4 @@
+import {HomeIntroduction} from '../apps/web/src/components/HomeIntroduction';
 import { COMPARE_ROUTES } from "../apps/web/src/routes/compareRoutes";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
@@ -9,7 +10,7 @@ import path from 'path';
 
 import { LANDING_ROUTES, type RouteLandingSpec, BASE_URL } from '../apps/web/src/routes/landingData';
 
-type RouteSEO = Pick<RouteLandingSpec,'path'|'title'|'description'|'canonical'|'h1'> | (typeof COMPARE_ROUTES)[keyof typeof COMPARE_ROUTES];
+type RouteSEO = Pick<RouteLandingSpec,'path'|'title'|'description'|'canonical'|'h1'|'lead'> | (typeof COMPARE_ROUTES)[keyof typeof COMPARE_ROUTES];
 
 const ROUTES: RouteSEO[] = [...Object.values(LANDING_ROUTES),...Object.values(COMPARE_ROUTES)];
 
@@ -20,8 +21,7 @@ const generateSSRHtml = (spec: RouteSEO, mobile = false) =>
           "main",
           null,
           createElement("a", { href: "/" }, "MDToDocs"),
-          createElement("h1", null, spec.h1),
-          createElement("p", null, spec.description),
+          createElement(HomeIntroduction, {content:spec}),
           createElement(
             "p",
             null,

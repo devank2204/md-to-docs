@@ -1,9 +1,10 @@
+import { HomeIntroduction } from "../components/HomeIntroduction";
 import { CapacityDecision } from "../components/CapacityDecision";
 import { SupportDialog } from "../components/SupportDialog";
 import { AppAppearance } from "../components/AppAppearance";
 import { useAppAppearance } from "../hooks/useAppAppearance";
 import { useStore } from "../store";
-import { Menu } from "../components/Controls";
+import { Button, Menu } from "../components/Controls";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { BrandWordmark } from "../components/BrandWordmark";
 import { WorkspaceSidebar } from "../components/WorkspaceSidebar";
@@ -108,7 +109,7 @@ export default function CompareApp({
   const effectiveMode = mobile ? (mode === "side" ? "original" : mode) : mode;
   return (
     <div
-      className="compare-app bg-surface text-on-surface"
+      className="compare-app bg-surface text-on-surface font-body-md text-body-md"
       onDragOver={(event) => {
         if (event.dataTransfer.types.includes("Files")) event.preventDefault();
       }}
@@ -119,7 +120,7 @@ export default function CompareApp({
         void importFile(event.dataTransfer.files[0], side);
       }}
     >
-      <header className="compare-header">
+      <header className="compare-header font-code-sm text-code-sm">
         <a
           href="/"
           onClick={(e) => {
@@ -185,26 +186,23 @@ export default function CompareApp({
           />
         </div>
         <main className="compare-main">
-          <div className="compare-title">
-            <div>
-              <h1 className="font-serif text-3xl">{spec.h1}</h1>
-              <p>{spec.lead}</p>
-            </div>
-            <button onClick={() => replace([inputs[1], inputs[0]])}>
+          <HomeIntroduction content={spec} />
+          <div className="compare-title font-code-sm text-code-sm">
+            <Button onClick={() => replace([inputs[1], inputs[0]])}>
               Swap
-            </button>
+            </Button>
             <details>
-              <summary>More</summary>
+              <summary className="ux-button">More</summary>
               <div className="compare-menu">
-                <button onClick={() => replace(["", ""])}>Clear both</button>
-                <button onClick={() => void copy(inputs[0])}>
+                <Button onClick={() => replace(["", ""])}>Clear both</Button>
+                <Button onClick={() => void copy(inputs[0])}>
                   Copy Original
-                </button>
-                <button onClick={() => void copy(inputs[1])}>
+                </Button>
+                <Button onClick={() => void copy(inputs[1])}>
                   Copy Updated
-                </button>
+                </Button>
                 {!json && (
-                  <button
+                  <Button
                     onClick={async () => {
                       const { createTwoFilesPatch } = await import("diff");
                       await copy(
@@ -221,13 +219,13 @@ export default function CompareApp({
                     }}
                   >
                     Copy unified diff
-                  </button>
+                  </Button>
                 )}
               </div>
             </details>
           </div>
-          <div className="compare-toolbar">
-            <button
+          <div className="compare-toolbar font-code-sm text-code-sm">
+            <Button
               onClick={() =>
                 replace(
                   json
@@ -243,7 +241,7 @@ export default function CompareApp({
               }
             >
               Try example
-            </button>
+            </Button>
             {!json && (
               <>
                 {mobile ? (
@@ -277,7 +275,7 @@ export default function CompareApp({
                       ["updated", "Updated"],
                       ["unified", "Unified"],
                     ].map(([value, label]) => (
-                      <button
+                      <Button
                         key={value}
                         role="tab"
                         aria-selected={effectiveMode === value}
@@ -285,11 +283,12 @@ export default function CompareApp({
                         onClick={() => setMode(value)}
                       >
                         {label}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 ) : (
                   <select
+                    className="ux-button"
                     aria-label="Comparison view"
                     value={effectiveMode}
                     onChange={(e) => setMode(e.target.value)}
@@ -308,10 +307,10 @@ export default function CompareApp({
                 <span role="status">
                   {count} differences{approx ? " · Approximate matching" : ""}
                 </span>
-                <button onClick={() => nav.current?.(false)}>Previous</button>
-                <button onClick={() => nav.current?.(true)}>Next</button>
+                <Button onClick={() => nav.current?.(false)}>Previous</Button>
+                <Button onClick={() => nav.current?.(true)}>Next</Button>
                 <details>
-                  <summary>Options</summary>
+                  <summary className="ux-button">Options</summary>
                   <label>
                     <input
                       type="checkbox"
@@ -354,17 +353,17 @@ export default function CompareApp({
               </>
             )}
             {!json && validJSON && (
-              <button
+              <Button
                 onClick={() => {
                   memory.json = [...inputs];
                   navigate("/json-compare");
                 }}
               >
                 Compare as JSON
-              </button>
+              </Button>
             )}
           </div>
-          <div className="compare-input-labels">
+          <div className="compare-input-labels font-code-sm text-code-sm">
             {(["Original", "Updated"] as const).map((label, index) => (
               <label
                 key={label}
@@ -385,7 +384,7 @@ export default function CompareApp({
                 />
                 {json && (
                   <>
-                    <button
+                    <Button
                       onClick={() => {
                         try {
                           update(
@@ -398,7 +397,7 @@ export default function CompareApp({
                       }}
                     >
                       Format input
-                    </button>
+                    </Button>
                     <textarea
                       aria-label={label}
                       value={inputs[index]}
@@ -449,8 +448,8 @@ export default function CompareApp({
             </p>
           )}
           <p role="status">{notice}</p>
-          <section className="compare-support">
-            <h2 className="font-serif text-xl">
+          <section className="compare-support text-secondary text-sm leading-relaxed">
+            <h2 className="font-serif text-lg font-medium text-on-surface mb-3">
               Review technical revisions before sharing
             </h2>
             <p>

@@ -41,17 +41,6 @@
 .compare-title > div:first-child {
   flex: 1;
 }
-:is(.compare-main, .compare-header) button,
-:is(.compare-main, .compare-header) select,
-:is(.compare-main, .compare-header) summary {
-  cursor: pointer;
-  padding: 6px 10px;
-  border: 1px solid #dedbd3;
-  border-radius: 5px;
-}
-:is(.compare-main, .compare-header) button:hover {
-  background: #eeeae2;
-}
 .compare-app details label {
   display: block;
   padding: 6px;
@@ -81,7 +70,8 @@
   background: transparent;
   border: 1px solid #dedbd3;
   font-family: "JetBrains Mono", monospace;
-  font-size: 16px;
+  font-size: 12px;
+  line-height: 1.5;
 }
 .compare-editors {
   border: 1px solid #dedbd3;
@@ -91,8 +81,12 @@
   height: 480px;
   min-width: 0;
   font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
 }
 .compare-editors .cm-scroller {
+  font-family: inherit;
+  line-height: inherit;
   overflow: auto;
 }
 .compare-editors .cm-mergeView {
@@ -137,8 +131,10 @@
   .compare-input-labels {
     flex-direction: column;
   }
-  .compare-editors .cm-editor {
+  .compare-editors .cm-editor,
+  .compare-input-labels textarea {
     font-size: 16px;
+    line-height: 1.65;
   }
   .compare-toolbar {
     gap: 6px;

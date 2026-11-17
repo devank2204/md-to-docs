@@ -1,3 +1,4 @@
+import { Button } from "../components/Controls";
 import { useEffect, useState } from "react";
 import { compareJSON, changesFromDelta, jsonError, type Change } from "./model";
 export default function JsonResult({
@@ -55,20 +56,22 @@ export default function JsonResult({
       </p>
       {result.changes.map((change, index) => (
         <div className="json-change" key={index}>
-          <button
+          <Button
+            className="font-code-sm text-code-sm"
             onClick={() =>
               setSelected(selected === change.path ? undefined : change.path)
             }
           >
             {change.type} <code>{change.path}</code>
-          </button>
-          <button
+          </Button>
+          <Button
+            className="font-code-sm text-code-sm"
             aria-label={`Copy path ${change.path}`}
             onClick={() => void copy(change.path)}
           >
             Copy path
-          </button>
-          <pre>
+          </Button>
+          <pre className="font-code-md text-code-md">
             {change.old === undefined
               ? "(missing)"
               : JSON.stringify(change.old, null, 2)}{" "}
@@ -80,7 +83,7 @@ export default function JsonResult({
           {selected === change.path && (
             <details open>
               <summary>Payload context</summary>
-              <pre>
+              <pre className="font-code-md text-code-md">
                 Original: {JSON.stringify(result.left, null, 2)}
                 {"\n"}Updated: {JSON.stringify(result.right, null, 2)}
               </pre>
