@@ -1,5 +1,12 @@
+import { compareSearch, findInEditor, type SearchHandle } from "./editorSearch";
 import { useEffect, useRef } from "react";
-import { EditorState, ChangeSet, Text, Compartment } from "@codemirror/state";
+import {
+  EditorState,
+  ChangeSet,
+  Text,
+  Compartment,
+  type StateEffect,
+} from "@codemirror/state";
 import {
   EditorView,
   keymap,
@@ -22,6 +29,7 @@ import {
   originalDocChangeEffect,
   getOriginalDoc,
   Chunk,
+  uncollapseUnchanged,
   goToNextChunk,
   goToPreviousChunk,
 } from "@codemirror/merge";
@@ -35,6 +43,9 @@ export function TextEditors({
   context,
   onStatus,
   nav,
+  find,
+  changesOnly,
+  onReady,
 }: {
   a: string;
   b: string;
@@ -45,6 +56,9 @@ export function TextEditors({
   context: number;
   onStatus: (count: number, approx: boolean, active?: number) => void;
   nav: { current: ((next: boolean) => void) | null };
+  find: SearchHandle;
+  changesOnly: boolean;
+  onReady: () => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const syncing = useRef(false);
@@ -115,6 +129,28 @@ export function TextEditors({
       EditorView.editable.of(!readOnly),
       lineNumbers(),
       history(),
+      compareSearch,
+      // Merge's collapsed-range state does not automatically reveal search
+      // selections. Use its public effect to reveal the containing block.
+      EditorState.transactionExtender.of((transaction) => {
+        if (!transaction.isUserEvent("select.search")) return null;
+        const effects: StateEffect<unknown>[] = [];
+        const selection = transaction.newSelection.main;
+        for (const decorations of transaction.state.facet(
+          EditorView.decorations,
+        )) {
+          if (typeof decorations === "function") continue;
+          decorations.between(
+            selection.from,
+            selection.to,
+            (from, to, decoration) => {
+              if (to > from && decoration.spec.block && decoration.spec.widget)
+                effects.push(uncollapseUnchanged.of(from));
+            },
+          );
+        }
+        return effects.length ? { effects } : null;
+      }),
       ...(histories.current[side]?.doc.toString() === values.current[side] &&
       !readOnly
         ? [
@@ -152,7 +188,9 @@ export function TextEditors({
     ];
     const config = {
       diffConfig: { scanLimit: 500, timeout: 50 },
-      collapseUnchanged: { margin: context, minSize: 8 },
+      collapseUnchanged: changesOnly
+        ? { margin: context, minSize: 1 }
+        : undefined,
     };
     let merge: MergeView | undefined;
     if (mode === "side") {
@@ -184,6 +222,11 @@ export function TextEditors({
         }),
       ];
     }
+    find.current = (side) => {
+      const view = mode === "side" ? editors.current[side] : editors.current[0];
+      if (view) findInEditor(view);
+    };
+    onReady();
     nav.current = (next) => {
       const view = editors.current.at(-1)!;
       (next ? goToNextChunk : goToPreviousChunk)(view);
@@ -214,6 +257,7 @@ export function TextEditors({
       observer.disconnect();
       reportStatus.current = null;
       nav.current = null;
+      find.current = null;
       if (!readOnly)
         editors.current.forEach((editor, index) => {
           const side = mode === "side" ? index : mode === "original" ? 0 : 1;
@@ -223,7 +267,7 @@ export function TextEditors({
       else editors.current.forEach((e) => e.destroy());
       editors.current = [];
     };
-  }, [mode, whitespace, context, readOnly]);
+  }, [mode, whitespace, context, readOnly, changesOnly]);
   useEffect(() => {
     syncing.current = true;
     editors.current.forEach((editor, index) => {

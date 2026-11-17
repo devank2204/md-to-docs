@@ -1,3 +1,6 @@
+import { compareSearch, findInEditor, type SearchHandle } from "./editorSearch";
+import { jsonContextFolding, outsideJSONContextRanges } from "./jsonFolding";
+import { foldEffect, unfoldAll } from "@codemirror/language";
 import { scrollAnchors, matchingScrollTop } from "./jsonScroll";
 import type { Change, JSONScrollPair } from "./model";
 import { locateChanges, type ChangeLocation } from "./jsonLocations";
@@ -38,6 +41,9 @@ export default function JsonEditors({
   onSelect,
   syncScroll,
   scrollPairs,
+  find,
+  changesOnly,
+  onReady,
 }: {
   a: string;
   b: string;
@@ -49,6 +55,9 @@ export default function JsonEditors({
   onSelect: (index: number) => void;
   syncScroll: boolean;
   scrollPairs: JSONScrollPair[];
+  find: SearchHandle;
+  changesOnly: boolean;
+  onReady: () => void;
 }) {
   const hosts = useRef<(HTMLDivElement | null)[]>([]),
     views = useRef<EditorView[]>([]),
@@ -103,6 +112,8 @@ export default function JsonEditors({
               ),
               highlightSpecialChars(),
               history(),
+              compareSearch,
+              jsonContextFolding,
               keymap.of([...defaultKeymap, ...historyKeymap]),
               json(),
               palette.current.of(colors()),
@@ -118,6 +129,10 @@ export default function JsonEditors({
           }),
         }),
     );
+    find.current = (side) => {
+      if (views.current[side]) findInEditor(views.current[side]);
+    };
+    onReady();
     const observer = new MutationObserver(() => {
       views.current.forEach((view) =>
         view.dispatch({ effects: palette.current.reconfigure(colors()) }),
@@ -129,6 +144,7 @@ export default function JsonEditors({
     });
     return () => {
       observer.disconnect();
+      find.current = null;
       views.current.forEach((view) => view.destroy());
       views.current = [];
     };
@@ -179,23 +195,98 @@ export default function JsonEditors({
     const clicked = clickedSide.current;
     clickedSide.current = null;
     if (selected < 0) return;
-    const frame = requestAnimationFrame(() => {
-      views.current.forEach((view, side) => {
-        const target = locations.current[side].find(
-          (location) => location.index === selected,
-        );
-        if (target && side !== clicked && (!mobile || side === active))
-          view.dispatch({
-            selection: { anchor: target.valueFrom },
-            effects: EditorView.scrollIntoView(target.valueFrom, {
-              y: "center",
-              yMargin: 60,
+    let canceled = false;
+    const frames: number[] = [];
+    views.current.forEach((view, side) => {
+      const target = locations.current[side].find(
+        (location) => location.index === selected,
+      );
+      if (!target || side === clicked || (mobile && side !== active)) return;
+      // A selected-field strip or focus layout can resize the editor outside
+      // CodeMirror. Measure first, then navigate after native scroll anchoring.
+      view.requestMeasure({
+        read: () => !canceled && views.current.includes(view),
+        write: (ready) => {
+          if (!ready) return;
+          frames.push(
+            requestAnimationFrame(() => {
+              if (canceled || !views.current.includes(view)) return;
+              view.dispatch({
+                selection: { anchor: target.valueFrom },
+                effects: EditorView.scrollIntoView(target.valueFrom, {
+                  y: "center",
+                  yMargin: 60,
+                }),
+              });
+              // Wrapped-line estimates may change when the destination renders.
+              // Verify the actual cursor rectangle after that measurement pass.
+              view.requestMeasure({
+                read: () => !canceled && views.current.includes(view),
+                write: (valid) => {
+                  if (!valid) return;
+                  frames.push(
+                    requestAnimationFrame(() => {
+                      if (canceled || !views.current.includes(view)) return;
+                      const cursor = view.coordsAtPos(target.valueFrom);
+                      if (!cursor) return;
+                      const boxes = views.current
+                        .filter((_item, index) => !mobile || index === active)
+                        .map((item) => item.scrollDOM.getBoundingClientRect());
+                      const top = Math.max(0, ...boxes.map((box) => box.top));
+                      const bottom = Math.min(
+                        innerHeight,
+                        ...boxes.map((box) => box.bottom),
+                      );
+                      let desired = (top + bottom) / 2;
+                      if (clicked !== null) {
+                        const source = views.current[clicked];
+                        const sourceTarget = locations.current[clicked].find(
+                          (location) => location.index === selected,
+                        );
+                        const sourceCursor =
+                          sourceTarget &&
+                          source.coordsAtPos(sourceTarget.valueFrom);
+                        if (sourceCursor)
+                          desired = Math.max(
+                            top + 12,
+                            Math.min(
+                              bottom - 12,
+                              (sourceCursor.top + sourceCursor.bottom) / 2,
+                            ),
+                          );
+                      }
+                      view.scrollDOM.scrollTop +=
+                        (cursor.top + cursor.bottom) / 2 - desired;
+                    }),
+                  );
+                },
+              });
             }),
-          });
+          );
+        },
       });
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      canceled = true;
+      frames.forEach(cancelAnimationFrame);
+    };
   }, [selected, active, mobile, changes]);
+  useEffect(() => {
+    views.current.forEach((view, side) => {
+      unfoldAll(view);
+      if (changesOnly) {
+        const ranges = outsideJSONContextRanges(
+          view.state.doc,
+          locations.current[side],
+        );
+        if (ranges.length)
+          view.dispatch({
+            effects: ranges.map((range) => foldEffect.of(range)),
+          });
+      }
+      view.requestMeasure();
+    });
+  }, [changesOnly, changes, a, b]);
   useEffect(() => {
     if (mobile || !syncScroll || views.current.length !== 2) return;
     const pair = views.current;
@@ -212,6 +303,7 @@ export default function JsonEditors({
         if (scrollLeader.current !== side) return;
         cancelAnimationFrame(frame);
         frame = requestAnimationFrame(() => {
+          if (disposed || !views.current.includes(view)) return;
           const other = side ? 0 : 1;
           // No stale path offsets during typing; the status supplies no pairs
           // until both current inputs have been compared successfully.

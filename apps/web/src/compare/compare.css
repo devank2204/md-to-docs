@@ -686,3 +686,302 @@
 .compare-input-valid > svg {
   flex-shrink: 0;
 }
+
+/* Extra workspace controls use the established control and source font roles. */
+.compare-changes-only {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 0 !important;
+  white-space: nowrap;
+}
+.compare-input-labels,
+.json-editors,
+.compare-empty-hints {
+  grid-template-columns: var(--compare-split, 50%) minmax(0, 1fr);
+}
+.compare-editors .cm-mergeViewEditors > .cm-mergeViewEditor:first-child {
+  flex-basis: var(--compare-split, 50%);
+  flex-grow: 0;
+}
+.compare-input-labels > section {
+  flex-wrap: wrap;
+}
+.compare-input-name {
+  flex: 1 1 90px;
+  min-width: 90px;
+  max-width: 100%;
+}
+.compare-input-actions {
+  flex-shrink: 1;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+.compare-pane-resize {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  left: calc(var(--compare-split, 50%) - 4px);
+  cursor: col-resize;
+  touch-action: none;
+}
+.compare-pane-resize:hover,
+.compare-pane-resize:focus-visible {
+  background: var(--sidebar-selected);
+  outline: 1px solid var(--sidebar-muted);
+  outline-offset: -2px;
+}
+.json-filter-options {
+  display: grid;
+  gap: 6px;
+  width: min(300px, calc(100vw - 64px));
+}
+.json-filter-options p {
+  color: var(--sidebar-muted);
+  white-space: normal;
+}
+.json-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--sidebar-line);
+  max-height: 120px;
+  overflow: auto;
+}
+.json-active-filters button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  max-width: 100%;
+}
+.json-excluded-count {
+  color: var(--sidebar-muted);
+}
+.json-context-bar > .json-ignore-field {
+  padding: 5px 8px;
+  white-space: nowrap;
+}
+.compare-editors .cm-panels {
+  background: rgb(var(--app-surface));
+  color: rgb(var(--app-on-surface));
+  border-color: var(--sidebar-line);
+}
+.compare-editors .cm-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 28px 8px 10px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.compare-editors .cm-search > br {
+  flex-basis: 100%;
+}
+.compare-editors .cm-search label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.compare-editors .cm-search .cm-textfield {
+  min-width: 90px;
+  flex: 1 1 120px;
+  width: 120px;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: rgb(var(--app-surface-container-lowest));
+  color: inherit;
+  border: 1px solid var(--sidebar-line);
+  font: inherit;
+}
+.compare-editors .cm-search .cm-button {
+  background: rgb(var(--app-surface));
+  color: inherit;
+  border: 1px solid var(--sidebar-line);
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+}
+.compare-editors .cm-foldPlaceholder {
+  background: rgb(var(--app-surface));
+  color: var(--sidebar-muted);
+  border: 1px solid var(--sidebar-line);
+  border-radius: 4px;
+  font: inherit;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+.compare-app[data-focus="true"] {
+  height: 100svh;
+  max-height: 100svh;
+  overflow: hidden;
+}
+.compare-app[data-focus="true"] .compare-sidebar,
+.compare-app[data-focus="true"] .compare-sidebar-toggle {
+  display: none;
+}
+.compare-app[data-focus="true"] .compare-header > .compare-brand {
+  flex-basis: auto;
+}
+.compare-app[data-focus="true"] .compare-main {
+  padding: 12px;
+  height: calc(100svh - 57px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.compare-app[data-focus="true"] .compare-heading {
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.compare-app[data-focus="true"] .compare-heading > div:first-child {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.compare-app[data-focus="true"] .compare-title {
+  width: 100%;
+}
+.compare-focus-title {
+  margin-right: auto;
+}
+.compare-app[data-focus="true"] .compare-tool-surface {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.compare-app[data-focus="true"]
+  .compare-tool-surface
+  > :not(.compare-editor-stage) {
+  flex-shrink: 0;
+}
+.compare-app[data-focus="true"] .compare-toolbar {
+  position: relative;
+  top: 0;
+}
+.compare-app[data-focus="true"] .compare-editor-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.compare-app[data-focus="true"]
+  .compare-editor-stage
+  > div:not(.compare-empty-hints):not(.compare-pane-resize) {
+  flex: 1;
+  min-height: 0;
+}
+.compare-app[data-focus="true"] .compare-editors,
+.compare-app[data-focus="true"] .json-editors > div {
+  height: 100%;
+  min-height: 0;
+}
+.compare-app[data-focus="true"] .compare-editors .cm-editor,
+.compare-app[data-focus="true"] .compare-editors .cm-mergeView {
+  height: 100%;
+}
+.compare-app[data-focus="true"] .compare-editors .cm-mergeView .cm-editor {
+  height: auto !important;
+}
+.compare-app[data-focus="true"] .compare-privacy,
+.compare-app[data-focus="true"] .compare-guidance,
+.compare-app[data-focus="true"] .compare-example {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .compare-input-labels:has(> section[hidden]),
+  .json-editors,
+  .compare-empty-hints {
+    grid-template-columns: 1fr;
+  }
+  .compare-pane-resize {
+    display: none;
+  }
+  .compare-app[data-focus="true"] .compare-main {
+    height: calc(100svh - 53px);
+    padding: 8px;
+  }
+  .compare-app[data-focus="true"] .compare-heading {
+    display: none;
+  }
+  .compare-app[data-focus="true"] .compare-toolbar .compare-title {
+    width: auto;
+    margin-top: 0;
+    gap: 4px;
+  }
+  .compare-app[data-focus="true"] .compare-toolbar .compare-focus-title {
+    display: none;
+  }
+  .compare-app[data-focus="true"] .json-context-bar[data-selected="false"] {
+    display: none;
+  }
+  .compare-app[data-focus="true"]
+    .compare-editor-footer
+    > span:not(.compare-legend) {
+    display: none;
+  }
+}
+.compare-app[data-focus="true"] .cm-mergeViewEditors {
+  min-height: 100%;
+}
+.compare-app[data-focus="true"] .cm-mergeViewEditor {
+  display: flex;
+}
+.compare-app[data-focus="true"] .cm-mergeViewEditor > .cm-editor {
+  flex: 1;
+}
+/* Keep the navigation row stable as empty/pending/valid status text changes. */
+@media (min-width: 1024px) {
+  .compare-toolbar:has(.json-inline-controls) > * {
+    order: 1;
+  }
+  .compare-toolbar:has(.json-inline-controls) > .json-inline-controls {
+    flex-basis: 100%;
+    order: 0;
+  }
+}
+.compare-app[data-focus="true"] .compare-heading {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: 0;
+}
+.compare-app[data-focus="true"] .compare-toolbar .compare-title {
+  width: auto;
+  margin-top: 0;
+  gap: 4px;
+}
+.compare-app[data-focus="true"] .compare-toolbar .compare-focus-title {
+  display: none;
+}
+/* Native search uses the established compact control role; source and mobile
+   text-entry sizes stay unchanged. */
+.compare-editors .cm-search {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+}
+.compare-editors .cm-search .cm-button {
+  padding: 5px 8px;
+  min-height: 28px;
+  box-shadow: none;
+}
+@media (max-width: 1023px) {
+  .compare-editors .cm-search .cm-textfield {
+    font-size: 16px;
+  }
+}

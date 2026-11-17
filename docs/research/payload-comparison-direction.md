@@ -74,6 +74,16 @@ available field anchors; Previous/Next remains the precise way to inspect one
 specific structural change, and unlinking remains available. Array identity is
 still conservative; no ID guessing was added to make scrolling appear smarter.
 
+## Implemented workspace phase
+
+The next authorized batch implements focus mode, keyboard/pointer pane resizing,
+CodeMirror full-source search, changes-only context, change-type filters and
+explicit selected-path noise filters. The original source stays in the editors;
+no detached results screen returns. This covers priorities 1–3 in the detailed
+sequence below (the user-facing recommendation grouped context/noise together).
+cURL Compare, configurable array identity and HTTP response/report tools remain
+planned. Verification is recorded in [comparison-tools.md](../qa/comparison-tools.md).
+
 ## Recommended next sequence
 
 | Priority | Improvement | Concrete user outcome | Implementation direction |

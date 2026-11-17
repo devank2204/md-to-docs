@@ -1,3 +1,8 @@
+import {
+  changeTypes,
+  visibleJSONChanges,
+  type IgnoredPath,
+} from "./jsonFilters";
 import { useMobileLayout } from "../hooks/useMobileLayout";
 import { CompareHeader } from "./CompareHeader";
 import type { JSONReviewStatus } from "./JsonResult";
@@ -13,6 +18,12 @@ import {
   CheckCircle2,
   Circle,
   AlertCircle,
+  Search,
+  Maximize2,
+  Minimize2,
+  X,
+  Filter,
+  EyeOff,
 } from "lucide-react";
 import { HomeIntroduction } from "../components/HomeIntroduction";
 import { CapacityDecision } from "../components/CapacityDecision";
@@ -20,7 +31,15 @@ import { SupportDialog } from "../components/SupportDialog";
 import { useAppAppearance } from "../hooks/useAppAppearance";
 import { useStore } from "../store";
 import { Button, Menu } from "../components/Controls";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  type CSSProperties,
+} from "react";
 import { WorkspaceSidebar } from "../components/WorkspaceSidebar";
 import { compareRoute } from "../routes/compareRoutes";
 import type { LandingRoutePath } from "../routes/landingData";
@@ -139,6 +158,16 @@ export default function CompareApp({
   useAppAppearance();
   const sidebarOpen = useStore((state) => state.isSidebarOpen);
   const root = useRef<HTMLDivElement>(null);
+  const [focusMode, setFocusMode] = useState(false);
+  const [split, setSplit] = useState(50);
+  const [changesOnly, setChangesOnly] = useState(false);
+  const [includedTypes, setIncludedTypes] = useState<string[]>([
+    ...changeTypes,
+  ]);
+  const [ignoredPaths, setIgnoredPaths] = useState<IgnoredPath[]>([]);
+  const [editorReady, setEditorReady] = useState(false);
+  const find = useRef<((side: 0 | 1) => void) | null>(null);
+  const pendingFind = useRef<0 | 1 | null>(null);
   const [syncScroll, setSyncScroll] = useState(true);
   const [selectedJSON, setSelectedJSON] = useState(-1);
   const [jsonStatus, setJSONStatus] = useState<JSONReviewStatus>();
@@ -235,7 +264,23 @@ export default function CompareApp({
   const currentJSON =
     jsonStatus?.a === inputs[0] && jsonStatus?.b === inputs[1];
   const canReview = currentJSON && jsonStatus.ready;
-  const jsonChanges = canReview ? (jsonStatus.changes ?? []) : [];
+  const jsonChanges = useMemo(
+    () =>
+      canReview
+        ? visibleJSONChanges(
+            jsonStatus.changes ?? [],
+            includedTypes,
+            ignoredPaths,
+          )
+        : [],
+    [canReview, jsonStatus, includedTypes, ignoredPaths],
+  );
+  const filtersActive = includedTypes.length !== 3 || ignoredPaths.length > 0;
+  const restoreFilters = () => {
+    setIncludedTypes([...changeTypes]);
+    setIgnoredPaths([]);
+    setSelectedJSON(-1);
+  };
   const selectedJSONChange = jsonChanges[selectedJSON];
   const comparisonBlocked =
     currentJSON && jsonStatus.error && !jsonStatus.errors?.some(Boolean);
@@ -305,11 +350,75 @@ export default function CompareApp({
     const frame = requestAnimationFrame(() => nav.current?.(next));
     return () => cancelAnimationFrame(frame);
   }, [effectiveMode]);
+  const runFind = (side: 0 | 1) => {
+    if (!json && effectiveMode === "unified" && side === 0) {
+      pendingFind.current = side;
+      setMode(mobile ? "original" : "side");
+    } else find.current?.(side);
+  };
+  useEffect(() => {
+    if (pendingFind.current === null || !editorReady) return;
+    const side = pendingFind.current;
+    const frame = requestAnimationFrame(() => {
+      pendingFind.current = null;
+      find.current?.(side);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [effectiveMode, editorReady]);
+  useEffect(() => {
+    if (focusMode) window.scrollTo({ top: 0, behavior: "instant" });
+  }, [focusMode]);
+  const actions = (
+    <div className="compare-title font-code-sm text-code-sm">
+      {focusMode && (
+        <span className="compare-focus-title">
+          {json ? "JSON Compare" : "Text Compare"}
+        </span>
+      )}
+      <Button onClick={() => replace([inputs[1], inputs[0]])}>
+        <ArrowLeftRight size={14} aria-hidden="true" /> Swap
+      </Button>
+      <Menu label="More" name="More">
+        <div className="compare-menu">
+          <Button onClick={() => replace(["", ""])}>Clear both</Button>
+
+          {!json && (
+            <Button
+              onClick={async () => {
+                const { createTwoFilesPatch } = await import("diff");
+                await copy(
+                  createTwoFilesPatch(
+                    "Original",
+                    "Updated",
+                    inputs[0],
+                    inputs[1],
+                    undefined,
+                    undefined,
+                    { context },
+                  ),
+                );
+              }}
+            >
+              Copy unified diff
+            </Button>
+          )}
+        </div>
+      </Menu>
+    </div>
+  );
   return (
     <div
       ref={root}
       data-sidebar={sidebarOpen}
+      data-focus={focusMode}
       onKeyDown={(event) => {
+        if (
+          event.key === "Escape" &&
+          focusMode &&
+          !event.defaultPrevented &&
+          !(event.target as Element).closest(".ux-menu, .cm-search")
+        )
+          setFocusMode(false);
         if (event.key === "F7" && !event.defaultPrevented) {
           event.preventDefault();
           if (json) nav.current?.(!event.shiftKey);
@@ -342,39 +451,12 @@ export default function CompareApp({
         <main className="compare-main">
           <div className="compare-heading">
             <HomeIntroduction content={spec} />
-            <div className="compare-title font-code-sm text-code-sm">
-              <Button onClick={() => replace([inputs[1], inputs[0]])}>
-                <ArrowLeftRight size={14} aria-hidden="true" /> Swap
-              </Button>
-              <Menu label="More" name="More">
-                <div className="compare-menu">
-                  <Button onClick={() => replace(["", ""])}>Clear both</Button>
-
-                  {!json && (
-                    <Button
-                      onClick={async () => {
-                        const { createTwoFilesPatch } = await import("diff");
-                        await copy(
-                          createTwoFilesPatch(
-                            "Original",
-                            "Updated",
-                            inputs[0],
-                            inputs[1],
-                            undefined,
-                            undefined,
-                            { context },
-                          ),
-                        );
-                      }}
-                    >
-                      Copy unified diff
-                    </Button>
-                  )}
-                </div>
-              </Menu>
-            </div>
+            {!focusMode && actions}
           </div>
-          <div className="compare-tool-surface">
+          <div
+            className="compare-tool-surface"
+            style={{ "--compare-split": `${split}%` } as CSSProperties}
+          >
             <div className="compare-toolbar font-code-sm text-code-sm">
               {json && (
                 <>
@@ -393,6 +475,7 @@ export default function CompareApp({
                       onSelect={setSelectedJSON}
                       nav={nav}
                       onStatus={setJSONStatus}
+                      visibleChanges={jsonChanges}
                     />
                   </Suspense>
                   {!mobile && (
@@ -417,6 +500,75 @@ export default function CompareApp({
                   )}
                 </>
               )}
+              <label className="compare-changes-only">
+                <input
+                  type="checkbox"
+                  checked={changesOnly}
+                  onChange={(event) => {
+                    setChangesOnly(event.target.checked);
+                    if (!json && mobile && event.target.checked)
+                      setMode("unified");
+                  }}
+                />{" "}
+                Changes only
+              </label>
+              {json && (
+                <Menu
+                  name={filtersActive ? "Filters: active" : "Filters"}
+                  label={
+                    <>
+                      <Filter size={13} aria-hidden="true" /> Filters
+                      {filtersActive ? " · on" : ""}
+                    </>
+                  }
+                >
+                  <div className="json-filter-options">
+                    <strong>Show change types</strong>
+                    {changeTypes.map((type) => (
+                      <label key={type}>
+                        <input
+                          type="checkbox"
+                          checked={includedTypes.includes(type)}
+                          onChange={(event) => {
+                            setIncludedTypes((old) =>
+                              event.target.checked
+                                ? [...old, type]
+                                : old.filter((value) => value !== type),
+                            );
+                            setSelectedJSON(-1);
+                          }}
+                        />{" "}
+                        {type}
+                      </label>
+                    ))}
+                    <p>
+                      Select a changed field, then choose Ignore field to remove
+                      noise. Ignoring a child keeps parent changes visible.
+                    </p>
+                    <Button disabled={!filtersActive} onClick={restoreFilters}>
+                      Show all changes
+                    </Button>
+                  </div>
+                </Menu>
+              )}
+              <Button
+                className="compare-focus-button"
+                aria-pressed={focusMode}
+                title={
+                  focusMode
+                    ? "Exit focus workspace (Esc)"
+                    : "Give the comparison the full workspace"
+                }
+                onClick={() => setFocusMode((value) => !value)}
+              >
+                {focusMode ? (
+                  <Minimize2 size={13} aria-hidden="true" />
+                ) : (
+                  <Maximize2 size={13} aria-hidden="true" />
+                )}
+                {focusMode ? "Exit focus" : "Focus"}
+              </Button>
+              {focusMode && actions}
               <Button
                 className="compare-example"
                 onClick={() =>
@@ -548,11 +700,49 @@ export default function CompareApp({
                 </Button>
               )}
             </div>
+            {json && filtersActive && (
+              <div
+                className="json-active-filters font-code-sm text-code-sm"
+                aria-label="Active JSON filters"
+              >
+                {changeTypes
+                  .filter((type) => !includedTypes.includes(type))
+                  .map((type) => (
+                    <Button
+                      key={type}
+                      onClick={() => {
+                        setIncludedTypes((old) => [...old, type]);
+                        setSelectedJSON(-1);
+                      }}
+                    >
+                      Show {type.toLowerCase()}{" "}
+                      <X size={12} aria-hidden="true" />
+                    </Button>
+                  ))}
+                {ignoredPaths.map((item) => (
+                  <Button
+                    key={item.path}
+                    aria-label={`Include ${item.path}`}
+                    onClick={() => {
+                      setIgnoredPaths((old) =>
+                        old.filter((path) => path !== item),
+                      );
+                      setSelectedJSON(-1);
+                    }}
+                  >
+                    <EyeOff size={12} aria-hidden="true" /> {item.path}{" "}
+                    <X size={12} aria-hidden="true" />
+                  </Button>
+                ))}
+                <Button onClick={restoreFilters}>Show all changes</Button>
+              </div>
+            )}
             {json && (
               <div
                 className="json-context-bar font-code-sm text-code-sm"
                 aria-label="Current JSON change"
                 data-kind={selectedJSONChange?.type.toLowerCase()}
+                data-selected={!!selectedJSONChange}
               >
                 {selectedJSONChange ? (
                   <>
@@ -585,11 +775,28 @@ export default function CompareApp({
                     >
                       <Copy size={13} />
                     </Button>
+                    <Button
+                      className="json-ignore-field"
+                      onClick={() => {
+                        setIgnoredPaths((old) => [
+                          ...old,
+                          {
+                            path: selectedJSONChange.path,
+                            segments: selectedJSONChange.segments,
+                          },
+                        ]);
+                        setSelectedJSON(-1);
+                      }}
+                    >
+                      <EyeOff size={13} aria-hidden="true" /> Ignore field
+                    </Button>
                   </>
                 ) : (
                   <span>
                     {canReview && !jsonChanges.length
-                      ? "Object key order and formatting are ignored."
+                      ? jsonStatus.count
+                        ? "No changes match these filters. Show all changes to restore them."
+                        : "Object key order and formatting are ignored."
                       : canReview
                         ? "Changes are highlighted below · Next jumps to both locations."
                         : "Edit either input · Differences update automatically when both contain valid JSON."}
@@ -643,6 +850,14 @@ export default function CompareApp({
                     </span>
                   </div>
                   <div className="compare-input-actions">
+                    <Button
+                      aria-label={`Find in ${label}`}
+                      title={`Find in ${label} (Ctrl/Cmd+F)`}
+                      disabled={!editorReady}
+                      onClick={() => runFind(index as 0 | 1)}
+                    >
+                      <Search size={13} aria-hidden="true" /> Find
+                    </Button>
                     <input
                       hidden
                       ref={(element) => {
@@ -710,6 +925,9 @@ export default function CompareApp({
                     mobile={mobile}
                     active={effectiveMode === "updated" ? 1 : 0}
                     changes={jsonChanges}
+                    changesOnly={changesOnly && !!canReview}
+                    find={find}
+                    onReady={() => setEditorReady(true)}
                     selected={selectedJSON}
                     onSelect={setSelectedJSON}
                     syncScroll={syncScroll}
@@ -730,6 +948,9 @@ export default function CompareApp({
                   <Suspense fallback={<p>Loading comparison editor…</p>}>
                     <div>
                       <TextEditors
+                        find={find}
+                        onReady={() => setEditorReady(true)}
+                        changesOnly={changesOnly}
                         readOnly={normalized}
                         a={normalized ? projection(inputs[0]) : inputs[0]}
                         b={normalized ? projection(inputs[1]) : inputs[1]}
@@ -791,6 +1012,63 @@ export default function CompareApp({
                     </div>
                   ))}
                 </div>
+              )}
+              {!mobile && (json || effectiveMode === "side") && (
+                <div
+                  className="compare-pane-resize"
+                  role="separator"
+                  aria-label="Resize comparison panes"
+                  aria-orientation="vertical"
+                  tabIndex={0}
+                  aria-valuemin={25}
+                  aria-valuemax={75}
+                  aria-valuenow={split}
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
+                  onPointerMove={(event) => {
+                    if (!event.currentTarget.hasPointerCapture(event.pointerId))
+                      return;
+                    const bounds =
+                      event.currentTarget.parentElement!.getBoundingClientRect();
+                    setSplit(
+                      Math.max(
+                        25,
+                        Math.min(
+                          75,
+                          Math.round(
+                            ((event.clientX - bounds.left) / bounds.width) *
+                              100,
+                          ),
+                        ),
+                      ),
+                    );
+                  }}
+                  onKeyDown={(event) => {
+                    if (
+                      ["ArrowLeft", "ArrowRight", "Home", "End"].includes(
+                        event.key,
+                      )
+                    ) {
+                      event.preventDefault();
+                      setSplit((value) =>
+                        event.key === "Home"
+                          ? 25
+                          : event.key === "End"
+                            ? 75
+                            : Math.max(
+                                25,
+                                Math.min(
+                                  75,
+                                  value + (event.key === "ArrowLeft" ? -5 : 5),
+                                ),
+                              ),
+                      );
+                    }
+                  }}
+                  onDoubleClick={() => setSplit(50)}
+                />
               )}
             </div>
             <div className="compare-editor-footer font-code-sm text-code-sm">

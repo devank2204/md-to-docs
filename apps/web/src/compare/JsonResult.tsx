@@ -25,6 +25,7 @@ export default function JsonResult({
   onSelect,
   nav,
   onStatus,
+  visibleChanges,
 }: {
   a: string;
   b: string;
@@ -32,6 +33,7 @@ export default function JsonResult({
   onSelect: (index: number) => void;
   nav: React.MutableRefObject<((next: boolean) => void) | null>;
   onStatus: (status: JSONReviewStatus) => void;
+  visibleChanges: Change[];
 }) {
   const [result, setResult] = useState<JSONReviewStatus>();
   const callbacks = useRef({ onStatus, onSelect });
@@ -90,7 +92,8 @@ export default function JsonResult({
   }, [a, b]);
   const current = result?.a === a && result?.b === b;
   const ready = current && result.ready;
-  const changes = ready ? (result.changes ?? []) : [];
+  const changes = ready ? visibleChanges : [];
+  const total = ready ? result.count : 0;
   const move = (next: boolean) => {
     if (!changes.length) return;
     onSelect(
@@ -114,14 +117,21 @@ export default function JsonResult({
         ? "Comparing JSON…"
         : result.error
           ? "Comparison unavailable"
-          : !changes.length
+          : !total
             ? "JSON values match"
-            : `${changes.length} ${changes.length === 1 ? "change" : "changes"}`;
+            : changes.length !== total
+              ? `${changes.length} of ${total} changes`
+              : `${total} ${total === 1 ? "change" : "changes"}`;
   return (
     <div className="json-inline-controls">
       <span className="json-inline-status" role="status">
         {label}
       </span>
+      {ready && total > changes.length && (
+        <span className="json-excluded-count">
+          {total - changes.length} excluded
+        </span>
+      )}
       {changes.length > 0 && (
         <span className="json-counts">
           {["Added", "Removed", "Modified"].map((type) => {

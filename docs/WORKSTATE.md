@@ -381,3 +381,24 @@ Mobile source tabs, formatting/copy and actual file-drop events are exercised.
 Screenshots and detail: [report](qa/comparison-tools.md). Earlier wide-suite export
 failures are not resolved or claimed passing. Revision kept local for review;
 no push, merge or deployment under this feedback turn.
+
+
+## Comparison focus/search/noise filters · 2026-11-17
+
+Next recommended workspace phase implemented: viewport focus, desktop adjustable
+panes, native CodeMirror full-source search, changes-only context and explicit JSON
+type/selected-path filters. Native search reveals folded matches. Visible/total
+counts prevent filtered results being described as equal. JSON navigation aligns
+selected native source positions after viewport measurement; strings remain unchanged.
+No new comparison engine, payload persistence or homepage/font edits. MIT search
+notice retained. cURL, explicit array identity and HTTP response tooling remain next.
+
+TypeScript/build/10-route prerender pass, lint exits 0 with warnings, 47 unit tests
+and 60 comparison/SEO browser tests pass. Supplemental homepage checks encountered
+Google Fonts HTTP 503 and raw icon text obstructing document-name controls (3 pass,
+4 fail on the first final-build run); earlier same-batch runs were 7/7. This is
+recorded rather than changing typography or weakening tests. Desktop/mobile evidence
+and complete scope/limitations are in [QA report](qa/comparison-tools.md). Homepage
+initial JS gzip increases 5 bytes over the prior revision; comparison libraries
+remain deferred. Standing user instruction authorizes the completed branch push;
+no merge or deployment is authorized.

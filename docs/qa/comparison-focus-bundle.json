@@ -1,0 +1,40 @@
+{
+  "method": "Static entry import graph; per-file gzip level 9 sum, excluding CSS/fonts/deferred imports. Main baseline 80632fa.",
+  "main": {
+    "initial_static_js_gzip_bytes": 104761,
+    "files": [
+      "assets/index-B-hteCgA.js",
+      "assets/jsx-runtime-DREnUpxT.js",
+      "assets/rolldown-runtime-Dd_uD5pT.js"
+    ]
+  },
+  "previous_sync_revision": {
+    "initial_static_js_gzip_bytes": 108071,
+    "files": [
+      "assets/index-CVtVDNhu.js",
+      "assets/jsx-runtime-DREnUpxT.js",
+      "assets/preload-helper-BZ1Pz5am.js",
+      "assets/react-CQOZoUwg.js",
+      "assets/rolldown-runtime-Dd_uD5pT.js"
+    ]
+  },
+  "focus_search_filters": {
+    "initial_static_js_gzip_bytes": 108076,
+    "files": [
+      "assets/index-1kIb6jUr.js",
+      "assets/jsx-runtime-DREnUpxT.js",
+      "assets/preload-helper-BZ1Pz5am.js",
+      "assets/react-CQOZoUwg.js",
+      "assets/rolldown-runtime-Dd_uD5pT.js"
+    ]
+  },
+  "increase_over_main_gzip_bytes": 3315,
+  "increase_over_previous_gzip_bytes": 5,
+  "initial_graph_editor_markers_found": [],
+  "deferred_individual_chunks_gzip_bytes": {
+    "TextEditors-c2mGw6r1.js": 11255,
+    "JsonResult-DAJ469wy.js": 8254,
+    "JsonEditors-CjlAmiWJ.js": 13819,
+    "CompareApp-BlZTJJqH.js": 8648
+  }
+}

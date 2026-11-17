@@ -24,3 +24,11 @@ array delta-key enumeration method to retain upstream old/new index semantics.
 No formatter HTML is rendered. The existing CodeMirror JSON language parser
 supplies source token ranges; CodeMirror decorations/gutters display those ranges.
 There are no additional dependencies or copied comparison algorithms.
+
+Focus/search/filter revision: @codemirror/search 6.7.2 (MIT) supplies full-document
+Find/Replace, search query handling, match highlighting and keyboard commands.
+Its notice is retained in codemirror-search-MIT.txt. It is imported only by the
+lazy comparison editors. JSON context collapsing uses the already-installed
+@codemirror/language folding APIs; Text Compare uses @codemirror/merge's existing
+collapse functionality and public reveal effect. No search or diff algorithm was
+copied/reimplemented. Exact-path/type filtering is presentation over library deltas.

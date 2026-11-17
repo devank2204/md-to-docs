@@ -453,3 +453,76 @@ deployment.
 | --- | --- | --- | --- | --- | --- |
 | Linked scrolling preserves context after source lengths diverge | Independent JSON scrolling rejected by owner | Source-field correspondence and visible on/off control | Real bidirectional wheel/unlock/relock checks pass with <3px matching-field difference | Native CodeMirror layout, original strings, conservative array identity, mobile single pane | Retained |
 | An explicit Black choice can coexist with the established appearances | Cream and dark-green two-state control | Three named persistent app-only appearances | Black #000, source preservation, unchanged document DOM/print and existing-site checks pass | Existing fonts and cream/dark-green values remain | Retained under D013 |
+
+
+## Focus, search and noise filters · 2026-11-17
+
+Implemented the next workspace recommendations on `feat/comparison-tools`:
+
+- Focus fills the viewport, hides the sidebar without changing its saved preference,
+  keeps source actions available and exits with Escape. Desktop panes resize with
+  pointer or keyboard (25–75%, double-click resets). Mobile retains source tabs.
+- `@codemirror/search` 6.7.2 supplies native Find/Replace, selection, next/previous
+  and keyboard commands. Find searches complete source and reveals folded matches.
+  Its MIT notice is retained in `docs/licenses/codemirror-search-MIT.txt`.
+- Changes only uses CodeMirror Merge collapse for text and native CodeMirror folds
+  around existing jsondiffpatch source locations for JSON. Full context is the default.
+  Fold buttons say hidden lines because excluded changes may also be folded.
+- JSON type filters and Ignore field affect presentation only. Paths use existing
+  typed segments, including hostile/dotted names; ignoring a path excludes its
+  descendants, while ignoring a child never conceals a parent replacement. Active
+  filters show explicit visible/total counts, excluded counts and removable chips.
+  Zero visible changes never means equal when the complete delta contains changes.
+- Selected JSON navigation aligns both native cursor positions in the common visible
+  viewport after layout measurement. Clicking source keeps that pane still and
+  aligns its counterpart. Deferred callbacks ignore replaced/destroyed editor views.
+
+Custom glue is limited to workspace controls/styles, native search/fold integration,
+visibility windows from existing engine locations, typed path filtering and native
+scroll positioning. The comparison algorithms remain CodeMirror Merge, jsondiffpatch
+and jsdiff. Payload strings/history are preserved; options/filters remain in memory.
+Existing fonts, homepage source, sidebar tokens and document/export flows were not edited.
+
+### Actual checks
+
+- `pnpm --filter web build`: passes TypeScript, production bundle and all ten prerendered routes.
+- `node --import tsx apps/web/src/compare/model.test.ts`: 20 pass.
+- `node --import tsx apps/web/src/compare/jsonLocations.test.ts`: 14 pass.
+- `node --import tsx apps/web/src/compare/jsonScroll.test.ts`: 7 pass.
+- `node --import tsx apps/web/src/compare/jsonFilters.test.ts`: 6 pass.
+- `pnpm --filter web lint`: exit 0 with warnings (including React refs/effect diagnostics);
+  this is not a warning-free claim.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium node_modules/.bin/playwright test`
+  with `compare-focus.spec.ts`, `compare-focus-mobile.spec.ts`,
+  `compare-sync-theme.spec.ts`, `json-context.spec.ts`, `compare-workspace.spec.ts`,
+  `compare-experience.spec.ts`, `compare.spec.ts`, `compare-identity.spec.ts`,
+  and `seo.spec.ts` (all in `tests/browser/`): **60 passed, 0 failed** in one final run.
+  Eleven new checks exercise focus at 320/390/1366px, matching selected source within
+  3px, native full-source search through folds, mobile input/control font roles,
+  pointer/keyboard resize, exact source copies, filter counts, no payload storage/URL
+  and editing/undo in the enlarged empty Text pane. Existing assertions were retained.
+- Supplemental existing-site selection (`identity.spec.ts`, `mobile-refinement.spec.ts`,
+  `quiet-workspace.spec.ts`, grep `incumbent home typography|mobile tools, title and reading width|header appearance and reading`):
+  initial final-build run **3 passed, 4 failed**. Earlier runs of the same selection
+  in this batch passed 7/7. The failed trace records HTTP **503** from Google Fonts
+  for Material Symbols and the existing text fonts; raw icon text overlaps the
+  document-name Save control. This prevents an unconditional existing-site pass claim.
+  A single-worker recheck also reproduced font HTTP 503 at all four mobile widths.
+  No font imports, homepage styles or existing test expectations were changed to hide it.
+
+Native regex/replace controls are provided upstream but were not separately exercised
+in this batch. No physical-device, screen-reader, whole-site export-suite or production
+claim. Earlier broad-suite/export failures remain outside this focused verification.
+Filters support selected existing paths, not wildcard/manual expressions. Array identity,
+cURL and HTTP response comparison remain future work.
+
+Evidence: [desktop focused workspace](compare-focus-1366.png),
+[320px focus](compare-focus-320.png), [390px focus](compare-focus-390.png),
+[mobile search](compare-search-mobile-390.png),
+[text search](compare-search-text.png), [JSON search](compare-search-json.png),
+[all changes excluded](compare-filtered-empty.png).
+
+[Bundle report](comparison-focus-bundle.json): homepage initial static JS gzip sum
+108,076 bytes, **+5 bytes** versus the previous sync/theme revision and +3,315 versus
+main 80632fa. Search/editors/engines remain deferred. This measures per-file gzip sums
+excluding CSS/fonts/deferred imports, not transfer speed or complete comparison-route size.
