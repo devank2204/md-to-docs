@@ -1,53 +1,106 @@
 import { create, type Delta } from "jsondiffpatch";
+import BaseFormatter from "jsondiffpatch/formatters/base";
 // No inferred object identity: array edits are positional; reorders are add/remove.
 const engine = create({ arrays: { detectMove: false } });
 export type Change = {
   path: string;
   segments: (string | number)[];
   type: string;
+  originalPath?: string;
+  updatedPath?: string;
+  originalSegments?: (string | number)[];
+  updatedSegments?: (string | number)[];
+  originalParentSegments?: (string | number)[];
+  updatedParentSegments?: (string | number)[];
   old?: unknown;
   next?: unknown;
 };
-export function changesFromDelta(
-  delta: Delta,
-  path = "$",
-  segments: (string | number)[] = [],
-): Change[] {
-  if (!delta) return [];
-  if (Array.isArray(delta))
-    return [
-      {
-        path,
-        segments,
-        type:
-          delta.length === 1
-            ? "Added"
-            : delta.length === 2
-              ? "Modified"
-              : "Removed",
-        old: delta.length === 1 ? undefined : decode(delta[0]),
-        next:
-          delta.length === 1
-            ? decode(delta[0])
-            : delta.length === 2
-              ? decode(delta[1])
-              : undefined,
-      },
-    ];
-  const array = delta._t === "a";
-  return Object.entries(delta).flatMap(([key, value]) =>
-    key === "_t" && array
-      ? []
-      : changesFromDelta(
-          value as Delta,
-          path +
-            (array
-              ? `[${key.replace(/^_/, "")}]`
-              : /^[A-Za-z_$][\w$]*$/.test(key.slice(1))
-                ? `.${key.slice(1)}`
-                : `[${JSON.stringify(key.slice(1))}]`),
-          [...segments, array ? Number(key.replace(/^_/, "")) : key.slice(1)],
-        ),
+// Reuse the upstream formatter's array index correspondence. Underscored delta
+// keys are old indices; other keys are new indices after insertions/removals.
+// Only the pure enumeration method is used: no formatter HTML is generated.
+const arrayFormatter = {
+  includeMoveDestinations: false,
+  forEachDeltaKey: BaseFormatter.prototype.forEachDeltaKey,
+};
+export function changesFromDelta(delta: Delta, left?: unknown): Change[] {
+  const visit = (
+    node: Delta,
+    original: unknown,
+    oldPath: (string | number)[],
+    newPath: (string | number)[],
+  ): Change[] => {
+    if (!node) return [];
+    if (Array.isArray(node)) {
+      const added = node.length === 1;
+      const removed = node.length > 2;
+      const segments = removed ? oldPath : newPath;
+      return [
+        {
+          path: jsonPath(segments),
+          segments,
+          originalPath: added ? undefined : jsonPath(oldPath),
+          updatedPath: removed ? undefined : jsonPath(newPath),
+          originalSegments: added ? undefined : oldPath,
+          updatedSegments: removed ? undefined : newPath,
+          originalParentSegments: oldPath.slice(0, -1),
+          updatedParentSegments: newPath.slice(0, -1),
+          type: added ? "Added" : removed ? "Removed" : "Modified",
+          old: added ? undefined : decode(node[0]),
+          next: added ? decode(node[0]) : removed ? undefined : decode(node[1]),
+        },
+      ];
+    }
+    const changes: Change[] = [];
+    if (node._t === "a") {
+      arrayFormatter.forEachDeltaKey(node, original, (key, leftKey) => {
+        const child = (node as Record<string, Delta>)[key];
+        if (!child) return;
+        const oldIndex = Number(leftKey),
+          newIndex = Number(key.replace(/^_/, ""));
+        changes.push(
+          ...visit(
+            child,
+            Array.isArray(original) ? original[oldIndex] : undefined,
+            [...oldPath, oldIndex],
+            [...newPath, newIndex],
+          ),
+        );
+      });
+    } else {
+      for (const [encodedKey, child] of Object.entries(node)) {
+        const key = encodedKey.slice(1);
+        const oldValue =
+          original &&
+          typeof original === "object" &&
+          Object.hasOwn(original, key)
+            ? (original as Record<string, unknown>)[key]
+            : undefined;
+        changes.push(
+          ...visit(
+            child as Delta,
+            oldValue,
+            [...oldPath, key],
+            [...newPath, key],
+          ),
+        );
+      }
+    }
+    return changes;
+  };
+  return visit(delta, left, [], []);
+}
+export function jsonPath(segments: (string | number)[]): string {
+  return (
+    "$" +
+    segments
+      .map((key) =>
+        typeof key === "number"
+          ? `[${key}]`
+          : /^[A-Za-z_$][\w$]*$/.test(key)
+            ? `.${key}`
+            : `[${JSON.stringify(key)}]`,
+      )
+      .join("")
   );
 }
 // Escape every object key before the library sees it. This prevents __proto__

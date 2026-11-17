@@ -344,161 +344,103 @@
 .compare-support p {
   margin-top: 12px;
 }
-.json-review-ready {
+/* Structural results stay attached to the editable source. */
+.json-inline-controls {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  padding: 18px 20px;
-  border-top: 1px solid var(--sidebar-line);
-  background: rgb(var(--app-surface));
-  border-radius: 0 0 8px 8px;
-}
-.json-review-ready p {
-  margin-top: 4px;
-  color: var(--sidebar-muted);
-}
-.compare-review-button.ux-button,
-.compare-review-button.ux-button:hover {
-  background: var(--ux-success);
-  color: var(--ux-success-ink);
-  border-color: transparent;
-  padding: 8px 14px;
-}
-.json-results {
-  border-top: 0;
-}
-.json-result-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
   flex-wrap: wrap;
+  gap: 10px 16px;
+  min-width: 0;
+  flex: 1;
 }
-.json-result-toolbar > div,
-.json-result-toolbar nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+.json-inline-status {
+  color: rgb(var(--app-on-surface));
 }
 .json-counts {
   display: flex;
   gap: 8px;
   color: var(--sidebar-muted);
 }
-.json-table-heading,
-.json-change-row {
-  display: grid;
-  grid-template-columns:
-    minmax(160px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr)
-    32px;
-  gap: 16px;
-  padding: 14px 16px;
-  align-items: start;
-}
-.json-table-heading {
-  background: rgb(var(--app-surface));
-  color: var(--sidebar-muted);
-  border-top: 1px solid var(--sidebar-line);
-}
-.json-change {
-  border-top: 1px solid var(--sidebar-line);
-}
-.json-change-location {
-  min-width: 0;
-  display: grid;
-  gap: 4px;
-}
-.json-kind {
-  padding-block: 4px;
-  color: var(--sidebar-muted);
-}
-.json-path.ux-button {
-  border: 0;
-  justify-content: flex-start;
-  padding: 3px 0;
-  white-space: normal;
-  text-align: left;
-  overflow-wrap: anywhere;
-  min-width: 0;
-}
-.json-path code {
-  overflow-wrap: anywhere;
-  min-width: 0;
-}
-.json-old,
-.json-new {
-  padding: 10px 12px;
-  border-radius: 4px;
-  min-width: 0;
-}
-.json-old {
-  background: var(--ux-removed);
-}
-.json-new {
-  background: var(--ux-added);
-}
-.json-change[data-kind="added"] .json-old,
-.json-change[data-kind="removed"] .json-new {
-  background: transparent;
-  color: var(--sidebar-muted);
-}
-.json-copy.ux-button {
-  border: 0;
-  padding: 6px;
-  min-width: 32px;
-}
-.json-change[data-selected="true"] {
-  box-shadow: inset 3px 0 var(--sidebar-muted);
-  background: rgb(var(--app-surface));
-}
-.json-change pre {
-  margin: 0;
-  max-height: 180px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  overflow: auto;
-}
-.json-mobile-value-label {
-  display: none;
-}
-.json-context {
-  padding: 0 16px 16px;
-}
-.json-context > p {
-  margin-bottom: 10px;
-  color: var(--sidebar-muted);
-}
-.json-context > div {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.json-context section {
-  min-width: 0;
-}
-.json-context pre {
-  margin-top: 6px;
-  padding: 12px;
-  border: 1px solid var(--sidebar-line);
-  border-radius: 4px;
-}
-.json-empty,
-.json-equal,
-.json-error {
+.json-inline-controls nav {
   display: flex;
-  gap: 12px;
-  padding: 24px 16px;
-  border-top: 1px solid var(--sidebar-line);
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.json-change-position {
+  min-width: 44px;
   color: var(--sidebar-muted);
 }
-.json-empty p + p {
-  margin-top: 6px;
+.json-jump-label {
+  min-width: 0;
+  max-width: 240px;
+  padding: 0 !important;
+}
+.json-jump-label select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--sidebar-line);
+  border-radius: 6px;
+  color: rgb(var(--app-on-surface));
+  background: rgb(var(--app-surface));
+  text-overflow: ellipsis;
+}
+.json-context-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--sidebar-line);
+  color: var(--sidebar-muted);
+  min-width: 0;
+}
+.json-context-bar > code {
+  color: rgb(var(--app-on-surface));
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.json-context-kind {
+  flex-shrink: 0;
+}
+.json-context-values {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-left: auto;
+}
+.json-context-values > span:not([aria-hidden]) {
+  padding: 3px 7px;
+  border-radius: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 210px;
+}
+.json-context-old {
+  background: var(--ux-removed);
+  color: rgb(var(--app-on-surface));
+}
+.json-context-new {
+  background: var(--ux-added);
+  color: rgb(var(--app-on-surface));
+}
+.json-context-bar[data-kind="added"] .json-context-old,
+.json-context-bar[data-kind="removed"] .json-context-new {
+  background: none;
+  color: var(--sidebar-muted);
+}
+.json-context-bar > button {
+  flex-shrink: 0;
+  padding: 5px;
+  border: 0;
 }
 .json-error {
-  display: block;
+  padding: 12px 16px;
   background: var(--ux-warning);
   color: var(--ux-warning-ink);
 }
@@ -506,6 +448,60 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   margin-top: 8px;
+}
+.json-editors .cm-json-line-added,
+.json-editors .cm-json-line-modified.cm-json-line:has(.cm-json-added) {
+  background: color-mix(in srgb, var(--ux-added) 45%, transparent);
+}
+.json-editors .cm-json-line-removed {
+  background: color-mix(in srgb, var(--ux-removed) 45%, transparent);
+}
+.json-editors [data-compare-side="0"] .cm-json-line-modified {
+  background: color-mix(in srgb, var(--ux-removed) 45%, transparent);
+}
+.json-editors [data-compare-side="1"] .cm-json-line-modified {
+  background: color-mix(in srgb, var(--ux-added) 45%, transparent);
+}
+.json-editors .cm-json-value {
+  border-radius: 2px;
+}
+.json-editors .cm-json-removed,
+.json-editors [data-compare-side="0"] .cm-json-modified {
+  background: var(--ux-removed);
+}
+.json-editors .cm-json-added,
+.json-editors [data-compare-side="1"] .cm-json-modified {
+  background: var(--ux-added);
+}
+.json-editors .cm-json-line-selected {
+  box-shadow: inset 3px 0 var(--sidebar-text);
+}
+.json-editors .cm-json-value-selected {
+  outline: 1px solid var(--sidebar-muted);
+  outline-offset: 1px;
+}
+.json-editors .cm-json-missing-anchor {
+  outline: 1px dashed var(--sidebar-muted);
+  outline-offset: -1px;
+}
+.json-editors .cm-json-change-gutter {
+  width: 16px;
+  text-align: center;
+}
+.json-editors .cm-json-change-gutter .cm-gutterElement {
+  padding-inline: 2px;
+}
+.json-editors .cm-json-gutter-added {
+  color: var(--ux-success-ink);
+}
+.json-editors .cm-json-gutter-removed {
+  color: rgb(var(--app-on-surface));
+}
+.compare-editor-stage[data-kind="json"] {
+  min-height: clamp(320px, calc(100svh - 440px), 720px);
+}
+.json-editors .cm-editor {
+  height: clamp(320px, calc(100svh - 440px), 720px);
 }
 .compare-app :focus-visible {
   outline: 2px solid currentColor;
@@ -617,63 +613,45 @@
   .compare-editor-footer > span:last-child {
     display: none;
   }
-  .json-review-ready {
-    padding: 14px 12px;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 12px;
+  .compare-toolbar:has(.json-inline-controls) .json-inline-controls {
+    order: 2;
+    flex-basis: 100%;
   }
-  .json-review-ready > .ux-button {
-    width: 100%;
+  .json-inline-controls {
+    gap: 8px;
   }
-  .json-table-heading {
+  .json-inline-controls nav {
+    margin-left: auto;
+  }
+  .json-inline-controls .ux-button {
+    padding: 6px;
+  }
+  .json-counts {
     display: none;
   }
-  .json-result-toolbar {
-    padding: 12px;
-    gap: 12px;
+  .json-jump-label {
+    max-width: 100%;
+    flex: 1 1 100%;
   }
-  .json-result-toolbar nav {
-    width: 100%;
-    justify-content: flex-end;
-    flex-wrap: nowrap;
+  .json-context-bar {
+    flex-wrap: wrap;
     gap: 6px;
+    padding: 8px 12px;
   }
-  .json-result-toolbar nav > span {
-    margin-right: auto;
-    min-width: 0;
+  .json-context-kind {
+    flex-basis: auto;
+  }
+  .json-context-bar > code {
     flex: 1;
   }
-  .json-change-row {
-    grid-template-columns: 1fr 1fr 28px;
-    padding: 14px 12px;
-    gap: 10px;
+  .json-context-values {
+    order: 2;
+    flex-basis: 100%;
+    margin-left: 0;
   }
-  .json-change-location {
-    grid-column: 1/3;
-    grid-row: 1;
-  }
-  .json-copy {
-    grid-column: 3;
-    grid-row: 1;
-  }
-  .json-old {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .json-new {
-    grid-column: 2/4;
-    grid-row: 2;
-  }
-  .json-mobile-value-label {
-    display: block;
-    margin-bottom: 6px;
-  }
-  .json-context {
-    padding: 0 12px 12px;
-  }
-  .json-context > div {
-    grid-template-columns: 1fr;
+  .json-context-values > span:not([aria-hidden]) {
+    flex: 1;
+    max-width: none;
   }
 }
 
@@ -697,4 +675,14 @@
   .compare-editors {
     --compare-text-height: 340px;
   }
+}
+
+.compare-input-status-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.compare-input-valid > svg {
+  flex-shrink: 0;
 }

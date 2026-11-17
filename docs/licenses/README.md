@@ -18,3 +18,9 @@ its exported syntax highlighting style for dark JSON editing. It does not supply
 MDToDocs chrome, fonts, layout or diff algorithms. Its MIT notice is retained in
 codemirror-one-dark-MIT.txt. Color selection uses CodeMirror compartments and the
 existing appearance preference; payloads are never stored with that preference.
+
+In-context JSON revision also uses the existing jsondiffpatch BaseFormatter's pure
+array delta-key enumeration method to retain upstream old/new index semantics.
+No formatter HTML is rendered. The existing CodeMirror JSON language parser
+supplies source token ranges; CodeMirror decorations/gutters display those ranges.
+There are no additional dependencies or copied comparison algorithms.

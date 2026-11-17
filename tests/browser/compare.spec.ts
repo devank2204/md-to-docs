@@ -1,15 +1,9 @@
-async function reviewJSON(page: import("@playwright/test").Page) {
-  await page
-    .getByRole("button", { name: /^Review (changes|comparison)$/ })
-    .click();
-}
 async function inputsJSON(
   page: import("@playwright/test").Page,
   side = "Original",
 ) {
-  const tab = page.getByRole("tab", { name: "Inputs", exact: true });
+  const tab = page.getByRole("tab", { name: side, exact: true });
   if (await tab.count()) await tab.click();
-  else await page.getByRole("tab", { name: side, exact: true }).click();
 }
 import { test, expect } from "@playwright/test";
 for (const width of [320, 390, 1440])
@@ -41,8 +35,12 @@ for (const width of [320, 390, 1440])
       .click();
     await page.getByRole("button", { name: "Try example" }).click();
     await expect(page.getByRole("status").first()).toHaveText("1 change");
-    await reviewJSON(page);
-    await expect(page.locator(".json-change")).toContainText("$.user.role");
+    await page
+      .getByRole("button", { name: "Next change", exact: true })
+      .click();
+    await expect(page.locator(".json-context-bar")).toContainText(
+      "$.user.role",
+    );
     await page.screenshot({
       path: `docs/qa/compare-json-${width}.png`,
       fullPage: true,
@@ -67,14 +65,23 @@ test("JSON order, primitive roots and safe values", async ({ page }) => {
     await a.fill(left);
     await b.fill(right);
     await expect(page.getByRole("status").first()).toHaveText(
-      `${count} ${count === 1 ? "change" : "changes"}`,
+      count
+        ? `${count} ${count === 1 ? "change" : "changes"}`
+        : "JSON values match",
     );
-    await reviewJSON(page);
-    await expect(page.locator(".json-change")).toHaveCount(count);
-    expect(await page.locator(".json-change script").count()).toBe(0);
+    await expect(
+      page
+        .getByRole("combobox", { name: "Jump to JSON change" })
+        .locator("option"),
+    ).toHaveCount(count + 1);
+    if (count)
+      await page
+        .getByRole("button", { name: "Next change", exact: true })
+        .click();
+    expect(await page.locator(".compare-tool-surface script").count()).toBe(0);
     await inputsJSON(page);
   }
-  expect(await page.locator(".json-change script").count()).toBe(0);
+  expect(await page.locator(".compare-tool-surface script").count()).toBe(0);
 });
 test("editing, swap, clear, undo and file import stay local", async ({
   page,
@@ -135,8 +142,8 @@ test("JSON handoff preserves inputs, key safety and history", async ({
     page.getByRole("textbox", { name: "Original", exact: true }),
   ).toHaveText(left);
   await expect(page.getByRole("status").first()).toHaveText("1 change");
-  await reviewJSON(page);
-  await expect(page.locator(".json-change")).toContainText("$.__proto__");
+  await page.getByRole("button", { name: "Next change", exact: true }).click();
+  await expect(page.locator(".json-context-bar")).toContainText("$.__proto__");
   await page.goBack();
   await expect(
     page.locator('.cm-content[aria-label="Original"]'),

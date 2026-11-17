@@ -1,0 +1,28 @@
+{
+  "method": "Static entry import graph; gzip level 9 per-file sum, excluding CSS/fonts/deferred imports. Baseline main 80632fa.",
+  "main": {
+    "initial_static_js_gzip_bytes": 104761,
+    "files": [
+      "assets/index-B-hteCgA.js",
+      "assets/jsx-runtime-DREnUpxT.js",
+      "assets/rolldown-runtime-Dd_uD5pT.js"
+    ]
+  },
+  "contextual_json_revision": {
+    "initial_static_js_gzip_bytes": 106355,
+    "files": [
+      "assets/index-CE863bZ8.js",
+      "assets/jsx-runtime-DREnUpxT.js",
+      "assets/preload-helper-BZ1Pz5am.js",
+      "assets/react-CQOZoUwg.js",
+      "assets/rolldown-runtime-Dd_uD5pT.js"
+    ]
+  },
+  "increase_gzip_bytes": 1594,
+  "deferred_individual_chunks_gzip_bytes": {
+    "TextEditors-D9nAnA-U.js": 11070,
+    "CompareApp-DzlI69Ql.js": 6611,
+    "JsonResult-BFJ7p-xP.js": 8005,
+    "JsonEditors-Bfdk0ibY.js": 12481
+  }
+}

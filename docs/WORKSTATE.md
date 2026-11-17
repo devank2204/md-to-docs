@@ -1,5 +1,28 @@
 # Current workstate
 
+## JSON comparison stays with its source · 2026-11-17
+
+Owner rejected the Inputs/Changes split for large JSON. That prior workflow is
+superseded. Both payloads now remain in editable CodeMirror panes with structural
+value/line highlights and gutter signs. Previous/Next, F7 and a changed-path list
+navigate both sources; selecting a value moves only its counterpart. Native cursor
+positions follow explicit navigation so re-entering the editor edits the visible
+change. Mobile keeps Original/Updated tabs and the same selected change. Missing
+values are explicit and use parent anchors rather than invented source highlights.
+
+jsondiffpatch remains the only structural engine. Its existing formatter array-key
+enumerator supplies old/new indices, and the installed JSON language parser supplies
+exact token offsets. No new dependencies, font/sidebar changes, payload persistence
+or homemade comparison algorithms. Production build/TypeScript and ten-route
+prerender pass; 44 Chromium browser checks and 34 model/source-location tests pass;
+lint exits zero with warnings. Includes 91 differences in 300+ lines with reversed
+object order, distant navigation, actual edits, undo and exact source copying.
+Homepage initial static JS: +1,594 gzip bytes versus main; comparison engines stay
+deferred. [Current evidence and limits](qa/comparison-tools.md#in-context-json-correction-after-owner-rejection--2026-11-17).
+Standing instruction: push verified changes automatically to feat/comparison-tools;
+no merge or deployment authorized. Earlier unrelated export failures remain.
+
+
 ## Comparison UX research revision · 2026-11-17
 
 Owner rejected the comparison workflow and appearance-control alignment. Reviewed

@@ -5,7 +5,9 @@ async function input(page: Page, name: string, value: unknown) {
   await page.keyboard.insertText(JSON.stringify(value, null, 2));
 }
 for (const width of [390, 1366])
-  test(`JSON workspace review at ${width}`, async ({ page }) => {
+  test(`JSON edits and structural changes share one workspace at ${width}`, async ({
+    page,
+  }) => {
     await page.setViewportSize({ width, height: 768 });
     await page.goto("/json-compare/");
     await expect(
@@ -29,21 +31,41 @@ for (const width of [390, 1366])
     await input(page, "Updated", updated);
     await expect(page.getByRole("status").first()).toHaveText("1 change");
     await page
-      .getByRole("button", { name: "Review changes", exact: true })
+      .getByRole("button", { name: "Next change", exact: true })
       .click();
-    const change = page.locator(".json-change");
+    const change = page.locator(".json-context-bar");
     await expect(change).toContainText("Removed");
-    await expect(change.locator(".json-old")).toContainText("LTE");
-    await expect(change.locator(".json-new")).toHaveText(/Not present/);
+    await expect(change.locator(".json-context-old")).toContainText("LTE");
+    await expect(change.locator(".json-context-new")).toHaveText(
+      /Not present in Updated/,
+    );
     await expect(change).toContainText("$.range_created_at[1]");
+    if (width < 1024)
+      await page.getByRole("tab", { name: "Original", exact: true }).click();
+    const originalEditor = page.getByRole("textbox", {
+      name: "Original",
+      exact: true,
+    });
+    await expect(originalEditor).toBeVisible();
+    await expect(
+      originalEditor.locator(".cm-json-value").filter({ hasText: "LTE" }),
+    ).toBeVisible();
+    if (width >= 1024) {
+      await expect(
+        page.getByRole("textbox", { name: "Updated", exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.locator('[data-compare-side="1"] .cm-json-value'),
+      ).toHaveCount(0);
+      await expect(
+        page.locator('[data-compare-side="1"] .cm-json-missing-anchor'),
+      ).toBeVisible();
+    }
+    await expect(page.getByRole("tab", { name: /^Changes/ })).toHaveCount(0);
     await expect(page.locator(".compare-guidance")).not.toHaveAttribute(
       "open",
       "",
     );
-    if (width > 768) {
-      const bounds = await change.boundingBox();
-      expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(768);
-    }
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -53,19 +75,6 @@ for (const width of [390, 1366])
       path: `docs/qa/compare-json-review-${width}.png`,
       fullPage: true,
     });
-    await page
-      .getByRole("button", { name: "Next change", exact: true })
-      .click();
-    await expect(change.locator(".json-context")).toBeVisible();
-    await expect(change.locator(".json-context")).toContainText(
-      "Parent payload context",
-    );
-    if (width < 1024) {
-      await page.getByRole("tab", { name: "Original", exact: true }).click();
-      await expect(
-        page.getByRole("textbox", { name: "Original", exact: true }),
-      ).toContainText("LTE");
-    }
   });
 test("per-side JSON actions and file drop preserve source", async ({
   page,
@@ -115,8 +124,6 @@ test("per-side JSON actions and file drop preserve source", async ({
   await expect(
     page.getByRole("textbox", { name: "Original", exact: true }),
   ).toContainText("1");
-  await page
-    .getByRole("button", { name: "Review changes", exact: true })
-    .click();
-  await expect(page.locator(".json-new")).toContainText("3");
+  await page.getByRole("button", { name: "Next change", exact: true }).click();
+  await expect(page.locator(".json-context-new")).toContainText("3");
 });
