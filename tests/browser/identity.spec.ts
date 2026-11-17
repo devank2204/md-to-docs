@@ -95,7 +95,7 @@ test('desktop delivery keeps the incumbent control typography in cream and dark'
   await page.locator('textarea').first().fill('# Protected controls');
   const trigger = page.locator('header .export-menu>summary');
   for (const appearance of ['cream', 'dark']) {
-    if(await page.locator('html').getAttribute('data-appearance')!==appearance) await page.getByRole('button',{name:/Switch to .* appearance/}).click();
+    if(await page.locator('html').getAttribute('data-appearance')!==appearance) { await page.getByRole('button',{name:/^Appearance:/}).click(); await page.getByRole('button',{name:appearance==='cream'?'Cream':'Dark green',exact:true}).click(); }
     const actual = await trigger.evaluate(node => {
       const style = getComputedStyle(node);
       return { family: style.fontFamily, size: style.fontSize, weight: style.fontWeight, lineHeight: style.lineHeight, tracking: style.letterSpacing };

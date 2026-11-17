@@ -1,5 +1,33 @@
 # Current workstate
 
+## Linked JSON scrolling and three appearances · 2026-11-17
+
+Owner requested visible scroll sync, absolute Black alongside Cream and the
+existing Dark green, and internet research for stronger payload/cURL comparison.
+JSON now links scrolling by default using corresponding source fields and the
+upstream delta formatter's array-index mapping. It supports both directions,
+independent scrolling and relocking without pixel drift. Native CodeMirror
+coordinates/measurement are used; programmatic change navigation is kept distinct
+from user scroll intent. Invalid inputs use position-based scrolling, disclosed
+in the control's tooltip. Original source order/strings remain unchanged.
+
+The shared appearance control now opens Cream / Dark green / Black choices.
+Existing palette variants and fonts remain; Black screen surfaces are #000000.
+Choice persists independently of document themes; document paper and print colors
+are verified unchanged. D013 updates the old two-state control requirement.
+
+Build/TypeScript and ten-route prerender pass. Final focused Chromium run: 49
+passed; existing-site typography/mobile/header checks: 7 passed. Unit suites:
+20 engine/model + 14 source-location + 7 scroll-correspondence = 41 passed.
+Lint exits zero with warnings. Homepage initial static JS is +3,310 gzip bytes
+versus main 80632fa (+1,716 versus the prior revision); engines remain deferred.
+[Verification/screenshots](qa/comparison-tools.md) and
+[research, ranked improvements and cURL proposal](research/payload-comparison-direction.md).
+Additional cURL/payload features are recommendations, not shipped capabilities.
+No new dependencies. Push verified work automatically to feat/comparison-tools;
+no merge/deploy authorized. Earlier unrelated export-suite failures remain.
+
+
 ## JSON comparison stays with its source · 2026-11-17
 
 Owner rejected the Inputs/Changes split for large JSON. That prior workflow is

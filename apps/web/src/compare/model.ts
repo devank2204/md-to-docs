@@ -89,6 +89,57 @@ export function changesFromDelta(delta: Delta, left?: unknown): Change[] {
   };
   return visit(delta, left, [], []);
 }
+export type JSONScrollPair = {
+  original: (string | number)[];
+  updated: (string | number)[];
+};
+// Navigation correspondence, not a diff: jsondiffpatch owns all matching. Its
+// formatter enumerates unchanged and changed pairs with their old/new indices.
+function scrollPairsFromDelta(
+  delta: Delta,
+  left: unknown,
+  right: unknown,
+): JSONScrollPair[] {
+  const pairs: JSONScrollPair[] = [];
+  const visit = (
+    node: Delta,
+    oldValue: unknown,
+    newValue: unknown,
+    original: (string | number)[],
+    updated: (string | number)[],
+  ) => {
+    pairs.push({ original, updated });
+    if (Array.isArray(node)) return;
+    if (
+      !oldValue ||
+      !newValue ||
+      typeof oldValue !== "object" ||
+      typeof newValue !== "object"
+    )
+      return;
+    const array = Array.isArray(oldValue) && Array.isArray(newValue);
+    if (Array.isArray(oldValue) !== Array.isArray(newValue)) return;
+    const current = node ?? (array ? { _t: "a" as const } : {});
+    arrayFormatter.forEachDeltaKey(current, oldValue, (key, leftKey) => {
+      if (array && key.startsWith("_")) return;
+      const oldKey = array ? Number(leftKey) : key;
+      const newKey = array ? Number(key) : key;
+      if (!Object.hasOwn(oldValue, oldKey) || !Object.hasOwn(newValue, newKey))
+        return;
+      const child = (current as Record<string, Delta>)[key];
+      if (Array.isArray(child) && child.length !== 2) return;
+      visit(
+        child,
+        (oldValue as Record<string, unknown>)[oldKey],
+        (newValue as Record<string, unknown>)[newKey],
+        [...original, array ? oldKey : key.slice(1)],
+        [...updated, array ? newKey : key.slice(1)],
+      );
+    });
+  };
+  visit(delta, left, right, [], []);
+  return pairs;
+}
 export function jsonPath(segments: (string | number)[]): string {
   return (
     "$" +
@@ -142,7 +193,15 @@ export function compareJSON(a: string, b: string) {
       for (const child of Object.values(value))
         stack.push({ value: child, depth: depth + 1 });
   }
-  return { left, right, delta: engine.diff(encode(a), encode(b)) };
+  const encodedLeft = encode(a),
+    encodedRight = encode(b);
+  const delta = engine.diff(encodedLeft, encodedRight);
+  return {
+    left,
+    right,
+    delta,
+    scrollPairs: scrollPairsFromDelta(delta, encodedLeft, encodedRight),
+  };
 }
 export function jsonError(text: string): string | undefined {
   try {

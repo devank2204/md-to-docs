@@ -34,9 +34,9 @@ formatted clipboard or a Word-file handoff; it does not create a cloud Doc.
   user explicitly asks to change typography. A general UX request does not do so.
 - Web and mobile home share the incumbent web introduction and wordmark.
 - Preserve the working mobile flow and unchanged document preview.
-- App appearance initially follows the device, with a single light/dark toggle
-  persisting explicit choice.
-  It must stay separate from document styling and export options.
+- App appearance initially follows the device. The explicit choices are Cream,
+  the existing Dark green, and Black (#000000 app surfaces), with a persisted
+  preference. App appearance stays separate from document styling and exports.
 - Show useful context at the user's next decision; avoid technical machinery in
   the normal conversion flow.
 

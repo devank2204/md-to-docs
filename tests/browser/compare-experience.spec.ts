@@ -1,3 +1,4 @@
+import { switchAppearance } from "./action-helpers";
 import { test, expect, type Page } from "@playwright/test";
 async function write(page: Page, name: string, text: string) {
   await page.getByRole("textbox", { name, exact: true }).focus();
@@ -10,17 +11,17 @@ for (const width of [320, 390, 900, 1366])
   }) => {
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/json-compare/");
-    const toggle = page.getByRole("button", {
-      name: "Switch to dark appearance",
-      exact: true,
-    });
     const controls = page.locator(".compare-header-actions");
     const box = await controls.boundingBox();
     expect(box!.x).toBeGreaterThan(width * 0.55);
     expect(box!.x + box!.width).toBeLessThanOrEqual(width);
     const center = await controls.evaluate((node) => {
-      const button = node.querySelector("button")!.getBoundingClientRect(),
-        tools = node.querySelector("summary")!.getBoundingClientRect();
+      const button = node
+          .querySelector(".app-appearance-menu > summary")!
+          .getBoundingClientRect(),
+        tools = node
+          .querySelector(".workspace-menu > summary")!
+          .getBoundingClientRect();
       return Math.abs(
         button.y + button.height / 2 - (tools.y + tools.height / 2),
       );
@@ -67,7 +68,7 @@ for (const width of [320, 390, 900, 1366])
       path: `docs/qa/compare-inputs-light-${width}.png`,
       fullPage: true,
     });
-    await toggle.click();
+    await switchAppearance(page, "Dark green");
     await expect(page.locator("html")).toHaveAttribute(
       "data-appearance",
       "dark",
@@ -102,9 +103,7 @@ for (const width of [320, 390, 900, 1366])
       path: `docs/qa/compare-review-dark-${width}.png`,
       fullPage: true,
     });
-    await page
-      .getByRole("button", { name: "Switch to light appearance", exact: true })
-      .click();
+    await switchAppearance(page, "Cream");
     await expect(page.locator("html")).toHaveAttribute(
       "data-appearance",
       "cream",

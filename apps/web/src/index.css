@@ -576,7 +576,7 @@ details.collapsible-section > summary > h6 {
   --app-success: 34 197 94;
   color-scheme: light;
 }
-html[data-appearance="dark"] {
+html:is([data-appearance="dark"], [data-appearance="black"]) {
   color-scheme: dark;
   --app-primary-fixed: 227 226 227;
   --app-on-tertiary-fixed: 180 184 172;
@@ -627,7 +627,7 @@ html[data-appearance="dark"] {
   --app-on-secondary-container: 180 184 172;
   --app-success: 34 197 94;
 }
-html[data-appearance="dark"] {
+html:is([data-appearance="dark"], [data-appearance="black"]) {
   --mobile-fafaf7: #141614;
   --mobile-242622: #e7e7dd;
   --mobile-666b61: #b4b8ac;
@@ -651,17 +651,17 @@ html[data-appearance="dark"] {
   --mobile-3d5a30: #bdc8a5;
   --mobile-707560: #b4b8ac;
 }
-html[data-appearance="dark"] .mobile-primary:not(:disabled) {
+html:is([data-appearance="dark"], [data-appearance="black"]) .mobile-primary:not(:disabled) {
   color: #141614;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.bg-white, .bg-gray-50, .bg-slate-50):not(
     [data-document-paper],
     [data-document-paper] *
   ) {
   background-color: #1b1e1b;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.text-gray-500, .text-gray-600, .text-slate-500):not(
     [data-document-paper] *
   ) {
@@ -771,13 +771,13 @@ html[data-appearance="dark"]
   color: #44474a;
   cursor: pointer;
 }
-html[data-appearance="dark"] [data-editor-pane] {
+html:is([data-appearance="dark"], [data-appearance="black"]) [data-editor-pane] {
   background: #1b1e1b;
 }
-html[data-appearance="dark"] [data-editor-pane] > :first-child {
+html:is([data-appearance="dark"], [data-appearance="black"]) [data-editor-pane] > :first-child {
   background: #252923;
 }
-html[data-appearance="dark"] .workspace-sheet {
+html:is([data-appearance="dark"], [data-appearance="black"]) .workspace-sheet {
   background: #141614;
   color: #e7e7dd;
 }
@@ -798,7 +798,7 @@ html[data-appearance="dark"] .workspace-sheet {
   }
 }
 
-html[data-appearance="dark"] {
+html:is([data-appearance="dark"], [data-appearance="black"]) {
   --app-error-container: 75 37 32;
   --app-on-error-container: 255 218 214;
   --app-secondary-container: 48 59 67;
@@ -807,31 +807,31 @@ html[data-appearance="dark"] {
   --app-inverse-surface: 231 231 221;
   --app-inverse-on-surface: 20 22 20;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.bg-red-50, .bg-red-100):not([data-document-paper] *) {
   background-color: #4b2520;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.text-red-600, .text-red-700, .text-red-800):not(
     [data-document-paper] *
   ) {
   color: #ffb4a5;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.bg-amber-50, .bg-yellow-50, .bg-orange-50):not([data-document-paper] *) {
   background-color: #353021;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.text-amber-600, .text-amber-700, .text-yellow-700, .text-orange-600):not(
     [data-document-paper] *
   ) {
   color: #e7d49b;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.bg-green-50, .bg-emerald-50, .bg-blue-50):not([data-document-paper] *) {
   background-color: #252f28;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   :is(.text-green-600, .text-emerald-600, .text-blue-600):not(
     [data-document-paper] *
   ) {
@@ -843,15 +843,15 @@ html[data-appearance="dark"]
   }
 }
 
-html[data-appearance="dark"] .desktop-delivery-trigger {
+html:is([data-appearance="dark"], [data-appearance="black"]) .desktop-delivery-trigger {
   background: #e7e7dd;
   color: #141614;
 }
-html[data-appearance="dark"]
+html:is([data-appearance="dark"], [data-appearance="black"])
   [data-preview-pane]:not([data-reading-layout="true"]) {
   background: #141614;
 }
-html[data-appearance="dark"] :focus-visible:not([data-document-paper] *) {
+html:is([data-appearance="dark"], [data-appearance="black"]) :focus-visible:not([data-document-paper] *) {
   outline: 2px solid #bdc8a5;
   outline-offset: 2px;
 }
@@ -885,7 +885,7 @@ html[data-appearance="dark"] :focus-visible:not([data-document-paper] *) {
 
 /* Shared app interaction states; document/export typography is independent. */
 :root { --ux-success:#28533b; --ux-success-ink:#fff; --ux-warning:#fff4d9; --ux-warning-ink:#62420d; --ux-added:#e2f1e5; --ux-removed:#f9e5e3; }
-:root[data-appearance="dark"] { --ux-success:#315d43; --ux-success-ink:#fff; --ux-warning:#3b301d; --ux-warning-ink:#f0d291; --ux-added:#203e2d; --ux-removed:#4d292c; }
+:root:is([data-appearance="dark"], [data-appearance="black"]) { --ux-success:#315d43; --ux-success-ink:#fff; --ux-warning:#3b301d; --ux-warning-ink:#f0d291; --ux-added:#203e2d; --ux-removed:#4d292c; }
 .ux-button {display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:5px 10px;border:1px solid rgb(var(--color-outline-variant,180 175 164)/.4);border-radius:7px;cursor:pointer;transition:background-color .14s,color .14s;white-space:nowrap;background:transparent;color:inherit}
 .ux-button:hover {background:var(--ux-added)}
 .ux-button:focus-visible,.ux-menu a:focus-visible,.ux-footer a:focus-visible {outline:2px solid currentColor;outline-offset:3px}
@@ -896,7 +896,7 @@ html[data-appearance="dark"] :focus-visible:not([data-document-paper] *) {
 .ux-icon {width:32px;padding:5px;flex-shrink:0}
 .ux-menu {position:relative}.ux-menu summary {list-style:none}.ux-menu summary::-webkit-details-marker {display:none}
 .ux-menu-items {position:absolute;right:0;top:100%;margin-top:5px;min-width:190px;padding:6px;z-index:60;background:var(--ux-menu-bg,#faf9f6);color:inherit;border:1px solid #9996;border-radius:9px;box-shadow:0 5px 15px #0002;max-height:65vh;overflow:auto}
-[data-appearance="dark"] .ux-menu-items {--ux-menu-bg:#252522}
+:is([data-appearance="dark"], [data-appearance="black"]) .ux-menu-items {--ux-menu-bg:#252522}
 .ux-menu-items a,.ux-menu-items button {display:block;width:100%;padding:8px;text-align:left;border-radius:4px}.ux-menu-items a:hover,.ux-menu-items button:hover {background:#8882}
 .ux-menu-items h3 {padding:6px 8px;color:inherit;opacity:.65}
 .ux-delivery {display:flex;align-items:center;gap:5px;position:relative}
@@ -941,7 +941,7 @@ html[data-appearance="dark"] :focus-visible:not([data-document-paper] *) {
 @media(max-width:600px){.ux-version-browser{grid-template-columns:1fr;grid-template-rows:100px minmax(160px,1fr)}.ux-version-list{border-right:0;border-bottom:1px solid #8883;padding:0 0 8px}.ux-history-scope{flex-wrap:wrap}.ux-rename-input{width:140px}}
 /* Approved interaction treatment: neutral chrome, one title field, one output menu. */
 .ux-button:hover {background:var(--ux-neutral-hover,#eeede7)}
-html[data-appearance="dark"] {--ux-neutral-hover:#30332c}
+html:is([data-appearance="dark"], [data-appearance="black"]) {--ux-neutral-hover:#30332c}
 .ux-button[data-state="selected"] {background:var(--ux-neutral-hover,#eeede7);box-shadow:none}
 .ux-menu summary {outline-offset:3px}
 .document-actions>summary,.workspace-menu>summary {border:0;padding:4px;min-width:28px}
@@ -1034,7 +1034,7 @@ html[data-appearance="dark"] {--ux-neutral-hover:#30332c}
 
 /* One neutral interaction language across app chrome; semantic diff colors stay scoped. */
 :root {--ux-neutral-hover:#eeede7}
-html[data-appearance="dark"] {--ux-neutral-hover:#353533}
+html:is([data-appearance="dark"], [data-appearance="black"]) {--ux-neutral-hover:#353533}
 header button:not(:disabled):hover,header summary:hover {background:var(--ux-neutral-hover);color:inherit}
 header .export-menu>summary:hover {background:#3b3b38;color:#fff}
 .header-document-name {max-width:none;flex:1;min-width:0}
@@ -1055,7 +1055,7 @@ header>div:last-child {flex-shrink:0}
 .mobile-document-actions {display:flex;gap:8px;flex-wrap:wrap;padding:6px 12px;border-bottom:1px solid #8883;font-size:11px}
 @media(min-width:1024px){.header-document-name .document-name {min-width:220px}}
 .document-action-bar {display:flex;flex-wrap:wrap;gap:8px;padding:6px 16px;border-bottom:1px solid #8883;background:var(--ux-menu-bg,#faf9f6);font-size:11px;flex-shrink:0}
-[data-appearance="dark"] .document-action-bar {background:#252522}
+:is([data-appearance="dark"], [data-appearance="black"]) .document-action-bar {background:#252522}
 .document-action-bar .material-symbols-outlined,.mobile-document-actions .material-symbols-outlined {font-size:17px}
 
 /* Mobile reading: no heading disclosure gutters; desktop documents stay unchanged. */
@@ -1093,3 +1093,60 @@ header>div:last-child {flex-shrink:0}
 @media(max-width:1023px){.mobile-header .mobile-tools>summary {border:1px solid #8884;border-radius:7px}}
 button[aria-busy="true"] {background-image:linear-gradient(100deg,transparent 20%,#8883 45%,transparent 70%);background-size:220% 100%;animation:app-shimmer 1.6s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){button[aria-busy="true"],.export-menu>summary {animation:none!important}}
+
+/* Third app appearance, explicitly requested by the owner. Document paper and
+   exported document themes remain independent of these app-only tokens. */
+@media screen {
+html[data-appearance="black"] {
+  color-scheme: dark;
+  --app-surface: 0 0 0;
+  --app-background: 0 0 0;
+  --app-surface-dim: 0 0 0;
+  --app-surface-bright: 0 0 0;
+  --app-surface-variant: 0 0 0;
+  --app-surface-container: 0 0 0;
+  --app-surface-container-lowest: 0 0 0;
+  --app-surface-container-low: 0 0 0;
+  --app-surface-container-high: 0 0 0;
+  --app-surface-container-highest: 0 0 0;
+  --app-primary-container: 0 0 0;
+  --app-on-surface: 238 238 238;
+  --app-on-background: 238 238 238;
+  --app-on-surface-variant: 180 180 180;
+  --app-primary: 238 238 238;
+  --app-secondary: 180 180 180;
+  --app-on-tertiary-fixed: 180 180 180;
+  --app-on-tertiary: 180 180 180;
+  --app-on-primary: 0 0 0;
+  --app-outline: 150 150 150;
+  --app-outline-variant: 70 70 70;
+  --mobile-fafaf7: #000;
+  --mobile-fff: #000;
+  --mobile-eeefe7: #171717;
+  --mobile-dfe2d8: #171717;
+  --mobile-dedfd8: #383838;
+  --mobile-d9dccd: #383838;
+  --mobile-d3d6cb: #383838;
+  --mobile-e1e3da: #383838;
+  --mobile-242622: #eee;
+  --mobile-31372d: #eee;
+  --mobile-666b61: #b4b4b4;
+  --mobile-727867: #b4b4b4;
+  --mobile-6a705e: #b4b4b4;
+  --mobile-707560: #b4b4b4;
+  --ux-neutral-hover: #191919;
+  --ux-menu-bg: #000;
+}
+html[data-appearance="black"] :is(.bg-white, .bg-gray-50, .bg-slate-50):not([data-document-paper], [data-document-paper] *) { background-color: #000; }
+html[data-appearance="black"] :is([data-editor-pane], [data-preview-pane]:not([data-reading-layout="true"]), .workspace-sheet, .document-action-bar) { background: #000; }
+html[data-appearance="black"] .ux-menu-items { --ux-menu-bg: #000; }
+}
+.app-appearance-menu > summary.ux-button { padding: 6px; width: 32px; height: 32px; gap: 0; }
+.app-appearance-menu .ux-menu-items { min-width: 166px; }
+.app-appearance-options { display: grid; gap: 4px; }
+.app-appearance-options > button { justify-content: flex-start; border: 0; width: 100%; }
+.app-appearance-options > button > svg { margin-left: auto; }
+.app-appearance-swatch { width: 14px; height: 14px; border: 1px solid var(--sidebar-muted); border-radius: 50%; flex-shrink: 0; }
+.app-appearance-swatch[data-mode="cream"] { background: #faf9f6; }
+.app-appearance-swatch[data-mode="dark"] { background: #141614; }
+.app-appearance-swatch[data-mode="black"] { background: #000; }

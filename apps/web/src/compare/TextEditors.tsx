@@ -104,7 +104,11 @@ export function TextEditors({
       appearance.current.of(
         EditorView.theme(
           {},
-          { dark: document.documentElement.dataset.appearance === "dark" },
+          {
+            dark: ["dark", "black"].includes(
+              document.documentElement.dataset.appearance ?? "",
+            ),
+          },
         ),
       ),
       EditorState.readOnly.of(readOnly),
@@ -192,7 +196,11 @@ export function TextEditors({
           effects: appearance.current.reconfigure(
             EditorView.theme(
               {},
-              { dark: document.documentElement.dataset.appearance === "dark" },
+              {
+                dark: ["dark", "black"].includes(
+                  document.documentElement.dataset.appearance ?? "",
+                ),
+              },
             ),
           ),
         }),

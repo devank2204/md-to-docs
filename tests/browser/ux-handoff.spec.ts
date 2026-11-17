@@ -221,7 +221,7 @@ for (const width of [320, 375, 390, 768, 1024, 1440])
       "data-appearance",
       "dark",
     );
-    await switchAppearance(page,"Switch to light appearance");
+    await switchAppearance(page,"Cream");
     await expect(page.locator("html")).toHaveAttribute(
       "data-appearance",
       "cream",

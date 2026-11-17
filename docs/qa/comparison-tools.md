@@ -352,3 +352,104 @@ Browser checks verify engine chunks remain deferred on the homepage. Existing
 privacy, structural complexity and import limits still apply. No physical-device
 or full export-suite pass is claimed. Push is authorized by the owner's standing
 instruction; this revision does not merge or deploy the branch.
+
+
+## Linked scroll and three appearances · 2026-11-17
+
+Owner explicitly requested a visible sync-scroll control and a third, absolute
+black appearance, plus researched next steps. See
+[primary references and recommendations](../research/payload-comparison-direction.md).
+Text Compare's public site was actually used with synthetic 200-line inputs and
+its aligned two-column result inspected. Other comparison/HTTP/cURL sources were
+read as documented references; their claims were not treated as test evidence.
+No public-demo source was copied and no cURL parser was installed.
+
+JSON Sync scroll is on by default. Wheel/trackpad, scrollbar, touch and scrolling
+keys can establish which visible pane leads; the counterpart follows source paths.
+The existing jsondiffpatch formatter enumerates old/new array indices, including
+unchanged elements. CodeMirror's JSON parser maps those paths to raw token offsets;
+public block/coordinate APIs and native scroll containers handle the geometry.
+This is navigation glue, not a new diff/line-alignment engine. No IDs are guessed.
+
+The scroll correspondence is canceled/replaced on edits, compact-layout changes,
+option changes and unmount. User scroll intent is distinct from programmatic
+change navigation, preventing feedback loops and keeping clicked values under
+the pointer. One correction after CodeMirror's layout/scroll-anchoring pass uses
+rendered token positions; an initial strict pixel check exposed four pixels of
+drift after relocking and was fixed without relaxing the <3px assertion. Source
+strings and undo remain untouched. Invalid/unsupported inputs have no semantic
+map, so they scroll by relative position; the tooltip states this limitation.
+
+Raw key order is preserved. Reversed object order cannot make every neighboring
+line align simultaneously. Continuous sync follows available field anchors and
+can be disabled; explicit Previous/Next precisely locates a selected change.
+Mobile retains one readable editor and source tabs rather than two cramped panes.
+Text Merge retains its native common scroll surface.
+
+The appearance chooser uses the existing native Menu/Button components. Named
+Cream / Dark green / Black choices replace cycling, show the selected state and
+return keyboard focus to the trigger. Initial device preference still resolves
+to Cream/Dark green until the user chooses. Both old palettes/fonts remain intact;
+Black adds #000000 app, editor and sidebar surfaces, neutral borders/hover surfaces
+and the established semantic diff colors. Black screen overrides do not leak into
+print. Persisted preference remains independent of document/export theme or
+comparison payload memory. No new font or dependency was introduced.
+
+Final verification:
+
+- `pnpm --config.verify-deps-before-run=false build`: passed; package builds,
+  TypeScript and ten-route prerender.
+- `node --import tsx apps/web/src/compare/model.test.ts`: 20 passed, 0 failed.
+- `node --import tsx apps/web/src/compare/jsonLocations.test.ts`: 14 passed,
+  0 failed.
+- `node --import tsx apps/web/src/compare/jsonScroll.test.ts`: 7 passed, 0 failed.
+  Includes inserts/removals, nested arrays, repeated values, reordered object keys
+  and unsafe property names. Container correspondence is a navigation anchor;
+  equality still comes exclusively from jsondiffpatch.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium node_modules/.bin/playwright test
+  tests/browser/compare-sync-theme.spec.ts tests/browser/json-context.spec.ts
+  tests/browser/compare-workspace.spec.ts tests/browser/compare-experience.spec.ts
+  tests/browser/compare.spec.ts tests/browser/compare-identity.spec.ts
+  tests/browser/seo.spec.ts`: **49 passed, 0 failed** in the final single run.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium node_modules/.bin/playwright test
+  tests/browser/identity.spec.ts tests/browser/mobile-refinement.spec.ts
+  tests/browser/quiet-workspace.spec.ts -g 'incumbent home typography|mobile tools,
+  title and reading width|header appearance and reading'`: **7 passed, 0 failed**.
+  The actual grep expression is one line; this document wraps it for readability.
+  Existing typography expectations remain unchanged. Appearance selectors were
+  updated for the explicitly requested named-choice control.
+- Web lint exits zero with warnings, not a warning-free claim.
+
+The new browser scenarios verify real wheel scrolling from either side, an
+inserted 40-line section plus different indentation, matching-field position
+within 3px, off/on control behavior, selected difference navigation, all three
+appearances at 320/390/1366px, exact #000 surfaces, payload preservation, persisted
+choice, keyboard escape/focus and unchanged document DOM/colors/print appearance.
+The document snapshot waits for its existing preparation shimmer to finish before
+comparison; it does not drop the content-equality assertion. Old comparison and
+SEO tests remain in the focused run. No physical-device or screen-reader claim.
+Earlier unrelated full-suite/export failures were not newly validated or excused.
+
+Current rendered evidence:
+
+- [Linked corresponding fields with different line numbers](compare-sync-fields.png).
+- [Desktop Black](compare-appearance-black-1366.png),
+  [Dark green](compare-appearance-dark-1366.png),
+  [Cream](compare-appearance-cream-1366.png).
+- [390px Black](compare-appearance-black-390.png),
+  [320px Black](compare-appearance-black-320.png).
+
+[Bundle measurement](comparison-sync-bundle.json): initial homepage static JS is
+108,071 gzip bytes versus 104,761 on main 80632fa (+3,310 bytes total; +1,716 versus
+the preceding in-context revision). Figures are per-file gzip sums, exclude
+CSS/fonts and deferred imports, and do not imply network-speed measurements.
+Individual lazy chunk figures exclude shared imports. Browser coverage confirms
+comparison engines are still deferred on unrelated routes. cURL/HTTP response
+comparison, filters, focus workspace and configurable array identity remain
+proposals. Standing instruction authorizes the verified branch push, not merge or
+deployment.
+
+| Hypothesis | Baseline / revision | Change | Check / actual result | Guardrails | Disposition |
+| --- | --- | --- | --- | --- | --- |
+| Linked scrolling preserves context after source lengths diverge | Independent JSON scrolling rejected by owner | Source-field correspondence and visible on/off control | Real bidirectional wheel/unlock/relock checks pass with <3px matching-field difference | Native CodeMirror layout, original strings, conservative array identity, mobile single pane | Retained |
+| An explicit Black choice can coexist with the established appearances | Cream and dark-green two-state control | Three named persistent app-only appearances | Black #000, source preservation, unchanged document DOM/print and existing-site checks pass | Existing fonts and cream/dark-green values remain | Retained under D013 |

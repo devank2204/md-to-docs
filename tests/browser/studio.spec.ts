@@ -33,7 +33,7 @@ for (const width of [390, 1440]) {
         s.fontStyle,
       ];
     });
-    await switchAppearance(page,'Switch to dark appearance');
+    await switchAppearance(page,'Dark green');
     if (width < 1024) await expect(page.locator('.mobile-workspace > .mobile-export')).toHaveCount(0);
     await expect(page.locator('html')).toHaveAttribute(
       'data-appearance',
@@ -75,7 +75,7 @@ for (const width of [390, 1440]) {
     expect(html).toContain('Appearance independent');
     expect(html).not.toContain('data-appearance');
     await page.getByRole('button', { name: /^Close / }).click();
-    await switchAppearance(page,'Switch to light appearance');
+    await switchAppearance(page,'Cream');
     await openExport(page);
     // Changing chrome appearance must retain the already prepared artifact.
     await expect(

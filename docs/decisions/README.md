@@ -119,3 +119,20 @@ motion, adds no runtime dependency. Support content uses the established body ro
 and native fields with a complete focus outline. Privacy/About dedicated URLs are
 recommended pending owner copy; feedback collection service is research only.
 See docs/qa/mobile-reading-refinement.md. D011 direct exports/history remain.
+
+
+## D013 — accepted appearance and comparison update · 2026-11-17
+
+Owner: user. Add an absolute-black app appearance alongside the existing cream
+and dark-green appearances. This supersedes D008/D010's two-state appearance
+control, not the existing font/sidebar identity or document/export themes.
+Use a compact named-choice control, retain device appearance as the initial
+fallback, persist explicit choice and keep print/document styling independent.
+
+The user also requested visible synchronized comparison scrolling. JSON links
+corresponding fields by default and permits independent scrolling; raw source
+order and strings remain intact. Text Compare retains native CodeMirror Merge
+scrolling. Additional payload/cURL ideas are research recommendations, not an
+approval to silently repair JSON, guess identities, execute requests or persist
+payloads. See [research and next priorities](../research/payload-comparison-direction.md)
+and [verification](../qa/comparison-tools.md).

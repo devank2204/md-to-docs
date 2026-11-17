@@ -3,7 +3,7 @@ const source='# A long document title for the mobile navigation\n\nA readable pa
 for(const width of [320,375,390,768])test(`mobile tools, title and reading width ${width}`,async({page})=>{
  await page.setViewportSize({width,height:844});await page.goto('/');
  await expect(page.getByRole('button',{name:'Tools',exact:true})).toBeVisible();
- await expect(page.getByRole('button',{name:/Switch to .* appearance/})).toBeVisible();
+ await expect(page.getByRole('button',{name:/^Appearance:/})).toBeVisible();
  await page.locator('textarea').first().fill(source);
  const input=page.getByRole('textbox',{name:'Document name',exact:true});await input.blur();await expect(input).toHaveCSS('font-size','14px');await input.focus();await expect(input).toHaveCSS('font-size','16px');await input.fill('Mobile renamed');await page.getByRole('button',{name:'Save document name',exact:true}).click();await expect(input).toHaveValue('Mobile renamed');
  await page.getByRole('button',{name:'Tools',exact:true}).click();await expect(page.getByRole('button',{name:'Document options',exact:true})).toBeVisible();await page.keyboard.press('Escape');
