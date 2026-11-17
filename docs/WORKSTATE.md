@@ -267,3 +267,27 @@ Netlify 404 fallback. Home identity and converter engines preserved. Added stati
 and Chromium initialization/navigation/no-JavaScript/width checks. See
 [implementation and evidence](qa/seo-iteration-01.md). Local only; no push or
 deployment. Production Netlify status and real receiving-app checks remain pending.
+
+## Comparison tools · 2026-11-17
+
+Local branch `feat/comparison-tools` from main `80632fa` adds standalone text/JSON
+comparison routes using CodeMirror Merge and jsondiffpatch, with existing jsdiff
+patch exports. Payloads remain in module memory; no document persistence or URL
+handoff. Metadata/prerender/sitemap and Compare navigation are added without new
+export destinations. See [implementation and actual verification](qa/comparison-tools.md)
+for limits, licenses, commands and desktop/mobile screenshots. Exact CRLF
+comparison uses the documented lineSeparator facet; undo history resets across
+route changes. The wider regression failures remain untriaged, so this is not
+certified as fully satisfying the production-ready brief. No push, merge or deployment.
+
+## Comparison typography correction · 2026-11-17
+
+User rejected page-by-page typography/UX drift. Comparison pages now render the
+existing HomeIntroduction component (including the server-rendered introduction),
+use shared Button controls and established body/code roles, and remove custom
+button geometry/colors. CodeMirror's scroller explicitly inherits JetBrains Mono;
+its default monospace declaration otherwise bypassed the editor's font. Homepage,
+wordmark and sidebar typography remain unchanged. New cross-page browser checks
+compare computed heading/description styles to the incumbent homepage and verify
+control/source fonts at 390px and 1440px. Validation results recorded in the
+comparison implementation report. Local only; no push or deployment.

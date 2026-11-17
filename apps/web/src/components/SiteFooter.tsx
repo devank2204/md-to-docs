@@ -6,6 +6,7 @@ type Navigation = {onNavigateRoute?: (path:LandingRoutePath)=>void};
 export function ToolsLinks({onNavigateRoute}:Navigation={}) {
   return (
     <>
+      <nav aria-label="Compare"><h3>Compare</h3><a href="/text-compare/">Text Compare</a><a href="/json-compare/">JSON Compare</a></nav>
       {["Documents", "Diagrams"].map((group) => (
         <nav key={group} aria-label={group}>
           <h3>{group}</h3>

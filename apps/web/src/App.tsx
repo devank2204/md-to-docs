@@ -1,3 +1,4 @@
+import {compareRoute} from './routes/compareRoutes';
 import { LoadingSkeleton } from "./components/LoadingSkeleton";
 import { SupportDialog } from "./components/SupportDialog";
 import { GlobalFileDrop } from './components/GlobalFileDrop';
@@ -33,7 +34,7 @@ const MermaidUtilityView = lazy(() => import('@/components/MermaidUtilityView').
 
 export type AppState = 'EMPTY' | 'WORKSPACE';
 
-function App() {
+function DocumentApp() {
   useAppAppearance();
   useLayoutEffect(() => {
     const startup = (window as any).__mdStartup;
@@ -292,4 +293,91 @@ function App() {
   );
 }
 
+
+
+const CompareApp = lazy(() => import("./compare/CompareApp"));
+function App() {
+  const [path, setPath] = useState(
+    () => window.location.pathname.replace(/\/$/, "") || "/",
+  );
+  useEffect(() => {
+    const pop = () =>
+      setPath(window.location.pathname.replace(/\/$/, "") || "/");
+    const click = (event: MouseEvent) => {
+      const anchor = (event.target as Element).closest?.("a");
+      if (
+        anchor &&
+        ["/text-compare/", "/json-compare/"].includes(
+          anchor.getAttribute("href") || "",
+        ) &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        event.button === 0
+      ) {
+        event.preventDefault();
+        history.pushState({}, "", anchor.href);
+        pop();
+      }
+    };
+    window.addEventListener("popstate", pop);
+    document.addEventListener("click", click);
+    return () => {
+      window.removeEventListener("popstate", pop);
+      document.removeEventListener("click", click);
+    };
+  }, []);
+  useEffect(() => {
+    const open = () => {
+      if (compareRoute(window.location.pathname.replace(/\/$/, ""))) {
+        history.pushState({}, "", "/");
+        setPath("/");
+      }
+    };
+    window.addEventListener("mdtodocs:document-opened", open);
+    return () => window.removeEventListener("mdtodocs:document-opened", open);
+  }, []);
+  const spec = compareRoute(path);
+  useLayoutEffect(() => {
+    if (spec) {
+      const startup = (window as any).__mdStartup;
+      startup?.dispose();
+      if (startup) {
+        startup.edited = false;
+        startup.value = undefined;
+        startup.focused = false;
+      }
+    }
+  }, [spec]);
+  useEffect(() => {
+    if (!spec) return;
+    document.title = spec.title;
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute("content", spec.description);
+    document
+      .querySelector('link[rel="canonical"]')
+      ?.setAttribute("href", spec.canonical);
+    for (const key of ["title", "description", "url"] as const) {
+      document
+        .querySelector(`meta[property="og:${key}"]`)
+        ?.setAttribute("content", key === "url" ? spec.canonical : spec[key]);
+    }
+    const schema = document.querySelector('script[type="application/ld+json"]');
+    if (schema) schema.textContent = JSON.stringify(structuredData(spec));
+  }, [spec]);
+  return spec ? (
+    <FeatureBoundary>
+      <CompareApp
+        key={path}
+        path={path}
+        navigate={(next) => {
+          history.pushState({}, "", next === "/" ? "/" : next + "/");
+          setPath(next);
+        }}
+      />
+    </FeatureBoundary>
+  ) : (
+    <DocumentApp key={path} />
+  );
+}
 export default App;
