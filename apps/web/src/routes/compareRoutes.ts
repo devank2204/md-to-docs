@@ -14,7 +14,7 @@ export const COMPARE_ROUTES = {
     title: "JSON Compare — Structural Changes | MDToDocs",
     description:
       "Compare JSON specifications locally, ignoring formatting and object key order while preserving array order.",
-    lead: "Paste the original and updated JSON, then review the fields and values that changed.",
+    lead: "Paste two versions. See changed fields highlighted in context as you edit, ignoring key order and formatting.",
     canonical: "https://mdtodocs.com/json-compare/",
   },
 } as const;

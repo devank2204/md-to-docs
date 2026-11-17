@@ -122,7 +122,7 @@ function JSONInputStatus({
       title={title}
     >
       <Icon size={11} aria-hidden="true" />
-      {label}
+      <span className="compare-input-status-text">{label}</span>
     </span>
   );
 }
@@ -137,7 +137,7 @@ export default function CompareApp({
   useAppAppearance();
   const sidebarOpen = useStore((state) => state.isSidebarOpen);
   const root = useRef<HTMLDivElement>(null);
-  const [review, setReview] = useState("inputs");
+  const [selectedJSON, setSelectedJSON] = useState(-1);
   const [jsonStatus, setJSONStatus] = useState<JSONReviewStatus>();
   const [activeChange, setActiveChange] = useState(0);
   const [textReady, setTextReady] = useState(false);
@@ -232,7 +232,8 @@ export default function CompareApp({
   const currentJSON =
     jsonStatus?.a === inputs[0] && jsonStatus?.b === inputs[1];
   const canReview = currentJSON && jsonStatus.ready;
-  const reviewCount = currentJSON ? jsonStatus.count : 0;
+  const jsonChanges = canReview ? (jsonStatus.changes ?? []) : [];
+  const selectedJSONChange = jsonChanges[selectedJSON];
   const comparisonBlocked =
     currentJSON && jsonStatus.error && !jsonStatus.errors?.some(Boolean);
   const inputFeedback = (index: number) => {
@@ -256,10 +257,17 @@ export default function CompareApp({
         label: "Not compared",
         title: jsonStatus?.error || "Comparison could not run.",
       };
+    const selectedPath = index
+      ? selectedJSONChange?.updatedPath
+      : selectedJSONChange?.originalPath;
     return {
       kind: "valid",
-      label: "Valid JSON",
-      title: "Strict JSON syntax is valid",
+      label: selectedJSONChange
+        ? (selectedPath ?? "Not present here")
+        : "Valid JSON",
+      title: selectedJSONChange
+        ? `Valid JSON · ${selectedPath ?? "This field is not present in this input"}`
+        : "Strict JSON syntax is valid",
     };
   };
   const paste = async (side: 0 | 1) => {
@@ -294,32 +302,15 @@ export default function CompareApp({
     const frame = requestAnimationFrame(() => nav.current?.(next));
     return () => cancelAnimationFrame(frame);
   }, [effectiveMode]);
-  const showReview = () => setReview("changes");
-  const viewOptions = mobile
-    ? [
-        ["original", "Original"],
-        ["updated", "Updated"],
-        ["changes", `Changes${canReview ? ` (${reviewCount})` : ""}`],
-      ]
-    : [
-        ["inputs", "Inputs"],
-        ["changes", `Changes${canReview ? ` (${reviewCount})` : ""}`],
-      ];
-  const changeView = (value: string) => {
-    if (value === "changes") setReview("changes");
-    else {
-      setReview("inputs");
-      if (value !== "inputs") setMode(value);
-    }
-  };
   return (
     <div
       ref={root}
       data-sidebar={sidebarOpen}
       onKeyDown={(event) => {
-        if (!json && event.key === "F7" && !event.defaultPrevented) {
+        if (event.key === "F7" && !event.defaultPrevented) {
           event.preventDefault();
-          jump(!event.shiftKey);
+          if (json) nav.current?.(!event.shiftKey);
+          else jump(!event.shiftKey);
         }
       }}
       className="compare-app bg-surface text-on-surface font-body-md text-body-md"
@@ -380,24 +371,28 @@ export default function CompareApp({
               </Menu>
             </div>
           </div>
-          <div
-            className="compare-tool-surface"
-            data-review={json && review === "changes"}
-          >
+          <div className="compare-tool-surface">
             <div className="compare-toolbar font-code-sm text-code-sm">
               {json && (
-                <InputTabs
-                  active={
-                    review === "changes"
-                      ? "changes"
-                      : mobile
-                        ? effectiveMode
-                        : "inputs"
-                  }
-                  onChange={changeView}
-                  options={viewOptions}
-                  disabledChanges={!canReview}
-                />
+                <>
+                  {mobile && (
+                    <InputTabs active={effectiveMode} onChange={setMode} />
+                  )}
+                  <Suspense
+                    fallback={
+                      <span role="status">Preparing JSON comparison…</span>
+                    }
+                  >
+                    <JsonResult
+                      a={inputs[0]}
+                      b={inputs[1]}
+                      selected={selectedJSON}
+                      onSelect={setSelectedJSON}
+                      nav={nav}
+                      onStatus={setJSONStatus}
+                    />
+                  </Suspense>
+                </>
               )}
               <Button
                 className="compare-example"
@@ -530,10 +525,67 @@ export default function CompareApp({
                 </Button>
               )}
             </div>
-            <div
-              className="compare-input-labels font-code-sm text-code-sm"
-              hidden={json && review === "changes"}
-            >
+            {json && (
+              <div
+                className="json-context-bar font-code-sm text-code-sm"
+                aria-label="Current JSON change"
+                data-kind={selectedJSONChange?.type.toLowerCase()}
+              >
+                {selectedJSONChange ? (
+                  <>
+                    <span className="json-context-kind">
+                      {selectedJSONChange.type}
+                    </span>
+                    <code>{selectedJSONChange.path}</code>
+                    <span className="json-context-values">
+                      <span className="json-context-old">
+                        {selectedJSONChange.old === undefined
+                          ? "Not present in Original"
+                          : JSON.stringify(selectedJSONChange.old)?.slice(
+                              0,
+                              100,
+                            )}
+                      </span>
+                      <span aria-hidden="true">→</span>
+                      <span className="json-context-new">
+                        {selectedJSONChange.next === undefined
+                          ? "Not present in Updated"
+                          : JSON.stringify(selectedJSONChange.next)?.slice(
+                              0,
+                              100,
+                            )}
+                      </span>
+                    </span>
+                    <Button
+                      aria-label={`Copy path ${selectedJSONChange.path}`}
+                      onClick={() => void copy(selectedJSONChange.path)}
+                    >
+                      <Copy size={13} />
+                    </Button>
+                  </>
+                ) : (
+                  <span>
+                    {canReview && !jsonChanges.length
+                      ? "Object key order and formatting are ignored."
+                      : canReview
+                        ? "Changes are highlighted below · Next jumps to both locations."
+                        : "Edit either input · Differences update automatically when both contain valid JSON."}
+                  </span>
+                )}
+              </div>
+            )}
+            {json && currentJSON && jsonStatus.error && (
+              <div className="json-error" role="alert">
+                <strong>
+                  {jsonStatus.errors?.some(Boolean)
+                    ? "Fix JSON syntax"
+                    : "Comparison unavailable"}
+                </strong>
+                <p>{jsonStatus.error}</p>
+                <p>Both inputs are preserved.</p>
+              </div>
+            )}
+            <div className="compare-input-labels font-code-sm text-code-sm">
               {(["Original", "Updated"] as const).map((label, index) => (
                 <section
                   key={label}
@@ -625,7 +677,6 @@ export default function CompareApp({
             <div
               className="compare-editor-stage"
               data-kind={json ? "json" : "text"}
-              hidden={json && review === "changes"}
             >
               {json ? (
                 <Suspense fallback={<p>Loading JSON comparison…</p>}>
@@ -635,7 +686,9 @@ export default function CompareApp({
                     onChange={update}
                     mobile={mobile}
                     active={effectiveMode === "updated" ? 1 : 0}
-                    visible={review === "inputs"}
+                    changes={jsonChanges}
+                    selected={selectedJSON}
+                    onSelect={setSelectedJSON}
                   />
                 </Suspense>
               ) : (
@@ -713,36 +766,26 @@ export default function CompareApp({
                 </div>
               )}
             </div>
-            {json ? (
-              <Suspense fallback={<p>Checking JSON…</p>}>
-                <JsonResult
-                  a={inputs[0]}
-                  b={inputs[1]}
-                  copy={copy}
-                  view={review}
-                  onReview={showReview}
-                  onStatus={setJSONStatus}
-                />
-              </Suspense>
-            ) : (
-              <div className="compare-editor-footer font-code-sm text-code-sm">
-                <span className="compare-legend">
-                  <span>− Removed</span>
-                  <span>+ Added</span>
-                </span>
-                <span>
-                  {!textReady
+            <div className="compare-editor-footer font-code-sm text-code-sm">
+              <span className="compare-legend">
+                <span>− Removed</span>
+                <span>+ Added</span>
+                {json && <span>~ Modified</span>}
+              </span>
+              <span>
+                {json
+                  ? "Key order and formatting ignored · Array order matters"
+                  : !textReady
                     ? "Loading comparison editor"
                     : approx
                       ? "Approximate matching · Diff limit reached"
                       : normalized
                         ? "Normalized, read-only view"
-                        : "Exact comparison"}{" "}
-                  · Updates as you type
-                </span>
-                <span>F7 Next · Shift+F7 Previous</span>
-              </div>
-            )}
+                        : "Exact comparison"}
+                {!json && " · Updates as you type"}
+              </span>
+              <span>F7 Next · Shift+F7 Previous</span>
+            </div>
             {!json && inputs.some((value) => value.includes("\r")) && (
               <p>
                 Carriage returns are shown as control characters so CRLF and LF

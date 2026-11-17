@@ -1,6 +1,7 @@
 # Comparison tools implementation record
 
-Branch: feat/comparison-tools, from main 80632fa. Local only; no push/merge/deployment.
+Branch: feat/comparison-tools, from main 80632fa. Revision records below distinguish
+local verification and publication. No merge or deployment is claimed.
 
 ## Architecture and references
 
@@ -251,3 +252,103 @@ are also refreshed. These checks do not establish that the design is ideal or
 replace user testing. Physical phones, screen readers and the full existing
 export suite were not newly validated. Earlier full-suite failures remain as
 recorded above. Revision stays local; no push, merge or deployment.
+
+
+## In-context JSON correction after owner rejection · 2026-11-17
+
+The owner explicitly rejected moving a large payload's changes into a separate
+Inputs/Changes screen. This supersedes that workflow decision in the previous
+research revision. The working comparison is now the editable JSON itself:
+
+- Both original source strings remain in CodeMirror. Every jsondiffpatch change
+  decorates its actual source value and lines, with a +/−/~ gutter marker. A compact
+  navigation bar gives the count, Previous/Next, F7/Shift-F7 and a native list of
+  changed paths. No separate results page or review gate hides the source.
+- Navigation brings the corresponding location into view in both editors and
+  places the editing cursor there without stealing focus from the navigator.
+  Clicking a highlighted value keeps the clicked pane under the pointer still;
+  only its counterpart moves. The source headers identify their actual paths.
+- A selected-field strip provides path copying and bounded old/new previews.
+  Missing values are explicitly absent; only an existing value receives a change
+  highlight. The missing side has a dashed parent navigation anchor.
+- Compact screens retain Original/Updated tabs, the same selected structural
+  change and full-sized source editing. Changing a value recomputes in place;
+  native undo restores the original text and differences.
+- Validity, syntax errors and resource-limit feedback remain next to the source.
+  Source offsets are cleared immediately on edits and never reused for a pending
+  comparison. No formatting, key sorting, inferred IDs or repair happens silently.
+
+Engine reuse: jsondiffpatch still computes all structural differences. Its existing
+BaseFormatter.forEachDeltaKey method supplies array old/new index correspondence;
+no formatter HTML is produced. The installed CodeMirror JSON language's Lezer
+parser supplies exact source token boundaries. Custom glue indexes those tokens by
+path and uses CodeMirror state fields, decorations, gutters, selection and scrolling.
+This is source presentation, not a replacement JSON parser or comparison algorithm.
+No new dependency or license is introduced. Text Compare remains CodeMirror Merge.
+
+Regression fixtures cover reordered object keys, differently indented payloads,
+array insertion/removal indices, nested arrays, primitive/type changes, duplicate
+keys (last occurrence), missing/null, Unicode and unsafe property names/strings.
+Browser scenarios use over 300 lines, navigate to line 339, edit in place, undo,
+copy exact original strings and switch dark/mobile appearance. A separate dense
+fixture contains 91 real structural changes and reverses all object keys in Updated;
+both highlighted values must be visible at their different source positions.
+The cursor test includes inspecting a nearby change before navigating to a distant
+one and re-entering the editor after a theme switch.
+
+Earlier test iterations caught two test-harness assumptions (multiline marks are
+split into DOM spans, and Home/End follows visual wrapping). Tests now check the
+actual highlighted LTE span and use native word selection to edit a numeric value.
+A screenshot helper that awaited all browser animations also awaited editor caret
+animations; final dark captures use the supported reduced-motion preference.
+A real cursor-position issue exposed by returning to the editor after navigation
+was corrected by updating the native CodeMirror selection with explicit navigation.
+These changes preserve the same raw-payload, editing and undo assertions.
+
+Rendered current workspace evidence:
+
+- [91 changes inside 300+ lines, desktop](json-context-91-changes.png).
+- [Desktop source comparison](json-context-1366-light.png),
+  [desktop dark at the distant change](json-context-1366-dark.png).
+- [390px source comparison](json-context-390-light.png),
+  [390px dark at line 339](json-context-390-dark.png).
+- [320px source comparison](json-context-320-light.png),
+  [320px dark](json-context-320-dark.png).
+
+These are rendered local Chromium pages. Dark evidence uses reduced motion to
+avoid capturing the middle of an appearance transition; normal appearance changes
+are exercised in the existing experience tests. No physical-device, screen-reader
+or user-research validation is claimed. Earlier unrelated export-suite failures
+remain unresolved and were not reclassified as passing.
+
+| Hypothesis | Baseline / revision | Change | Check / actual result | Guardrails | Disposition |
+| --- | --- | --- | --- | --- | --- |
+| Large JSON is easier to inspect without losing source context | Owner rejected detached Inputs/Changes review | Structural source highlights, shared navigation and retained editing | See final verification below | Existing fonts/sidebar, local-only state, jsondiffpatch semantics, exact source copy and undo | Replaces rejected flow; usability is not claimed proven by automated checks |
+
+
+Final verification for the in-context revision:
+
+- `pnpm --config.verify-deps-before-run=false build`: passed, including recursive
+  package builds, web TypeScript and ten-route prerender.
+- `node --import tsx apps/web/src/compare/model.test.ts`: **20 passed, 0 failed**.
+- `node --import tsx apps/web/src/compare/jsonLocations.test.ts`: **14 passed,
+  0 failed**. Direct execution uses Node's test registration/reporting and avoids
+  the sandbox-blocked tsx CLI IPC socket.
+- `pnpm --config.verify-deps-before-run=false --filter web lint`: exit 0 with
+  warnings (including existing CodeMirror ref bridges); not a warning-free claim.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium node_modules/.bin/playwright test
+  tests/browser/json-context.spec.ts tests/browser/compare-workspace.spec.ts
+  tests/browser/compare-experience.spec.ts tests/browser/compare.spec.ts
+  tests/browser/compare-identity.spec.ts tests/browser/seo.spec.ts`: **44 passed,
+  0 failed**, in the final single run. Typography assertions remain unchanged.
+  Workflow assertions changed because the owner explicitly rejected the old
+  separate review view; tests now require sources to remain visible and editable.
+
+[Current bundle measurement](comparison-context-bundle.json): homepage initial
+static JS is 106,355 gzip bytes versus 104,761 on main 80632fa (+1,594 bytes).
+Compared with the preceding research revision this is +2 bytes. This per-file gzip
+sum excludes CSS/fonts and deferred imports; chunk figures exclude shared imports.
+Browser checks verify engine chunks remain deferred on the homepage. Existing
+privacy, structural complexity and import limits still apply. No physical-device
+or full export-suite pass is claimed. Push is authorized by the owner's standing
+instruction; this revision does not merge or deploy the branch.

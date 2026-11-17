@@ -61,7 +61,7 @@ for (const width of [320, 390, 900, 1366])
       '{"project":"private-ui-probe","active":false}',
     );
     await expect(
-      page.getByRole("button", { name: "Review changes", exact: true }),
+      page.getByRole("button", { name: "Next change", exact: true }),
     ).toBeEnabled();
     await page.screenshot({
       path: `docs/qa/compare-inputs-light-${width}.png`,
@@ -88,9 +88,9 @@ for (const width of [320, 390, 900, 1366])
       fullPage: true,
     });
     await page
-      .getByRole("button", { name: "Review changes", exact: true })
+      .getByRole("button", { name: "Next change", exact: true })
       .click();
-    await expect(page.locator(".json-change")).toContainText("$.active");
+    await expect(page.locator(".json-context-bar")).toContainText("$.active");
     const previous = await page
         .getByRole("button", { name: "Previous change", exact: true })
         .boundingBox(),
@@ -109,12 +109,7 @@ for (const width of [320, 390, 900, 1366])
       "data-appearance",
       "cream",
     );
-    await page
-      .getByRole("tab", {
-        name: width < 1024 ? "Updated" : "Inputs",
-        exact: true,
-      })
-      .click();
+
     await expect(
       page.getByRole("textbox", { name: "Updated", exact: true }),
     ).toHaveText('{"project":"private-ui-probe","active":false}');
@@ -127,47 +122,54 @@ for (const width of [320, 390, 900, 1366])
       ),
     ).toBe(true);
   });
-test("validation controls review and edits survive switching views", async ({
+test("validation and live highlights never hide the JSON being edited", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/json-compare/");
   await expect(
-    page.getByRole("tab", { name: "Changes", exact: true }),
+    page.getByRole("button", { name: "Next change", exact: true }),
   ).toBeDisabled();
   const initialTop = (await page.locator(".json-editors").boundingBox())!.y;
   await write(page, "Original", '{"role":');
   await write(page, "Updated", '{"role":"editor"}');
   await expect(page.getByRole("alert")).toContainText("Original");
+  await expect(
+    page.getByRole("textbox", { name: "Original", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Next change", exact: true }),
+  ).toBeDisabled();
+  await write(page, "Original", '{"role":"admin"}');
+  await expect(
+    page.getByRole("button", { name: "Next change", exact: true }),
+  ).toBeEnabled();
   expect(
     Math.abs(
       (await page.locator(".json-editors").boundingBox())!.y - initialTop,
     ),
   ).toBeLessThan(1);
-  await expect(
-    page.getByRole("tab", { name: "Changes", exact: true }),
-  ).toBeDisabled();
-  await write(page, "Original", '{"role":"admin"}');
-  await page
-    .getByRole("button", { name: "Review changes", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Next change", exact: true }).click();
   await expect(
     page.getByRole("textbox", { name: "Original", exact: true }),
-  ).toBeHidden();
-  await page.locator(".json-path").click();
-  await expect(page.locator(".json-context")).toContainText("admin");
-  await page.getByRole("tab", { name: "Inputs", exact: true }).click();
+  ).toBeVisible();
   await expect(
-    page.getByRole("textbox", { name: "Original", exact: true }),
-  ).toHaveText('{"role":"admin"}');
+    page.getByRole("textbox", { name: "Updated", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.locator('.json-editors [data-compare-side="0"] .cm-json-value'),
+  ).toHaveText('"admin"');
+  await expect(
+    page.locator('.json-editors [data-compare-side="1"] .cm-json-value'),
+  ).toHaveText('"editor"');
   await write(page, "Updated", '{"role":"admin"}');
-  await page
-    .getByRole("button", { name: "Review comparison", exact: true })
-    .click();
   await expect(
     page.getByText("JSON values match", { exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".json-change")).toHaveCount(0);
+  await expect(page.locator(".cm-json-value")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Next change", exact: true }),
+  ).toBeDisabled();
 });
 for (const width of [390, 1366])
   test(`text navigation follows actual chunks with F7 at ${width}`, async ({
@@ -264,7 +266,7 @@ test("large payload remains copyable and cannot leave a stale successful compari
   await write(page, "Original", '{"x":1}');
   await write(page, "Updated", '{"x":2}');
   await expect(
-    page.getByRole("button", { name: "Review changes", exact: true }),
+    page.getByRole("button", { name: "Next change", exact: true }),
   ).toBeEnabled();
   const large = JSON.stringify({ text: "a".repeat(200001) });
   await page.getByLabel("Import Original", { exact: true }).setInputFiles({
@@ -274,7 +276,7 @@ test("large payload remains copyable and cannot leave a stale successful compari
   });
   await expect(page.getByRole("alert")).toContainText("200,000");
   await expect(
-    page.getByRole("tab", { name: "Changes", exact: true }),
+    page.getByRole("button", { name: "Next change", exact: true }),
   ).toBeDisabled();
   await page
     .getByRole("button", { name: "Copy Original", exact: true })
@@ -289,13 +291,10 @@ test("large payload remains copyable and cannot leave a stale successful compari
     mimeType: "application/json",
     buffer: Buffer.from('{"x":2}'),
   });
-  await page
-    .getByRole("button", { name: "Review comparison", exact: true })
-    .click();
   await expect(
     page.getByText("JSON values match", { exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".json-change")).toHaveCount(0);
+  await expect(page.locator(".cm-json-value")).toHaveCount(0);
 });
 test("slow editor loading reserves space and preserves an early explicit paste", async ({
   page,

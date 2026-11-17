@@ -1,3 +1,10 @@
+import type { Change } from "./model";
+import { locateChanges, type ChangeLocation } from "./jsonLocations";
+import {
+  jsonHighlightState,
+  jsonChangeGutter,
+  setJSONHighlights,
+} from "./jsonHighlights";
 import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
 import { useLayoutEffect, useEffect, useRef } from "react";
 import { EditorState, Compartment } from "@codemirror/state";
@@ -25,19 +32,29 @@ export default function JsonEditors({
   onChange,
   active,
   mobile,
-  visible = true,
+  changes,
+  selected,
+  onSelect,
 }: {
   a: string;
   b: string;
   onChange: (side: 0 | 1, value: string) => void;
   active: 0 | 1;
   mobile: boolean;
-  visible?: boolean;
+  changes: Change[];
+  selected: number;
+  onSelect: (index: number) => void;
 }) {
   const hosts = useRef<(HTMLDivElement | null)[]>([]),
     views = useRef<EditorView[]>([]),
     syncing = useRef(false),
     change = useRef(onChange);
+  const clickedSide = useRef<number | null>(null);
+  const selectedIndex = useRef(selected);
+  selectedIndex.current = selected;
+  const pick = useRef(onSelect);
+  pick.current = onSelect;
+  const locations = useRef<ChangeLocation[][]>([[], []]);
   change.current = onChange;
   const palette = useRef(new Compartment());
   const colors = () => {
@@ -57,6 +74,22 @@ export default function JsonEditors({
             extensions: [
               EditorState.lineSeparator.of("\n"),
               lineNumbers(),
+              jsonHighlightState,
+              jsonChangeGutter,
+              EditorView.domEventHandlers({
+                mousedown(event) {
+                  const target = (event.target as Element).closest<HTMLElement>(
+                    "[data-json-change]",
+                  );
+                  if (target) {
+                    const index = Number(target.dataset.jsonChange);
+                    if (index !== selectedIndex.current)
+                      clickedSide.current = side;
+                    pick.current(index);
+                  }
+                  return false;
+                },
+              }),
               placeholder(
                 side ? "Paste updated JSON here…" : "Paste original JSON here…",
               ),
@@ -109,7 +142,51 @@ export default function JsonEditors({
   }, [a, b]);
   useEffect(() => {
     views.current.forEach((view) => view.requestMeasure());
-  }, [active, mobile, visible]);
+  }, [active, mobile]);
+  useEffect(() => {
+    locations.current = views.current.map((view, side) =>
+      changes.length
+        ? locateChanges(view.state.doc.toString(), changes, side as 0 | 1)
+        : [],
+    );
+    views.current.forEach((view, side) =>
+      view.dispatch({
+        effects: setJSONHighlights.of({
+          locations: locations.current[side],
+          selected,
+        }),
+      }),
+    );
+  }, [changes]);
+  useEffect(() => {
+    views.current.forEach((view, side) =>
+      view.dispatch({
+        effects: setJSONHighlights.of({
+          locations: locations.current[side],
+          selected,
+        }),
+      }),
+    );
+    const clicked = clickedSide.current;
+    clickedSide.current = null;
+    if (selected < 0) return;
+    const frame = requestAnimationFrame(() => {
+      views.current.forEach((view, side) => {
+        const target = locations.current[side].find(
+          (location) => location.index === selected,
+        );
+        if (target && side !== clicked && (!mobile || side === active))
+          view.dispatch({
+            selection: { anchor: target.valueFrom },
+            effects: EditorView.scrollIntoView(target.valueFrom, {
+              y: "center",
+              yMargin: 60,
+            }),
+          });
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [selected, active, mobile, changes]);
   return (
     <div className="json-editors compare-editors">
       {[0, 1].map((side) => (
