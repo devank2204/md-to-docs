@@ -291,3 +291,22 @@ wordmark and sidebar typography remain unchanged. New cross-page browser checks
 compare computed heading/description styles to the incumbent homepage and verify
 control/source fonts at 390px and 1440px. Validation results recorded in the
 comparison implementation report. Local only; no push or deployment.
+
+## Comparison workspace correction after owner rejection · 2026-11-17
+
+The owner rejected the screenshot's form-like layout. Reworked only the compare
+workspace: grouped source headers with per-side import/format/copy, hidden native
+file fields, CodeMirror JSON inputs with standard language support, and a clear
+structural change table with old/new value columns, navigation and parent context.
+Supporting guidance is collapsed. Existing fonts, shared controls and 248px sidebar
+remain authoritative. Text keeps its single MergeView working surface. JSON still
+uses jsondiffpatch; no new comparison algorithm or persistence.
+
+Production build/TypeScript/ten-route prerender pass. 28 focused browser checks
+pass (including SEO and unchanged cross-page font assertions); 20 engine/adapter
+unit tests pass; lint exits 0 with warnings. Tested the date-filter removal from
+owner feedback at 1366×768: the complete first change is visible without scrolling.
+Mobile source tabs, formatting/copy and actual file-drop events are exercised.
+Screenshots and detail: [report](qa/comparison-tools.md). Earlier wide-suite export
+failures are not resolved or claimed passing. Revision kept local for review;
+no push, merge or deployment under this feedback turn.

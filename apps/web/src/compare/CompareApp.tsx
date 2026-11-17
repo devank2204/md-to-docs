@@ -1,3 +1,11 @@
+import {
+  Upload,
+  Copy,
+  AlignLeft,
+  ArrowLeftRight,
+  LockKeyhole,
+  Braces,
+} from "lucide-react";
 import { HomeIntroduction } from "../components/HomeIntroduction";
 import { CapacityDecision } from "../components/CapacityDecision";
 import { SupportDialog } from "../components/SupportDialog";
@@ -22,9 +30,61 @@ const DocumentHistoryModal = lazy(() =>
     default: m.DocumentHistoryModal,
   })),
 );
+const JsonEditors = lazy(() => import("./JsonEditors"));
 const JsonResult = lazy(() => import("./JsonResult"));
 // Ephemeral module memory survives tool navigation; never enters document storage or URLs.
 const memory = { text: ["", ""], json: ["", ""] };
+
+function InputTabs({
+  active,
+  onChange,
+  unified = false,
+}: {
+  active: string;
+  onChange: (value: string) => void;
+  unified?: boolean;
+}) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Comparison view"
+      onKeyDown={(event) => {
+        const tabs = Array.from(
+          event.currentTarget.querySelectorAll<HTMLButtonElement>("button"),
+        );
+        const index = tabs.indexOf(event.target as HTMLButtonElement);
+        let next = index;
+        if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+        else if (event.key === "ArrowLeft")
+          next = (index + tabs.length - 1) % tabs.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = tabs.length - 1;
+        else return;
+        event.preventDefault();
+        tabs[next].click();
+        tabs[next].focus();
+      }}
+    >
+      {[
+        ["original", "Original"],
+        ["updated", "Updated"],
+        ...(unified ? [["unified", "Unified"]] : []),
+      ].map(([value, label]) => (
+        <Button
+          key={value}
+          role="tab"
+          aria-selected={active === value}
+          state={active === value ? "selected" : "idle"}
+          tabIndex={active === value ? 0 : -1}
+          onClick={() => onChange(value)}
+        >
+          {label}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
 export default function CompareApp({
   path,
   navigate,
@@ -50,25 +110,30 @@ export default function CompareApp({
   const [approx, setApprox] = useState(false);
   const [notice, setNotice] = useState("");
   const nav = useRef<((next: boolean) => void) | null>(null);
-  const importVersion = useRef(0);
+  const importVersion = useRef([0, 0]);
+  const fileInputs = useRef<(HTMLInputElement | null)[]>([]);
   useEffect(() => {
     const media = matchMedia("(max-width:767px)");
     const change = () => setMobile(media.matches);
     media.addEventListener("change", change);
     return () => {
       media.removeEventListener("change", change);
-      importVersion.current++;
+      importVersion.current[0]++;
+      importVersion.current[1]++;
     };
   }, []);
-  const update = (side: 0 | 1, value: string) =>
+  const update = (side: 0 | 1, value: string) => {
+    importVersion.current[side]++;
     setInputs((old) => {
       const next = [...old];
       next[side] = value;
       memory[json ? "json" : "text"] = next;
       return next;
     });
+  };
   const replace = (next: string[]) => {
-    importVersion.current++;
+    importVersion.current[0]++;
+    importVersion.current[1]++;
     memory[json ? "json" : "text"] = next;
     setInputs(next);
   };
@@ -94,9 +159,13 @@ export default function CompareApp({
       setNotice("Import limit is 2 MB per input.");
       return;
     }
-    const version = ++importVersion.current;
-    const text = await file.text();
-    if (version === importVersion.current) update(side, text);
+    const version = ++importVersion.current[side];
+    try {
+      const text = await file.text();
+      if (version === importVersion.current[side]) update(side, text);
+    } catch {
+      setNotice("Could not read this file. Your inputs are unchanged.");
+    }
   };
   const normalized = ignoreSpace || ignoreCase;
   const projection = (value: string) => {
@@ -116,7 +185,12 @@ export default function CompareApp({
       onDrop={(event) => {
         if (!event.dataTransfer.files.length) return;
         event.preventDefault();
-        const side = (event.target as Element).closest(".cm-merge-b") ? 1 : 0;
+        const target = (event.target as Element).closest("[data-compare-side]");
+        const side = target
+          ? (Number(target.getAttribute("data-compare-side")) as 0 | 1)
+          : (event.target as Element).closest(".cm-merge-b")
+            ? 1
+            : 0;
         void importFile(event.dataTransfer.files[0], side);
       }}
     >
@@ -186,289 +260,325 @@ export default function CompareApp({
           />
         </div>
         <main className="compare-main">
-          <HomeIntroduction content={spec} />
-          <div className="compare-title font-code-sm text-code-sm">
-            <Button onClick={() => replace([inputs[1], inputs[0]])}>
-              Swap
-            </Button>
-            <details>
-              <summary className="ux-button">More</summary>
-              <div className="compare-menu">
-                <Button onClick={() => replace(["", ""])}>Clear both</Button>
-                <Button onClick={() => void copy(inputs[0])}>
-                  Copy Original
-                </Button>
-                <Button onClick={() => void copy(inputs[1])}>
-                  Copy Updated
-                </Button>
-                {!json && (
-                  <Button
-                    onClick={async () => {
-                      const { createTwoFilesPatch } = await import("diff");
-                      await copy(
-                        createTwoFilesPatch(
-                          "Original",
-                          "Updated",
-                          inputs[0],
-                          inputs[1],
-                          undefined,
-                          undefined,
-                          { context },
-                        ),
-                      );
-                    }}
-                  >
-                    Copy unified diff
-                  </Button>
-                )}
-              </div>
-            </details>
-          </div>
-          <div className="compare-toolbar font-code-sm text-code-sm">
-            <Button
-              onClick={() =>
-                replace(
-                  json
-                    ? [
-                        '{"user":{"id":5,"role":"admin"},"active":true}',
-                        '{"active":true,"user":{"role":"editor","id":5}}',
-                      ]
-                    : [
-                        "# Project plan\n\nReview the first draft.\n",
-                        " # Project plan\n\nReview the updated draft.\n",
-                      ],
-                )
-              }
-            >
-              Try example
-            </Button>
-            {!json && (
-              <>
-                {mobile ? (
-                  <div
-                    role="tablist"
-                    aria-label="Comparison view"
-                    onKeyDown={(event) => {
-                      const tabs = Array.from(
-                        event.currentTarget.querySelectorAll<HTMLButtonElement>(
-                          "button",
-                        ),
-                      );
-                      const index = tabs.indexOf(
-                        event.target as HTMLButtonElement,
-                      );
-                      let next = index;
-                      if (event.key === "ArrowRight")
-                        next = (index + 1) % tabs.length;
-                      else if (event.key === "ArrowLeft")
-                        next = (index + tabs.length - 1) % tabs.length;
-                      else if (event.key === "Home") next = 0;
-                      else if (event.key === "End") next = tabs.length - 1;
-                      else return;
-                      event.preventDefault();
-                      tabs[next].click();
-                      tabs[next].focus();
-                    }}
-                  >
-                    {[
-                      ["original", "Original"],
-                      ["updated", "Updated"],
-                      ["unified", "Unified"],
-                    ].map(([value, label]) => (
-                      <Button
-                        key={value}
-                        role="tab"
-                        aria-selected={effectiveMode === value}
-                        tabIndex={effectiveMode === value ? 0 : -1}
-                        onClick={() => setMode(value)}
-                      >
-                        {label}
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <select
-                    className="ux-button"
-                    aria-label="Comparison view"
-                    value={effectiveMode}
-                    onChange={(e) => setMode(e.target.value)}
-                  >
-                    {mobile ? (
-                      <>
-                        <option value="original">Original</option>
-                        <option value="updated">Updated</option>
-                      </>
-                    ) : (
-                      <option value="side">Side by side</option>
-                    )}
-                    <option value="unified">Unified</option>
-                  </select>
-                )}
-                <span role="status">
-                  {count} differences{approx ? " · Approximate matching" : ""}
-                </span>
-                <Button onClick={() => nav.current?.(false)}>Previous</Button>
-                <Button onClick={() => nav.current?.(true)}>Next</Button>
-                <details>
-                  <summary className="ux-button">Options</summary>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={ignoreSpace}
-                      onChange={(e) => setIgnoreSpace(e.target.checked)}
-                    />{" "}
-                    Ignore whitespace
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={ignoreCase}
-                      onChange={(e) => setIgnoreCase(e.target.checked)}
-                    />{" "}
-                    Ignore case
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={whitespace}
-                      onChange={(e) => setWhitespace(e.target.checked)}
-                    />{" "}
-                    Show whitespace
-                  </label>
-                  <label>
-                    Context lines{" "}
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={context}
-                      onChange={(e) =>
-                        setContext(
-                          Math.max(0, Math.min(100, Number(e.target.value))),
-                        )
-                      }
-                    />
-                  </label>
-                </details>
-              </>
-            )}
-            {!json && validJSON && (
-              <Button
-                onClick={() => {
-                  memory.json = [...inputs];
-                  navigate("/json-compare");
-                }}
-              >
-                Compare as JSON
+          <div className="compare-heading">
+            <HomeIntroduction content={spec} />
+            <div className="compare-title font-code-sm text-code-sm">
+              <Button onClick={() => replace([inputs[1], inputs[0]])}>
+                <ArrowLeftRight size={14} aria-hidden="true" /> Swap
               </Button>
-            )}
-          </div>
-          <div className="compare-input-labels font-code-sm text-code-sm">
-            {(["Original", "Updated"] as const).map((label, index) => (
-              <label
-                key={label}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  void importFile(e.dataTransfer.files[0], index as 0 | 1);
-                }}
-              >
-                {label}{" "}
-                <input
-                  aria-label={`Import ${label}`}
-                  type="file"
-                  accept="text/*,.json,.md,.csv"
-                  onChange={(e) =>
-                    void importFile(e.target.files?.[0], index as 0 | 1)
-                  }
-                />
-                {json && (
-                  <>
+              <Menu label="More" name="More">
+                <div className="compare-menu">
+                  <Button onClick={() => replace(["", ""])}>Clear both</Button>
+
+                  {!json && (
                     <Button
-                      onClick={() => {
-                        try {
-                          update(
-                            index as 0 | 1,
-                            JSON.stringify(JSON.parse(inputs[index]), null, 2),
-                          );
-                        } catch {
-                          setNotice(`${label} contains invalid JSON.`);
-                        }
+                      onClick={async () => {
+                        const { createTwoFilesPatch } = await import("diff");
+                        await copy(
+                          createTwoFilesPatch(
+                            "Original",
+                            "Updated",
+                            inputs[0],
+                            inputs[1],
+                            undefined,
+                            undefined,
+                            { context },
+                          ),
+                        );
                       }}
                     >
-                      Format input
+                      Copy unified diff
                     </Button>
-                    <textarea
-                      aria-label={label}
-                      value={inputs[index]}
-                      onChange={(e) => update(index as 0 | 1, e.target.value)}
-                      spellCheck={false}
-                    />
-                  </>
-                )}
-              </label>
-            ))}
-          </div>
-          {json ? (
-            <Suspense fallback={<p>Loading JSON comparison…</p>}>
-              <JsonResult a={inputs[0]} b={inputs[1]} copy={copy} />
-            </Suspense>
-          ) : (
-            <>
-              {normalized && (
-                <p>
-                  Ignore options show a normalized, read-only comparison below.
-                  Original inputs remain unchanged; turn options off to edit.
-                </p>
-              )}
-              <Suspense fallback={<p>Loading comparison editor…</p>}>
-                <div>
-                  <TextEditors
-                    readOnly={normalized}
-                    a={normalized ? projection(inputs[0]) : inputs[0]}
-                    b={normalized ? projection(inputs[1]) : inputs[1]}
-                    onChange={normalized ? () => {} : update}
-                    mode={normalized ? "unified" : effectiveMode}
-                    whitespace={whitespace}
-                    context={context}
-                    nav={nav}
-                    onStatus={(n, p) => {
-                      setCount(n);
-                      setApprox(p);
-                    }}
-                  />
+                  )}
                 </div>
+              </Menu>
+            </div>
+          </div>
+          <div className="compare-tool-surface">
+            <div className="compare-toolbar font-code-sm text-code-sm">
+              {json && (
+                <span className="compare-toolbar-label">
+                  <Braces size={14} aria-hidden="true" /> JSON inputs · Live
+                  comparison
+                </span>
+              )}
+              <Button
+                onClick={() =>
+                  replace(
+                    json
+                      ? [
+                          JSON.stringify(
+                            { user: { id: 5, role: "admin" }, active: true },
+                            null,
+                            2,
+                          ),
+                          JSON.stringify(
+                            { active: true, user: { role: "editor", id: 5 } },
+                            null,
+                            2,
+                          ),
+                        ]
+                      : [
+                          "# Project plan\n\nReview the first draft.\n",
+                          " # Project plan\n\nReview the updated draft.\n",
+                        ],
+                  )
+                }
+              >
+                Try example
+              </Button>
+              <span className="compare-local">
+                <LockKeyhole size={12} aria-hidden="true" /> Local only · Not
+                saved
+              </span>
+              {json && mobile && (
+                <InputTabs active={effectiveMode} onChange={setMode} />
+              )}
+              {!json && (
+                <>
+                  {mobile ? (
+                    <InputTabs
+                      active={effectiveMode}
+                      onChange={setMode}
+                      unified
+                    />
+                  ) : (
+                    <select
+                      className="ux-button"
+                      aria-label="Comparison view"
+                      value={effectiveMode}
+                      onChange={(e) => setMode(e.target.value)}
+                    >
+                      {mobile ? (
+                        <>
+                          <option value="original">Original</option>
+                          <option value="updated">Updated</option>
+                        </>
+                      ) : (
+                        <option value="side">Side by side</option>
+                      )}
+                      <option value="unified">Unified</option>
+                    </select>
+                  )}
+                  <span role="status">
+                    {count} {count === 1 ? "difference" : "differences"}
+                    {approx ? " · Approximate matching" : ""}
+                  </span>
+                  <Button onClick={() => nav.current?.(false)}>Previous</Button>
+                  <Button onClick={() => nav.current?.(true)}>Next</Button>
+                  <Menu name="Options" label="Options">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={ignoreSpace}
+                        onChange={(e) => setIgnoreSpace(e.target.checked)}
+                      />{" "}
+                      Ignore whitespace
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={ignoreCase}
+                        onChange={(e) => setIgnoreCase(e.target.checked)}
+                      />{" "}
+                      Ignore case
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={whitespace}
+                        onChange={(e) => setWhitespace(e.target.checked)}
+                      />{" "}
+                      Show whitespace
+                    </label>
+                    <label>
+                      Context lines{" "}
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={context}
+                        onChange={(e) =>
+                          setContext(
+                            Math.max(0, Math.min(100, Number(e.target.value))),
+                          )
+                        }
+                      />
+                    </label>
+                  </Menu>
+                </>
+              )}
+              {!json && validJSON && (
+                <Button
+                  onClick={() => {
+                    memory.json = [...inputs];
+                    navigate("/json-compare");
+                  }}
+                >
+                  Compare as JSON
+                </Button>
+              )}
+            </div>
+            <div className="compare-input-labels font-code-sm text-code-sm">
+              {(["Original", "Updated"] as const).map((label, index) => (
+                <section
+                  key={label}
+                  data-compare-side={index}
+                  hidden={
+                    mobile &&
+                    effectiveMode !== "unified" &&
+                    (effectiveMode === "updated" ? 1 : 0) !== index
+                  }
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    void importFile(
+                      event.dataTransfer.files[0],
+                      index as 0 | 1,
+                    );
+                  }}
+                >
+                  <div className="compare-input-name">
+                    <strong>{label}</strong>
+                    <span>
+                      {inputs[index]
+                        ? `${inputs[index].length.toLocaleString()} characters`
+                        : "Paste text or drop a file"}
+                    </span>
+                  </div>
+                  <div className="compare-input-actions">
+                    <input
+                      hidden
+                      ref={(element) => {
+                        fileInputs.current[index] = element;
+                      }}
+                      aria-label={`Import ${label}`}
+                      type="file"
+                      accept="text/*,.json,.md,.csv"
+                      onChange={(event) => {
+                        void importFile(
+                          event.target.files?.[0],
+                          index as 0 | 1,
+                        );
+                        event.target.value = "";
+                      }}
+                    />
+                    <Button
+                      aria-label={`Open file for ${label}`}
+                      onClick={() => fileInputs.current[index]?.click()}
+                    >
+                      <Upload size={13} aria-hidden="true" /> Import
+                    </Button>
+                    {json && (
+                      <Button
+                        aria-label={`Format ${label}`}
+                        onClick={() => {
+                          try {
+                            update(
+                              index as 0 | 1,
+                              JSON.stringify(
+                                JSON.parse(inputs[index]),
+                                null,
+                                2,
+                              ),
+                            );
+                          } catch {
+                            setNotice(`${label} contains invalid JSON.`);
+                          }
+                        }}
+                      >
+                        <AlignLeft size={13} aria-hidden="true" /> Format
+                      </Button>
+                    )}
+                    <Button
+                      aria-label={`Copy ${label}`}
+                      onClick={() => void copy(inputs[index])}
+                    >
+                      <Copy size={13} aria-hidden="true" />
+                      <span className="compare-copy-label">Copy</span>
+                    </Button>
+                  </div>
+                </section>
+              ))}
+            </div>
+            {json ? (
+              <Suspense fallback={<p>Loading JSON comparison…</p>}>
+                <JsonEditors
+                  a={inputs[0]}
+                  b={inputs[1]}
+                  onChange={update}
+                  mobile={mobile}
+                  active={effectiveMode === "updated" ? 1 : 0}
+                />
+                <JsonResult a={inputs[0]} b={inputs[1]} copy={copy} />
               </Suspense>
-            </>
-          )}
-          {!json && inputs.some((value) => value.includes("\r")) && (
-            <p>
-              Carriage returns are shown as control characters so CRLF and LF
-              line endings compare exactly.
+            ) : (
+              <>
+                {normalized && (
+                  <p>
+                    Ignore options show a normalized, read-only comparison
+                    below. Original inputs remain unchanged; turn options off to
+                    edit.
+                  </p>
+                )}
+                <Suspense fallback={<p>Loading comparison editor…</p>}>
+                  <div>
+                    <TextEditors
+                      readOnly={normalized}
+                      a={normalized ? projection(inputs[0]) : inputs[0]}
+                      b={normalized ? projection(inputs[1]) : inputs[1]}
+                      onChange={normalized ? () => {} : update}
+                      mode={normalized ? "unified" : effectiveMode}
+                      whitespace={whitespace}
+                      context={context}
+                      nav={nav}
+                      onStatus={(n, p) => {
+                        setCount(n);
+                        setApprox(p);
+                      }}
+                    />
+                  </div>
+                </Suspense>
+              </>
+            )}
+            {!json && inputs.some((value) => value.includes("\r")) && (
+              <p>
+                Carriage returns are shown as control characters so CRLF and LF
+                line endings compare exactly.
+              </p>
+            )}
+            <p
+              role="status"
+              className="compare-notice font-code-sm text-code-sm"
+            >
+              {notice}
             </p>
-          )}
-          <p role="status">{notice}</p>
-          <section className="compare-support text-secondary text-sm leading-relaxed">
-            <h2 className="font-serif text-lg font-medium text-on-surface mb-3">
-              Review technical revisions before sharing
-            </h2>
-            <p>
-              {json
-                ? "Compare API examples and JSON in technical specifications. Object key order and indentation do not affect results. Arrays retain their order; object changes are compared by position without inferred IDs."
-                : "Inspect AI-generated document changes and Markdown revisions in the editors. Unified patches include the original inputs; ignore options only affect the displayed comparison."}
-            </p>
-            <p>
-              Processing stays in your browser. Inputs are held in memory only
-              and disappear on refresh. JSON duplicate keys follow JSON.parse
-              semantics: the last value wins. No automatic repair or merging is
-              performed.
-            </p>
-            <p>
-              For responsiveness, imports are limited to 2 MB. JSON structural
-              comparisons are limited to 200,000 characters per side; larger
-              inputs remain available for copying.
-            </p>
-          </section>
+          </div>
+          <details className="compare-guidance">
+            <summary>About this comparison · privacy and limits</summary>
+            <section className="compare-support text-secondary text-sm leading-relaxed">
+              <h2 className="font-serif text-lg font-medium text-on-surface mb-3">
+                Review technical revisions before sharing
+              </h2>
+              <p>
+                {json
+                  ? "Compare API examples and JSON in technical specifications. Object key order and indentation do not affect results. Arrays retain their order; object changes are compared by position without inferred IDs."
+                  : "Inspect AI-generated document changes and Markdown revisions in the editors. Unified patches include the original inputs; ignore options only affect the displayed comparison."}
+              </p>
+              <p>
+                Processing stays in your browser. Inputs are held in memory only
+                and disappear on refresh. JSON duplicate keys follow JSON.parse
+                semantics: the last value wins. No automatic repair or merging
+                is performed.
+              </p>
+              <p>
+                For responsiveness, imports are limited to 2 MB. JSON structural
+                comparisons are limited to 200,000 characters per side; larger
+                inputs remain available for copying.
+              </p>
+            </section>
+          </details>
         </main>
       </div>
       <CapacityDecision />
