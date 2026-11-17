@@ -51,6 +51,8 @@ not an instruction to install packages, hooks, providers, or another design syst
 
 Run checks appropriate to the change. Summarize what changed, why, verification,
 and material limits. Update the active workstate; add a decision only when durable.
-Follow [.agents/rules/git.md](.agents/rules/git.md): local commits are permitted;
-**never push unless the user explicitly asks in the current prompt**. Preserve
-other changes and do not claim deployment or physical-device testing without evidence.
+Follow [.agents/rules/git.md](.agents/rules/git.md): local commits are permitted.
+Standing user authorization, reaffirmed 2026-11-17: automatically push completed,
+verified changes to the current working branch; do not ask again. Never force-push,
+merge or deploy without separate authorization. Preserve other changes and do not
+claim deployment or physical-device testing without evidence.

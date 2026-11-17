@@ -1,5 +1,25 @@
 # Current workstate
 
+## Comparison UX research revision · 2026-11-17
+
+Owner rejected the comparison workflow and appearance-control alignment. Reviewed
+public Diffchecker/JSONDiff/jsondiffpatch demos and official Meld, VS Code, Beyond
+Compare and NN/g guidance; [research and decisions](research/comparison-ux.md).
+Comparison header now keeps shared appearance/Tools controls together at the right,
+with the sidebar control beside the existing wordmark. Guided input actions, live
+JSON validity and explicit Inputs → Review changes → Inputs navigation preserve
+both editable sources and undo. Text uses native chunk navigation/current position
+and shared aligned scrolling; narrow layouts use the existing 1023px breakpoint.
+Dark JSON syntax uses CodeMirror’s MIT One Dark highlighting only. Approved fonts,
+sidebar tokens and document/export behavior remain unchanged.
+
+Production build/TypeScript and ten-route prerender pass; 40 focused Chromium
+browser tests and 20 model/engine tests pass; lint exits zero with warnings.
+Homepage initial static JS increases 1,592 gzip bytes versus main 80632fa; engines
+remain deferred. [Verification and screenshots](qa/comparison-tools.md). Existing
+full-suite export failures remain unresolved; no physical-device/user-research
+validation claimed. Local commit only; not pushed, merged or deployed.
+
 ## Mobile reading refinement · 2026-11-15
 
 D012: visible Tools/appearance, compact accessible Export, smaller unfocused mobile
@@ -291,3 +311,22 @@ wordmark and sidebar typography remain unchanged. New cross-page browser checks
 compare computed heading/description styles to the incumbent homepage and verify
 control/source fonts at 390px and 1440px. Validation results recorded in the
 comparison implementation report. Local only; no push or deployment.
+
+## Comparison workspace correction after owner rejection · 2026-11-17
+
+The owner rejected the screenshot's form-like layout. Reworked only the compare
+workspace: grouped source headers with per-side import/format/copy, hidden native
+file fields, CodeMirror JSON inputs with standard language support, and a clear
+structural change table with old/new value columns, navigation and parent context.
+Supporting guidance is collapsed. Existing fonts, shared controls and 248px sidebar
+remain authoritative. Text keeps its single MergeView working surface. JSON still
+uses jsondiffpatch; no new comparison algorithm or persistence.
+
+Production build/TypeScript/ten-route prerender pass. 28 focused browser checks
+pass (including SEO and unchanged cross-page font assertions); 20 engine/adapter
+unit tests pass; lint exits 0 with warnings. Tested the date-filter removal from
+owner feedback at 1366×768: the complete first change is visible without scrolling.
+Mobile source tabs, formatting/copy and actual file-drop events are exercised.
+Screenshots and detail: [report](qa/comparison-tools.md). Earlier wide-suite export
+failures are not resolved or claimed passing. Revision kept local for review;
+no push, merge or deployment under this feedback turn.

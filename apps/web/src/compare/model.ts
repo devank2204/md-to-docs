@@ -3,16 +3,22 @@ import { create, type Delta } from "jsondiffpatch";
 const engine = create({ arrays: { detectMove: false } });
 export type Change = {
   path: string;
+  segments: (string | number)[];
   type: string;
   old?: unknown;
   next?: unknown;
 };
-export function changesFromDelta(delta: Delta, path = "$"): Change[] {
+export function changesFromDelta(
+  delta: Delta,
+  path = "$",
+  segments: (string | number)[] = [],
+): Change[] {
   if (!delta) return [];
   if (Array.isArray(delta))
     return [
       {
         path,
+        segments,
         type:
           delta.length === 1
             ? "Added"
@@ -40,6 +46,7 @@ export function changesFromDelta(delta: Delta, path = "$"): Change[] {
               : /^[A-Za-z_$][\w$]*$/.test(key.slice(1))
                 ? `.${key.slice(1)}`
                 : `[${JSON.stringify(key.slice(1))}]`),
+          [...segments, array ? Number(key.replace(/^_/, "")) : key.slice(1)],
         ),
   );
 }

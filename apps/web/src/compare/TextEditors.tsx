@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import { EditorState, ChangeSet, Text } from "@codemirror/state";
+import { EditorState, ChangeSet, Text, Compartment } from "@codemirror/state";
 import {
   EditorView,
   keymap,
   lineNumbers,
   highlightWhitespace,
   highlightSpecialChars,
+  placeholder,
 } from "@codemirror/view";
 import {
   history,
@@ -42,7 +43,7 @@ export function TextEditors({
   whitespace: boolean;
   readOnly?: boolean;
   context: number;
-  onStatus: (count: number, approx: boolean) => void;
+  onStatus: (count: number, approx: boolean, active?: number) => void;
   nav: { current: ((next: boolean) => void) | null };
 }) {
   const host = useRef<HTMLDivElement>(null);
@@ -51,27 +52,61 @@ export function TextEditors({
   values.current = [a, b];
   const editors = useRef<EditorView[]>([]);
   const histories = useRef<(EditorState | undefined)[]>([]);
+  const appearance = useRef(new Compartment());
+  const cache = useRef<{
+    a: string;
+    b: string;
+    chunks: readonly Chunk[];
+  } | null>(null);
+  const reportStatus = useRef<(() => void) | null>(null);
   const callback = useRef(onChange);
   callback.current = onChange;
   useEffect(() => {
-    const status = () => {
-      const editor = editors.current.at(-1);
+    const status = (focused?: EditorView) => {
+      const editor = focused || editors.current.at(-1);
       if (!editor) return;
-      const chunks =
-        getChunks(editor.state)?.chunks ||
-        Chunk.build(
-          Text.of(values.current[0].split("\n")),
-          Text.of(values.current[1].split("\n")),
-          { scanLimit: 500, timeout: 50 },
-        );
+      const merge = getChunks(editor.state);
+      let chunks = merge?.chunks;
+      if (!chunks) {
+        if (
+          cache.current?.a !== values.current[0] ||
+          cache.current?.b !== values.current[1]
+        )
+          cache.current = {
+            a: values.current[0],
+            b: values.current[1],
+            chunks: Chunk.build(
+              Text.of(values.current[0].split("\n")),
+              Text.of(values.current[1].split("\n")),
+              { scanLimit: 500, timeout: 50 },
+            ),
+          };
+        chunks = cache.current!.chunks;
+      }
+      const side = merge?.side || (mode === "original" ? "a" : "b");
+      const head = editor.state.selection.main.head;
+      const active = chunks.findIndex(
+        (chunk) =>
+          head >= (side === "a" ? chunk.fromA : chunk.fromB) &&
+          head <= (side === "a" ? chunk.toA : chunk.toB),
+      );
       onStatus(
         chunks.length,
-        chunks.some((c) => !c.precise),
+        chunks.some((chunk) => !chunk.precise),
+        active + 1,
       );
     };
+    reportStatus.current = () => status();
     const extensions = (side: 0 | 1) => [
       EditorState.lineSeparator.of("\n"),
       highlightSpecialChars(),
+      placeholder(side ? "Paste updated text…" : "Paste original text…"),
+      appearance.current.of(
+        EditorView.theme(
+          {},
+          { dark: document.documentElement.dataset.appearance === "dark" },
+        ),
+      ),
       EditorState.readOnly.of(readOnly),
       EditorView.editable.of(!readOnly),
       lineNumbers(),
@@ -84,7 +119,12 @@ export function TextEditors({
             ),
           ]
         : []),
-      keymap.of([...defaultKeymap, ...historyKeymap]),
+      keymap.of([
+        { key: "F7", run: goToNextChunk },
+        { key: "Shift-F7", run: goToPreviousChunk },
+        ...defaultKeymap,
+        ...historyKeymap,
+      ]),
       EditorView.lineWrapping,
       EditorView.contentAttributes.of({
         "aria-label": side ? "Updated" : "Original",
@@ -97,9 +137,13 @@ export function TextEditors({
         }
         if (
           update.docChanged ||
+          update.selectionSet ||
+          update.focusChanged ||
           update.transactions.some((transaction) => transaction.effects.length)
         )
-          queueMicrotask(status);
+          queueMicrotask(() => {
+            if (editors.current.includes(update.view)) status(update.view);
+          });
       }),
     ];
     const config = {
@@ -142,7 +186,25 @@ export function TextEditors({
       view.focus();
     };
     status();
+    const observer = new MutationObserver(() => {
+      editors.current.forEach((view) =>
+        view.dispatch({
+          effects: appearance.current.reconfigure(
+            EditorView.theme(
+              {},
+              { dark: document.documentElement.dataset.appearance === "dark" },
+            ),
+          ),
+        }),
+      );
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-appearance"],
+    });
     return () => {
+      observer.disconnect();
+      reportStatus.current = null;
       nav.current = null;
       if (!readOnly)
         editors.current.forEach((editor, index) => {
@@ -180,6 +242,7 @@ export function TextEditors({
         });
     });
     syncing.current = false;
+    reportStatus.current?.();
   }, [a, b, mode]);
   return <div ref={host} className="compare-editors" />;
 }

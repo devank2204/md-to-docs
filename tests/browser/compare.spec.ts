@@ -1,3 +1,16 @@
+async function reviewJSON(page: import("@playwright/test").Page) {
+  await page
+    .getByRole("button", { name: /^Review (changes|comparison)$/ })
+    .click();
+}
+async function inputsJSON(
+  page: import("@playwright/test").Page,
+  side = "Original",
+) {
+  const tab = page.getByRole("tab", { name: "Inputs", exact: true });
+  if (await tab.count()) await tab.click();
+  else await page.getByRole("tab", { name: side, exact: true }).click();
+}
 import { test, expect } from "@playwright/test";
 for (const width of [320, 390, 1440])
   test(`comparison tools at ${width}`, async ({ page }) => {
@@ -9,7 +22,7 @@ for (const width of [320, 390, 1440])
     await page.getByRole("button", { name: "Try example" }).click();
     await expect(page.locator(".cm-editor").first()).toBeVisible();
     await expect(page.getByRole("status").first()).toContainText(
-      "1 differences",
+      "1 difference",
     );
     expect(
       await page.evaluate(
@@ -20,7 +33,7 @@ for (const width of [320, 390, 1440])
       path: `docs/qa/compare-text-${width}.png`,
       fullPage: true,
     });
-    if (width < 768)
+    if (width < 1024)
       await page.getByRole("button", { name: "Tools", exact: true }).click();
     await page
       .getByRole("link", { name: "JSON Compare", exact: true })
@@ -28,17 +41,20 @@ for (const width of [320, 390, 1440])
       .click();
     await page.getByRole("button", { name: "Try example" }).click();
     await expect(page.getByRole("status").first()).toHaveText("1 change");
+    await reviewJSON(page);
     await expect(page.locator(".json-change")).toContainText("$.user.role");
     await page.screenshot({
       path: `docs/qa/compare-json-${width}.png`,
       fullPage: true,
     });
+    await inputsJSON(page);
     await page
       .getByRole("textbox", { name: "Original", exact: true })
       .fill("{");
     await expect(page.getByRole("alert")).toContainText("Original");
   });
 test("JSON order, primitive roots and safe values", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/json-compare/");
   const a = page.getByRole("textbox", { name: "Original", exact: true }),
     b = page.getByRole("textbox", { name: "Updated", exact: true });
@@ -53,12 +69,18 @@ test("JSON order, primitive roots and safe values", async ({ page }) => {
     await expect(page.getByRole("status").first()).toHaveText(
       `${count} ${count === 1 ? "change" : "changes"}`,
     );
+    await reviewJSON(page);
+    await expect(page.locator(".json-change")).toHaveCount(count);
+    expect(await page.locator(".json-change script").count()).toBe(0);
+    await inputsJSON(page);
   }
   expect(await page.locator(".json-change script").count()).toBe(0);
 });
 test("editing, swap, clear, undo and file import stay local", async ({
   page,
+  context,
 }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/text-compare/");
   await page
@@ -73,9 +95,12 @@ test("editing, swap, clear, undo and file import stay local", async ({
   ).toContainText("private updated");
   await page.getByText("More", { exact: true }).click();
   await page.getByRole("button", { name: "Clear both" }).click();
-  await expect(page.locator('.cm-content[aria-label="Original"]')).toHaveText(
-    "",
-  );
+  await page
+    .getByRole("button", { name: "Copy Original", exact: true })
+    .click();
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toBe("");
   await page.locator('.cm-content[aria-label="Original"]').focus();
   await page.keyboard.press("Control+z");
   await expect(
@@ -108,8 +133,9 @@ test("JSON handoff preserves inputs, key safety and history", async ({
   await page.getByRole("button", { name: "Compare as JSON" }).click();
   await expect(
     page.getByRole("textbox", { name: "Original", exact: true }),
-  ).toHaveValue(left);
+  ).toHaveText(left);
   await expect(page.getByRole("status").first()).toHaveText("1 change");
+  await reviewJSON(page);
   await expect(page.locator(".json-change")).toContainText("$.__proto__");
   await page.goBack();
   await expect(
@@ -118,7 +144,7 @@ test("JSON handoff preserves inputs, key safety and history", async ({
   await page.goForward();
   await expect(
     page.getByRole("textbox", { name: "Updated", exact: true }),
-  ).toHaveValue(right);
+  ).toHaveText(right);
 });
 test("comparison engines stay deferred on homepage", async ({ page }) => {
   const requests: string[] = [];
@@ -142,10 +168,8 @@ test("ignore projection is read-only and preserves originals", async ({
   await page.getByLabel("Ignore case", { exact: true }).check();
   await page.getByLabel("Ignore whitespace", { exact: true }).check();
   await expect(page.getByRole("status").first()).toHaveText("0 differences");
-  await expect(page.locator(".cm-content")).toHaveAttribute(
-    "contenteditable",
-    "false",
-  );
+  for (const editor of await page.locator(".cm-content").all())
+    await expect(editor).toHaveAttribute("contenteditable", "false");
   await page.getByLabel("Ignore case", { exact: true }).uncheck();
   await page.getByLabel("Ignore whitespace", { exact: true }).uncheck();
   await expect(page.locator('.cm-content[aria-label="Original"]')).toHaveText(
@@ -174,13 +198,13 @@ test("CRLF import keeps original bytes and copies a standard patch", async ({
       exact: false,
     }),
   ).toBeVisible();
-  await page.getByText("More", { exact: true }).click();
   await page
     .getByRole("button", { name: "Copy Original", exact: true })
     .click();
   await expect
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
     .toBe("old\r\n");
+  await page.getByText("More", { exact: true }).click();
   await page.getByRole("button", { name: "Copy unified diff" }).click();
   await expect
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
@@ -204,9 +228,7 @@ test("line-ending-only changes stay exact in both merge views", async ({
     mimeType: "text/plain",
     buffer: Buffer.from("same\n"),
   });
-  await expect(page.getByRole("status").first()).toHaveText("1 differences");
-  await page
-    .getByLabel("Comparison view", { exact: true })
-    .selectOption("unified");
-  await expect(page.getByRole("status").first()).toHaveText("1 differences");
+  await expect(page.getByRole("status").first()).toHaveText("1 difference");
+  await page.getByRole("tab", { name: "Unified", exact: true }).click();
+  await expect(page.getByRole("status").first()).toHaveText("1 difference");
 });
