@@ -1,3 +1,4 @@
+import { containedEditorScroll } from "./containedScroll";
 import { compareSearch, findInEditor, type SearchHandle } from "./editorSearch";
 import { useEffect, useRef } from "react";
 import {
@@ -46,6 +47,8 @@ export function TextEditors({
   find,
   changesOnly,
   onReady,
+  reveal,
+  placeholders,
 }: {
   a: string;
   b: string;
@@ -53,12 +56,14 @@ export function TextEditors({
   mode: string;
   whitespace: boolean;
   readOnly?: boolean;
+  placeholders?: [string, string];
   context: number;
   onStatus: (count: number, approx: boolean, active?: number) => void;
   nav: { current: ((next: boolean) => void) | null };
   find: SearchHandle;
   changesOnly: boolean;
   onReady: () => void;
+  reveal?: { current: ((ranges: ({ from: number; to: number } | undefined)[]) => void) | null };
 }) {
   const host = useRef<HTMLDivElement>(null);
   const syncing = useRef(false);
@@ -114,7 +119,7 @@ export function TextEditors({
     const extensions = (side: 0 | 1) => [
       EditorState.lineSeparator.of("\n"),
       highlightSpecialChars(),
-      placeholder(side ? "Paste updated text…" : "Paste original text…"),
+      placeholder(placeholders?.[side] ?? (side ? "Paste updated text…" : "Paste original text…")),
       appearance.current.of(
         EditorView.theme(
           {},
@@ -130,6 +135,7 @@ export function TextEditors({
       lineNumbers(),
       history(),
       compareSearch,
+      reveal ? containedEditorScroll : [],
       // Merge's collapsed-range state does not automatically reveal search
       // selections. Use its public effect to reveal the containing block.
       EditorState.transactionExtender.of((transaction) => {
@@ -226,6 +232,17 @@ export function TextEditors({
       const view = mode === "side" ? editors.current[side] : editors.current[0];
       if (view) findInEditor(view);
     };
+    if (reveal) reveal.current = (ranges) => {
+      editors.current.forEach((view, index) => {
+        const side = mode === "side" ? index : mode === "original" ? 0 : 1;
+        const range = ranges[side];
+        if (!range || range.to > view.state.doc.length) return;
+        view.dispatch({
+          selection: { anchor: range.from, head: range.to },
+          effects: EditorView.scrollIntoView(range.from, { y: "center" }),
+        });
+      });
+    };
     onReady();
     nav.current = (next) => {
       const view = editors.current.at(-1)!;
@@ -258,6 +275,7 @@ export function TextEditors({
       reportStatus.current = null;
       nav.current = null;
       find.current = null;
+      if (reveal) reveal.current = null;
       if (!readOnly)
         editors.current.forEach((editor, index) => {
           const side = mode === "side" ? index : mode === "original" ? 0 : 1;

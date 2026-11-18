@@ -3,3 +3,5 @@ packages:
   - 'packages/*'
 allowBuilds:
   esbuild: true
+  tree-sitter: false
+  tree-sitter-bash: false

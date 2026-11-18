@@ -123,3 +123,22 @@ variables, read referenced files or contact the API. Authentication differences
 should remain detectable while summaries/reports offer secret masking. Keep
 request comparison distinct from comparing pasted HTTP responses; neither should
 pretend it has tested a live endpoint. This contract is proposed, not implemented.
+
+
+## cURL phase implemented · 2026-11-18
+
+The next authorized task adds `/curl-compare/`: two original commands plus an
+in-workspace decoded JSON body view, explicit view-only formatting, request
+sections, original copies and partial-result explanations. Published curlconverter
+4.12.0 and its compatible web-tree-sitter 0.24.7 browser path passed the parser
+spike; the shipped runtime differs from current upstream main's manifest. Reuse
+is limited to parser/request modules, shared CodeMirror/jsondiffpatch/jsdiff
+integration and MIT fixtures. No commands, endpoint requests, referenced files
+or environment expansions are executed. The original proposed contract above is
+realized within the documented single-Bash-command/HTTP(S) scope; unsupported
+options remain visibly partial. See [actual checks and limits](../qa/curl-compare.md).
+
+Priorities 1–4 are now implemented in this branch. The next recommendation is
+explicit, user-chosen array identity with completeness/uniqueness validation,
+followed by pasted HTTP response comparison and previewed review reports. Those
+features remain unimplemented; no array IDs are currently guessed.

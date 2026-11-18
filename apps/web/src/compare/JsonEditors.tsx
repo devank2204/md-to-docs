@@ -1,3 +1,4 @@
+import { containedEditorScroll } from "./containedScroll";
 import { compareSearch, findInEditor, type SearchHandle } from "./editorSearch";
 import { jsonContextFolding, outsideJSONContextRanges } from "./jsonFolding";
 import { foldEffect, unfoldAll } from "@codemirror/language";
@@ -44,6 +45,9 @@ export default function JsonEditors({
   find,
   changesOnly,
   onReady,
+  readOnly = false,
+  containScroll = false,
+  focusMode = false,
 }: {
   a: string;
   b: string;
@@ -58,6 +62,9 @@ export default function JsonEditors({
   find: SearchHandle;
   changesOnly: boolean;
   onReady: () => void;
+  readOnly?: boolean;
+  containScroll?: boolean;
+  focusMode?: boolean;
 }) {
   const hosts = useRef<(HTMLDivElement | null)[]>([]),
     views = useRef<EditorView[]>([]),
@@ -111,6 +118,8 @@ export default function JsonEditors({
                 side ? "Paste updated JSON here…" : "Paste original JSON here…",
               ),
               highlightSpecialChars(),
+              EditorState.readOnly.of(readOnly),
+              containScroll ? containedEditorScroll : [],
               history(),
               compareSearch,
               jsonContextFolding,
@@ -120,6 +129,7 @@ export default function JsonEditors({
               EditorView.lineWrapping,
               EditorView.contentAttributes.of({
                 "aria-label": side ? "Updated" : "Original",
+                "aria-readonly": String(readOnly),
               }),
               EditorView.updateListener.of((update) => {
                 if (update.docChanged && !syncing.current)
@@ -181,7 +191,7 @@ export default function JsonEditors({
         }),
       }),
     );
-  }, [changes]);
+  }, [changes, a, b]);
   useEffect(() => {
     views.current.forEach((view, side) =>
       view.dispatch({
@@ -270,7 +280,7 @@ export default function JsonEditors({
       canceled = true;
       frames.forEach(cancelAnimationFrame);
     };
-  }, [selected, active, mobile, changes]);
+  }, [selected, active, mobile, changes, focusMode, containScroll, a, b]);
   useEffect(() => {
     views.current.forEach((view, side) => {
       unfoldAll(view);

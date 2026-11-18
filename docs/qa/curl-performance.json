@@ -1,0 +1,15 @@
+{
+  "scenario": "Warm 700-field literal JSON body; one change; desktop Chromium 1366x900; includes imports, debounce and UI rendering.",
+  "source_characters_per_side": [
+    27815,
+    27796
+  ],
+  "wall_ms": 655,
+  "long_tasks_ms": [
+    89,
+    75,
+    93
+  ],
+  "longest_observed_task_ms": 93,
+  "notes": "One local browser sample, not a benchmark or a production/device claim. No payload values recorded."
+}

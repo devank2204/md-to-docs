@@ -8,6 +8,15 @@ import { gzipSync } from 'node:zlib'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), {
+    name: 'curl-browser-parser',
+    enforce: 'pre',
+    resolveId(source, importer) {
+      // curlconverter's published browser entry hardcodes root WASM URLs.
+      // Use the same runtime with Vite-managed, hashed assets instead.
+      if (source === './Parser.js' && importer?.includes('/curlconverter/dist/src/shell/'))
+        return path.resolve(__dirname, 'src/compare/curl/browserParser.ts');
+    },
+  }, {
     name: 'existing-symbol-font-subset',
     enforce: 'pre',
     transform(code, id) {

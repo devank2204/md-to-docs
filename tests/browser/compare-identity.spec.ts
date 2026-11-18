@@ -26,9 +26,9 @@ for (const width of [390, 1440])
     await page.goto("/");
     await expect(page.locator("h1")).toBeVisible();
     const incumbent = await typography();
-    for (const route of ["/text-compare/", "/json-compare/"]) {
+    for (const route of ["/text-compare/", "/json-compare/", "/curl-compare/"]) {
       await page.goto(route);
-      await expect(page.locator(".compare-toolbar")).toBeVisible();
+      await expect(page.locator(".compare-toolbar").first()).toBeVisible();
       expect(await typography()).toEqual(incumbent);
       const control = await page
         .getByRole("button", { name: "Try example" })
@@ -40,7 +40,7 @@ for (const width of [390, 1440])
       expect(control.shared).toBe(true);
       expect(control.font).toContain("JetBrains Mono");
       expect(control.size).toBe("11px");
-      if (route === "/text-compare/") {
+      if (route !== "/json-compare/") {
         await expect(page.locator(".cm-scroller").first()).toBeVisible();
         const source = await page
           .locator(".cm-scroller")

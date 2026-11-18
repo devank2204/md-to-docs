@@ -25,10 +25,11 @@ const generateSSRHtml = (spec: RouteSEO, mobile = false) =>
           createElement(
             "p",
             null,
-            "Compare AI-generated drafts, Markdown revisions and JSON in technical specifications. Processing stays local in your browser; inputs are never saved.",
+            "Compare AI-generated drafts, Markdown revisions, JSON payloads and pasted API requests in technical specifications. Processing stays local in your browser; inputs are never saved.",
           ),
           createElement("a", { href: "/text-compare/" }, "Text Compare"),
           createElement("a", { href: "/json-compare/" }, "JSON Compare"),
+          createElement("a", { href: "/curl-compare/" }, "cURL Compare"),
         ),
       )
     : renderLanding(spec as RouteLandingSpec, mobile);

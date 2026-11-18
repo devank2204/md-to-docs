@@ -1,0 +1,59 @@
+{
+  "method": "Initial homepage static JS import graph; sum of per-file gzip level 9. Excludes CSS, fonts and deferred imports. No network performance claim.",
+  "baseline_commit": "6936c20",
+  "baseline_initial_static_js_gzip_bytes": 108076,
+  "current_initial_static_js_gzip_bytes": 116556,
+  "increase_gzip_bytes": 8480,
+  "initial_files": [
+    "assets/AppAppearance-BAuMEeQl.js",
+    "assets/BrandWordmark-BDPDWzr8.js",
+    "assets/Controls-BD2SGQG7.js",
+    "assets/FeatureBoundary-CvCY_0Qz.js",
+    "assets/HomeIntroduction-Crc_NMv1.js",
+    "assets/LandingPageContent-DCzXeU_Y.js",
+    "assets/LoadingSkeleton-5X-tLrYz.js",
+    "assets/MobileWorkspace-BGpbT19S.js",
+    "assets/WorkspaceSheet-D6PesaRX.js",
+    "assets/createLucideIcon-De772Qga.js",
+    "assets/default-DbVYJflA.js",
+    "assets/diagramReviewRequest-APoiGw2a.js",
+    "assets/exportHelpers-CZZgNWKe.js",
+    "assets/index-C9yAMA6D.js",
+    "assets/jsx-runtime-DREnUpxT.js",
+    "assets/platform-Dw3j2DBv.js",
+    "assets/preload-helper-BZ1Pz5am.js",
+    "assets/react-CQOZoUwg.js",
+    "assets/react-dom-pEVw9mjF.js",
+    "assets/rolldown-runtime-Dd_uD5pT.js",
+    "assets/src-B_dhZfxP.js",
+    "assets/store-DkL_fMT2.js",
+    "assets/templates-CT0kzc7K.js",
+    "assets/useAppAppearance-CkK1uI_E.js",
+    "assets/useMobileLayout-BVoNAL_0.js"
+  ],
+  "initial_engine_markers_found": [],
+  "deferred_curl_chunks_excluding_shared_imports": [
+    {
+      "file": "assets/CurlCompareApp-BSebaPOX.js",
+      "bytes": 16115,
+      "gzip_bytes": 5875
+    },
+    {
+      "file": "assets/review-g8xUeNq7.js",
+      "bytes": 159421,
+      "gzip_bytes": 40165
+    }
+  ],
+  "deferred_parser_wasm": [
+    {
+      "file": "assets/tree-sitter-CZNa0Ox6.wasm",
+      "bytes": 190779,
+      "gzip_bytes": 76446
+    },
+    {
+      "file": "assets/tree-sitter-bash-fgn8fAsY.wasm",
+      "bytes": 1364304,
+      "gzip_bytes": 177090
+    }
+  ]
+}

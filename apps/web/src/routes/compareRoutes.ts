@@ -1,4 +1,12 @@
 export const COMPARE_ROUTES = {
+  "/curl-compare": {
+    path: "/curl-compare",
+    h1: "cURL Compare",
+    title: "cURL Compare — API Requests & JSON Bodies | MDToDocs",
+    description: "Compare pasted cURL requests locally: methods, URLs, query parameters, headers, credentials and JSON bodies. No requests are executed.",
+    lead: "Paste two cURL commands. Review request fields and JSON body changes together, without sending either request.",
+    canonical: "https://mdtodocs.com/curl-compare/",
+  },
   "/text-compare": {
     path: "/text-compare",
     h1: "Text Compare",

@@ -50,9 +50,10 @@ test('all landing descriptions and links remain readable without JavaScript', as
   await page.goto(spec.path === '/' ? '/' : spec.path + '/');
   await expect(page.locator('h1')).toHaveText(spec.h1);
   await expect(page.getByRole('heading', {name:'How to convert'})).toBeVisible();
-  await expect(page.locator('footer nav').getByRole('link')).toHaveCount(9);
+  await expect(page.locator('footer nav').getByRole('link')).toHaveCount(10);
   await expect(page.locator('footer').getByRole('link',{name:'Text Compare',exact:true})).toHaveAttribute('href','/text-compare/');
   await expect(page.locator('footer').getByRole('link',{name:'JSON Compare',exact:true})).toHaveAttribute('href','/json-compare/');
+  await expect(page.locator('footer').getByRole('link',{name:'cURL Compare',exact:true})).toHaveAttribute('href','/curl-compare/');
  }
  await context.close();
 });

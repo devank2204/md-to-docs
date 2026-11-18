@@ -296,6 +296,7 @@ function DocumentApp() {
 
 
 const CompareApp = lazy(() => import("./compare/CompareApp"));
+const CurlCompareApp = lazy(() => import("./compare/curl/CurlCompareApp"));
 function App() {
   const [path, setPath] = useState(
     () => window.location.pathname.replace(/\/$/, "") || "/",
@@ -308,7 +309,7 @@ function App() {
       const anchor = (event.target as Element).closest?.("a");
       if (
         anchor &&
-        ["/text-compare/", "/json-compare/"].includes(
+        ["/text-compare/", "/json-compare/", "/curl-compare/"].includes(
           anchor.getAttribute("href") || "",
         ) &&
         !event.ctrlKey &&
@@ -366,9 +367,10 @@ function App() {
     const schema = document.querySelector('script[type="application/ld+json"]');
     if (schema) schema.textContent = JSON.stringify(structuredData(spec));
   }, [spec]);
+  const ToolApp = path === "/curl-compare" ? CurlCompareApp : CompareApp;
   return spec ? (
     <FeatureBoundary>
-      <CompareApp
+      <ToolApp
         key={path}
         path={path}
         navigate={(next) => {

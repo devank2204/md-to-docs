@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Clipboard, Ellipsis, FileDown, FileText, Image, Plus, SquarePen, Workflow } from 'lucide-react';
+import { Clipboard, Ellipsis, FileDown, FileText, Image, Plus, SquarePen, Terminal, Workflow } from 'lucide-react';
 import { Menu } from './Controls';
 import { useStore } from '../store';
 import type { LandingRoutePath } from '@/routes/landingData';
@@ -79,7 +79,7 @@ export function WorkspaceSidebar({ onNavigateRoute }: { onNavigateRoute: (path: 
         <div className="workspace-sidebar-divider" />
         <section aria-labelledby="sidebar-tools-heading">
           <h2 id="sidebar-tools-heading" className="workspace-sidebar-heading">Tools</h2>
-          <nav className="workspace-sidebar-tools" aria-label="Compare tools"><h3>Compare</h3><a href="/text-compare/"><SquarePen aria-hidden="true"/><span>Text Compare</span></a><a href="/json-compare/"><FileText aria-hidden="true"/><span>JSON Compare</span></a></nav>
+          <nav className="workspace-sidebar-tools" aria-label="Compare tools"><h3>Compare</h3><a href="/text-compare/"><SquarePen aria-hidden="true"/><span>Text Compare</span></a><a href="/json-compare/"><FileText aria-hidden="true"/><span>JSON Compare</span></a><a href="/curl-compare/"><Terminal aria-hidden="true"/><span>cURL Compare</span></a></nav>
           <nav className="workspace-sidebar-tools" aria-label="Document tools">
             <h3>Documents</h3>
             <a href="/markdown-to-word/" data-route="/markdown-to-word" onClick={navigate}><FileDown aria-hidden="true" /><span>Markdown to Word</span></a>

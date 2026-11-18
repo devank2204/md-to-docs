@@ -32,3 +32,16 @@ lazy comparison editors. JSON context collapsing uses the already-installed
 @codemirror/language folding APIs; Text Compare uses @codemirror/merge's existing
 collapse functionality and public reveal effect. No search or diff algorithm was
 copied/reimplemented. Exact-path/type filtering is presentation over library deltas.
+
+cURL Compare: curlconverter 4.12.0 (MIT) supplies Bash tokenization, cURL option
+parsing and request construction; its browser path uses web-tree-sitter 0.24.7
+(MIT) and the upstream bundled Bash grammar WASM (MIT, Max Brunsfeld). Notices
+are retained alongside this file. Native tree-sitter build scripts are disabled;
+they are not used or bundled in the browser. Only the parser/request modules are
+imported, not language generators or the upstream website. Eight upstream MIT
+command fixtures are retained under tests/fixtures/curlconverter.
+
+lossless-json 4.3.3 (MIT; already a curlconverter dependency) checks JSON body
+number precision. Bodies with unsafe numeric values fall back to literal text
+with an explicit partial-comparison explanation. Its notice is retained here.
+Existing jsondiffpatch, CodeMirror and jsdiff licenses continue to apply.

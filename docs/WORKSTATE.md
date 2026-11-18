@@ -402,3 +402,31 @@ and complete scope/limitations are in [QA report](qa/comparison-tools.md). Homep
 initial JS gzip increases 5 bytes over the prior revision; comparison libraries
 remain deferred. Standing user instruction authorizes the completed branch push;
 no merge or deployment is authorized.
+
+
+## cURL comparison · 2026-11-18
+
+Retried and verified the prior workspace push (`6936c20`) before starting this
+phase. Added `/curl-compare/` through standalone-tool routes and existing
+prerender/metadata/sitemap/Tools navigation. Reuses curlconverter's published
+4.12.0 parser with compatible browser WASM, existing Merge/JSON editors,
+jsondiffpatch and jsdiff. Command/request sections and read-only decoded JSON
+bodies share one workspace. Explicit view formatting preserves both original
+commands and copied payloads. Search/folds, linked body scroll, focus, adjustable
+desktop panes, mobile tabs, file import/drop and native undo are retained.
+
+One Bash command/HTTP(S) URL per side; unsupported options and unread external
+references remain partial. Lossless JSON numeric validation prevents rounded
+IDs being falsely reported equal. No execution, endpoint traffic, payload
+persistence or URL handoff. Existing fonts, palette tokens, homepage hero, saved
+documents and document export appearance remain unchanged. Shared tabs/support
+dialogs/input memory were extracted without changing their existing behavior.
+
+Build/TypeScript/eleven-route prerender and lint pass (lint retains warnings).
+55 unit tests and 107 comparison/cURL/SEO browser tests pass. Desktop/mobile
+screenshots, bundle/timing evidence and important limits are recorded in
+[QA report](qa/curl-compare.md). Existing-site supplemental checks also pass 10/10,
+covering sidebar identity, Mermaid image downloads, Word/HTML export and
+history/recovery. Homepage initial static JS adds 8,480 gzip bytes over 6936c20;
+parser engines/WASM remain deferred. Standing authorization covers the completed
+branch push, not merge/deployment. Configurable array identity and HTTP response tools remain next.

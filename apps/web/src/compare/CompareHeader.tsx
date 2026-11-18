@@ -1,4 +1,4 @@
-import { PanelLeft, ArrowRightLeft, Braces } from "lucide-react";
+import { PanelLeft, ArrowRightLeft, Braces, Terminal } from "lucide-react";
 import { BrandWordmark } from "../components/BrandWordmark";
 import { AppAppearance } from "../components/AppAppearance";
 import { IconButton, Menu } from "../components/Controls";
@@ -62,6 +62,7 @@ export function CompareHeader({
       <nav className="compare-tool-switch" aria-label="Comparison tools">
         {link("/text-compare", "Text Compare", ArrowRightLeft)}
         {link("/json-compare", "JSON Compare", Braces)}
+        {link("/curl-compare", "cURL Compare", Terminal)}
       </nav>
       <div className="compare-header-actions">
         <AppAppearance />

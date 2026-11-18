@@ -28,6 +28,11 @@ No sign-in is required. Browser storage is local to this browser/device and can
 be unavailable or full. PDF is the browser print/save flow. Google Docs uses
 formatted clipboard or a Word-file handoff; it does not create a cloud Doc.
 
+Standalone Text Compare, JSON Compare and cURL Compare tools process inputs in
+memory locally, separate from saved Markdown documents. cURL supports one literal
+Bash HTTP(S) request per side, with explicit partial results for unsupported
+options/files. It never executes commands or contacts pasted API endpoints.
+
 ## Binding user commitments
 
 - Preserve the cream identity. Preserve existing fonts and typography unless the
